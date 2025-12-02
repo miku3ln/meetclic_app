@@ -43,7 +43,7 @@ class _HomeTabDefinition {
   });
 }
 
-class HomeScreenState extends State<HomeScreen> {
+class HomeMainMenu extends State<HomeScreen> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final DeepLinkHandler _deepLinkHandler = DeepLinkHandler();
   StreamSubscription<Uri>? _linkSubscription;
