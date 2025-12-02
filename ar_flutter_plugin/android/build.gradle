@@ -1,0 +1,44 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    // Debe coincidir con el package del archivo Kotlin y la ruta de carpetas
+    namespace "io.carius.lars.ar_flutter_plugin"
+
+    compileSdkVersion 34
+
+    defaultConfig {
+        minSdkVersion 24
+        targetSdkVersion 34
+        consumerProguardFiles 'consumer-rules.pro'
+    }
+
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions { jvmTarget = '17' }
+}
+
+repositories {
+    google()
+    mavenCentral()
+}
+
+dependencies {
+    // ARCore reciente y estable
+    implementation "com.google.ar:core:1.44.0"
+
+    // Sceneform (legacy) que usa el plugin
+    implementation 'com.google.ar.sceneform:core:1.15.0'
+    implementation 'com.google.ar.sceneform:assets:1.15.0'
+    implementation 'com.google.ar.sceneform.ux:sceneform-ux:1.17.1'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+}

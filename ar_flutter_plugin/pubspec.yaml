@@ -1,0 +1,32 @@
+name: ar_flutter_plugin
+description: Flutter Plugin for creating (collaborative) Augmented Reality experiences - Supports ARKit for iOS and ARCore for Android devices.
+version: 0.7.3+custom
+homepage: https://lars.carius.io
+repository: https://github.com/CariusLars/ar_flutter_plugin
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Sube permission_handler para evitar el viejo Registrar (embedding v1)
+  permission_handler: ^11.3.1
+  # Alinea con tu app
+  geolocator: ^9.0.0
+  vector_math: ^2.1.4
+  json_annotation: ^4.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  plugin:
+    platforms:
+      android:
+        package: io.carius.lars.ar_flutter_plugin
+        pluginClass: ArFlutterPlugin
+      ios:
+        pluginClass: ArFlutterPlugin
