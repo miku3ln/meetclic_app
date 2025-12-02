@@ -10,7 +10,8 @@ import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import '../../../../shared/providers_session.dart';
 
 class UserProfileHeader extends StatelessWidget {
-  const UserProfileHeader({super.key});
+  final SessionService session;
+  const UserProfileHeader({super.key, required this.session});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,8 @@ class UserProfileHeader extends StatelessWidget {
           image: const AssetImage(
             AppImages.pageProfileAvatar,
           ), // Usa tu imagen local o NetworkImage
-          onSettingsTap: () {
+          onSettingsTap: () async {
+            await session.clearSession();
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text('Configuración disponible próximamente'),

@@ -3,15 +3,17 @@ import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/presentation/pages/profile-page/organisms/user-profile-header.dart';
 
 import '../../../presentation/widgets/template/custom_app_bar.dart';
+import '../../domain/services/session_service.dart';
 
 class ProfilePage extends StatefulWidget {
   final String title;
   final List<MenuTabUpItem> itemsStatus;
-
+  final SessionService session;
   const ProfilePage({
     super.key,
     required this.title,
     required this.itemsStatus,
+    required this.session,
   });
 
   @override
@@ -96,7 +98,7 @@ class _ProfilePageState extends State<ProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              UserProfileHeader(),
+              UserProfileHeader(session: widget.session),
               SizedBox(
                 height: screenHeight * 0.10,
               ), // Solo para permitir scroll de prueba

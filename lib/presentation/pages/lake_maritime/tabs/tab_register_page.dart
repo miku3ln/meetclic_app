@@ -19,6 +19,8 @@ class _TabRegisterPageState extends State<TabRegisterPage> {
   final MaritimeDepartureService maritimeDepartureService =
       MaritimeDepartureService();
   bool isLoading = false;
+  String responsibleName = "Cesar Iban Alba";
+
   void addCustomerRow() {
     setState(() {
       customers.add(CustomerModel.empty());
@@ -58,7 +60,7 @@ class _TabRegisterPageState extends State<TabRegisterPage> {
         userId: 1,
         userManagementId: 5,
         arrivalTime: arrivalTime,
-        responsibleName: "Alex Alba",
+        responsibleName: responsibleName,
       );
 
       final payload = maritimeDepartureService
@@ -103,7 +105,7 @@ class _TabRegisterPageState extends State<TabRegisterPage> {
                   LakeMaritimeViewHeader(
                     nombreEmbarcacion: "Embarcación Taita Imbabura",
                     fecha: "03/05/2025",
-                    nombreResponsable: "Cesar Iban Alba",
+                    nombreResponsable: responsibleName,
                     identificacion: "1002954889",
                     imageUrl:
                         "https://meetclic.com/public/uploads/business/information/logomuellecatalina.png",

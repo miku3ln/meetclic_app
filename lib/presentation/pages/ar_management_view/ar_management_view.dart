@@ -21,6 +21,7 @@ import 'services/ar_service.dart';
 import 'services/download_helper.dart';
 import 'widgets/center_reticle.dart';
 import 'widgets/info_card_ar.dart';
+import 'widgets/loading_overlay.dart';
 
 /// Estado de carga del AR
 enum ARLoadStatus { idle, loading, success, error }
@@ -451,10 +452,18 @@ class _ARManagementViewState extends State<ARManagementView> {
               child: Material(
                 elevation: 8,
                 borderRadius: BorderRadius.circular(12),
+                color: Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: DropdownButtonHideUnderline(
                     child: DropdownButton<ItemAR>(
+                      dropdownColor:
+                          Colors.white, // <- fondo del MENÚ desplegable
+                      iconEnabledColor: Colors.black87, // color del ícono ▼
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: Colors
+                            .black87, // <- color del TEXTO (seleccionado e items)
+                      ),
                       isExpanded: true,
                       value: _selected,
                       items: itemsSources.map((item) {
@@ -469,10 +478,38 @@ class _ARManagementViewState extends State<ARManagementView> {
                                   width: 42,
                                   height: 42,
                                   fit: BoxFit.cover,
-                                  errorBuilder: (_, __, ___) => const SizedBox(
-                                    width: 42,
-                                    height: 42,
-                                    child: Icon(Icons.image),
+                                  loadingBuilder:
+                                      (context, child, loadingProgress) {
+                                        if (loadingProgress == null) {
+                                          // ya terminó de cargar
+                                          return child;
+                                        }
+                                        return Container(
+                                          color: Colors.grey[200],
+                                          alignment: Alignment.center,
+                                          child: Column(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: const [
+                                              SizedBox(
+                                                width: 22,
+                                                height: 22,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 2,
+                                                    ),
+                                              ),
+                                              SizedBox(height: 6),
+                                              Text(
+                                                'Cargando…',
+                                                style: TextStyle(fontSize: 10),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                  // ===== Si hay error al cargar la imagen =====
+                                  errorBuilder: (_, __, ___) => const Center(
+                                    child: Icon(Icons.image_not_supported),
                                   ),
                                 ),
                               ),
@@ -499,33 +536,6 @@ class _ARManagementViewState extends State<ARManagementView> {
               ),
             ),
 
-            // Chip de estado (solo números durante carga)
-            Positioned(
-              right: 12,
-              top: 12 + 56,
-              child: Chip(
-                label: Text(
-                  _status == ARLoadStatus.loading
-                      ? (_progressKnown
-                            ? '${(_progress * 100).clamp(0, 100).toStringAsFixed(0)}%'
-                            : '0%') // sin Content-Length → 0%
-                      : _status == ARLoadStatus.success
-                      ? 'Listo'
-                      : _status == ARLoadStatus.error
-                      ? 'Error'
-                      : 'Listo',
-                  style: const TextStyle(color: Colors.white),
-                ),
-                backgroundColor: _status == ARLoadStatus.loading
-                    ? Colors.amber[700]
-                    : _status == ARLoadStatus.success
-                    ? Colors.green[700]
-                    : _status == ARLoadStatus.error
-                    ? Colors.red[700]
-                    : Colors.blueGrey[600],
-              ),
-            ),
-
             // Overlay de carga (solo número grande)
             if (_status == ARLoadStatus.loading)
               Positioned.fill(
@@ -534,7 +544,7 @@ class _ARManagementViewState extends State<ARManagementView> {
                   child: Container(
                     color: Colors.black54,
                     alignment: Alignment.center,
-                    child: _LoadingOverlay(
+                    child: LoadingOverlay(
                       progress: _progress, // 0..1
                       progressKnown:
                           _progressKnown, // true si hay Content-Length
@@ -587,42 +597,6 @@ class _ARManagementViewState extends State<ARManagementView> {
                 ),
               ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-// ====== Widgets internos ======
-
-class _LoadingOverlay extends StatelessWidget {
-  final double progress; // 0..1
-  final bool progressKnown; // true si hay Content-Length
-
-  const _LoadingOverlay({
-    super.key,
-    required this.progress,
-    required this.progressKnown,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    // Si no hay tamaño del servidor: 0%. Si hay, usamos progress*100.
-    final pctText = progressKnown
-        ? '${(progress * 100).clamp(0, 100).toStringAsFixed(0)}%'
-        : '0%';
-
-    return Container(
-      color: Colors.transparent,
-      alignment: Alignment.center,
-      child: Text(
-        pctText,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 56,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.2,
         ),
       ),
     );

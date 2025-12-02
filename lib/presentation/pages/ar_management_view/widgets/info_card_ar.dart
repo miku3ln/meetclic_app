@@ -34,7 +34,7 @@ class InfoCardAR extends StatelessWidget {
       borderRadius: BorderRadius.circular(16),
       child: Container(
         decoration: BoxDecoration(
-          color: theme.cardColor,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
         ),
         padding: const EdgeInsets.all(12),
@@ -45,15 +45,40 @@ class InfoCardAR extends StatelessWidget {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.network(
-                    item.sources.img,
+                  child: SizedBox(
                     width: 72,
                     height: 72,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => const SizedBox(
-                      width: 72,
-                      height: 72,
-                      child: Icon(Icons.image_not_supported),
+                    child: Image.network(
+                      item.sources.img,
+                      fit: BoxFit.cover,
+                      // ===== Mientras la imagen se está cargando =====
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) {
+                          // ya terminó de cargar
+                          return child;
+                        }
+                        return Container(
+                          color: Colors.grey[200],
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: const [
+                              SizedBox(
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                              SizedBox(height: 6),
+                              Text('Cargando…', style: TextStyle(fontSize: 10)),
+                            ],
+                          ),
+                        );
+                      },
+                      // ===== Si hay error al cargar la imagen =====
+                      errorBuilder: (_, __, ___) =>
+                          const Center(child: Icon(Icons.image_not_supported)),
                     ),
                   ),
                 ),
@@ -66,14 +91,16 @@ class InfoCardAR extends StatelessWidget {
                         item.title,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: theme.textTheme.titleMedium,
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          color: theme.colorScheme.primary,
+                        ),
                       ),
                       Text(
                         item.subtitle,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.labelLarge?.copyWith(
-                          color: Colors.blueGrey,
+                          color: theme.colorScheme.secondary,
                         ),
                       ),
                       const SizedBox(height: 6),
@@ -107,7 +134,7 @@ class InfoCardAR extends StatelessWidget {
             const SizedBox(height: 8),
             Row(
               children: [
-                const Icon(Icons.place, size: 16),
+                Icon(Icons.place, size: 16, color: theme.colorScheme.secondary),
                 const SizedBox(width: 6),
                 Flexible(
                   child: Text(
