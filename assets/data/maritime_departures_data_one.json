@@ -1,0 +1,4202 @@
+[
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 12:58:00",
+    "responsible_name": "Jazm\u00edn Viteri 1",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 04:50:00",
+    "responsible_name": "Luc\u00eda Ortega 2",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 00:05:00",
+    "responsible_name": "Manuel D\u00edaz 3",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 02:18:00",
+    "responsible_name": "Cesar Iban 4",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 20:53:00",
+    "responsible_name": "Cesar Iban 5",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 08:50:00",
+    "responsible_name": "Luc\u00eda Ortega 6",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 13:15:00",
+    "responsible_name": "Alex Alba 7",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 19:21:00",
+    "responsible_name": "Alex Alba 8",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 00:33:00",
+    "responsible_name": "Jazm\u00edn Viteri 9",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 22:59:00",
+    "responsible_name": "Jazm\u00edn Viteri 10",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-09 01:07:00",
+    "responsible_name": "Alex Alba 11",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 02:48:00",
+    "responsible_name": "Luc\u00eda Ortega 12",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 14:26:00",
+    "responsible_name": "Luc\u00eda Ortega 13",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 14:41:00",
+    "responsible_name": "Cesar Iban 14",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 15:27:00",
+    "responsible_name": "Manuel D\u00edaz 15",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 20:05:00",
+    "responsible_name": "Luc\u00eda Ortega 16",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 18:55:00",
+    "responsible_name": "Jazm\u00edn Viteri 17",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 11:43:00",
+    "responsible_name": "Cesar Iban 18",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 09:09:00",
+    "responsible_name": "Manuel D\u00edaz 19",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 02:44:00",
+    "responsible_name": "Luc\u00eda Ortega 20",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 07:15:00",
+    "responsible_name": "Luc\u00eda Ortega 21",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 11:06:00",
+    "responsible_name": "Luc\u00eda Ortega 22",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 03:00:00",
+    "responsible_name": "Alex Alba 23",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-12 01:48:00",
+    "responsible_name": "Alex Alba 24",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 21:58:00",
+    "responsible_name": "Cesar Iban 25",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 09:45:00",
+    "responsible_name": "Luc\u00eda Ortega 26",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 06:52:00",
+    "responsible_name": "Cesar Iban 27",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 23:44:00",
+    "responsible_name": "Alex Alba 28",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-09 16:57:00",
+    "responsible_name": "Cesar Iban 29",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 18:13:00",
+    "responsible_name": "Manuel D\u00edaz 30",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 14:36:00",
+    "responsible_name": "Luc\u00eda Ortega 31",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 20:44:00",
+    "responsible_name": "Luc\u00eda Ortega 32",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 17:38:00",
+    "responsible_name": "Cesar Iban 33",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 03:45:00",
+    "responsible_name": "Manuel D\u00edaz 34",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-10 23:07:00",
+    "responsible_name": "Alex Alba 35",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 07:33:00",
+    "responsible_name": "Cesar Iban 36",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 09:34:00",
+    "responsible_name": "Alex Alba 37",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 05:13:00",
+    "responsible_name": "Alex Alba 38",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 10:08:00",
+    "responsible_name": "Alex Alba 39",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 08:55:00",
+    "responsible_name": "Alex Alba 40",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 00:46:00",
+    "responsible_name": "Luc\u00eda Ortega 41",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 01:47:00",
+    "responsible_name": "Manuel D\u00edaz 42",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 07:18:00",
+    "responsible_name": "Alex Alba 43",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 10:22:00",
+    "responsible_name": "Manuel D\u00edaz 44",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 22:47:00",
+    "responsible_name": "Luc\u00eda Ortega 45",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 07:31:00",
+    "responsible_name": "Cesar Iban 46",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 12:57:00",
+    "responsible_name": "Manuel D\u00edaz 47",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 14:39:00",
+    "responsible_name": "Jazm\u00edn Viteri 48",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 07:51:00",
+    "responsible_name": "Manuel D\u00edaz 49",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 14:20:00",
+    "responsible_name": "Luc\u00eda Ortega 50",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 16:53:00",
+    "responsible_name": "Manuel D\u00edaz 51",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-10 11:30:00",
+    "responsible_name": "Jazm\u00edn Viteri 52",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 17:37:00",
+    "responsible_name": "Manuel D\u00edaz 53",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 03:23:00",
+    "responsible_name": "Manuel D\u00edaz 54",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 13:01:00",
+    "responsible_name": "Alex Alba 55",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-21 03:51:00",
+    "responsible_name": "Cesar Iban 56",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 07:19:00",
+    "responsible_name": "Jazm\u00edn Viteri 57",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 16:23:00",
+    "responsible_name": "Alex Alba 58",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 11:18:00",
+    "responsible_name": "Luc\u00eda Ortega 59",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-09 19:31:00",
+    "responsible_name": "Cesar Iban 60",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 09:01:00",
+    "responsible_name": "Alex Alba 61",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-12 10:59:00",
+    "responsible_name": "Alex Alba 62",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 18:46:00",
+    "responsible_name": "Alex Alba 63",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 22:17:00",
+    "responsible_name": "Jazm\u00edn Viteri 64",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 16:03:00",
+    "responsible_name": "Jazm\u00edn Viteri 65",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 02:31:00",
+    "responsible_name": "Cesar Iban 66",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 10:00:00",
+    "responsible_name": "Jazm\u00edn Viteri 67",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 20:24:00",
+    "responsible_name": "Manuel D\u00edaz 68",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 05:52:00",
+    "responsible_name": "Jazm\u00edn Viteri 69",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 18:42:00",
+    "responsible_name": "Jazm\u00edn Viteri 70",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 17:28:00",
+    "responsible_name": "Alex Alba 71",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-10 09:02:00",
+    "responsible_name": "Luc\u00eda Ortega 72",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 04:22:00",
+    "responsible_name": "Alex Alba 73",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 20:00:00",
+    "responsible_name": "Luc\u00eda Ortega 74",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 14:40:00",
+    "responsible_name": "Luc\u00eda Ortega 75",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 12:08:00",
+    "responsible_name": "Manuel D\u00edaz 76",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 11:15:00",
+    "responsible_name": "Cesar Iban 77",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 00:43:00",
+    "responsible_name": "Alex Alba 78",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 13:16:00",
+    "responsible_name": "Manuel D\u00edaz 79",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 04:22:00",
+    "responsible_name": "Jazm\u00edn Viteri 80",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 02:24:00",
+    "responsible_name": "Luc\u00eda Ortega 81",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-10 13:36:00",
+    "responsible_name": "Cesar Iban 82",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 03:20:00",
+    "responsible_name": "Alex Alba 83",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 12:05:00",
+    "responsible_name": "Luc\u00eda Ortega 84",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 07:54:00",
+    "responsible_name": "Alex Alba 85",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 12:27:00",
+    "responsible_name": "Jazm\u00edn Viteri 86",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 23:10:00",
+    "responsible_name": "Jazm\u00edn Viteri 87",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 02:00:00",
+    "responsible_name": "Luc\u00eda Ortega 88",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 16:21:00",
+    "responsible_name": "Cesar Iban 89",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 22:33:00",
+    "responsible_name": "Jazm\u00edn Viteri 90",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 16:57:00",
+    "responsible_name": "Cesar Iban 91",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 22:29:00",
+    "responsible_name": "Alex Alba 92",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 18:57:00",
+    "responsible_name": "Manuel D\u00edaz 93",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 13:32:00",
+    "responsible_name": "Cesar Iban 94",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-12 16:06:00",
+    "responsible_name": "Luc\u00eda Ortega 95",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 14:08:00",
+    "responsible_name": "Cesar Iban 96",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-10 15:02:00",
+    "responsible_name": "Cesar Iban 97",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 03:31:00",
+    "responsible_name": "Manuel D\u00edaz 98",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 13:32:00",
+    "responsible_name": "Luc\u00eda Ortega 99",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 10:18:00",
+    "responsible_name": "Cesar Iban 100",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 12:30:00",
+    "responsible_name": "Manuel D\u00edaz 101",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 14:05:00",
+    "responsible_name": "Cesar Iban 102",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-09 02:27:00",
+    "responsible_name": "Manuel D\u00edaz 103",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 13:29:00",
+    "responsible_name": "Cesar Iban 104",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 12:07:00",
+    "responsible_name": "Jazm\u00edn Viteri 105",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 05:57:00",
+    "responsible_name": "Luc\u00eda Ortega 106",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 20:59:00",
+    "responsible_name": "Jazm\u00edn Viteri 107",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 00:15:00",
+    "responsible_name": "Alex Alba 108",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 17:49:00",
+    "responsible_name": "Alex Alba 109",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 22:29:00",
+    "responsible_name": "Cesar Iban 110",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 01:30:00",
+    "responsible_name": "Luc\u00eda Ortega 111",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 14:43:00",
+    "responsible_name": "Luc\u00eda Ortega 112",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 22:51:00",
+    "responsible_name": "Cesar Iban 113",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 20:58:00",
+    "responsible_name": "Cesar Iban 114",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 14:26:00",
+    "responsible_name": "Manuel D\u00edaz 115",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 16:48:00",
+    "responsible_name": "Luc\u00eda Ortega 116",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 15:53:00",
+    "responsible_name": "Manuel D\u00edaz 117",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 23:11:00",
+    "responsible_name": "Luc\u00eda Ortega 118",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 23:54:00",
+    "responsible_name": "Alex Alba 119",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 06:09:00",
+    "responsible_name": "Cesar Iban 120",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 15:55:00",
+    "responsible_name": "Manuel D\u00edaz 121",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 11:12:00",
+    "responsible_name": "Alex Alba 122",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-09 23:21:00",
+    "responsible_name": "Luc\u00eda Ortega 123",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 22:06:00",
+    "responsible_name": "Luc\u00eda Ortega 124",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 00:29:00",
+    "responsible_name": "Manuel D\u00edaz 125",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 16:27:00",
+    "responsible_name": "Jazm\u00edn Viteri 126",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 23:18:00",
+    "responsible_name": "Alex Alba 127",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 10:53:00",
+    "responsible_name": "Cesar Iban 128",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 20:13:00",
+    "responsible_name": "Luc\u00eda Ortega 129",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-12 13:35:00",
+    "responsible_name": "Luc\u00eda Ortega 130",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 20:45:00",
+    "responsible_name": "Jazm\u00edn Viteri 131",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-12 19:13:00",
+    "responsible_name": "Cesar Iban 132",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 17:02:00",
+    "responsible_name": "Luc\u00eda Ortega 133",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 00:25:00",
+    "responsible_name": "Alex Alba 134",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 14:13:00",
+    "responsible_name": "Alex Alba 135",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 16:55:00",
+    "responsible_name": "Manuel D\u00edaz 136",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 02:57:00",
+    "responsible_name": "Cesar Iban 137",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 19:50:00",
+    "responsible_name": "Alex Alba 138",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 02:44:00",
+    "responsible_name": "Manuel D\u00edaz 139",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-10 07:14:00",
+    "responsible_name": "Alex Alba 140",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 22:07:00",
+    "responsible_name": "Cesar Iban 141",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 08:18:00",
+    "responsible_name": "Jazm\u00edn Viteri 142",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 13:01:00",
+    "responsible_name": "Jazm\u00edn Viteri 143",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 09:38:00",
+    "responsible_name": "Manuel D\u00edaz 144",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 13:40:00",
+    "responsible_name": "Alex Alba 145",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 09:30:00",
+    "responsible_name": "Cesar Iban 146",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-20 05:49:00",
+    "responsible_name": "Manuel D\u00edaz 147",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 12:31:00",
+    "responsible_name": "Jazm\u00edn Viteri 148",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 19:12:00",
+    "responsible_name": "Alex Alba 149",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 21:35:00",
+    "responsible_name": "Jazm\u00edn Viteri 150",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 23:47:00",
+    "responsible_name": "Alex Alba 151",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 11:54:00",
+    "responsible_name": "Manuel D\u00edaz 152",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 07:27:00",
+    "responsible_name": "Cesar Iban 153",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 03:16:00",
+    "responsible_name": "Luc\u00eda Ortega 154",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 14:43:00",
+    "responsible_name": "Cesar Iban 155",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 15:47:00",
+    "responsible_name": "Alex Alba 156",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 12:58:00",
+    "responsible_name": "Cesar Iban 157",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 22:40:00",
+    "responsible_name": "Cesar Iban 158",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-10 21:27:00",
+    "responsible_name": "Alex Alba 159",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 23:19:00",
+    "responsible_name": "Luc\u00eda Ortega 160",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-09 19:00:00",
+    "responsible_name": "Alex Alba 161",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 15:34:00",
+    "responsible_name": "Manuel D\u00edaz 162",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 20:38:00",
+    "responsible_name": "Jazm\u00edn Viteri 163",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 12:47:00",
+    "responsible_name": "Cesar Iban 164",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 08:39:00",
+    "responsible_name": "Jazm\u00edn Viteri 165",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 02:16:00",
+    "responsible_name": "Jazm\u00edn Viteri 166",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 18:08:00",
+    "responsible_name": "Alex Alba 167",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 09:35:00",
+    "responsible_name": "Manuel D\u00edaz 168",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 17:31:00",
+    "responsible_name": "Cesar Iban 169",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-09 10:32:00",
+    "responsible_name": "Manuel D\u00edaz 170",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 20:09:00",
+    "responsible_name": "Manuel D\u00edaz 171",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 08:26:00",
+    "responsible_name": "Alex Alba 172",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 17:19:00",
+    "responsible_name": "Alex Alba 173",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 05:35:00",
+    "responsible_name": "Jazm\u00edn Viteri 174",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-14 20:34:00",
+    "responsible_name": "Jazm\u00edn Viteri 175",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 23:49:00",
+    "responsible_name": "Luc\u00eda Ortega 176",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 19:36:00",
+    "responsible_name": "Alex Alba 177",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 00:47:00",
+    "responsible_name": "Alex Alba 178",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 18:57:00",
+    "responsible_name": "Luc\u00eda Ortega 179",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-12 23:21:00",
+    "responsible_name": "Alex Alba 180",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 01:57:00",
+    "responsible_name": "Cesar Iban 181",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-16 07:54:00",
+    "responsible_name": "Alex Alba 182",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 10:46:00",
+    "responsible_name": "Luc\u00eda Ortega 183",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 09:28:00",
+    "responsible_name": "Cesar Iban 184",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 00:09:00",
+    "responsible_name": "Jazm\u00edn Viteri 185",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 02:49:00",
+    "responsible_name": "Alex Alba 186",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-11 23:21:00",
+    "responsible_name": "Cesar Iban 187",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 05:32:00",
+    "responsible_name": "Alex Alba 188",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 09:00:00",
+    "responsible_name": "Luc\u00eda Ortega 189",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-15 23:55:00",
+    "responsible_name": "Cesar Iban 190",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 04:04:00",
+    "responsible_name": "Cesar Iban 191",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-13 05:51:00",
+    "responsible_name": "Jazm\u00edn Viteri 192",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 07:54:00",
+    "responsible_name": "Cesar Iban 193",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 17:45:00",
+    "responsible_name": "Manuel D\u00edaz 194",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-18 22:20:00",
+    "responsible_name": "Manuel D\u00edaz 195",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-17 05:46:00",
+    "responsible_name": "Cesar Iban 196",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-08 03:03:00",
+    "responsible_name": "Jazm\u00edn Viteri 197",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-12 20:00:00",
+    "responsible_name": "Luc\u00eda Ortega 198",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-19 15:58:00",
+    "responsible_name": "Cesar Iban 199",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 00:24:00",
+    "responsible_name": "Luc\u00eda Ortega 200",
+    "customers": [
+      {
+        "fullName": "Cliente A",
+        "documentNumber": "0102030405",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Cliente B",
+        "documentNumber": "0912345678",
+        "type": "CHILDREN",
+        "age": 28
+      }
+    ]
+  }
+]

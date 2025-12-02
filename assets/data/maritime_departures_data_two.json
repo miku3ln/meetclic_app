@@ -1,0 +1,2312 @@
+[
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 09:01:00",
+    "responsible_name": "Ana Torres",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-5012",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-2679",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-2424",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-1520",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 12:14:00",
+    "responsible_name": "Miguel R\u00edos",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-1434",
+        "type": "ADULT",
+        "age": 35
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-9928",
+        "type": "ADULT",
+        "age": 31
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-8359",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-1106",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 16:17:00",
+    "responsible_name": "Luc\u00eda Ortega",
+    "customers": [
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-4527",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-2674",
+        "type": "ADULT",
+        "age": 20
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-2584",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-5333",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 09:59:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-2291",
+        "type": "ADULT",
+        "age": 35
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-6925",
+        "type": "ADULT",
+        "age": 36
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-2139",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-5741",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 09:24:00",
+    "responsible_name": "Carlos G\u00f3mez",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-8428",
+        "type": "ADULT",
+        "age": 38
+      },
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-3664",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-4432",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-2169",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 13:10:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-7216",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-4598",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-1916",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-6168",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 08:13:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-6155",
+        "type": "ADULT",
+        "age": 24
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-7482",
+        "type": "ADULT",
+        "age": 38
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-3340",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-5040",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 14:47:00",
+    "responsible_name": "Carlos G\u00f3mez",
+    "customers": [
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-8019",
+        "type": "ADULT",
+        "age": 36
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-6930",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-9348",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-1771",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 11:50:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-2040",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-8668",
+        "type": "ADULT",
+        "age": 34
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-1188",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-9797",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-01 09:18:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-3591",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-5315",
+        "type": "ADULT",
+        "age": 34
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-9317",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-9317",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 10:23:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-9837",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-1009",
+        "type": "ADULT",
+        "age": 37
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-9005",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-6947",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 07:15:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-2290",
+        "type": "ADULT",
+        "age": 20
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-2133",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-3060",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-3705",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 19:13:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-4295",
+        "type": "ADULT",
+        "age": 40
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-7537",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-8177",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-2982",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 08:21:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-4770",
+        "type": "ADULT",
+        "age": 36
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-1117",
+        "type": "ADULT",
+        "age": 20
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-4750",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-6413",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 13:17:00",
+    "responsible_name": "Miguel R\u00edos",
+    "customers": [
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-4510",
+        "type": "ADULT",
+        "age": 35
+      },
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-8744",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-7669",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-2588",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 17:27:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-8651",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-2612",
+        "type": "ADULT",
+        "age": 19
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-6559",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-4139",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 20:08:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-4006",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-5092",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-8260",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-1828",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 06:05:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-3724",
+        "type": "ADULT",
+        "age": 31
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-8886",
+        "type": "ADULT",
+        "age": 24
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-1960",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-1035",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 20:18:00",
+    "responsible_name": "Ver\u00f3nica Le\u00f3n",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-8973",
+        "type": "ADULT",
+        "age": 22
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-5861",
+        "type": "ADULT",
+        "age": 24
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-9883",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-1936",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-02 21:32:00",
+    "responsible_name": "Ana Torres",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-3579",
+        "type": "ADULT",
+        "age": 19
+      },
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-2312",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-2122",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-4853",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 13:37:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-1651",
+        "type": "ADULT",
+        "age": 37
+      },
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-7868",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-9565",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-4346",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 13:16:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-3144",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-8491",
+        "type": "ADULT",
+        "age": 28
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-1152",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-2638",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 12:32:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-3170",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-5002",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-3584",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-5956",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 06:42:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-5905",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-3200",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-2753",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-3546",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 12:45:00",
+    "responsible_name": "Luis Mart\u00ednez",
+    "customers": [
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-4335",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-9280",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-1832",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-5533",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 16:49:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-5291",
+        "type": "ADULT",
+        "age": 23
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-8007",
+        "type": "ADULT",
+        "age": 35
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-2832",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-9938",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 10:27:00",
+    "responsible_name": "Miguel R\u00edos",
+    "customers": [
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-1685",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-1653",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-5088",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-6794",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 10:59:00",
+    "responsible_name": "Ana Torres",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-3662",
+        "type": "ADULT",
+        "age": 43
+      },
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-7755",
+        "type": "ADULT",
+        "age": 18
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-6442",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-5371",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 18:55:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-8711",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-8541",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-4728",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-4164",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-03 14:55:00",
+    "responsible_name": "Ver\u00f3nica Le\u00f3n",
+    "customers": [
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-5573",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-7548",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-6425",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-5279",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 14:02:00",
+    "responsible_name": "Luis Mart\u00ednez",
+    "customers": [
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-8119",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-8149",
+        "type": "ADULT",
+        "age": 37
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-2894",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-4114",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 19:00:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-9821",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-6967",
+        "type": "ADULT",
+        "age": 31
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-6409",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-3041",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 15:42:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-6344",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-3085",
+        "type": "ADULT",
+        "age": 24
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-7211",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-5930",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 06:19:00",
+    "responsible_name": "Carlos G\u00f3mez",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-4443",
+        "type": "ADULT",
+        "age": 31
+      },
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-6279",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-8244",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-9375",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 08:18:00",
+    "responsible_name": "Ver\u00f3nica Le\u00f3n",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-6491",
+        "type": "ADULT",
+        "age": 20
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-6085",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-3414",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-5011",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 08:29:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-4185",
+        "type": "ADULT",
+        "age": 40
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-9099",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-3417",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-2746",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 11:51:00",
+    "responsible_name": "Ver\u00f3nica Le\u00f3n",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-8611",
+        "type": "ADULT",
+        "age": 19
+      },
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-5082",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-8478",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-9702",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 16:48:00",
+    "responsible_name": "Luc\u00eda Ortega",
+    "customers": [
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-9270",
+        "type": "ADULT",
+        "age": 31
+      },
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-8305",
+        "type": "ADULT",
+        "age": 23
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-8373",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-5543",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 13:17:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-2269",
+        "type": "ADULT",
+        "age": 40
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-4841",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-6238",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-3267",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-04 18:44:00",
+    "responsible_name": "Miguel R\u00edos",
+    "customers": [
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-4505",
+        "type": "ADULT",
+        "age": 20
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-7678",
+        "type": "ADULT",
+        "age": 28
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-8633",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-4388",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 06:54:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-7232",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-6763",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-7865",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-4613",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 14:27:00",
+    "responsible_name": "Miguel R\u00edos",
+    "customers": [
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-1475",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-7624",
+        "type": "ADULT",
+        "age": 41
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-8657",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-9751",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 06:05:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-3223",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-3977",
+        "type": "ADULT",
+        "age": 19
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-7211",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-8449",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 18:17:00",
+    "responsible_name": "Luis Mart\u00ednez",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-5133",
+        "type": "ADULT",
+        "age": 44
+      },
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-8705",
+        "type": "ADULT",
+        "age": 18
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-1853",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-2124",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 06:15:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-1333",
+        "type": "ADULT",
+        "age": 37
+      },
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-4908",
+        "type": "ADULT",
+        "age": 22
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-2874",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-8619",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 17:10:00",
+    "responsible_name": "Laura P\u00e9rez",
+    "customers": [
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-2876",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-6096",
+        "type": "ADULT",
+        "age": 21
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-1420",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-7149",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 08:37:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-2669",
+        "type": "ADULT",
+        "age": 40
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-2983",
+        "type": "ADULT",
+        "age": 43
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-1672",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-8018",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 08:32:00",
+    "responsible_name": "Carlos G\u00f3mez",
+    "customers": [
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-1207",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-9031",
+        "type": "ADULT",
+        "age": 21
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-6934",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-3506",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 14:39:00",
+    "responsible_name": "Ver\u00f3nica Le\u00f3n",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-8921",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-5397",
+        "type": "ADULT",
+        "age": 28
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-2419",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-4995",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-05 18:21:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-9098",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-3979",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-6813",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-5581",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 06:33:00",
+    "responsible_name": "Ana Torres",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-2402",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-9004",
+        "type": "ADULT",
+        "age": 35
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-8800",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-8342",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 15:14:00",
+    "responsible_name": "Luc\u00eda Ortega",
+    "customers": [
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-4986",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-7046",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-9698",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-6419",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 14:19:00",
+    "responsible_name": "Ver\u00f3nica Le\u00f3n",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-4777",
+        "type": "ADULT",
+        "age": 21
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-6169",
+        "type": "ADULT",
+        "age": 21
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-4033",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-8933",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 15:06:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-5853",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Patricia Rivera",
+        "documentNumber": "ADULT-3939",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-9751",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-1745",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 15:44:00",
+    "responsible_name": "Luc\u00eda Ortega",
+    "customers": [
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-9042",
+        "type": "ADULT",
+        "age": 21
+      },
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-5658",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-8216",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-1841",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 09:52:00",
+    "responsible_name": "Miguel R\u00edos",
+    "customers": [
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-7565",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-1878",
+        "type": "ADULT",
+        "age": 22
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-5978",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-2940",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 13:49:00",
+    "responsible_name": "Ana Torres",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-7232",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-5871",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-8025",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-1986",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 12:40:00",
+    "responsible_name": "Ver\u00f3nica Le\u00f3n",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-5335",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-3573",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-2229",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-7693",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 21:18:00",
+    "responsible_name": "Ana Torres",
+    "customers": [
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-4792",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-8438",
+        "type": "ADULT",
+        "age": 20
+      },
+      {
+        "fullName": "Tom\u00e1s Aguirre",
+        "documentNumber": "CHILD-5334",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-4241",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-06 13:41:00",
+    "responsible_name": "Ana Torres",
+    "customers": [
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-5352",
+        "type": "ADULT",
+        "age": 44
+      },
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-2169",
+        "type": "ADULT",
+        "age": 19
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-6039",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-5728",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 20:44:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-7594",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-9847",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-2317",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "fullName": "Mateo Rivas",
+        "documentNumber": "CHILD-8078",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 14:01:00",
+    "responsible_name": "Luc\u00eda Ortega",
+    "customers": [
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-4750",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-1339",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-1659",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-9502",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 14:11:00",
+    "responsible_name": "Patricia Rivera",
+    "customers": [
+      {
+        "fullName": "Ver\u00f3nica Le\u00f3n",
+        "documentNumber": "ADULT-8141",
+        "type": "ADULT",
+        "age": 38
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-2494",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-7690",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-2713",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 19:44:00",
+    "responsible_name": "Andr\u00e9s Castillo",
+    "customers": [
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-5722",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-1601",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "fullName": "Valentina Mora",
+        "documentNumber": "CHILD-6153",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-2899",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 06:42:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-8569",
+        "type": "ADULT",
+        "age": 31
+      },
+      {
+        "fullName": "Luis Mart\u00ednez",
+        "documentNumber": "ADULT-4073",
+        "type": "ADULT",
+        "age": 34
+      },
+      {
+        "fullName": "Gabriel Lema",
+        "documentNumber": "CHILD-9167",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-1845",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 10:59:00",
+    "responsible_name": "Luis Mart\u00ednez",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-8178",
+        "type": "ADULT",
+        "age": 40
+      },
+      {
+        "fullName": "Luc\u00eda Ortega",
+        "documentNumber": "ADULT-2989",
+        "type": "ADULT",
+        "age": 18
+      },
+      {
+        "fullName": "Dylan Z\u00fa\u00f1iga",
+        "documentNumber": "CHILD-4920",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-6091",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 19:05:00",
+    "responsible_name": "Luc\u00eda Ortega",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-2858",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "fullName": "Ana Torres",
+        "documentNumber": "ADULT-3522",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-9337",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "fullName": "Isabela Vera",
+        "documentNumber": "CHILD-7807",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 13:29:00",
+    "responsible_name": "Jorge Silva",
+    "customers": [
+      {
+        "fullName": "Andr\u00e9s Castillo",
+        "documentNumber": "ADULT-3369",
+        "type": "ADULT",
+        "age": 30
+      },
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-9327",
+        "type": "ADULT",
+        "age": 41
+      },
+      {
+        "fullName": "Sof\u00eda Cede\u00f1o",
+        "documentNumber": "CHILD-2143",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-6568",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 06:18:00",
+    "responsible_name": "Luc\u00eda Ortega",
+    "customers": [
+      {
+        "fullName": "Jorge Silva",
+        "documentNumber": "ADULT-9022",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Carlos G\u00f3mez",
+        "documentNumber": "ADULT-8316",
+        "type": "ADULT",
+        "age": 35
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-6654",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Emma Andrade",
+        "documentNumber": "CHILD-9903",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 999,
+    "user_management_id": 5,
+    "arrival_time": "2025-08-07 16:55:00",
+    "responsible_name": "Carlos G\u00f3mez",
+    "customers": [
+      {
+        "fullName": "Laura P\u00e9rez",
+        "documentNumber": "ADULT-4912",
+        "type": "ADULT",
+        "age": 36
+      },
+      {
+        "fullName": "Miguel R\u00edos",
+        "documentNumber": "ADULT-4826",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "fullName": "Camila Sornoza",
+        "documentNumber": "CHILD-1715",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "fullName": "Thiago Jaramillo",
+        "documentNumber": "CHILD-7246",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  }
+]

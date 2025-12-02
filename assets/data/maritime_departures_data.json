@@ -1,0 +1,578 @@
+[
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-07-28T08:32:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000000",
+        "fullName": "Patricia Andrade",
+        "type": "ADULT",
+        "age": 28
+      },
+      {
+        "documentNumber": "1000000001",
+        "fullName": "Fernando Salazar",
+        "type": "ADULT",
+        "age": 39
+      },
+      {
+        "documentNumber": "1000000002",
+        "fullName": "Juan P\u00e9rez",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "documentNumber": "1000000003",
+        "fullName": "Ricardo Molina",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "documentNumber": "1000000004",
+        "fullName": "Carlos Torres",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "documentNumber": "1000000005",
+        "fullName": "Tom\u00e1s Vallejo",
+        "type": "CHILD",
+        "age": 11
+      },
+      {
+        "documentNumber": "1000000006",
+        "fullName": "Emilia Castro",
+        "type": "CHILD",
+        "age": 7
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-07-29T15:44:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000007",
+        "fullName": "Luisa Fern\u00e1ndez",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "documentNumber": "1000000008",
+        "fullName": "Ricardo Molina",
+        "type": "ADULT",
+        "age": 35
+      },
+      {
+        "documentNumber": "1000000009",
+        "fullName": "Patricia Andrade",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "documentNumber": "1000000010",
+        "fullName": "Juan P\u00e9rez",
+        "type": "ADULT",
+        "age": 44
+      },
+      {
+        "documentNumber": "1000000011",
+        "fullName": "Mar\u00eda Gonz\u00e1lez",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "documentNumber": "1000000012",
+        "fullName": "Jorge Castillo",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "documentNumber": "1000000013",
+        "fullName": "Mateo Ruiz",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "documentNumber": "1000000014",
+        "fullName": "Mateo Ruiz",
+        "type": "CHILD",
+        "age": 11
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-07-30T16:45:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000015",
+        "fullName": "Carlos Torres",
+        "type": "ADULT",
+        "age": 34
+      },
+      {
+        "documentNumber": "1000000016",
+        "fullName": "Juan P\u00e9rez",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "documentNumber": "1000000017",
+        "fullName": "Luisa Fern\u00e1ndez",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "documentNumber": "1000000018",
+        "fullName": "Emilia Castro",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "documentNumber": "1000000019",
+        "fullName": "Benjam\u00edn Vaca",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "documentNumber": "1000000020",
+        "fullName": "Valentina Mej\u00eda",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "documentNumber": "1000000021",
+        "fullName": "Camila J\u00e1come",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "documentNumber": "1000000022",
+        "fullName": "Gabriel Luna",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-07-31T08:10:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000023",
+        "fullName": "Laura Cede\u00f1o",
+        "type": "ADULT",
+        "age": 37
+      },
+      {
+        "documentNumber": "1000000024",
+        "fullName": "Laura Cede\u00f1o",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "documentNumber": "1000000025",
+        "fullName": "Patricia Andrade",
+        "type": "ADULT",
+        "age": 43
+      },
+      {
+        "documentNumber": "1000000026",
+        "fullName": "Carlos Torres",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "documentNumber": "1000000027",
+        "fullName": "Tom\u00e1s Vallejo",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "documentNumber": "1000000028",
+        "fullName": "Emilia Castro",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-08-01T10:42:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000029",
+        "fullName": "Jorge Castillo",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "documentNumber": "1000000030",
+        "fullName": "Carlos Torres",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "documentNumber": "1000000031",
+        "fullName": "Patricia Andrade",
+        "type": "ADULT",
+        "age": 36
+      },
+      {
+        "documentNumber": "1000000032",
+        "fullName": "Gabriel Luna",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "documentNumber": "1000000033",
+        "fullName": "Isabela Mora",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "documentNumber": "1000000034",
+        "fullName": "Emilia Castro",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "documentNumber": "1000000035",
+        "fullName": "Emilia Castro",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "documentNumber": "1000000036",
+        "fullName": "Isabela Mora",
+        "type": "CHILD",
+        "age": 11
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-08-02T13:06:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000037",
+        "fullName": "Laura Cede\u00f1o",
+        "type": "ADULT",
+        "age": 36
+      },
+      {
+        "documentNumber": "1000000038",
+        "fullName": "Laura Cede\u00f1o",
+        "type": "ADULT",
+        "age": 34
+      },
+      {
+        "documentNumber": "1000000039",
+        "fullName": "Jorge Castillo",
+        "type": "ADULT",
+        "age": 25
+      },
+      {
+        "documentNumber": "1000000040",
+        "fullName": "Ricardo Molina",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "documentNumber": "1000000041",
+        "fullName": "Sof\u00eda Torres",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "documentNumber": "1000000042",
+        "fullName": "Sof\u00eda Torres",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "documentNumber": "1000000043",
+        "fullName": "Tom\u00e1s Vallejo",
+        "type": "CHILD",
+        "age": 11
+      },
+      {
+        "documentNumber": "1000000044",
+        "fullName": "Emilia Castro",
+        "type": "CHILD",
+        "age": 11
+      },
+      {
+        "documentNumber": "1000000045",
+        "fullName": "Santiago Vera",
+        "type": "CHILD",
+        "age": 9
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-08-03T11:14:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000046",
+        "fullName": "Carlos Torres",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "documentNumber": "1000000047",
+        "fullName": "Mar\u00eda Gonz\u00e1lez",
+        "type": "ADULT",
+        "age": 45
+      },
+      {
+        "documentNumber": "1000000048",
+        "fullName": "Juan P\u00e9rez",
+        "type": "ADULT",
+        "age": 34
+      },
+      {
+        "documentNumber": "1000000049",
+        "fullName": "Patricia Andrade",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "documentNumber": "1000000050",
+        "fullName": "Gabriel Luna",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "documentNumber": "1000000051",
+        "fullName": "Valentina Mej\u00eda",
+        "type": "CHILD",
+        "age": 5
+      },
+      {
+        "documentNumber": "1000000052",
+        "fullName": "Emilia Castro",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "documentNumber": "1000000053",
+        "fullName": "Isabela Mora",
+        "type": "CHILD",
+        "age": 6
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-08-04T09:08:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000054",
+        "fullName": "Carlos Torres",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "documentNumber": "1000000055",
+        "fullName": "Patricia Andrade",
+        "type": "ADULT",
+        "age": 34
+      },
+      {
+        "documentNumber": "1000000056",
+        "fullName": "Luisa Fern\u00e1ndez",
+        "type": "ADULT",
+        "age": 28
+      },
+      {
+        "documentNumber": "1000000057",
+        "fullName": "Patricia Andrade",
+        "type": "ADULT",
+        "age": 27
+      },
+      {
+        "documentNumber": "1000000058",
+        "fullName": "Carlos Torres",
+        "type": "ADULT",
+        "age": 32
+      },
+      {
+        "documentNumber": "1000000059",
+        "fullName": "Isabela Mora",
+        "type": "CHILD",
+        "age": 11
+      },
+      {
+        "documentNumber": "1000000060",
+        "fullName": "Camila J\u00e1come",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "documentNumber": "1000000061",
+        "fullName": "Mateo Ruiz",
+        "type": "CHILD",
+        "age": 11
+      },
+      {
+        "documentNumber": "1000000062",
+        "fullName": "Isabela Mora",
+        "type": "CHILD",
+        "age": 5
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-08-05T10:34:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000063",
+        "fullName": "Luisa Fern\u00e1ndez",
+        "type": "ADULT",
+        "age": 33
+      },
+      {
+        "documentNumber": "1000000064",
+        "fullName": "Laura Cede\u00f1o",
+        "type": "ADULT",
+        "age": 37
+      },
+      {
+        "documentNumber": "1000000065",
+        "fullName": "Luisa Fern\u00e1ndez",
+        "type": "ADULT",
+        "age": 28
+      },
+      {
+        "documentNumber": "1000000066",
+        "fullName": "Santiago Vera",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "documentNumber": "1000000067",
+        "fullName": "Sof\u00eda Torres",
+        "type": "CHILD",
+        "age": 9
+      },
+      {
+        "documentNumber": "1000000068",
+        "fullName": "Camila J\u00e1come",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "documentNumber": "1000000069",
+        "fullName": "Gabriel Luna",
+        "type": "CHILD",
+        "age": 6
+      },
+      {
+        "documentNumber": "1000000070",
+        "fullName": "Mateo Ruiz",
+        "type": "CHILD",
+        "age": 10
+      }
+    ]
+  },
+  {
+    "business_id": 1,
+    "user_id": 1,
+    "user_management_id": 1,
+    "arrival_time": "2025-08-06T13:58:00",
+    "responsible_name": "Responsable X",
+    "customers": [
+      {
+        "documentNumber": "1000000071",
+        "fullName": "Mar\u00eda Gonz\u00e1lez",
+        "type": "ADULT",
+        "age": 29
+      },
+      {
+        "documentNumber": "1000000072",
+        "fullName": "Juan P\u00e9rez",
+        "type": "ADULT",
+        "age": 26
+      },
+      {
+        "documentNumber": "1000000073",
+        "fullName": "Jorge Castillo",
+        "type": "ADULT",
+        "age": 40
+      },
+      {
+        "documentNumber": "1000000074",
+        "fullName": "Mar\u00eda Gonz\u00e1lez",
+        "type": "ADULT",
+        "age": 28
+      },
+      {
+        "documentNumber": "1000000075",
+        "fullName": "Ana Ram\u00edrez",
+        "type": "ADULT",
+        "age": 42
+      },
+      {
+        "documentNumber": "1000000076",
+        "fullName": "Valentina Mej\u00eda",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "documentNumber": "1000000077",
+        "fullName": "Tom\u00e1s Vallejo",
+        "type": "CHILD",
+        "age": 7
+      },
+      {
+        "documentNumber": "1000000078",
+        "fullName": "Camila J\u00e1come",
+        "type": "CHILD",
+        "age": 8
+      },
+      {
+        "documentNumber": "1000000079",
+        "fullName": "Gabriel Luna",
+        "type": "CHILD",
+        "age": 10
+      },
+      {
+        "documentNumber": "1000000080",
+        "fullName": "Valentina Mej\u00eda",
+        "type": "CHILD",
+        "age": 8
+      }
+    ]
+  }
+]

@@ -1,4 +1,4 @@
-package com.meetclic.meetclic_movile.meetclic_app;
+package com.meetclic.meetclic_movile;
 
 import io.flutter.embedding.android.FlutterActivity;
 
