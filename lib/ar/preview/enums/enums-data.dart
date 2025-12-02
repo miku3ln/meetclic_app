@@ -1,0 +1,1 @@
+enum PinchMode { scale, distance }
