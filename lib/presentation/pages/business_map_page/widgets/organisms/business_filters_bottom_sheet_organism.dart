@@ -131,37 +131,73 @@ class _BusinessFiltersBottomSheetOrganismState
               ),
               const SizedBox(height: 12),
 
-              Row(
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    '1 km',
-                    style: TextStyle(color: colors.distanceLabelColor),
-                  ),
-                  Expanded(
-                    child: SliderTheme(
-                      data: SliderTheme.of(context).copyWith(
-                        activeTrackColor: colors.distanceSliderActiveColor,
-                        inactiveTrackColor: colors.distanceSliderInactiveColor,
-                        thumbColor: colors.distanceSliderThumbColor,
+                  // --- Valor seleccionado (siempre visible)
+                  Row(
+                    children: [
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colors.distanceSliderActiveColor.withOpacity(
+                            0.15,
+                          ),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '${_radiusKm.toStringAsFixed(0)} km',
+                          style: TextStyle(
+                            color: colors.distanceSliderActiveColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                       ),
-                      child: Slider(
-                        value: _radiusKm,
-                        min: 1,
-                        max: 30,
-                        divisions: 29,
-                        label: '${_radiusKm.toStringAsFixed(0)} km',
-                        onChanged: (value) {
-                          setState(() => _radiusKm = value);
-                        },
-                      ),
-                    ),
+                      const Spacer(),
+                    ],
                   ),
-                  Text(
-                    '30 km',
-                    style: TextStyle(color: colors.distanceLabelColor),
+
+                  const SizedBox(height: 8),
+
+                  // --- Slider con numeración lateral
+                  Row(
+                    children: [
+                      Text(
+                        '1 km',
+                        style: TextStyle(color: colors.distanceLabelColor),
+                      ),
+                      Expanded(
+                        child: SliderTheme(
+                          data: SliderTheme.of(context).copyWith(
+                            activeTrackColor: colors.distanceSliderActiveColor,
+                            inactiveTrackColor:
+                                colors.distanceSliderInactiveColor,
+                            thumbColor: colors.distanceSliderThumbColor,
+                          ),
+                          child: Slider(
+                            value: _radiusKm,
+                            min: 1,
+                            max: 30,
+                            divisions: 29,
+                            onChanged: (value) {
+                              setState(() => _radiusKm = value);
+                            },
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '30 km',
+                        style: TextStyle(color: colors.distanceLabelColor),
+                      ),
+                    ],
                   ),
                 ],
               ),
+
               const SizedBox(height: 16),
 
               // CATEGORÍAS
