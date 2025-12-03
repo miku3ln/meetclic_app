@@ -13,18 +13,25 @@ class BusinessRepositoryImpl implements BusinessRepository {
   Future<ApiResponseModel<List<BusinessModel>>> getNearbyBusinesses({
     required double latitude,
     required double longitude,
-    double radiusKm = 10,
-    List<int>? subcategoryIds,
+    required double radiusKm,
+    required String searchQuery,
+    required List<String>? categoriesIds,
   }) async {
     final url = Uri.parse(
       '${ServerConfig.baseUrl}/business/searchNearbyBusinesses',
     );
 
+    late final searchQueryCurrent = "";
+    final String categoriesIdsCurrent = (categoriesIds ?? [])
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .join(',');
     final body = {
       'latitude': latitude,
       'longitude': longitude,
       'radius_km': radiusKm,
-      'subcategory_ids': subcategoryIds ?? [0],
+      'subcategory_ids': categoriesIdsCurrent,
+      'searchQuery': searchQuery,
     };
 
     return NetworkHelper.safeRequest<List<BusinessModel>>(

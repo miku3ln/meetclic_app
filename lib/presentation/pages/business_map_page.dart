@@ -25,6 +25,8 @@ import 'business_map_page/state/business_map_state.dart';
 import 'business_map_page/widgets/atoms/current_location_fab_atom.dart';
 import 'business_map_page/widgets/atoms/loading_overlay_atom.dart';
 import 'business_map_page/widgets/molecules/business_popup_card_molecule.dart';
+import 'business_map_page/widgets/molecules/top_search_bar_molecule.dart';
+import 'business_map_page/widgets/organisms/business_filters_bottom_sheet_organism.dart';
 
 class BusinessMapPage extends StatefulWidget {
   final DeepLinkInfo? info;
@@ -65,6 +67,50 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
   // ============================================================
   //   INIT / DISPOSE
   // ============================================================
+  void _onSearchChanged(String value) {
+    setState(() {
+      _filtersState = _filtersState.copyWith(searchQuery: value);
+    });
+  }
+
+  Future<void> _onSearchSubmit() async {
+    // Reutilizamos el centro actual del manager
+    final center = LatLng(
+      manager.currentPosition.latitude,
+      manager.currentPosition.longitude,
+    );
+    await _refreshFromCenter(center, zoom: manager.currentZoom);
+  }
+
+  Future<void> _openFilters() async {
+    final updated = await showModalBottomSheet<BusinessFiltersState>(
+      context: context,
+      isScrollControlled: true,
+      builder: (_) => DraggableScrollableSheet(
+        expand: false,
+        minChildSize: 0.6,
+        initialChildSize: 0.8,
+        maxChildSize: 0.95,
+        builder: (_, scrollController) {
+          return BusinessFiltersBottomSheetOrganism(
+            initialState: _filtersState,
+          );
+        },
+      ),
+    );
+
+    if (updated != null) {
+      setState(() {
+        _filtersState = updated;
+      });
+
+      final center = LatLng(
+        manager.currentPosition.latitude,
+        manager.currentPosition.longitude,
+      );
+      await _refreshFromCenter(center, zoom: manager.currentZoom);
+    }
+  }
 
   @override
   void initState() {
@@ -164,12 +210,14 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
 
     _setLoading(true);
     try {
-      late final info = _filtersState.radiusKm;
-
       final data = await _businessMapService.fetchBusinesses(
         center.latitude,
         center.longitude,
+        _filtersState.radiusKm,
+        _filtersState.searchQuery,
+        _filtersState.categoriesIds,
       );
+
       _applyBusinessData(center, data, zoom: zoom, moveCamera: moveCamera);
     } catch (e) {
       if (mounted) {
@@ -337,6 +385,7 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
       appBar: CustomAppBar(title: title, items: widget.itemsStatus),
       body: Stack(
         children: [
+          // MAPA
           AbsorbPointer(
             absorbing: _state.isLoading,
             child: FlutterMap(
@@ -385,6 +434,21 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
               ],
             ),
           ),
+
+          // 🔵 Barra superior de búsqueda + filtros
+          Positioned(
+            left: 16,
+            right: 16,
+            top: 16,
+            child: TopSearchBarMolecule(
+              filtersState: _filtersState,
+              onSearchChanged: _onSearchChanged,
+              onSearchSubmit: _onSearchSubmit,
+              onOpenFilters: _openFilters,
+            ),
+          ),
+
+          // Overlay de carga
           LoadingOverlayAtom(isLoading: _state.isLoading),
         ],
       ),

@@ -5,12 +5,14 @@ abstract class BusinessRepository {
   Future<ApiResponseModel<List<BusinessModel>>> getNearbyBusinesses({
     required double latitude,
     required double longitude,
-    double radiusKm,
-    List<int>? subcategoryIds,
+    required double radiusKm,
+    required String searchQuery,
+    required List<String> categoriesIds,
   });
 }
+
 abstract class BusinessDetailsRepository {
   Future<ApiResponseModel<List<BusinessModel>>> getBusinessesDetails({
-    required int businessId
+    required int businessId,
   });
 }

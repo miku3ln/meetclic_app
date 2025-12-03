@@ -9,13 +9,17 @@ class BusinessMapService {
 
   Future<List<BusinessModel>> fetchBusinesses(
     double latitude,
-    double longitude, {
-    double? radiusKm,
-  }) async {
+    double longitude,
+    double radiusKm,
+    String searchQuery,
+    List<String> categoriesIds,
+  ) async {
     final response = await useCase.execute(
       latitude: latitude,
       longitude: longitude,
       radiusKm: radiusKm ?? defaultRadiusKm,
+      categoriesIds: categoriesIds,
+      searchQuery: searchQuery,
     );
     return response.data ?? [];
   }

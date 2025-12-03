@@ -10,12 +10,16 @@ class GetNearbyBusinessesUseCase {
   Future<ApiResponseModel<List<BusinessModel>>> execute({
     required double latitude,
     required double longitude,
-    double radiusKm = 10,
+    required double radiusKm,
+    required String searchQuery,
+    required List<String> categoriesIds,
   }) async {
     return await repository.getNearbyBusinesses(
       latitude: latitude,
       longitude: longitude,
       radiusKm: radiusKm,
+      searchQuery: searchQuery,
+      categoriesIds: categoriesIds,
     );
   }
 }

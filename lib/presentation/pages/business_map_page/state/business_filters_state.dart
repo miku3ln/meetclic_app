@@ -1,30 +1,29 @@
-// presentation/pages/business_map_page/state/business_filters_state.dart
 class BusinessFiltersState {
-  final double radiusKm; // 1 - 50 km
-  final Set<int> selectedCategoryIds; // ids o códigos de categorías
-  final String searchQuery; // texto del input superior
+  final String searchQuery;
+  final double radiusKm;
+  final List<String> categoriesIds;
 
   const BusinessFiltersState({
-    required this.radiusKm,
-    required this.selectedCategoryIds,
     required this.searchQuery,
+    required this.radiusKm,
+    required this.categoriesIds,
   });
 
   factory BusinessFiltersState.initial() => const BusinessFiltersState(
-    radiusKm: 10,
-    selectedCategoryIds: {},
     searchQuery: '',
+    radiusKm: 10, // km por defecto
+    categoriesIds: [],
   );
 
   BusinessFiltersState copyWith({
-    double? radiusKm,
-    Set<int>? selectedCategoryIds,
     String? searchQuery,
+    double? radiusKm,
+    List<String>? categoriesIds,
   }) {
     return BusinessFiltersState(
-      radiusKm: radiusKm ?? this.radiusKm,
-      selectedCategoryIds: selectedCategoryIds ?? this.selectedCategoryIds,
       searchQuery: searchQuery ?? this.searchQuery,
+      radiusKm: radiusKm ?? this.radiusKm,
+      categoriesIds: categoriesIds ?? this.categoriesIds,
     );
   }
 }
