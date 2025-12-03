@@ -1,3 +1,4 @@
+// presentation/pages/business_map_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
@@ -6,7 +7,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/domain/models/business_model.dart';
 import 'package:meetclic_app/domain/usecases/get_nearby_businesses_usecase.dart';
-import 'package:meetclic_app/infrastructure/assets/app_images.dart';
 import 'package:meetclic_app/infrastructure/repositories/implementations/business_repository_impl.dart';
 import 'package:meetclic_app/presentation/widgets/template/custom_app_bar.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
@@ -15,18 +15,16 @@ import '../../../shared/utils/deep_link_type.dart';
 import '../../aplication/usecases/check_location_permission_usecase.dart';
 import '../../infrastructure/services/geolocator_service.dart';
 import 'business_detail_page.dart';
-
-class MapPosition {
-  final double latitude;
-  final double longitude;
-  final double zoom;
-
-  MapPosition({
-    required this.latitude,
-    required this.longitude,
-    required this.zoom,
-  });
-}
+import 'business_map_page/helpers/map_refresh_helper.dart';
+import 'business_map_page/helpers/marker_helper.dart';
+import 'business_map_page/models/business_position.dart';
+import 'business_map_page/services/business_map_service.dart';
+import 'business_map_page/services/manager_business.dart';
+import 'business_map_page/state/business_filters_state.dart';
+import 'business_map_page/state/business_map_state.dart';
+import 'business_map_page/widgets/atoms/current_location_fab_atom.dart';
+import 'business_map_page/widgets/atoms/loading_overlay_atom.dart';
+import 'business_map_page/widgets/molecules/business_popup_card_molecule.dart';
 
 class BusinessMapPage extends StatefulWidget {
   final DeepLinkInfo? info;
@@ -41,15 +39,32 @@ class BusinessMapPage extends StatefulWidget {
 class _BusinessMapPageState extends State<BusinessMapPage> {
   final PopupController _popupController = PopupController();
   final MapController _mapController = MapController();
-  Map<String, dynamic> currentPosition = {
-    'latitude': 0.2322591,
-    'longitude': -78.2590913,
-    'zoom': 5.0,
-  };
-  bool isLoading = false;
-  List<BusinessModel> businesses = [];
-  List<Marker> markers = [];
-  Marker? currentLocationMarker;
+
+  /// Manager responsable de la posición “principal” del mapa
+  late final ManagerBusiness manager = ManagerBusiness();
+
+  /// Servicio de negocios cerca (capa de dominio/infra)
+  late final BusinessMapService _businessMapService = BusinessMapService(
+    useCase: GetNearbyBusinessesUseCase(repository: BusinessRepositoryImpl()),
+  );
+
+  /// Helper para decidir cuándo refrescar en base a movimiento/zoom
+  late final MapRefreshHelper _refreshHelper = MapRefreshHelper(
+    minDistanceMeters: 400,
+    minZoomDelta: 0.7,
+  );
+
+  /// Estado del mapa (negocios, markers, loading, etc.)
+  BusinessMapState _state = BusinessMapState.initial();
+
+  /// ✅ Estado de filtros PERSISTENTE en la página
+  BusinessFiltersState _filtersState = BusinessFiltersState.initial();
+
+  Map<String, dynamic> get currentPosition => manager.currentPositionAsMap;
+
+  // ============================================================
+  //   INIT / DISPOSE
+  // ============================================================
 
   @override
   void initState() {
@@ -59,21 +74,137 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
     });
   }
 
-  bool _isGpsEnabled = false;
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  // Helpers para setear estado de forma limpia
+  void _setLoading(bool value) {
+    setState(() {
+      _state = _state.copyWith(isLoading: value);
+    });
+  }
+
+  void _setGpsEnabled(bool value) {
+    setState(() {
+      _state = _state.copyWith(isGpsEnabled: value);
+    });
+  }
+
+  void _setBusinessData({
+    required List<BusinessModel> businesses,
+    required List<Marker> businessMarkers,
+    required Marker currentLocationMarker,
+  }) {
+    setState(() {
+      _state = _state.copyWith(
+        businesses: businesses,
+        businessMarkers: businessMarkers,
+        currentLocationMarker: currentLocationMarker,
+      );
+    });
+  }
+
+  // ============================================================
+  //   CORE / DATA
+  // ============================================================
+
+  /// Aplica data a:
+  /// - manager (posición principal)
+  /// - marker principal
+  /// - lista de negocios + markers
+  /// - cámara (opcional)
+  void _applyBusinessData(
+    LatLng center,
+    List<BusinessModel> newBusinesses, {
+    double? zoom,
+    bool moveCamera = true,
+  }) {
+    // Actualizar manager
+    manager.updateCurrentPosition(
+      BusinessPosition(
+        latitude: center.latitude,
+        longitude: center.longitude,
+        zoom: zoom ?? manager.currentZoom,
+      ),
+    );
+
+    // Construir markers por helper
+    final currentMarker = MarkerHelper.buildCurrentLocationMarker(center);
+    final businessMarkers = MarkerHelper.buildBusinessMarkers(
+      businesses: newBusinesses,
+      mapController: _mapController,
+      popupController: _popupController,
+    );
+
+    // Mover cámara solo si se indica
+    if (moveCamera) {
+      _mapController.move(center, zoom ?? manager.currentZoom);
+    }
+
+    _setBusinessData(
+      businesses: newBusinesses,
+      businessMarkers: businessMarkers,
+      currentLocationMarker: currentMarker,
+    );
+  }
+
+  /// Punto ÚNICO que:
+  /// - Usa el centro dado
+  /// - Llama a backend (servicio) con filtros actuales
+  /// - Actualiza manager, markers y mapa
+  Future<void> _refreshFromCenter(
+    LatLng center, {
+    double? zoom,
+    bool moveCamera = false,
+  }) async {
+    // Guard anti-spam (scroll / zoom muy rápido)
+    if (_state.isLoading) return;
+
+    _setLoading(true);
+    try {
+      late final info = _filtersState.radiusKm;
+
+      final data = await _businessMapService.fetchBusinesses(
+        center.latitude,
+        center.longitude,
+      );
+      _applyBusinessData(center, data, zoom: zoom, moveCamera: moveCamera);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al actualizar negocios: $e')),
+        );
+      }
+    } finally {
+      if (mounted) {
+        _setLoading(false);
+      }
+    }
+  }
+
+  // ============================================================
+  //   CARGA INICIAL
+  // ============================================================
+
   Future<void> _loadNearbyBusinesses() async {
-    if (isLoading) return;
-    setState(() => isLoading = true);
-    double latitude = 0;
-    double longitude = 0;
+    if (_state.isLoading) return;
+
+    // ✅ SIEMPRE PARTIMOS DE LA POSICIÓN POR DEFECTO
+    double latitude = currentPosition["latitude"];
+    double longitude = currentPosition["longitude"];
+
     try {
       final useCaseCheckLocation = CheckLocationPermissionUseCase(
         GeolocatorService(),
       );
-      final resultPermission = await useCaseCheckLocation.execute();
 
-      setState(() => _isGpsEnabled = resultPermission.success);
+      final resultPermission = await useCaseCheckLocation.execute();
+      _setGpsEnabled(resultPermission.success);
 
       if (!resultPermission.success) {
+        // Avisamos, pero NO hacemos return (queremos usar el fallback)
         ScaffoldMessenger.of(
           context,
         ).showSnackBar(SnackBar(content: Text(resultPermission.message)));
@@ -84,115 +215,104 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
           } catch (e) {
             debugPrint("No se pudo abrir configuración: $e");
           }
-
-          // ✅ Usar fallback
-          latitude = currentPosition["latitude"];
-          longitude = currentPosition["longitude"];
-        } else {
-          // Otros errores sí detienen el proceso
-          setState(() => isLoading = false);
-          return;
         }
+        // 👇 IMPORTANTE: NO retornamos, seguimos con la lat/long por defecto
       }
 
-      if (_isGpsEnabled) {
+      // Si tenemos permiso y servicios OK → intentamos obtener ubicación real
+      if (_state.isGpsEnabled) {
         try {
           final position = await Geolocator.getCurrentPosition(
             desiredAccuracy: LocationAccuracy.high,
           );
           latitude = position.latitude;
           longitude = position.longitude;
-        } catch (e) {
+        } catch (_) {
+          // Si falla, nos quedamos con la lat/long por defecto ya seteadas
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('No se pudo obtener tu ubicación actual.'),
             ),
           );
-          latitude = currentPosition["latitude"];
-          longitude = currentPosition["longitude"];
         }
       }
-      final useCase = GetNearbyBusinessesUseCase(
-        repository: BusinessRepositoryImpl(),
-      );
-      final newCenter = LatLng(latitude, longitude);
-      setMarkerCurrentPosition(newCenter);
-      final response = await useCase.execute(
-        latitude: latitude,
-        longitude: longitude,
-        radiusKm: 10,
-      );
-      _mapController.move(newCenter, 16);
-      businesses = response.data ?? [];
-      _generateMarkers();
+
+      // ✅ SIEMPRE LLEGAMOS AQUÍ CON ALGÚN CENTER VÁLIDO
+      final center = LatLng(latitude, longitude);
+      await _refreshFromCenter(center, zoom: 16, moveCamera: true);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error al cargar negocios: ${e.toString()}')),
-      );
-    } finally {
-      setState(() => isLoading = false);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Error al cargar negocios: $e')));
     }
   }
 
-  void _generateMarkers() {
-    markers = businesses.map((business) {
-      final markerPoint = LatLng(business.streetLat, business.streetLng);
-      return Marker(
-        point: markerPoint,
-        width: 40,
-        height: 40,
-        alignment: Alignment.topCenter,
-        child: GestureDetector(
-          onTap: () {
-            _mapController.move(markerPoint, _mapController.camera.zoom);
-            _popupController.showPopupsOnlyFor([
-              Marker(
-                point: markerPoint,
-                width: 40,
-                height: 40,
-                alignment: Alignment.topCenter,
-                child: const Icon(
-                  Icons.location_on,
-                  color: Colors.red,
-                  size: 40,
-                ),
-              ),
-            ]);
-          },
-          child: const Icon(Icons.location_on, color: Colors.red, size: 40),
-        ),
-      );
-    }).toList();
-  }
+  // ============================================================
+  //   EVENTOS DEL MAPA (MOVE / ZOOM)
+  // ============================================================
 
-  setMarkerCurrentPosition(LatLng newCenter) {
-    currentLocationMarker = Marker(
-      point: newCenter,
-      width: 60,
-      height: 60,
-      alignment: Alignment.center,
-      child: Image.asset(AppImages.pageBusinessMapMarkerPosition),
+  /// Se llama cada vez que cambia la posición del mapa (move / zoom)
+  /// `hasGesture` true = viene de interacción del usuario.
+  void _onMapPositionChanged(MapPosition pos, bool hasGesture) async {
+    if (!hasGesture) return; // solo cambios por usuario
+    if (_state.isLoading) return;
+
+    final center = pos.center;
+    final zoom = pos.zoom;
+    if (center == null || zoom == null) return;
+
+    // 🔥 Aquí decidimos si realmente vale la pena refrescar
+    if (!_refreshHelper.shouldRefresh(center, zoom)) {
+      return;
+    }
+
+    await _refreshFromCenter(
+      center,
+      zoom: zoom,
+      moveCamera: false, // ya está en esa posición
     );
   }
 
+  // ============================================================
+  //   MARCADORES COMBINADOS
+  // ============================================================
+
+  List<Marker> get _allMarkers {
+    final list = [..._state.businessMarkers];
+    if (_state.currentLocationMarker != null) {
+      list.add(_state.currentLocationMarker!);
+    }
+    return list;
+  }
+
+  // ============================================================
+  //   FAB: CENTRAR EN UBICACIÓN ACTUAL
+  // ============================================================
+
   Future<void> _centerToCurrentLocation() async {
-    if (isLoading) return;
-    setState(() => isLoading = true);
+    if (_state.isLoading) return;
+
     final useCaseCheckLocation = CheckLocationPermissionUseCase(
       GeolocatorService(),
     );
     final resultPermission = await useCaseCheckLocation.execute();
-    setState(() => _isGpsEnabled = resultPermission.success);
+    _setGpsEnabled(resultPermission.success);
 
     try {
-      if (_isGpsEnabled) {
+      if (_state.isGpsEnabled) {
         final position = await Geolocator.getCurrentPosition(
           desiredAccuracy: LocationAccuracy.high,
         );
+
         final newCenter = LatLng(position.latitude, position.longitude);
-        _mapController.move(newCenter, 16);
-        setMarkerCurrentPosition(newCenter);
-        setState(() {});
+        await _refreshFromCenter(newCenter, zoom: 16, moveCamera: true);
+      } else {
+        // Si no hay GPS, recentramos en el default y cargamos desde ahí
+        final center = LatLng(
+          currentPosition["latitude"],
+          currentPosition["longitude"],
+        );
+        await _refreshFromCenter(center, zoom: 16, moveCamera: true);
       }
     } catch (_) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -201,21 +321,14 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
         ),
       );
     }
-
-    setState(() => isLoading = false);
   }
 
-  List<Marker> get allMarkers {
-    final list = [...markers];
-    if (currentLocationMarker != null) {
-      list.add(currentLocationMarker!);
-    }
-    return list;
-  }
+  // ============================================================
+  //   UI
+  // ============================================================
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     final String title = AppLocalizations.of(
       context,
     ).translate('pages.business');
@@ -225,13 +338,17 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
       body: Stack(
         children: [
           AbsorbPointer(
-            absorbing: isLoading,
+            absorbing: _state.isLoading,
             child: FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                center: LatLng(-0.305, -78.602),
-                zoom: 13,
+                center: LatLng(
+                  manager.currentPosition.latitude,
+                  manager.currentPosition.longitude,
+                ),
+                zoom: manager.currentZoom,
                 onTap: (_, __) => _popupController.hideAllPopups(),
+                onPositionChanged: _onMapPositionChanged,
               ),
               children: [
                 TileLayer(
@@ -240,18 +357,27 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
                 ),
                 PopupMarkerLayer(
                   options: PopupMarkerLayerOptions(
-                    markers: allMarkers,
+                    markers: _allMarkers,
                     popupController: _popupController,
                     popupDisplayOptions: PopupDisplayOptions(
                       builder: (context, marker) {
-                        final business = businesses.firstWhere(
+                        final business = _state.businesses.firstWhere(
                           (b) =>
                               b.streetLat == marker.point.latitude &&
                               b.streetLng == marker.point.longitude,
-                          orElse: () => businesses.first,
+                          orElse: () => _state.businesses.first,
                         );
-                        // _mapController.move(marker, _mapController.camera.zoom);
-                        return _buildPopupCard(context, business, marker);
+                        return BusinessPopupCardMolecule(
+                          business: business,
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) =>
+                                    BusinessDetailPage(businessId: business.id),
+                              ),
+                            );
+                          },
+                        );
                       },
                     ),
                   ),
@@ -259,79 +385,13 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
               ],
             ),
           ),
-          if (isLoading)
-            Container(
-              color: Colors.black.withOpacity(0.3),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
+          LoadingOverlayAtom(isLoading: _state.isLoading),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: theme.colorScheme.primary,
-        onPressed: isLoading ? null : _centerToCurrentLocation,
-        tooltip: _isGpsEnabled ? 'Ubicación actual' : 'GPS desactivado',
-        child: Icon(
-          _isGpsEnabled
-              ? Icons.my_location
-              : Icons.location_off, // 👈 cambia dinámicamente
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPopupCard(BuildContext context, BusinessModel business, marker) {
-    final theme = Theme.of(context);
-
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => BusinessDetailPage(businessId: business.id),
-          ),
-        );
-      },
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.7,
-        child: Card(
-          elevation: 6,
-          margin: const EdgeInsets.all(8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          color: theme.colorScheme.surface,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  business.businessName,
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 5),
-                Text(
-                  "Direccion:" + business.street1 + " " + business.street2,
-                  style: theme.textTheme.bodyMedium,
-                ),
-
-                const SizedBox(height: 8),
-                Row(
-                  children: [
-                    const Icon(Icons.star, color: Colors.amber, size: 20),
-                    const SizedBox(width: 4),
-                    Text(
-                      AppLocalizations.of(
-                        context,
-                      ).translate('gamification.points'),
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
+      floatingActionButton: CurrentLocationFabAtom(
+        isLoading: _state.isLoading,
+        isGpsEnabled: _state.isGpsEnabled,
+        onPressed: _centerToCurrentLocation,
       ),
     );
   }

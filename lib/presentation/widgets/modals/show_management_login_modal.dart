@@ -15,7 +15,7 @@ void showManagementLoginModal(
   final onTapFacebook = actions['facebook'];
   final onTapLogin = actions['login'];
   final onTapSignUp = actions['signup'];
-
+  final allowLoginSocialNetwork = false;
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
@@ -56,9 +56,6 @@ void showManagementLoginModal(
               height: 70,
               child: ElevatedButton(
                 onPressed: onTapLogin,
-                child: Text(
-                  appLocalizations.translate('loginManagerTitle.singInButton'),
-                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: theme.colorScheme.primary, // 👈 Usa primary
                   foregroundColor: theme.colorScheme.onPrimary, // 👈 Texto
@@ -66,6 +63,9 @@ void showManagementLoginModal(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(24),
                   ),
+                ),
+                child: Text(
+                  appLocalizations.translate('loginManagerTitle.singInButton'),
                 ),
               ),
             ),
@@ -77,9 +77,6 @@ void showManagementLoginModal(
               height: 70,
               child: OutlinedButton(
                 onPressed: onTapSignUp,
-                child: Text(
-                  appLocalizations.translate('loginManagerTitle.singUpButton'),
-                ),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: theme.colorScheme.primary, // 👈 Texto
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -90,25 +87,31 @@ void showManagementLoginModal(
                     color: theme.colorScheme.primary,
                   ), // 👈 Borde
                 ),
+                child: Text(
+                  appLocalizations.translate('loginManagerTitle.singUpButton'),
+                ),
               ),
             ),
-            AppSpacing.spaceBetweenButtons,
-            Text(
-              appLocalizations.translate('loginManagerTitle.loginInNetwork'),
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+
+            if (allowLoginSocialNetwork) ...[
+              AppSpacing.spaceBetweenButtons,
+              Text(
+                appLocalizations.translate('loginManagerTitle.loginInNetwork'),
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                SocialIcon(FontAwesomeIcons.google, onTap: onTapGoogle!),
-                const SizedBox(width: 16),
-                SocialIcon(FontAwesomeIcons.facebookF, onTap: onTapFacebook!),
-                const SizedBox(width: 16),
-              ],
-            ),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SocialIcon(FontAwesomeIcons.google, onTap: onTapGoogle!),
+                  const SizedBox(width: 16),
+                  SocialIcon(FontAwesomeIcons.facebookF, onTap: onTapFacebook!),
+                  const SizedBox(width: 16),
+                ],
+              ),
+            ],
           ],
         ),
       );

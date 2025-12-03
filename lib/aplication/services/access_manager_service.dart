@@ -182,7 +182,7 @@ class AccessManagerService {
             );
           }
 
-          return response.success; // ✅ Devuelve bool al modal
+          return response; // ✅ Devuelve bool al modal
         });
 
         if (result) {

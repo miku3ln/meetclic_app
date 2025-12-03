@@ -6,9 +6,14 @@ import 'package:meetclic_app/presentation/widgets/atoms/intro_logo.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import 'package:meetclic_app/shared/themes/app_spacing.dart';
 
+import '../../../domain/models/api_response_model.dart';
+
 /// Callback estándar: retorna bool indicando éxito del login
 typedef LoginActionCallback =
-    Future<bool> Function(BuildContext context, UserLoginModel model);
+    Future<ApiResponseModel<Map<String, dynamic>>> Function(
+      BuildContext context,
+      UserLoginModel model,
+    );
 
 /// Modal que devuelve un bool (login exitoso o fallido)
 Future<bool> showLoginUserModal(
@@ -42,6 +47,12 @@ class _LoginModalContentState extends State<LoginModalContent> {
   bool isButtonEnabled = false;
   bool isLoading = false;
 
+  // 🔹 Estado del ALERT / BADGE
+  String? _alertMessage;
+  Color? _alertBackgroundColor;
+  Color? _alertTextColor;
+  IconData? _alertIcon;
+
   @override
   void initState() {
     super.initState();
@@ -63,8 +74,15 @@ class _LoginModalContentState extends State<LoginModalContent> {
 
   Future<void> handleLogin() async {
     if (!isButtonEnabled) return;
+    final theme = Theme.of(context);
 
-    setState(() => isLoading = true);
+    setState(() {
+      isLoading = true;
+      _alertMessage = "Validando tus datos, por favor espera…";
+      _alertBackgroundColor = theme.colorScheme.primary.withOpacity(0.08);
+      _alertTextColor = theme.colorScheme.onSurface;
+      _alertIcon = Icons.info_outline;
+    });
 
     final model = UserLoginModel(
       email: emailController.text.trim(),
@@ -75,10 +93,23 @@ class _LoginModalContentState extends State<LoginModalContent> {
 
     setState(() => isLoading = false);
 
-    if (result) {
-      Navigator.pop(context, true); // ✅ Cierra modal si login fue exitoso
+    if (result.success) {
+      setState(() {
+        _alertMessage = "¡Inicio de sesión exitoso!";
+        _alertBackgroundColor = Colors.green.withOpacity(0.1);
+        _alertTextColor = Colors.green[800];
+        _alertIcon = Icons.check_circle_outline;
+      });
+      Navigator.pop(context, true);
+      // ✅ Cierra modal si login fue exitoso
     } else {
-      // Permite reintento, no cierra modal
+      setState(() {
+        isLoading = false;
+        _alertMessage = result.message;
+        _alertBackgroundColor = Colors.red.withOpacity(0.08);
+        _alertTextColor = Colors.red[800];
+        _alertIcon = Icons.error_outline;
+      });
     }
   }
 
@@ -91,6 +122,7 @@ class _LoginModalContentState extends State<LoginModalContent> {
 
   @override
   Widget build(BuildContext context) {
+    //LOGIN FORM
     final theme = Theme.of(context);
     final appLocalizations = AppLocalizations.of(context);
 
@@ -116,6 +148,43 @@ class _LoginModalContentState extends State<LoginModalContent> {
             mainAxisSize: MainAxisSize.min,
             children: [
               IntroLogo(assetPath: AppImages.pageLoginInit, height: 200),
+              // 🔹 ALERTA / BADGE ANTES DEL CORREO
+              if (_alertMessage != null) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color:
+                        _alertBackgroundColor ??
+                        theme.colorScheme.surfaceVariant.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Icon(
+                        _alertIcon ?? Icons.info_outline,
+                        size: 20,
+                        color: _alertTextColor ?? theme.colorScheme.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          _alertMessage!,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color:
+                                _alertTextColor ?? theme.colorScheme.onSurface,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                AppSpacing.spaceBetweenInputs,
+              ],
               AppSpacing.spaceBetweenInputs,
               InputTextAtom(
                 label: appLocalizations.translate(

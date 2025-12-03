@@ -11,25 +11,21 @@ class GetNearbyBusinessesUseCase {
     required double latitude,
     required double longitude,
     double radiusKm = 10,
-    List<int>? subcategoryIds,
   }) async {
     return await repository.getNearbyBusinesses(
       latitude: latitude,
       longitude: longitude,
       radiusKm: radiusKm,
-      subcategoryIds: subcategoryIds,
     );
   }
 }
+
 class BusinessesDetailsUseCase {
   final BusinessDetailsRepository repository;
   BusinessesDetailsUseCase({required this.repository});
   Future<ApiResponseModel<List<BusinessModel>>> execute({
     required int businessId,
   }) async {
-    return await repository.getBusinessesDetails(
-      businessId: businessId,
-
-    );
+    return await repository.getBusinessesDetails(businessId: businessId);
   }
 }
