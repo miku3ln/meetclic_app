@@ -27,7 +27,7 @@ class ScheduleModalOrganism extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               const SizedBox(width: 12),
-              const VerifiedLabelAtom(text: "Verified 1 month ago"),
+              const VerifiedLabelAtom(text: "Actualizado hace 1 Semana"),
               const Spacer(),
               IconButton(
                 icon: const Icon(Icons.close),
@@ -39,25 +39,10 @@ class ScheduleModalOrganism extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           ...schedule.map(
-            (item) => ScheduleRowMolecule(
-              day: item.day,
-              status: item.isOpen ? item.timeRange : "Cerrado",
-              isToday: item.isToday,
-            ),
+            (item) => ScheduleAccordionMolecule(daySchedule: item),
           ),
+
           const SizedBox(height: 16),
-          GestureDetector(
-            onTap: () {
-              print("Sugerir edición clicado");
-            },
-            child: const Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                "Sugerir una edición",
-                style: TextStyle(color: Colors.teal),
-              ),
-            ),
-          ),
         ],
       ),
     );

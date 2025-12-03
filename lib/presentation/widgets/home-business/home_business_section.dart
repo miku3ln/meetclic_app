@@ -103,11 +103,10 @@ class _SocialIcon extends StatelessWidget {
 List<DaySchedule> convertToDaySchedule(List<BusinessDay> days) {
   final now = DateTime.now();
   final todayIndex = now.weekday % 7; // Flutter: Lunes = 1
-
   return days.map((day) {
     final openRanges = day.configTypeSchedule.data;
     final isOpen = day.configTypeSchedule.type && openRanges.isNotEmpty;
-
+    final isAllDay = day.modelDay;
     final timeRange = isOpen
         ? openRanges
               .map(
@@ -118,10 +117,12 @@ List<DaySchedule> convertToDaySchedule(List<BusinessDay> days) {
         : "";
 
     return DaySchedule(
+      isAllDay: isAllDay,
       day: day.text,
-      isToday: day.weightDay == todayIndex,
+      isToday: (day.weightDay + 1) == todayIndex,
       isOpen: isOpen,
       timeRange: timeRange,
+      openRanges: openRanges,
     );
   }).toList();
 }
@@ -178,8 +179,34 @@ class _HomeBusinessSectionState extends State<HomeBusinessSection> {
   }
 
   Widget _buildSchedule() {
+    final theme = Theme.of(context);
     List<BusinessDay>? days = business.schedulingData!;
     List<DaySchedule> schedule = convertToDaySchedule(days);
+    String descriptionCurrentDay = "";
+    Color descriptionColor = Colors.deepOrange;
+    final DaySchedule todayDataCurrent = schedule.firstWhere(
+      (item) => item.isToday,
+    );
+    if (todayDataCurrent.isToday) {
+      descriptionColor = Colors.lightGreen;
+      String lblStateOpen = todayDataCurrent.isOpen ? "Abierto " : "Cerrado";
+      String lblTimeRange = "";
+      if (todayDataCurrent.isOpen &&
+          todayDataCurrent.timeRange == "" &&
+          todayDataCurrent.isAllDay) {
+        lblTimeRange = "Todo el dia.";
+      } else {
+        lblTimeRange = todayDataCurrent.timeRange;
+        final result = ScheduleCheckResult.check(todayDataCurrent.timeRange);
+        lblTimeRange = result.selectedRange;
+        if (result.isOpen) {
+          descriptionColor = Colors.lightGreen;
+        } else {
+          descriptionColor = Colors.deepOrange;
+        }
+      }
+      descriptionCurrentDay = lblStateOpen + " " + lblTimeRange;
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -187,8 +214,9 @@ class _HomeBusinessSectionState extends State<HomeBusinessSection> {
         children: [
           InfoTileScheduleAtom(
             title: "Horario",
-            subtitle: "Verified 1 month ago",
-            description: "Abierto 8:00 a.m. - 2:00 p.m. EDT",
+            subtitle: "Actualizado hace una semana.!",
+            description: descriptionCurrentDay,
+            descriptionColor: descriptionColor,
             icon: Icons.access_time,
             onTap: () {
               showModalBottomSheet(
@@ -294,5 +322,60 @@ class _HomeBusinessSectionState extends State<HomeBusinessSection> {
         ),
       ],
     );
+  }
+}
+
+class ScheduleCheckResult {
+  final bool isOpen;
+  final String selectedRange;
+
+  ScheduleCheckResult({required this.isOpen, required this.selectedRange});
+
+  /// MÉTODO PRINCIPAL
+  static ScheduleCheckResult check(String scheduleString) {
+    final now = TimeOfDay.now();
+
+    // Dividir por rangos "08:33 - 12:33"
+    final ranges = scheduleString.split("/").map((e) => e.trim()).toList();
+
+    for (final range in ranges) {
+      if (_isNowInsideRange(now, range)) {
+        return ScheduleCheckResult(isOpen: true, selectedRange: range);
+      }
+    }
+
+    // No está dentro de ningún rango
+    return ScheduleCheckResult(isOpen: false, selectedRange: scheduleString);
+  }
+
+  /// ------------------------------
+  /// Helpers internos
+  /// ------------------------------
+
+  static bool _isNowInsideRange(TimeOfDay now, String range) {
+    try {
+      final parts = range.split("-");
+      if (parts.length != 2) return false;
+
+      final start = _parseTime(parts[0].trim());
+      final end = _parseTime(parts[1].trim());
+
+      return _timeBetween(now, start, end);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  static TimeOfDay _parseTime(String timeString) {
+    final parts = timeString.split(":");
+    return TimeOfDay(hour: int.parse(parts[0]), minute: int.parse(parts[1]));
+  }
+
+  static bool _timeBetween(TimeOfDay now, TimeOfDay start, TimeOfDay end) {
+    final nowMin = now.hour * 60 + now.minute;
+    final startMin = start.hour * 60 + start.minute;
+    final endMin = end.hour * 60 + end.minute;
+
+    return nowMin >= startMin && nowMin <= endMin;
   }
 }

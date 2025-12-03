@@ -7,6 +7,11 @@ class InfoTileScheduleAtom extends StatelessWidget {
   final IconData icon;
   final VoidCallback? onTap;
 
+  /// 🔹 Colores opcionales
+  final Color? titleColor;
+  final Color? subtitleColor;
+  final Color? descriptionColor;
+
   const InfoTileScheduleAtom({
     Key? key,
     required this.title,
@@ -14,11 +19,19 @@ class InfoTileScheduleAtom extends StatelessWidget {
     required this.description,
     required this.icon,
     this.onTap,
+    this.titleColor,
+    this.subtitleColor,
+    this.descriptionColor,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+
+    final Color effectiveTitleColor = titleColor ?? Colors.black87;
+    final Color effectiveSubtitleColor = subtitleColor ?? Colors.grey.shade600;
+    final Color effectiveDescriptionColor =
+        descriptionColor ?? Colors.green.shade800;
 
     return InkWell(
       onTap: onTap,
@@ -33,23 +46,35 @@ class InfoTileScheduleAtom extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(title,
-                      style: textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black87)),
+                  Text(
+                    title,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: effectiveTitleColor,
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(subtitle,
-                      style: textTheme.bodySmall
-                          ?.copyWith(color: Colors.grey.shade600)),
+                  Text(
+                    subtitle,
+                    style: textTheme.bodySmall?.copyWith(
+                      color: effectiveSubtitleColor,
+                    ),
+                  ),
                   const SizedBox(height: 6),
-                  Text(description,
-                      style: textTheme.bodyMedium
-                          ?.copyWith(color: Colors.green.shade800)),
+                  Text(
+                    description,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: effectiveDescriptionColor,
+                    ),
+                  ),
                 ],
               ),
             ),
-            const Icon(Icons.arrow_forward_ios_rounded,
-                size: 16, color: Colors.black45),
+            const Icon(
+              Icons.arrow_forward_ios_rounded,
+              size: 16,
+              color: Colors.black45,
+            ),
           ],
         ),
       ),
