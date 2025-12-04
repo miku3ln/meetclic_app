@@ -56,13 +56,13 @@ class GamificationFiltersMolecule extends StatelessWidget {
         const SizedBox(height: 8),
 
         // 🔵 Switches (átomos reutilizables)
-        ToggleFilterTileAtom(
+       /* ToggleFilterTileAtom(
           title: 'Solo empresas con juegos activos',
           subtitle:
               'Muestra negocios que tienen tareas o misiones disponibles.',
           value: onlyWithGamesActive,
           onChanged: onChangedOnlyWithGamesActive,
-        ),
+        ),*/
         ToggleFilterTileAtom(
           title: 'Solo empresas donde puedo canjear premios',
           subtitle:
