@@ -24,17 +24,34 @@ class BusinessDay {
   });
 
   factory BusinessDay.fromJson(Map<String, dynamic> json) {
-    return BusinessDay(
-      id: json['id'],
-      name: json['name'],
-      text: json['text'],
-      type: json['type'],
-      modelDay: json['modelDay'],
-      businessId: json['business_id'],
-      status: json['status'],
-      weightDay: json['weight_day'],
-      configTypeSchedule: ConfigTypeSchedule.fromJson(json['configTypeSchedule']),
-    );
+    try {
+      return BusinessDay(
+        id: json['id'],
+        name: json['name'],
+        text: json['text'],
+        type: json['type'],
+        modelDay: json['modelDay'],
+        businessId: json['business_id'],
+        status: json['status'],
+        weightDay: json['weight_day'],
+        configTypeSchedule: ConfigTypeSchedule.fromJson(
+          json['configTypeSchedule'],
+        ),
+      );
+    } catch (e, stack) {
+      late final configTypeSchedule = ConfigTypeSchedule(data: [], type: false);
+      return BusinessDay(
+        id: -1,
+        name: "",
+        text: "",
+        type: 1,
+        modelDay: false,
+        businessId: -1,
+        status: "ACTIVE",
+        weightDay: 1,
+        configTypeSchedule: configTypeSchedule,
+      );
+    }
   }
 
   Map<String, dynamic> toJson() => {
@@ -59,17 +76,15 @@ class ConfigTypeSchedule {
   final bool type;
   final List<ScheduleRange> data;
 
-  ConfigTypeSchedule({
-    required this.type,
-    required this.data,
-  });
+  ConfigTypeSchedule({required this.type, required this.data});
 
   factory ConfigTypeSchedule.fromJson(Map<String, dynamic> json) {
     return ConfigTypeSchedule(
       type: json['type'],
-      data: (json['data'] as List<dynamic>?)
-          ?.map((e) => ScheduleRange.fromJson(e))
-          .toList() ??
+      data:
+          (json['data'] as List<dynamic>?)
+              ?.map((e) => ScheduleRange.fromJson(e))
+              .toList() ??
           [],
     );
   }
@@ -84,10 +99,7 @@ class ScheduleRange {
   final ScheduleTime startTime;
   final ScheduleTime endTime;
 
-  ScheduleRange({
-    required this.startTime,
-    required this.endTime,
-  });
+  ScheduleRange({required this.startTime, required this.endTime});
 
   factory ScheduleRange.fromJson(Map<String, dynamic> json) {
     return ScheduleRange(

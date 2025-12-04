@@ -27,6 +27,9 @@ class BusinessModel {
   MovementSummaryModel? summary;
   List<BusinessDay>? schedulingData;
   List<SocialNetwork>? socialNetworksData;
+  final int gamificationId;
+  final int allowExchange;
+  final int allowExchangeBusiness;
 
   BusinessModel({
     required this.id,
@@ -51,6 +54,10 @@ class BusinessModel {
     required this.summary,
     this.schedulingData,
     this.socialNetworksData,
+
+    required this.gamificationId,
+    required this.allowExchange,
+    required this.allowExchangeBusiness,
   });
 
   factory BusinessModel.fromJson(Map<String, dynamic> json) {
@@ -103,7 +110,16 @@ class BusinessModel {
           .map((e) => BusinessDay.fromJson(e as Map<String, dynamic>))
           .toList();
     }
-    return BusinessModel(
+    late final gamificationId = json['gamification_id'] == null
+        ? -1
+        : json['gamification_id'];
+    late final allowExchange = json['allow_exchange'] == null
+        ? -1
+        : json['allow_exchange'];
+    late final allowExchangeBusiness = json['allow_exchange_business'] == null
+        ? -1
+        : json['allow_exchange_business'];
+    late final result = BusinessModel(
       id: json['id'],
       title: json['title'] ?? '',
       description: json['description'] ?? '',
@@ -113,6 +129,9 @@ class BusinessModel {
       pageUrl: json['page_url'] ?? '',
       street1: json['street_1'] ?? '',
       street2: json['street_2'] ?? '',
+      gamificationId: gamificationId,
+      allowExchange: allowExchange,
+      allowExchangeBusiness: allowExchangeBusiness,
       streetLat: double.parse(json['street_lat'].toString()),
       streetLng: double.parse(json['street_lng'].toString()),
       status: json['status'] ?? '',
@@ -127,7 +146,9 @@ class BusinessModel {
       schedulingData: schedulingData,
       socialNetworksData: socialNetworksData,
     );
+    return result;
   }
+
   factory BusinessModel.empty([int businessId = 1]) {
     return BusinessModel(
       id: businessId,
@@ -149,6 +170,11 @@ class BusinessModel {
       distance: 0.0,
       distanceKmText: '',
       sourceLogo: '',
+
+      gamificationId: -1,
+      allowExchange: -1,
+      allowExchangeBusiness: -1,
+
       summary: MovementSummaryModel.fromJson({
         "yapitas": {"totalInput": 0, "totalOutput": 0, "currentBalance": 0},
         "yapitasPremium": {
