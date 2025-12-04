@@ -18,7 +18,9 @@ import 'business_detail_page.dart';
 import 'business_map_page/helpers/map_refresh_helper.dart';
 import 'business_map_page/helpers/marker_helper.dart';
 import 'business_map_page/models/business_position.dart';
+import 'business_map_page/models/search_location_info_model.dart';
 import 'business_map_page/services/business_map_service.dart';
+import 'business_map_page/services/geocoding_location_service.dart';
 import 'business_map_page/services/manager_business.dart';
 import 'business_map_page/state/business_filters_state.dart';
 import 'business_map_page/state/business_map_state.dart';
@@ -49,6 +51,8 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
   late final BusinessMapService _businessMapService = BusinessMapService(
     useCase: GetNearbyBusinessesUseCase(repository: BusinessRepositoryImpl()),
   );
+  late final GeocodingLocationService locationService =
+      GeocodingLocationService();
 
   /// Helper para decidir cuándo refrescar en base a movimiento/zoom
   late final MapRefreshHelper _refreshHelper = MapRefreshHelper(
@@ -115,6 +119,7 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadNearbyBusinesses();
     });
@@ -210,6 +215,19 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
 
     _setLoading(true);
     try {
+      // 1) Primero obtenemos info de dirección de ese center
+      final SearchLocationInfoModel locationInfo = await locationService
+          .getLocationInfoFromCoordinates(center.latitude, center.longitude);
+      // 2) Guardamos esa info en el estado
+      setState(() {
+        _state = _state.copyWith(currentLocationInfo: locationInfo);
+      });
+
+      setState(() {
+        _filtersState = _filtersState.copyWith(
+          currentLocationInfo: locationInfo,
+        );
+      });
       final data = await _businessMapService.fetchBusinesses(
         center.latitude,
         center.longitude,
@@ -333,6 +351,8 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
     return list;
   }
 
+  get currentLocationInfo => null;
+
   // ============================================================
   //   FAB: CENTRAR EN UBICACIÓN ACTUAL
   // ============================================================
@@ -360,6 +380,7 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
           currentPosition["latitude"],
           currentPosition["longitude"],
         );
+
         await _refreshFromCenter(center, zoom: 16, moveCamera: true);
       }
     } catch (_) {

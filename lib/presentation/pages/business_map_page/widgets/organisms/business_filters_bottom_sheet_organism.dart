@@ -1,9 +1,13 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/business_map_page/widgets/organisms/search_location_detail_organism.dart';
 
 import '../../models/filter_category_model.dart';
+import '../../models/search_location_info_model.dart';
 import '../../state/business_filters_state.dart';
 import '../../theme/business_filters_colors.dart';
 import '../molecules/category_expansion_molecule.dart';
+import '../molecules/search_location_summary_card_molecule.dart';
 
 class BusinessFiltersBottomSheetOrganism extends StatefulWidget {
   final BusinessFiltersState initialState;
@@ -24,7 +28,8 @@ class _BusinessFiltersBottomSheetOrganismState
     extends State<BusinessFiltersBottomSheetOrganism> {
   late double _radiusKm;
   late Set<String> _selectedSubcategoryIds;
-
+  SearchLocationInfoModel? get _locationInfo =>
+      widget.initialState.currentLocationInfo;
   @override
   void initState() {
     super.initState();
@@ -107,6 +112,40 @@ class _BusinessFiltersBottomSheetOrganismState
                 ],
               ),
               const SizedBox(height: 8),
+
+              // =====================================================
+              // 🌍 SECCIÓN PRINCIPAL: UBICACIÓN DE BÚSQUEDA
+              // Card que se expande a pantalla completa (parent-child)
+              // =====================================================
+              if (_locationInfo != null) ...[
+                OpenContainer(
+                  transitionType: ContainerTransitionType.fadeThrough,
+                  closedElevation: 2,
+                  openElevation: 0,
+                  closedShape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  openShape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero,
+                  ),
+                  closedColor: colors.headerBackgroundColor,
+                  openColor: theme.scaffoldBackgroundColor,
+                  // Vista "cerrada": card dentro del bottom sheet
+                  closedBuilder: (context, openContainer) =>
+                      SearchLocationSummaryCard(
+                        info: _locationInfo!,
+                        colors: colors,
+                        onTap: openContainer,
+                      ),
+                  // Vista "abierta": pantalla completa con más detalle
+                  openBuilder: (context, closeContainer) =>
+                      SearchLocationDetailOrganism(
+                        info: _locationInfo!,
+                        onClose: closeContainer,
+                      ),
+                ),
+                const SizedBox(height: 16),
+              ],
 
               // DISTANCIA
               Align(
