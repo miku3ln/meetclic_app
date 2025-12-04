@@ -7,6 +7,7 @@ import '../../models/search_location_info_model.dart';
 import '../../state/business_filters_state.dart';
 import '../../theme/business_filters_colors.dart';
 import '../molecules/category_expansion_molecule.dart';
+import '../molecules/gamification_filters_molecule.dart';
 import '../molecules/search_location_summary_card_molecule.dart';
 
 class BusinessFiltersBottomSheetOrganism extends StatefulWidget {
@@ -28,8 +29,15 @@ class _BusinessFiltersBottomSheetOrganismState
     extends State<BusinessFiltersBottomSheetOrganism> {
   late double _radiusKm;
   late Set<String> _selectedSubcategoryIds;
+
+  // 🔥 nuevos filtros locales
+  late bool _onlyWithGamesActive;
+  late bool _onlyWithRedeemableRewards;
+  late bool _onlyAlliedCompanies;
+
   SearchLocationInfoModel? get _locationInfo =>
       widget.initialState.currentLocationInfo;
+
   @override
   void initState() {
     super.initState();
@@ -37,12 +45,20 @@ class _BusinessFiltersBottomSheetOrganismState
     _selectedSubcategoryIds = Set<String>.from(
       widget.initialState.categoriesIds,
     );
+
+    _onlyWithGamesActive = widget.initialState.onlyWithGamesActive;
+    _onlyWithRedeemableRewards = widget.initialState.onlyWithRedeemableRewards;
+    _onlyAlliedCompanies = widget.initialState.onlyAlliedCompanies;
   }
 
   void _resetAll() {
     setState(() {
       _radiusKm = 10;
       _selectedSubcategoryIds.clear();
+
+      _onlyWithGamesActive = false;
+      _onlyWithRedeemableRewards = false;
+      _onlyAlliedCompanies = false;
     });
   }
 
@@ -50,6 +66,10 @@ class _BusinessFiltersBottomSheetOrganismState
     final newState = widget.initialState.copyWith(
       radiusKm: _radiusKm,
       categoriesIds: _selectedSubcategoryIds.toList(),
+
+      onlyWithGamesActive: _onlyWithGamesActive,
+      onlyWithRedeemableRewards: _onlyWithRedeemableRewards,
+      onlyAlliedCompanies: _onlyAlliedCompanies,
     );
     Navigator.of(context).pop<BusinessFiltersState>(newState);
   }
@@ -65,11 +85,17 @@ class _BusinessFiltersBottomSheetOrganismState
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = widget.colors ?? BusinessFiltersColors.fromTheme(theme);
 
-    final hasAnyFilter = _selectedSubcategoryIds.isNotEmpty || _radiusKm != 10;
+    final hasAnyFilter =
+        _selectedSubcategoryIds.isNotEmpty ||
+        _radiusKm != 10 ||
+        _onlyWithGamesActive ||
+        _onlyWithRedeemableRewards ||
+        _onlyAlliedCompanies;
 
     final bgButton = hasAnyFilter
         ? colors.applyButtonBackgroundColor
@@ -84,9 +110,12 @@ class _BusinessFiltersBottomSheetOrganismState
         child: Padding(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
           child: Column(
-            mainAxisSize: MainAxisSize.min,
+            // 👇 importante para poder usar Expanded
+            mainAxisSize: MainAxisSize.max,
             children: [
+              // =====================================================
               // HEADER
+              // =====================================================
               Row(
                 children: [
                   IconButton(
@@ -114,172 +143,201 @@ class _BusinessFiltersBottomSheetOrganismState
               const SizedBox(height: 8),
 
               // =====================================================
-              // 🌍 SECCIÓN PRINCIPAL: UBICACIÓN DE BÚSQUEDA
-              // Card que se expande a pantalla completa (parent-child)
+              // CONTENIDO SCROLLEABLE
               // =====================================================
-              if (_locationInfo != null) ...[
-                OpenContainer(
-                  transitionType: ContainerTransitionType.fadeThrough,
-                  closedElevation: 2,
-                  openElevation: 0,
-                  closedShape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  openShape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                  closedColor: colors.headerBackgroundColor,
-                  openColor: theme.scaffoldBackgroundColor,
-                  // Vista "cerrada": card dentro del bottom sheet
-                  closedBuilder: (context, openContainer) =>
-                      SearchLocationSummaryCard(
-                        info: _locationInfo!,
-                        colors: colors,
-                        onTap: openContainer,
-                      ),
-                  // Vista "abierta": pantalla completa con más detalle
-                  openBuilder: (context, closeContainer) =>
-                      SearchLocationDetailOrganism(
-                        info: _locationInfo!,
-                        onClose: closeContainer,
-                      ),
-                ),
-                const SizedBox(height: 16),
-              ],
-
-              // DISTANCIA
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Distancia',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colors.distanceTitleColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Muestra negocios dentro de un radio seleccionado.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colors.distanceSubtitleColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // --- Valor seleccionado (siempre visible)
-                  Row(
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colors.distanceSliderActiveColor.withOpacity(
-                            0.15,
+                      // 🌍 UBICACIÓN DE BÚSQUEDA
+                      if (_locationInfo != null) ...[
+                        OpenContainer(
+                          transitionType: ContainerTransitionType.fadeThrough,
+                          closedElevation: 2,
+                          openElevation: 0,
+                          closedShape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
                           ),
-                          borderRadius: BorderRadius.circular(12),
+                          openShape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.zero,
+                          ),
+                          closedColor: colors.headerBackgroundColor,
+                          openColor: theme.scaffoldBackgroundColor,
+                          closedBuilder: (context, openContainer) =>
+                              SearchLocationSummaryCard(
+                                info: _locationInfo!,
+                                colors: colors,
+                                onTap: openContainer,
+                              ),
+                          openBuilder: (context, closeContainer) =>
+                              SearchLocationDetailOrganism(
+                                info: _locationInfo!,
+                                onClose: closeContainer,
+                              ),
                         ),
+                        const SizedBox(height: 16),
+                      ],
+
+                      // DISTANCIA
+                      Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          '${_radiusKm.toStringAsFixed(0)} km',
-                          style: TextStyle(
-                            color: colors.distanceSliderActiveColor,
+                          'Distancia',
+                          style: theme.textTheme.titleMedium?.copyWith(
                             fontWeight: FontWeight.w600,
+                            color: colors.distanceTitleColor,
                           ),
                         ),
                       ),
-                      const Spacer(),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  // --- Slider con numeración lateral
-                  Row(
-                    children: [
-                      Text(
-                        '1 km',
-                        style: TextStyle(color: colors.distanceLabelColor),
-                      ),
-                      Expanded(
-                        child: SliderTheme(
-                          data: SliderTheme.of(context).copyWith(
-                            activeTrackColor: colors.distanceSliderActiveColor,
-                            inactiveTrackColor:
-                                colors.distanceSliderInactiveColor,
-                            thumbColor: colors.distanceSliderThumbColor,
-                          ),
-                          child: Slider(
-                            value: _radiusKm,
-                            min: 1,
-                            max: 30,
-                            divisions: 29,
-                            onChanged: (value) {
-                              setState(() => _radiusKm = value);
-                            },
+                      const SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Muestra negocios dentro de un radio seleccionado.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.distanceSubtitleColor,
                           ),
                         ),
                       ),
-                      Text(
-                        '30 km',
-                        style: TextStyle(color: colors.distanceLabelColor),
+                      const SizedBox(height: 12),
+
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              const Spacer(),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colors.distanceSliderActiveColor
+                                      .withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  '${_radiusKm.toStringAsFixed(0)} km',
+                                  style: TextStyle(
+                                    color: colors.distanceSliderActiveColor,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                              const Spacer(),
+                            ],
+                          ),
+                          const SizedBox(height: 8),
+                          Row(
+                            children: [
+                              Text(
+                                '1 km',
+                                style: TextStyle(
+                                  color: colors.distanceLabelColor,
+                                ),
+                              ),
+                              Expanded(
+                                child: SliderTheme(
+                                  data: SliderTheme.of(context).copyWith(
+                                    activeTrackColor:
+                                        colors.distanceSliderActiveColor,
+                                    inactiveTrackColor:
+                                        colors.distanceSliderInactiveColor,
+                                    thumbColor: colors.distanceSliderThumbColor,
+                                  ),
+                                  child: Slider(
+                                    value: _radiusKm,
+                                    min: 1,
+                                    max: 30,
+                                    divisions: 29,
+                                    onChanged: (value) {
+                                      setState(() => _radiusKm = value);
+                                    },
+                                  ),
+                                ),
+                              ),
+                              Text(
+                                '30 km',
+                                style: TextStyle(
+                                  color: colors.distanceLabelColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
+
+                      const SizedBox(height: 16),
+                      // 🔥 OPCIONES DE JUEGOS Y PREMIOS
+                      GamificationFiltersMolecule(
+                        colors: colors,
+                        onlyWithGamesActive: _onlyWithGamesActive,
+                        onlyWithRedeemableRewards: _onlyWithRedeemableRewards,
+                        onlyAlliedCompanies: _onlyAlliedCompanies,
+                        onChangedOnlyWithGamesActive: (value) {
+                          setState(() => _onlyWithGamesActive = value);
+                        },
+                        onChangedOnlyWithRedeemableRewards: (value) {
+                          setState(() => _onlyWithRedeemableRewards = value);
+                        },
+                        onChangedOnlyAlliedCompanies: (value) {
+                          setState(() => _onlyAlliedCompanies = value);
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // CATEGORÍAS
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Categorías',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w600,
+                            color: colors.categoriesTitleColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          'Selecciona categorías y subcategorías para filtrar los negocios.',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.categoriesSubtitleColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // 👇 ListView embebido dentro del scroll
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: kFilterCategories.length,
+                        itemBuilder: (_, index) {
+                          final category = kFilterCategories[index];
+                          return CategoryExpansionMolecule(
+                            category: category,
+                            selectedSubcategoryIds: _selectedSubcategoryIds,
+                            colors: colors,
+                            onToggleSubcategory: _toggleSubcategory,
+                          );
+                        },
+                      ),
+
+                      const SizedBox(height: 16),
                     ],
                   ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // CATEGORÍAS
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Categorías',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                    color: colors.categoriesTitleColor,
-                  ),
                 ),
               ),
-              const SizedBox(height: 4),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  'Selecciona categorías y subcategorías para filtrar los negocios.',
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: colors.categoriesSubtitleColor,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
 
-              Flexible(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: kFilterCategories.length,
-                  itemBuilder: (_, index) {
-                    final category = kFilterCategories[index];
-                    return CategoryExpansionMolecule(
-                      category: category,
-                      selectedSubcategoryIds: _selectedSubcategoryIds,
-                      colors: colors,
-                      onToggleSubcategory: _toggleSubcategory,
-                    );
-                  },
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // BOTÓN APLICAR
+              // =====================================================
+              // BOTÓN APLICAR (FIJO ABAJO)
+              // =====================================================
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

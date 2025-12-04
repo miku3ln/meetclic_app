@@ -5,33 +5,31 @@ import 'package:http/http.dart' as http;
 import '../../../domain/models/api_response_model.dart';
 import '../../../domain/models/business_model.dart';
 import '../../../domain/repositories/business_repository.dart';
+import '../../../presentation/pages/business_map_page/models/business_search_params.dart';
 import '../../config/server_config.dart';
 import '../../network/network_helper.dart';
 
 class BusinessRepositoryImpl implements BusinessRepository {
   @override
-  Future<ApiResponseModel<List<BusinessModel>>> getNearbyBusinesses({
-    required double latitude,
-    required double longitude,
-    required double radiusKm,
-    required String searchQuery,
-    required List<String>? categoriesIds,
-  }) async {
+  Future<ApiResponseModel<List<BusinessModel>>> getNearbyBusinesses(
+    BusinessSearchParams params,
+  ) async {
     final url = Uri.parse(
       '${ServerConfig.baseUrl}/business/searchNearbyBusinesses',
     );
-
-    late final searchQueryCurrent = "";
-    final String categoriesIdsCurrent = (categoriesIds ?? [])
+    final String categoriesIdsCurrent = (params.categoriesIds ?? [])
         .map((e) => e.trim())
         .where((e) => e.isNotEmpty)
         .join(',');
     final body = {
-      'latitude': latitude,
-      'longitude': longitude,
-      'radius_km': radiusKm,
+      'latitude': params.latitude,
+      'longitude': params.longitude,
+      'radius_km': params.radiusKm,
       'subcategory_ids': categoriesIdsCurrent,
-      'searchQuery': searchQuery,
+      'searchQuery': params.searchQuery,
+      'onlyWithGamesActive': params.onlyWithGamesActive,
+      'onlyWithRedeemableRewards': params.onlyWithRedeemableRewards,
+      'onlyAlliedCompanies': params.onlyAlliedCompanies,
     };
 
     return NetworkHelper.safeRequest<List<BusinessModel>>(

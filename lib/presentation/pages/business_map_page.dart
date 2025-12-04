@@ -18,6 +18,7 @@ import 'business_detail_page.dart';
 import 'business_map_page/helpers/map_refresh_helper.dart';
 import 'business_map_page/helpers/marker_helper.dart';
 import 'business_map_page/models/business_position.dart';
+import 'business_map_page/models/business_search_params.dart';
 import 'business_map_page/models/search_location_info_model.dart';
 import 'business_map_page/services/business_map_service.dart';
 import 'business_map_page/services/geocoding_location_service.dart';
@@ -228,13 +229,18 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
           currentLocationInfo: locationInfo,
         );
       });
-      final data = await _businessMapService.fetchBusinesses(
-        center.latitude,
-        center.longitude,
-        _filtersState.radiusKm,
-        _filtersState.searchQuery,
-        _filtersState.categoriesIds,
+      late final filters = BusinessSearchParams(
+        latitude: center.latitude,
+        longitude: center.longitude,
+        radiusKm: _filtersState.radiusKm,
+        searchQuery: _filtersState.searchQuery,
+        categoriesIds: _filtersState.categoriesIds,
+        onlyWithGamesActive: _filtersState.onlyWithGamesActive,
+        onlyWithRedeemableRewards: _filtersState.onlyWithRedeemableRewards,
+        onlyAlliedCompanies: _filtersState.onlyAlliedCompanies,
       );
+
+      final data = await _businessMapService.fetchBusinesses(filters);
 
       _applyBusinessData(center, data, zoom: zoom, moveCamera: moveCamera);
     } catch (e) {
