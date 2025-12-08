@@ -18,12 +18,18 @@
     "profile": "Perfil",
     "projects": "Proyectos",
     "explore": "Explora",
+    "dictionary": "Diccionario",
     "businessSection": {
       "information": "Información",
       "shop": "Tienda",
       "news": "Noticias",
       "gaming": "Juegos"
     }
+  },
+  "dictionaryPage": {
+    "searchWord": "Buscar Palabra",
+    "seeAll": "Ver Todo",
+    "grammaticalClasses": "Clases Gramaticales"
   },
   "gamification": {
     "points": "Puntos"
@@ -81,7 +87,6 @@
       "buttonRegister": "Registrar"
     }
   },
-
   "Reset Password Notification": "Notificación de restablecimiento de contraseña\n",
   "Hello!": "Hola!",
   "You are receiving this email because we received a password reset request for your account.": "Recibió este correo electrónico porque recibimos una solicitud de restablecimiento de contraseña para su cuenta.",
@@ -92,9 +97,6 @@
   "Oh no": "Oh no",
   "Whoops!": "Genial!",
   "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser: [:actionURL](:actionURL)": "Si tiene problemas para hacer clic en el botón \":actionText\", copie y pegue la URL a continuación\n en su navegador web: [:actionURL](:actionURL)",
-
-
-
   "login.bread-crumb-wrapper.title": "Login",
   "login.bread-crumb-wrapper.list.ref1": "Inicio",
   "login.bread-crumb-wrapper.list.ref2": "Account",
@@ -104,7 +106,6 @@
   "login.form.password.place-holder": "Ingrese su contraseña.",
   "login.form.remember": "Recordar",
   "login.form.button-submit": "Login",
-
   "frontend.menu.home": "HOME",
   "frontend.menu.project.one.home": "Pachamama",
   "frontend.menu.project.one.kichwa": "Kichwa",
@@ -124,67 +125,53 @@
   "frontend.menu.project.one.kichwa.sectionThree.description": "La poblacion kichwa hablante es aproximadamente 724.721 personas ,pero se estima en realidad hay mas de un milon de kichwas dispuestos a rescatar su cultura.",
   "frontend.menu.project.one.kichwa.sectionFour.title": "Extension",
   "frontend.menu.project.one.kichwa.sectionFour.description": "El Idioma kichwa se habla en los 7 paieses pertenecientes al tawa-inti-suyo : Sur de Colombia ,Ecuador ,Peru,Bolivia  region este de Brasil ,norte de Argentina y norte de Chile",
-
   "frontend.menu.project.one.elements.section.title": "Los Elementos de la Pachamama",
   "frontend.menu.project.one.elements.section.subTitle": "En la Gramatica Kichwa",
   "frontend.menu.project.one.elements.sectionOne.title": "Aire I",
   "frontend.menu.project.one.elements.sectionOne.description": "Ha ciertos sonidos que caracterizan a una lengua y su correcta pronunciacion es importante, quien nos ayuda a estudiar estos sonidos y sus reglas de combinacion es la ",
   "frontend.menu.project.one.elements.sectionOne.description.bold": "fonologia.",
-
   "frontend.menu.project.one.elements.sectionTwo.title": "Agua II",
   "frontend.menu.project.one.elements.sectionTwo.description": "Las palabras que utilizamos estan formadas por elementos mas pequeños que , combinados,sirven para formarlas. La parte dela gramatica que estudia este fenomeno es la ",
   "frontend.menu.project.one.elements.sectionTwo.description.bold": "morfologia.",
-
   "frontend.menu.project.one.elements.sectionThree.title": "Tierra III",
   "frontend.menu.project.one.elements.sectionThree.description": "Hablamos con palabras , pero esas palabras necesitan organizarse segun ciertas reglas. La parte de la gramatica que se ocupa de las reglas que rigen para estructurar las oraciones se denominan ",
   "frontend.menu.project.one.elements.sectionThree.description.bold": "sintaxis.",
-
   "frontend.menu.project.one.elements.sectionFour.title": "Fuego IV",
   "frontend.menu.project.one.elements.sectionFour.description.init": "La ",
   "frontend.menu.project.one.elements.sectionFour.description.bold": "estructura gramatical",
   "frontend.menu.project.one.elements.sectionFour.description": " es la forma en que las palabras se unen y se cambian para formar oracioens y expresar diferentes significados, estan palabras son el sujeto,complemento y verbo, junto con particulas aglutinantes. ",
-
   "frontend.menu.project.one.arawi.section.title": "EL CHASKI SHIMI MENSAJERO DE LA LENGUAA",
   "frontend.menu.project.one.arawi.section.subTitle": "",
-
   "frontend.menu.about-us": "Conócenos",
   "frontend.menu.contact-us": "Contáctanos",
   "frontend.menu.services": "Servicios",
   "frontend.menu.shop": "Tienda",
   "frontend.menu.hive": "Meet Clic",
   "frontend.menu.businessProducts": "Productos",
-
   "frontend.menu.search": "Buscar",
   "frontend.menu.FAQ": "FAQ",
-
   "frontend.menu.productFlowers": "Mundi flowers",
   "frontend.menu.productProducts": "Mundi Products",
   "frontend.menu.productFruits": "Mundi fruits",
   "frontend.menu.productFrozen": "Mundi Frozen",
   "frontend.menu.productBox": "Mundi Box",
-
   "frontend.menu.howItWorks": "Preguntas?",
   "frontend.menu.backLine": "Backline",
-
   "frontend.menu.dictionaryKichwaToCastellano": "Kichwa - Castellano",
   "frontend.menu.project": "Cultura",
   "frontend.menu.project.one": "Riksichishun",
-
   "frontend.menu.dictionaryCastilianToKichwa": "Castellano-Kichwa",
   "frontend.dictionaryCastilianToKichwa.slider.title": "Diccionario",
   "frontend.dictionaryCastilianToKichwa.slider.subtitle": "Castellano-Kichwa",
-
   "frontend.menu.prices": "Planes",
   "frontend.plans.slider.title": "Nuestros planes tarifarios",
   "frontend.plans.slider.breadcrumb.main": "Inicio",
   "frontend.plans.slider.breadcrumb.current": "Planes",
   "frontend.plans.slider.button": "Empecemos",
-
   "frontend.menu.pages": "Empresa",
   "frontend.menu.dictionary": "Diccionarios",
   "frontend.dictionary.slider.title": "Diccionario ",
   "frontend.dictionary.slider.subtitle": "Kichwa - Castellano",
-
   "frontend.menu.pages.two": "Tienda",
   "frontend.menu.pages.three": "Acerca de",
   "frontend.menu.shop-cart": "Carrito de Compras",
@@ -203,13 +190,11 @@
   "frontend.menu.search.pagination.prev": "Anterior",
   "frontend.menu.search.pagination.next": "Siguiente",
   "frontend.menu.search.admin.addedBy": "Agregado Por",
-
   "frontend.menu.home.filters.keywords": "Qué estás buscando?",
   "frontend.menu.home.filters.location": "Ubicacion",
   "frontend.menu.home.filters.category": "Todas las Categorias",
   "frontend.menu.home.filters.button": "Buscar",
   "frontend.menu.home.filters.button.search": "Busqueda",
-
   "frontend.menu.home.slider.button": "Empecemos",
   "frontend.menu.home.slider.title": "Te ayudaremos a encontrar todo\n",
   "frontend.menu.home.slider.subtitle": "Encuentra buenos lugares, hoteles, restaurantes, tiendas, etc.",
@@ -225,44 +210,29 @@
   "frontend.menu.home.join.title": "Únete a nuestra comunidad",
   "frontend.menu.home.join.description": "Haz crecer tu comercialización y se feliz con tu negocio en línea",
   "frontend.menu.home.join.button": "Registrate Ahora",
-
-
   "frontend.menu.home.categories.title": "Categorías Destacadas",
   "frontend.menu.home.categories.subtitle": "Catalogo de categorias",
   "frontend.menu.home.categories.description": "Explore algunos de los mejores consejos de la ciudad de nuestros socios y amigos.",
-
   "frontend.menu.home.categories.button-search": "Ver Meet Clic",
   "frontend.menu.home.categories.button-category": "Negocio",
-
-
   "frontend.menu.home.listing.title": "Empresas populares",
   "frontend.menu.home.listing.subtitle": "Las mejores listas",
   "frontend.menu.home.listing.description": "Todas estas empresas fueron calificadas por nuestra comunidad por clientes satisfechos por el servicios prestado",
-
   "frontend.menu.home.how-it-works.title": "Cómo funciona",
   "frontend.menu.home.how-it-works.subtitle": "Descrubre y Conecta.",
   "frontend.menu.home.how-it-works.description": "Hacemos que las empresas y clientes tengan una union amena y ganen mutuamente apoyandose,trabajando entre si.",
-
-
   "frontend.menu.homeOne.title": "Servicio Inmediato . Transporte Seguro",
   "frontend.menu.homeOne.subtitle": "d",
   "frontend.menu.homeOne.description": "Nuestra especialidad es el servicio de compras o envíos express hacia ecuador, nos convertimos en tu aliado para\n facilitar la gestión de compra.",
-
-
   "frontend.menu.homeTwo.title": "Rosas y flores de alta calidad",
   "frontend.menu.homeTwo.subtitle": "d",
   "frontend.menu.homeTwo.description": "Nuestras Fincas aliadas, poseen los mejores estándares de calidad\n en el proceso de cultivo, cosecha y despacho de la flor ,calificándonos  como uno de los mejores proveedores ecuatorianos a nivel internacional",
-
   "frontend.menu.homeThree.title": "Frutas Frescas y deliciosas",
   "frontend.menu.homeThree.subtitle": "d",
   "frontend.menu.homeThree.description": "Control de calidad en toda la cadena productiva, garantizando la conservación de todos sus nutrientes y beneficios",
-
-
   "frontend.menu.homeFour.title": "Directamente desde el mar",
   "frontend.menu.homeFour.subtitle": "d",
   "frontend.menu.homeFour.description": "productos ricos en proteínas de excelente calidad",
-
-
   "frontend.menu.home.testimonials.title": "Testimonios",
   "frontend.menu.home.testimonials.subtitle": "Clientes",
   "frontend.menu.home.testimonials.description": "Nuestra plataforma brinda seguridad ,confianza y una estrecha relacion con tus clientes.",
@@ -271,7 +241,6 @@
   "frontend.menu.home.prices.description": "Nuestros planes con las mejores caracteristicas",
   "frontend.menu.home.blog.title": "Consejos y artículos",
   "frontend.menu.home.blog.button": "Leer Todos",
-
   "frontend.menu.home.blog.subtitle": "Desde el blog.",
   "frontend.menu.home.blog.description": "Explore los últimos artículos de nuestro blog.",
   "frontend.menu.home.do-you-have.title": "Tienes preguntas ?",
@@ -282,7 +251,6 @@
   "frontend.business-details.menu-top.three.title": "Sugerencias",
   "frontend.business-details.menu-top.four.title": "Tienda",
   "frontend.business-details.menu-top.five.title": "Acerca de Nosotros",
-
   "frontend.business-details.working": "Horas Laborales",
   "frontend.business-details.all-day": "Todo el dia.",
   "frontend.business-details.all-day-open": "Abierto",
@@ -292,15 +260,12 @@
   "frontend.business-details.support.chat.need-help": "¿Necesitas ayuda? Escribe al propietario",
   "frontend.business-details.now": "Ahora",
   "frontend.business-details.gallery": "Galeria",
-
-
   "frontend.business-details.contact-us": "Ubicación / Contactos",
   "frontend.business-details.contact-us.address": "Direccion",
   "frontend.business-details.contact-us.phone": "Telefono",
   "frontend.business-details.contact-us.mail": "Email",
   "frontend.business-details.contact-us.web": "Pagin Web",
   "frontend.business-details.contact-us.chat-button": "Mensaje con el propietario",
-
   "frontend.business-details.reviews.title": "Agregar Sugerencias y calificar negocio",
   "frontend.business-details.reviews.field1": "Tu calificación para este negocio",
   "frontend.business-details.reviews.field2": "Nombres",
@@ -310,11 +275,8 @@
   "frontend.business-details.shop.title": "Tienda",
   "frontend.shop.manager.buttons.add": "Agregar al carrito",
   "frontend.shop.manager.buttons.view-previews": "Ver",
-
   "frontend.business-details.shop.breadcrumb.main": "Inicio",
   "frontend.business-details.shop.breadcrumb.current": "Tienda",
-
-
   "frontend.actions.open": "Abrir",
   "frontend.actions.opened": "Abierto",
   "frontend.actions.close": "Cerrar",
@@ -323,7 +285,6 @@
   "frontend.actions.reviewed": "Opinado",
   "frontend.actions.view": "Vista",
   "frontend.actions.viewed": "Visto",
-
   "frontend.actions.add": "Agregar",
   "frontend.actions.added": "Agregado",
   "frontend.actions.save": "Guardar",
@@ -338,8 +299,6 @@
   "frontend.referral.success": "Publicación completada",
   "frontend.referral.error": "Error al publicar",
   "frontend.referral.coming-soon": "Muy Pronto",
-
-
   "frontend.menu.home.services.one.title": "24 horas de soporte",
   "frontend.menu.home.services.one.description": "Asistencia y soporte técnico para satisfacer sus necesidades.",
   "frontend.menu.home.services.two.title": "Panel de administrador",
@@ -357,7 +316,6 @@
   "frontend.business-details.counter.five": "Habitaciones de hotel",
   "frontend.business-details.counter.six": "Clientes satisfechos esta semana.",
   "frontend.business-details.counter.seven": "Restaurantes en el interior",
-
   "frontend.menu.home.prices.bee.title": "Abeja",
   "frontend.menu.home.prices.bee.subtitle": "Gratis",
   "frontend.menu.home.prices.bee.timer": "Mensual",
@@ -365,7 +323,6 @@
   "frontend.menu.home.prices.bee.options.two": "Disponibilidad de 30 días",
   "frontend.menu.home.prices.bee.options.three": "Soporte Limitado",
   "frontend.menu.home.prices.bee.options.four": "Administracion Limitada",
-
   "frontend.menu.home.prices.worker.title": "Obrero",
   "frontend.menu.home.prices.worker.subtitle": "99",
   "frontend.menu.home.prices.worker.timer": "Trimestral",
@@ -377,8 +334,6 @@
   "frontend.menu.home.prices.worker.options.six": "Administracion Prom",
   "frontend.menu.home.prices.worker.options.seven": "Compartir Prom Limitadas",
   "frontend.menu.home.prices.worker.options.eight": "Compartir Desc Limitadas",
-
-
   "frontend.menu.home.prices.queen.title": "Reina",
   "frontend.menu.home.prices.queen.subtitle": "149",
   "frontend.menu.home.prices.queen.timer": "Trimestral",
@@ -392,10 +347,8 @@
   "frontend.menu.home.prices.queen.options.eight": "Compartir Desctos Limitadas",
   "frontend.menu.home.prices.queen.options.nine": "Administracion Entregas",
   "frontend.menu.home.prices.queen.options.ten": "Administracion Yapas Limitados",
-
   "frontend.menu.home.prices.button": "Escoger",
   "frontend.menu.home.prices.title.recommended": "Recomendado",
-
   "frontend.how-it-works.slider.title": "Cómo funciona / Preguntas frecuentes",
   "frontend.how-it-works.slider.breadcrumb.main": "Inicio",
   "frontend.how-it-works.slider.breadcrumb.current": "Cómo funciona",
@@ -406,38 +359,28 @@
   "frontend.how-it-works.item.faq.video.one.title": "Fidelizacion de Clientes",
   "frontend.how-it-works.item.faq.video.one.description": "In ut odio libero, at vulputate urna. Nulla tristique mi a massa convallis cursus. Nulla eu mi magna. Etiam suscipit commodo gravida. Lorem ipsum dolor sit amet, conse ctetuer adipiscing elit, sed diam nonu mmy nibh euismod tincidunt ut laoreet dolore magna aliquam erat.",
   "frontend.how-it-works.item.faq.video.one.button": "Nuestro Video",
-
   "frontend.how-it-works.faq.title.title": "Preguntas Frecuentes",
   "frontend.how-it-works.faq.title.subtitle": "Explore algunos de los mejores consejos de la ciudad de nuestros socios y amigos",
   "frontend.how-it-works.item.faq.text.one.title": "¿Cuál es el precio de publicación?",
   "frontend.how-it-works.item.faq.text.one.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.two.title": " ¿Puedo subir archivos adjuntos?",
   "frontend.how-it-works.item.faq.text.two.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.three.title": " ¿Puedo crear una página de perfil para empresas?\n",
   "frontend.how-it-works.item.faq.text.three.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.four.title": "  ¿Cuál es el precio de publicación?",
   "frontend.how-it-works.item.faq.text.four.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.five.title": "  ¿Cómo publico mi anuncio? ",
   "frontend.how-it-works.item.faq.text.five.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.six.title": " Qué beneficios tengo ?",
   "frontend.how-it-works.item.faq.text.six.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.seven.title": "Fidelizacion entre Cliente? ",
   "frontend.how-it-works.item.faq.text.seven.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.eight.title": " Mejor servicio en la  Entrega  ",
   "frontend.how-it-works.item.faq.text.eight.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.how-it-works.item.faq.text.nine.title": "Como Expando mi negocio ?",
   "frontend.how-it-works.item.faq.text.nine.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
   "frontend.how-it-works.item.faq.text.ten.title": "Puedo agregar mis Producto/Servicios en mi perfil ?",
   "frontend.how-it-works.item.faq.text.ten.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar. Donec a consectetur nulla. Nulla posuere sapien vitae lectus suscipit, et pulvinar nisi tincidunt. Aliquam erat volutpat. Curabitur convallis fringilla diam sed aliquam. Sed tempor iaculis massa faucibus feugiat. In fermentum facilisis massa, a consequat purus viverra.",
-
   "frontend.menu.home.how-it-works.business.title": "Negocios",
   "frontend.menu.home.how-it-works.business.one.title": "Registra tu Empresa",
   "frontend.menu.home.how-it-works.business.one.description": "Únase a nuestra comunidad y registre información relevante de tu negocio para sus futuros clientes.",
@@ -452,10 +395,6 @@
   "frontend.menu.home.how-it-works.customers.two.description": "En actividades posteadas por los negocios ,tales como compartir ,referir informacion de la empresa :Productos/Servicios ,promociones ,descuentos. ",
   "frontend.menu.home.how-it-works.customers.three.title": "Gana",
   "frontend.menu.home.how-it-works.customers.three.description": "Al realizar actividades posteadas por una empresa puedes recibir   compensaciones(Yapitas) que puedes utilizar en la plataforma.",
-
-
-
-
   "frontend.menu.search.filters.location": "Destino",
   "frontend.menu.search.filters.button.back": "Regresar a filtros",
   "shop-cart.product.title": "Producto",
@@ -465,8 +404,6 @@
   "shop-cart.product.sub-total-title": "Subtotal",
   "shop-cart.product.total": "Totales de Compras",
   "shop-cart.product.tax": "Total Impuestos",
-
-
   "shop-cart.button": "Proceder Compra",
   "shop-cart.empty": "  No existe productos agregados.",
   "checkout.paypal.on-authorize.success": "  Se Realizo con exito la orden,se envio un correo electronico informativo de la orden.",
@@ -498,7 +435,6 @@
   "checkout.form.zipcode.place-holder": "Ingrese Codigo Postal.",
   "checkout.form.document": "Documento/Pasaporte",
   "checkout.form.document.place-holder": "Ingrese Documento/Pasaporte",
-
   "checkout.form.billing_document": "Documento/Pasaporte",
   "checkout.form.billing_document.place-holder": "Ingrese Documento/Pasaporte",
   "checkout.form.billing_first_name": "Nombres",
@@ -532,8 +468,6 @@
   "checkout.titles.step1": "1.REVISE SU ORDEN",
   "checkout.titles.step2": "2.DIRECCION DE ENTREGA",
   "checkout.titles.step3": "3.SELECCIONE EL MÉTODO DE PAGO",
-
-
   "checkout.billing.title": "Compras Total",
   "checkout.billing.total": "Total",
   "checkout.billing.product": "Producto",
@@ -542,19 +476,16 @@
   "checkout.billing.total-cart": "Total Compras",
   "checkout.buttons.submit": "Realizar Pago",
   "checkout.messages.empty": "    No existe productos agregados al carrito.!",
-
   "contact-us.map.title": "Sin Gestionar Empresa",
   "contact-us.form.message.error": "Mensaje no Enviado.",
   "contact-us.form.message.loading": "Enviando Mensaje....",
   "contact-us.form.message.success": "Mensaje Enviado",
   "contact-us.form.message.notification.title": "Informacion",
-
   "services.map.title": "Sin Gestionar Empresa",
   "services.form.message.error": "Mensaje no Enviado.",
   "services.form.message.loading": "Enviando Mensaje....",
   "services.form.message.success": "Mensaje Enviado",
   "services.form.message.notification.title": "Informacion",
-
   "shop.bread-crumb-wrapper.title": "Tienda",
   "shop.filters.field-0": "Todos",
   "shop.filters.field-1": "Nombres",
@@ -595,7 +526,6 @@
   "header.shopping.subtotal": "Subtotal",
   "header.shopping.view-cart": "Ver Compras",
   "header.shopping.checkout": "Finalizar Compra",
-
   "page.home": "Inicio",
   "page.aboutUs": "Quienes Somos",
   "page.aboutUs.variants.title": "Cómo trabajamos",
@@ -605,29 +535,24 @@
   "page.aboutUs.variants.background.title": "Necesitas más información",
   "page.aboutUs.variants.background.subtitle": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.",
   "page.aboutUs.variants.background.button": "Ponerse en contacto",
-
   "page.ourTeam.title": "Nuestro equipo",
   "page.ourTeam.subtitle": "Capacitados para tu atencion",
   "page.ourTeam.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas in pulvinar neque. Nulla finibus lobortis pulvinar.",
   "page.ourTeam.data.one.title": "Katherine Males",
   "page.ourTeam.data.one.subtitle": "Consultora de negocios",
   "page.ourTeam.data.one.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-
   "page.ourTeam.data.four.title": "Leonel Lema",
   "page.ourTeam.data.four.subtitle": "System Process",
   "page.ourTeam.data.four.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
   "page.ourTeam.data.five.title": "Patricio Isama",
   "page.ourTeam.data.five.subtitle": "Multimedia",
   "page.ourTeam.data.five.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-
   "page.ourTeam.data.two.title": "Miguel Alba",
   "page.ourTeam.data.two.subtitle": "Ingeniero en Sistemas",
   "page.ourTeam.data.two.description": "Soy una persona emprendedora, que adora los retos y no se rinde fácilmente. Muy detallista y autodidacta cada día, nunca dejo de aprender y tengo un especial don de gentes.",
   "page.ourTeam.data.three.title": "Johana Saenz",
   "page.ourTeam.data.three.subtitle": "Diseñadora",
   "page.ourTeam.data.three.description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-
-
   "page.initSection.button": "Empecemos",
   "page.contactUs": "Contáctanos",
   "page.contactUs.variant.background.title": "Contacte",
@@ -635,13 +560,11 @@
   "page.contactUs.variant.background.description": "✨ ¿Tienes un negocio o idea que merece ser vista?\n\uD83D\uDE80 En MeetClic conectamos empresas con personas reales que valoran lo auténtico.\n\uD83D\uDCAC Escríbenos y descubre cómo potenciar tus ventas con herramientas que enamoran.\n\uD83E\uDD1D Estamos aquí para ayudarte a crecer, compartir y destacar.\n\uD83D\uDCE9 ¡Contáctanos ahora y transforma la forma en que conectas!",
   "page.contactUs.variant.map": "Nuestra Ubicacion",
   "page.contactUs.variant.map.instruction": "Mueve el marker",
-
   "page.services": "Nuestros Servicios",
   "page.faq": "Pregusntas Frecuentes",
   "page.shop.productsServices": "Tienda",
   "page.shop.productDetails": "Detalle del Producto",
   "page.shop.eventDetails": "Detalle del Evento",
-
   "page.shop.cart": "Carrito de Compras",
   "page.shop.checkout": "Chequear",
   "page.terms": "Terminos y Condiciones",
@@ -653,7 +576,6 @@
   "page.checkoutDetails.invoice.header.order-date": "Fecha de Orden :",
   "page.checkoutDetails.invoice.header.order-status": "Estado de Orden :",
   "page.checkoutDetails.invoice.header.order-no": "Orden No. :",
-
   "page.checkoutDetails.status.created": "POR REVISAR",
   "page.checkoutDetails.status.executed": "POR ENTREGAR",
   "page.checkoutDetails.status.delivered": "ENTREGADO",
@@ -668,13 +590,11 @@
   "page.checkoutDetails.type-payments.credit-card": "TARJETA DE CREDITO",
   "page.checkoutDetails.type-payments.pay-pal": "PAY PAL",
   "page.checkoutDetails.type-payments.deposit-bank": "DEPOSITO/TRANSFERENCIA",
-
   "page.checkoutDetails.table.header.col1": "Cant",
   "page.checkoutDetails.table.header.col2": "Producto/Detalle",
   "page.checkoutDetails.table.header.col3": "Precio",
   "page.checkoutDetails.table.header.col4": "Total",
   "page.checkoutDetails.table.header.col5": "Evento/Detalle",
-
   "page.checkoutDetails.totalManager.subtotal": "Sub-total :",
   "page.checkoutDetails.totalManager.discount": "Descuento :",
   "page.checkoutDetails.notes.title": "Nota:",
@@ -682,11 +602,8 @@
   "page.checkoutDetails.notes.credit-cards": "Estamos procesando el pago, en unos minutos recibirá un correo electrónico de confirmación de compra.",
   "page.checkoutDetails.notes.pay-pal": "Estamos procesando el pago, en unos minutos recibirá un correo electrónico de confirmación de compra.",
   "page.checkoutDetails.typePayment.title": "Metodo de Pago",
-
   "page.checkoutDetails.checkout.title": "Orden Confirmada",
   "page.checkoutDetails.checkout.msg": "Enviaremos los detalles de la compra al correo electrónico. :email.",
-
-
   "formContactUs.title": "Tienes Preguntas?",
   "formContactUs.subtitle": "Tu satisfacción define nuestro resultado",
   "formContactUs.field1": "Nombres",
@@ -694,18 +611,12 @@
   "formContactUs.field3": "Asunto",
   "formContactUs.field4": "Mensaje",
   "formContactUs.buttonSend": "Enviar",
-
   "payments.type.bankDeposit.intro": "Realice el depósito a la cuenta # :accountNumber",
   "payments.type.bankDeposit.title": "Transferencias electrónicas o depósitos bancarios",
   "payments.type.payPal.title": "Paypal",
   "payments.type.payPal.intro": "Realice pagos mediante paypal.",
   "payments.type.creditCards.title": "Paymentez",
   "payments.type.creditCards.intro": "Paymentez es la solución completa para pagos en línea. Seguro, fácil y rápido. ",
-
-
-
-
-
   "frontend.referral.activities.one": "Compartir negocio",
   "frontend.referral.activities.two": "Compartir producto",
   "frontend.referral.activities.three": "Negocio de referencia",
@@ -715,29 +626,22 @@
   "frontend.referral.activities.six": "Listado",
   "frontend.referral.activities.seven": "Marcado como favorito",
   "frontend.referral.activities.eight": "Responder",
-
   "frontend.structure.hive.bee": "Abeja",
   "frontend.structure.hive.worker": "Obrera",
   "frontend.structure.hive.drone": "Zangano",
   "frontend.structure.hive.queen": "Reina",
-
   "frontend.greeting.hi": "Hola",
   "frontend.greeting.one": "Tu",
   "frontend.greeting.two": "ha sido aprobado",
   "frontend.greeting.three": "Alguien",
   "frontend.greeting.four": "Alguien marcó tu",
   "frontend.greeting.five": "Alguien dejó una reseña en",
-
   "frontend.account.menu.title.one": "Cuenta",
   "frontend.account.menu.title.two": "Administración",
   "frontend.account.menu.title.three": "Historiales",
   "frontend.account.menu.records.one": "Ordenes",
   "frontend.account.menu.records.two": "Puntos de Venta",
-
   "frontend.account.menu.records.manager.one": "Administración  de Ordenes",
-
-
-
   "frontend.account.breadcrumb.left": "Panel de administrador",
   "frontend.account.menu.dashboard": "Tablero",
   "frontend.account.dashboard.title-activities": "Actividades recientes",
@@ -745,8 +649,6 @@
   "frontend.account.dashboard.counters.total-listings-views": "Vistas de reinas",
   "frontend.account.dashboard.counters.total-reviews": "Revisiones totales",
   "frontend.account.dashboard.counters.total-times-bookmarked": "Tiempos marcados",
-
-
   "frontend.account.menu.profile": "Perfil",
   "frontend.account.menu.profile.title.one": "Mi Informacion",
   "frontend.account.menu.profile.field.one": "Tu nombre",
@@ -758,7 +660,6 @@
   "frontend.account.menu.profile.field.four.address.main": "Calle Principal",
   "frontend.account.menu.profile.field.five.address.secondary": "Calle Secundaria",
   "frontend.account.menu.profile.field.five.address.reference": "Referencia",
-
   "frontend.account.menu.profile.field.six": "Web",
   "frontend.account.menu.profile.field.seven": "Acerca de ti",
   "frontend.account.menu.profile.field.eight": "País",
@@ -774,14 +675,11 @@
   "frontend.account.menu.profile.field.sixteen": "Fecha Nacimiento",
   "frontend.account.menu.profile.field.seventeen": "Reference",
   "frontend.account.menu.profile.title.five": "Contacto",
-
-
   "frontend.account.menu.change-password": "Cambia la contraseña",
   "frontend.account.menu.change-password.title": "Cambia la contraseña",
   "frontend.account.menu.change-password.field.one": "Contraseña actual",
   "frontend.account.menu.change-password.field.two": "Contraseña nueva",
   "frontend.account.menu.change-password.field.three": "Confirmar nueva contraseña",
-
   "frontend.account.menu.suggestions-mailbox": "Buzón de sugerencias",
   "frontend.account.menu.suggestions-mailbox.title.one": "Bandeja de entrada",
   "frontend.account.menu.suggestions-mailbox.manager-grid.one": "nUEVO",
@@ -797,7 +695,6 @@
   "frontend.buttons.return": "Regresar",
   "frontend.buttons.logout": "Salir",
   "frontend.buttons.manager-admin": "Administracion Sistema",
-
   "frontend.account.menu.one": "Mis Negocios",
   "frontend.account.menu.my-business.one": "Informacion",
   "frontend.account.menu.my-business.two": "Direccion",
@@ -805,10 +702,8 @@
   "frontend.account.menu.my-business.four": "Servicio de Entrega ",
   "frontend.account.menu.my-business.five": "Rembolso",
   "frontend.account.menu.my-business.six": "Otros",
-
   "frontend.account.menu.my-business": "Mis Empresas",
   "frontend.account.menu.my-businessEmployer": "Mis Empleos",
-
   "frontend.account.menu.my-business.field.one": "Sube un archivo para comenzar a recortar",
   "frontend.account.menu.my-business.field.two": "Nombre comercial",
   "frontend.account.menu.my-business.field.three": "Pais",
@@ -823,39 +718,28 @@
   "frontend.account.menu.my-business.eleven": "Email",
   "frontend.account.menu.my-business.twelve": "Descripción",
   "frontend.account.menu.my-business.thirteen": "Web",
-
-
-
   "frontend.account.menu.my-queens": "Empresas Amigas",
   "frontend.account.menu.my-queens.title.one": "Entrada",
-
   "frontend.account.menu.my-bees": "Amigos",
   "frontend.account.menu.my-bees.title.one": "Entrada",
-
   "frontend.account.menu.reviews": "Mis Sugerencias",
   "frontend.account.menu.reviews.title.one": "Cuenta",
   "frontend.account.menu.reviews.title.two": "Meet Clic",
-
   "frontend.author-single.contact-us": "Usuarios/Contactos",
   "frontend.author-single.label.one": "Usuario",
   "frontend.author-single.label.two": "Comentario",
   "frontend.author-single.label.three": "Comentario",
-
   "frontend.author-single.contact-us.address": "Direccion",
   "frontend.author-single.contact-us.phone": "Teléfono",
   "frontend.author-single.contact-us.mail": "Email",
   "frontend.author-single.contact-us.web": "Web",
   "frontend.author-single.contact-us.chat-button": "Chat con el propietario",
-
   "frontend.author-single.reviews.title": "Agregar comentarios y calificar artículo",
   "frontend.author-single.reviews.field1": "Tu calificación para este listado",
   "frontend.author-single.reviews.field2": "Tu nombre",
   "frontend.author-single.reviews.field3": "Dirección de correo electrónico",
   "frontend.author-single.reviews.field4": "Tu opinión",
   "frontend.author-single.reviews.button": "Enviar opinión",
-
-
-
   "business.filters.sort.one": "Ninguno",
   "business.filters.sort.two": "Nombre Negocio",
   "business.filters.sort.three": "Email",
@@ -864,33 +748,26 @@
   "business.filters.sort.six": "Estado/Provincia",
   "business.filters.sort.seven": "Ciudad",
   "business.filters.sort.eight": "Subcategoria",
-
   "business.variants.one.title": "Comodidades",
-
   "address.one.title": "Pais",
   "address.two.title": "Estado/Provincia",
   "address.three.title": "Pueblo/Ciudad",
   "address.four.title": "Zona",
-
-
   "coming-soon.one": "Dias",
   "coming-soon.two": "horas",
   "coming-soon.three": "minutos",
   "coming-soon.four": "segundos",
-
   "config.buttons.one": "Agregar al carrito",
   "config.buttons.two": "Ver",
   "config.buttons.three": "Participar",
   "config.buttons.four": "Agregar a mi lista",
   "config.buttons.five": "Ver Producto",
-
   "config.routes.titles.one": "Empresa",
   "config.routes.titles.two": "Equipos",
   "config.routes.titles.three": "Categorias",
   "config.routes.titles.four": "Kit",
   "config.routes.titles.five": "Distancias",
   "config.routes.titles.six": "Tipo",
-
   "labels.one": "Iniciar Sesion",
   "labels.two": "Registrarse",
   "labels.three": "Email",
@@ -902,8 +779,6 @@
   "labels.nine": " Todos los derechos reservados.",
   "labels.ten": " Inicio",
   "labels.eleven": "Iniciar Sesion con",
-
-
   "labels.twelve": "Perfil del usuario",
   "labels.thirteen": "Usuario",
   "labels.fourteen": "Acerca del Usuario",
@@ -922,12 +797,10 @@
   "labels.twenty-seven": "Web",
   "labels.twenty-eight": "Contactános",
   "labels.twenty-nine": "Contamos con gente que cree en tus proyectos.",
-
   "labels.thirty": "Outlet",
   "labels.thirty-one": "Saldos",
   "page.shopOutlets.productsServices": "Tienda Outlets",
   "page.shopBalances.productsServices": "Tienda Saldos",
-
   "labels.thirty-two": "Nuestras Tiendas",
   "labels.thirty-three": "Sucursal",
   "labels.thirty-four": "Matriz",
@@ -949,25 +822,18 @@
   "labels.fifty": "Tamaño/Medida",
   "labels.fifty-one": "Categorias",
   "labels.fifty-two": "Subcategorias",
-
-
   "labels.business-details.product.one": "Compra",
   "labels.business-details.product.two": "y gana",
   "labels.business-details.product.three": "Punto",
-
-
   "page.aboutUs.variants.vision.title": "Nuestra Vision",
   "page.aboutUs.variants.vision.description": "Ser Facilitadores en el proceso de comercio exterior de productos y servicios, convirtiéndonos en el aliado estratégico de Startups, Pequeñas y Medianas Industrias. Optimizando todos los aspectos logísticos y comerciales relacionados a la operación",
-
   "page.aboutUs.variants.mission.title": "Nuestra Mision",
   "page.aboutUs.variants.mission.description": "Ser el socio predilecto en la comercialización y aplicación de Comercio Exterior, contribuyendo al mejoramiento económico de nuestros clientes.Fomentando valor a las compañías que representamos, manteniendo una presencia activa en el mercado internacional. Promoviendo una cultura colaborativa entre nuestro equipo de trabajo, clientes y provedores, generando ideas, decisiones y utilidades prácticas en la gestión.",
-
   "page.aboutUs.variants.aboutData.title": "Nosotros",
   "page.aboutUs.variants.aboutData.columnOne": "Mundicomex, nace oficialmente en el año 2018 como un servicio de Logística y Transporte, la misma que ha tomado forma y comienza con la fidelización de sus clientes en el exterior, debido a nuestros tiempos de respuesta y calidad de servicio; contamos con 30 años de experiencia en trabajo con aerolíneas, navieras y agencias de carga, de tal manera que podemos ofrecer las mejores alternativas para el transporte y seguimiento de la carga desde el origen hasta el destino manteniendo relaciones estratégicas en Agenciamiento de Aduanas y transporte local a nivel nacional e internacional.",
   "page.aboutUs.variants.aboutData.columnTwo": "En el año 2022, nace la necesidad de innovarnos y presentar nuevas líneas de negocio, implementando MundiBox, MundiFlowers, MundiProducts, MundiFruits.   Con la apertura de Mundicomex USA LLC desde nuestra oficina en Arizona, contamos con aliados comerciales en Estados Unidos y el resto del mundo. Con miras en crecimiento y propuesta de nuevos proyectos, calificados como Courier autorizado en Ecuador,apuntándonos a generar un comercio internacional activo, a través de nuestras líneas de Negocio, alianzas comerciales y fidelización de nuestros clientes.",
   "page.aboutUs.variants.aboutTem.title": "Nuestro Equipo",
   "page.aboutUs.variants.aboutTem.description": "Conoce a nuestros profesionales y expertos en servicios y consultas en negocios",
-
   "page.contactUs.title": "Mundicomex Ecuador",
   "page.contactUs.addressLocal.address.title": "Dirección Ecuador",
   "page.contactUs.addressLocal.address.value": "Juan Paz y Miño y Jaime Chiriboga Quito-Ecuador",
@@ -975,80 +841,54 @@
   "page.contactUs.addressLocal.phone.value": "02 5151466 / 0983142290",
   "page.contactUs.addressLocal.import.title": "Importaciones",
   "page.contactUs.addressLocal.import.value": "courier1@mundicomex.com",
-
   "page.contactUs.local.operations.title": "Operaciones",
   "page.contactUs.local.operations.value": "courier@mundicomex.com",
-
   "page.contactUs.local.export.title": "Exportaciones",
   "page.contactUs.local.export.value": "jponce@mundicomex.com,sales1@mundicomex.com",
-
   "page.contactUs.local.invoice.title": "Facturación y Finanzas",
   "page.contactUs.local.invoice.value": "comercial@mundicomex.com",
   "page.contactUs.local.accounting.title": "Contabilidad",
   "page.contactUs.local.accounting.value": "contabilidad@mundicomex.com",
   "page.contactUs.titleTwo": "Mundicomex USA",
-
   "page.contactUs.international.address.title": "Dirección USA",
   "page.contactUs.international.address.value": "4616 S. 6TH Ave. Tucson, Az.",
   "page.contactUs.international.phone.title": "Telefono USA",
   "page.contactUs.international.phone.value": "(240) 384 8903 (480) 2528 238",
   "page.contactUs.international.mail.title": "Mail",
   "page.contactUs.international.mail.value": "dhidalgo@mundicomex.com",
-
-
   "page.product.flowers.section.one.title": "FORTALECEMOS LA FLORICULTURA SOSTENIBLE ASEGURANDO QUE NUESTRAS COSECHAS GENEREN SEGURIDAD Y EMOCIONES INSPIRADORAS",
   "page.product.flowers.section.two.title": "COLORES INTENSOS.HERMOSAS COMBINACIONES",
   "page.product.flowers.section.two.description": "Ofertamos una amplia variedad de Flores para brindar lo mejor del Ecuador a todo el mundo",
-
   "page.product.flowers.section.three.title": "CALIDAD . RESISTENCIA",
   "page.product.flowers.section.three.description": "Nuestras Flores están sujetas a un estricto control de calidad,avalando su comportamiento en cosecha, postcosecha y venta.",
-
   "page.product.flowers.section.four.title": "DIVERSOS DISEÑOS. GAMA VIBRANTE",
   "page.product.flowers.section.four.description": "Desarrollamos junto a la finca variedad de colores y diseños,perfectas para cualquier ocasión ",
-
   "page.product.flowers.section.five.title": "ESTILO. COMPETENCIA",
   "page.product.flowers.section.five.description": "Nuestro personal se encarga de contactarte para despejar cualquier duda. Cumplimos con nuestros objetivos de entrega",
-
   "page.product.flowers.section.six.title": "PERSONALIZAMOS TU EVENTO",
   "page.product.flowers.section.six.description": "Somos especialistas en hacer momentos inolvidables, pregunta por nuestros paquetes",
-
   "page.product.flowers.section.seven.title": "NUESTROS CLIENTES",
   "page.product.flowers.section.seven.description": "La experiencia de nuestros clientes habla por nosotros. Muchas entregas exitosas y a tiempo valen más que cualquier marketing. Oferta disponible en toda temporada  Ordenes fijas de clientes satisfechos en todo Estados Unidos",
-
   "page.product.flowers.section.eight.title": "MAS DE UN 2,000,000 DE TALLOS ENTREGADOS",
-
   "page.product.products.section.one.title": "CONTAMOS CON AMPLIA CARTERA DE  PRODUCTOS, IDEALES PARA TODA INDUSTRIA Y NECESIDAD",
-
   "page.product.products.section.two.title": "SABOR ÚNICO Y ESPECIAL",
   "page.product.products.section.two.description": "  Extraida de entre las raíces de zonas de manglar",
-
   "page.product.products.section.three.title": "NUTRITIVO Y DELICIOSO",
   "page.product.products.section.three.description": " Aporta variedad de nutrientes y minerales esenciales para nuestro organismo.",
-
   "page.product.products.section.four.title": "ELEGANCIA DE LA MÁS ALTA COCINA",
   "page.product.products.section.four.description": " Armoniosa estructura esocojida de la mejor selección de cangrejos rojos",
-
   "page.product.fruits.section.one.title": "EXPLOSIÓN DE SABORES, TEXTURAS,AROMAS, COLORES EN NUESTRAS SELECTAS FRUTAS DE EXPORTACIÓN.",
-
   "page.product.fruits.section.two.title": "SABOR INTENSO. TESORO TROPICAL",
   "page.product.fruits.section.two.description": " Piel fina y pulpa jugosa, de aroma agradable con sabor único.",
-
   "page.product.fruits.section.three.title": "ACIDA NUTRITIVA Y SABROSA",
   "page.product.fruits.section.three.description": " Gracias a su gran contenido de vitaminas, minerales y nutrientes esenciales, es considerada como medicina natural. ",
-
-
   "page.product.fruits.section.four.title": "DULCE SABOR. ENERGÍA INSTANTÁNEA",
   "page.product.fruits.section.four.description": " La fruta más codiciada por sus nutritivos aportes calóricos de manera natural que brindan balance a una dieta sana.",
-
-
   "page.product.box.section.eight.title": "LA MEJOR SOLUCIÓN EN LOGÍSITICA PARA ENVÍO Y RECEPCIÓN DE PAQUETERÍA ",
-
   "page.product.box.section.nine.title": "Nuestra Visión",
   "page.product.box.section.nine.description": "Ser Facilitadores en el proceso de comercio exterior de productos y servicios, convirtiéndonos en el aliado estratégico de Startups,Pequeñas y Medianas Industrias.Optimizando todos los aspectos logísticos y comerciales relacionados a la operación.",
-
   "page.product.box.section.ten.title": "Nuestra Misión",
   "page.product.box.section.ten.description": "Ser el socio predilecto en la comercialización y aplicación de Comercio Exterior, contribuyendo al mejoramiento económico de nuestros clientes.Fomentando valor a las compañías que representamos, manteniendo una presencia activa en el mercado internacional.Promoviendo una cultura colaborativa entre nuestro equipo de trabajo,clientes y provedores, generando ideas, decisiones y utilidades prácticas en la gestión.",
-
   "page.product.box.section.eleven.title": "PROCESO DE EXPORTACIÓN",
   "page.product.box.section.twelve.title": "PROCESO DE IMPORTACIÓN",
   "auth.forgot-password": "Olvido Contraseña",
@@ -1061,7 +901,6 @@
   "frontend.account.menu.profile.field.twentytwo": "Linkedin",
   "frontend.account.menu.profile.field.twentythree": "Youtube",
   "frontend.account.menu.profile.field.twentyfour": "Tiktok",
-
   "frontend.web.eatPura.frontend.menu.one": "Inicio",
   "frontend.web.eatPura.frontend.menu.two": "Busqueda",
   "frontend.web.eatPura.frontend.menu.three": "Categorias",
@@ -1077,41 +916,31 @@
   "frontend.web.eatPura.frontend.menu.fourth": "Perfil",
   "frontend.web.eatPura.frontend.menu.fifteen": "Empresa",
   "frontend.web.eatPura.frontend.menu.sixteen": "Busqueda Inicio",
-
   "frontend.web.customer.top.topTitle": "Registrarse",
   "frontend.web.customer.top.topTitleBreadcrumbOne": "Inicio",
   "frontend.web.customer.top.topTitleBreadcrumbTwo": "Registrarse",
   "frontend.web.customer.register.title": "¿No tienes una cuenta? Crea tu propia cuenta, toma menos de un minuto",
   "frontend.web.customer.register.form.name": "Nombres",
   "frontend.web.customer.register.form.nameHelp": "Ingrese su Nombre",
-
   "frontend.web.customer.register.form.lastName": "Apellidos",
   "frontend.web.customer.register.form.lastNameHelp": "Ingrese su Apellido",
-
   "frontend.web.customer.register.form.typeDocument": "Tipo de Identificación",
   "frontend.web.customer.register.form.typeDocumentHelp": "Ingrese su Tipo de Identificación",
-
   "frontend.web.customer.register.form.document": "Identificación",
   "frontend.web.customer.register.form.documentHelp": "Ingrese su Identificación",
-
   "frontend.web.customer.register.form.gender": "Género",
   "frontend.web.customer.register.form.genderHelp": "Ingrese su Género",
-
   "frontend.web.customer.register.form.dateBorn": "Fecha de Nacimiento",
   "frontend.web.customer.register.form.dateBornHelp": "Ingrese su Fecha de Nacimiento",
-
   "frontend.web.customer.register.form.mobilNumber": "Celular",
   "frontend.web.customer.register.form.mobilNumberHelp": "Ingrese su Número de Celular",
-
   "frontend.web.customer.register.form.email": "Correo Electrónico",
   "frontend.web.customer.register.form.emailHelp": "Ingrese su Correo Electrónico",
-
   "frontend.web.customer.register.form.password": "Contraseña",
   "frontend.web.customer.register.form.passwordHelp": "Ingrese su Contraseña",
   "frontend.web.customer.register.form.register": "Registrarse",
   "frontend.web.customer.register.footer.registerOne": "¿Ya tienes una cuenta?",
   "frontend.web.customer.register.footer.registerTwo": "Iniciar Sesión",
-
   "frontend.web.customer.login.topTitleBreadcrumb": "Logearse",
   "frontend.web.customer.login.form.email": "Correo Electrónico",
   "frontend.web.customer.login.form.emailHelp": "Ingrese su Correo Electrónico",
@@ -1124,5 +953,4 @@
   "account.filters.sort.one": "Ninguno",
   "account.filters.sort.two": "Ingreso-Egreso",
   "account.filters.sort.three": "Descripción"
-
 }

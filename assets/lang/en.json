@@ -18,12 +18,18 @@
     "profile": "Profile",
     "projects": "Projects",
     "explore": "Explore",
+    "dictionary": "Dictionary",
     "businessSection": {
       "information": "Information",
       "shop": "Shop",
       "news": "News",
       "gaming": "Gaming"
     }
+  },
+  "dictionaryPage": {
+    "searchWord": "Search Word",
+    "seeAll": "See All",
+    "grammaticalClasses": "Grammatical Classes"
   },
   "gamification": {
     "points": "Points"

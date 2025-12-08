@@ -1,6 +1,7 @@
 // search_language_app_bar.dart
 import 'package:flutter/material.dart';
 
+import '../../../shared/localization/app_localizations.dart';
 import 'language_drop_down.dart';
 
 class SearchLanguageAppBar extends StatelessWidget
@@ -86,9 +87,10 @@ class SearchLanguageAppBar extends StatelessWidget
                         fontWeight: FontWeight.w500,
                         color: Colors.black87,
                       ),
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         isCollapsed: true,
-                        hintText: 'Search words...',
+                        hintText:
+                            '${AppLocalizations.of(context).translate('dictionaryPage.searchWord')}...',
                         hintStyle: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w500,

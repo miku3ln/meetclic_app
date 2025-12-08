@@ -9,6 +9,7 @@ import 'package:meetclic_app/shared/models/language_modal_config.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 
 class MenuTabUpController {
+  /// Construye la lista de items del menú superior (bandera + contadores).
   static List<MenuTabUpItem> buildMenu({
     required BuildContext context,
     required AppConfig config,
@@ -21,18 +22,26 @@ class MenuTabUpController {
     final double yapitas = session.isLoggedIn
         ? user?.summary?.yapitas.currentBalance ?? 0
         : 0;
+
     final double yapitasPremium = session.isLoggedIn
         ? user?.summary?.yapitasPremium.currentBalance ?? 0
         : 0;
+
     final double trofeos = session.isLoggedIn
         ? user?.summary?.trophies.total ?? 0
         : 0;
+
     final double cesta = 0;
     final double idioma = 3;
-    final locale = config.locale.languageCode != 'it'
-        ? config.locale.languageCode
-        : "ki";
 
+    // Normalizamos el código de idioma (por si quedó 'it' viejo)
+    final rawLocale = config.locale.languageCode; // 'es', 'en', 'ki', etc.
+    final locale = rawLocale != 'it' ? rawLocale : 'ki';
+
+    // Esta es la lista REAL que se usará en el AppBar
+    final List<MenuTabUpItem> items = [];
+
+    // Item de idioma (bandera)
     final itemLanguage = MenuTabUpItem(
       id: 1,
       name: 'idioma',
@@ -42,13 +51,13 @@ class MenuTabUpController {
         LanguageModalConfig(
           context: context,
           onChanged: (newLocale) => config.setLocale(Locale(newLocale)),
-          menuTabUpItems: [], // ✅ Se pasa la lista real
-          setStateFn: setFlagCallback,
+          menuTabUpItems: items, // 👉 referencia a la MISMA lista
+          setStateFn: setFlagCallback, // 👉 setState de HomeMainMenu
         ),
       ),
     );
 
-    return [
+    items.addAll([
       itemLanguage,
       _item(
         context,
@@ -71,11 +80,13 @@ class MenuTabUpController {
         yapitasPremium,
         accessManager,
       ),
-
       _item(context, 'cesta', AppImages.basketEcommerce, cesta, accessManager),
-    ];
+    ]);
+
+    return items;
   }
 
+  /// Helper para crear los demás items (trofeo, fuego, diamante, cesta).
   static MenuTabUpItem _item(
     BuildContext context,
     String name,
@@ -91,6 +102,7 @@ class MenuTabUpController {
       onTap: () async {
         final result = await accessManager.handleAccess(() async {
           showViewComponents(context, (formData) {
+            // Aquí luego conectas con lo que necesites
             print('🚀 Datos recibidos: $formData');
           });
         });

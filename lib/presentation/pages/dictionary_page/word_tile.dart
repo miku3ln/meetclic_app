@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/shared/themes/app_colors.dart';
 
+import '../../../shared/localization/app_localizations.dart';
 import 'models/word_item.dart';
 
 class WordTile extends StatelessWidget {
@@ -132,7 +133,7 @@ class WordTile extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Clases Gramaticales:',
+                        "${AppLocalizations.of(context).translate('dictionaryPage.grammaticalClasses')}:",
                         style: theme.textTheme.titleMedium?.copyWith(
                           color: const Color(0xFF7A1B1B),
                           fontWeight: FontWeight.w700,

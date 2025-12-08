@@ -27,7 +27,14 @@ void updateMenuItem({
   required Map<String, String> flags,
   required VoidCallback onClose,
 }) {
-  final newFlag = flags[selectedLangCode]!;
+  final newFlag = flags[selectedLangCode];
+
+  if (newFlag == null) {
+    // Aquí puedes loguear o hacer un assert si estás en debug
+    debugPrint('⚠️ No hay flag para el código de idioma: $selectedLangCode');
+    onClose();
+    return;
+  }
 
   final menuItemIdiomaActualizado = MenuTabUpItem(
     id: 1,
@@ -38,7 +45,13 @@ void updateMenuItem({
   );
 
   config.setStateFn(() {
-    config.menuTabUpItems[0] = menuItemIdiomaActualizado;
+    if (config.menuTabUpItems.isNotEmpty) {
+      config.menuTabUpItems[0] = menuItemIdiomaActualizado;
+    } else {
+      debugPrint(
+        '⚠️ menuTabUpItems está vacío, no se pudo actualizar el item de idioma',
+      );
+    }
   });
 
   onClose();

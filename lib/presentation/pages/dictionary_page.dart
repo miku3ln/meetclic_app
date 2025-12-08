@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
-import 'package:meetclic_app/shared/themes/app_colors.dart';
 
+import '../../shared/localization/app_localizations.dart';
 import '../pages/dictionary_page/categories_top.dart';
 import '../pages/dictionary_page/controllers/dictionary_controller.dart';
 import '../pages/dictionary_page/repositories/dictionary_repository.dart';
@@ -33,6 +33,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
 
   late final DictionaryController _vm;
   late final CategoryController _controllerCategory;
+
   @override
   void initState() {
     super.initState();
@@ -130,17 +131,14 @@ class _DictionaryPageState extends State<DictionaryPage> {
                         // -------------------- HEADER LISTA --------------------
                         Row(
                           children: [
-                            Text(
-                              'New Words',
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.w800,
-                                color: AppColors.grisOscuro,
-                              ),
-                            ),
                             const Spacer(),
                             TextButton(
                               onPressed: () {},
-                              child: const Text('See all'),
+                              child: Text(
+                                AppLocalizations.of(
+                                  context,
+                                ).translate('dictionaryPage.seeAll'),
+                              ),
                             ),
                           ],
                         ),

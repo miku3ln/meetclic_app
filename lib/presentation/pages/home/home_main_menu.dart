@@ -205,11 +205,13 @@ class HomeMainMenu extends State<HomeScreen> {
       _HomeTabDefinition(
         id: HomeTabId.dictionary,
         isVisible: (_) => true,
-        builder: (session, menuItems) =>
-            DictionaryPage(title: "Diccionario", itemsStatus: menuItems),
-        navItemBuilder: (_) => const BottomNavigationBarItem(
+        builder: (session, menuItems) => DictionaryPage(
+          title: l10n.translate('pages.dictionary'),
+          itemsStatus: menuItems,
+        ),
+        navItemBuilder: (_) => BottomNavigationBarItem(
           icon: Icon(Icons.dangerous),
-          label: "Diccionario",
+          label: l10n.translate('pages.dictionary'),
         ),
       ),
       _HomeTabDefinition(

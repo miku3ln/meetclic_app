@@ -42,7 +42,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (_) => HomeScreen(modules: [])),
+        MaterialPageRoute(builder: (_) => HomeScreenAllMenu(modules: [])),
       );
     } catch (e) {
       debugPrint('Error cargando datos: $e');
