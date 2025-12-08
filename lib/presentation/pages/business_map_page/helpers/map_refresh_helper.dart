@@ -5,7 +5,7 @@ import 'package:latlong2/latlong.dart';
 class MapRefreshHelper {
   MapRefreshHelper({
     this.minDistanceMeters = 400, // distancia mínima para refrescar
-    this.minZoomDelta = 0.7, // cambio mínimo de zoom
+    this.minZoomDelta = 0.9, // cambio mínimo de zoom
   });
 
   final double minDistanceMeters;

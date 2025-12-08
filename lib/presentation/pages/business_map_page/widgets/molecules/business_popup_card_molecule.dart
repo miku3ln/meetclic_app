@@ -4,10 +4,16 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:meetclic_app/domain/models/business_model.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 
+import '../../helpers/business_marker_visual_resolver.dart'
+    show BusinessGamificationTypeResolver;
+import '../../models/meet_clic_colors.dart';
 import '../atoms/gamification_tag_atom.dart';
 
 class BusinessPopupCardMolecule extends StatelessWidget {
   final BusinessModel business;
+  final int
+  type; // 0 = marcador ubicación, 1 = marcador negocio (por ahora usamos 1)
+
   final VoidCallback onTap;
 
   // Colores opcionales (con defaults)
@@ -19,6 +25,7 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     super.key,
     required this.business,
     required this.onTap,
+    required this.type,
     this.cardColor,
     this.titleColor,
     this.rewardsIconColor,
@@ -29,10 +36,18 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     final theme = Theme.of(context);
     final l10n = AppLocalizations.of(context);
 
+    // 🔥 Resolver tipo de gamificación a partir de los flags de la empresa
+    final gamificationType = BusinessGamificationTypeResolver.fromBusiness(
+      business,
+    );
+    final gamificationConfig = BusinessGamificationTypeConfig.fromType(
+      gamificationType,
+    );
+
     final Color resolvedCardColor = cardColor ?? Colors.white;
     final Color resolvedTitleColor = titleColor ?? theme.colorScheme.onSurface;
     final Color resolvedRewardsIconColor =
-        rewardsIconColor ?? theme.colorScheme.secondary;
+        rewardsIconColor ?? gamificationConfig.primaryColor;
 
     return GestureDetector(
       onTap: onTap,
@@ -51,23 +66,28 @@ class BusinessPopupCardMolecule extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // ===== HEADER: Estrellas (izquierda) + nombre empresa (derecha) =====
+                // 1) Info base de la empresa
                 _buildHeader(theme, resolvedTitleColor),
+                const SizedBox(height: 6),
+                _buildInfoRow(theme),
+                const SizedBox(height: 10),
 
+                // 2) Estado de gamificación (Piedra / Chakana / Inti / Minga)
+                _buildGamificationHeader(
+                  theme: theme,
+                  config: gamificationConfig,
+                ),
                 const SizedBox(height: 6),
 
-                // ===== NUEVA FILA: logo + categoría + teléfono =====
-                _buildInfoRow(theme),
+                // 3) Descripción funcional (qué puedo hacer aquí)
+                _buildGamificationDescription(
+                  theme: theme,
+                  config: gamificationConfig,
+                ),
+                const SizedBox(height: 6),
 
-                const SizedBox(height: 8),
-
-                // Estado de premios / juegos
-                _buildRewardsRow(theme, l10n, resolvedRewardsIconColor),
-
-                const SizedBox(height: 8),
-
-                // Tags de opciones de juego / canje
-                _buildGamificationTags(theme, l10n),
+                // 4) Chips de opciones concretas (canje local / aliados)
+                _buildGamificationTags(theme, l10n, gamificationType),
               ],
             ),
           ),
@@ -76,10 +96,11 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     );
   }
 
-  /// Header con rating a la izquierda y nombre empresa a la derecha
+  // ----------------------------------------------------------
+  // 1) HEADER: rating + nombre
+  // ----------------------------------------------------------
   Widget _buildHeader(ThemeData theme, Color titleColor) {
-    // Aseguramos rango de 0 a 5
-    final double rawRating = business.summary!.rating.averageStars;
+    final double rawRating = business.summary?.rating.averageStars ?? 0.0;
     final double rating = rawRating.isNaN
         ? 0.0
         : rawRating.clamp(0.0, 5.0).toDouble();
@@ -125,10 +146,11 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     );
   }
 
-  /// Fila con logo, categoría y teléfono
+  // ----------------------------------------------------------
+  // Logo + categoría + teléfono
+  // ----------------------------------------------------------
   Widget _buildInfoRow(ThemeData theme) {
-    final hasLogo =
-        business.sourceLogo.isNotEmpty; // normalmente URL o path relativo
+    final hasLogo = business.sourceLogo.isNotEmpty;
     final hasCategory = business.subcategoryName.isNotEmpty;
     final hasPhone = business.phoneValue.isNotEmpty;
 
@@ -193,79 +215,102 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     );
   }
 
-  Widget _buildRewardsRow(
-    ThemeData theme,
-    AppLocalizations l10n,
-    Color iconColor,
-  ) {
-    if (business.gamificationId <= 0) {
-      return Row(
-        children: [
-          Icon(Icons.videogame_asset_off, size: 18, color: theme.disabledColor),
-          const SizedBox(width: 6),
-          Text(
-            // l10n.translate('business_map.no_rewards')
-            'Sin juegos ni premios activos',
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: theme.disabledColor,
-            ),
-          ),
-        ],
-      );
-    }
-
+  // ----------------------------------------------------------
+  // 2) HEADER DE GAMIFICACIÓN (icono + nombre andino)
+  // ----------------------------------------------------------
+  Widget _buildGamificationHeader({
+    required ThemeData theme,
+    required BusinessGamificationTypeConfig config,
+  }) {
     return Row(
       children: [
-        Icon(Icons.emoji_events, size: 20, color: iconColor),
-        const SizedBox(width: 6),
-        Text(
-          // l10n.translate('business_map.rewards_available')
-          'Premios disponibles para canje',
-          style: theme.textTheme.bodySmall?.copyWith(
-            fontWeight: FontWeight.w600,
-            color: theme.colorScheme.onSurface,
+        Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: config.badgeBackgroundColor.withOpacity(0.15),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(config.icon, size: 18, color: config.primaryColor),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            // Ej: "Piedra – Sin gamificación" / "Inti – Canje local"
+            _buildGamificationTitleFromConfig(config),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: config.primaryColor,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildGamificationTags(ThemeData theme, AppLocalizations l10n) {
+  String _buildGamificationTitleFromConfig(
+    BusinessGamificationTypeConfig config,
+  ) {
+    switch (config.type) {
+      case BusinessGamificationType.none:
+        return '${config.andeanSymbolName} – Sin gamificación';
+      case BusinessGamificationType.basic:
+        return '${config.andeanSymbolName} – Gamificación activo';
+      case BusinessGamificationType.redeemLocal:
+        return '${config.andeanSymbolName} – Canje en esta empresa';
+      case BusinessGamificationType.redeemAllies:
+        return '${config.andeanSymbolName} – Canje en red de aliados';
+    }
+  }
+
+  // ----------------------------------------------------------
+  // 3) DESCRIPCIÓN DE FUNCIONALIDAD (texto corto)
+  // ----------------------------------------------------------
+  Widget _buildGamificationDescription({
+    required ThemeData theme,
+    required BusinessGamificationTypeConfig config,
+  }) {
+    return Text(config.description, style: theme.textTheme.bodySmall);
+  }
+
+  // ----------------------------------------------------------
+  // 4) CHIPS / TAGS SEGÚN FUNCIONALIDAD REAL
+  // ----------------------------------------------------------
+  Widget _buildGamificationTags(
+    ThemeData theme,
+    AppLocalizations l10n,
+    BusinessGamificationType gamificationType,
+  ) {
     if (business.gamificationId <= 0) {
+      // piedra → no mostramos chips
       return const SizedBox.shrink();
     }
 
     final List<Widget> tags = [];
 
-    // canjear en esta empresa
+    // Siempre que haya gamificación, mostramos al menos "Juego activo"
+    tags.add(
+      const GamificationTagAtom(
+        icon: Icons.videogame_asset,
+        label: 'Juego activo',
+      ),
+    );
+
+    // Canje en esta empresa
     if (business.allowExchange == 1) {
       tags.add(
         const GamificationTagAtom(
           icon: Icons.store_mall_directory,
-          // l10n.translate('business_map.redeem_here')
           label: 'Canje en esta empresa',
         ),
       );
     }
 
-    // canjear en empresas aliadas
+    // Canje en empresas aliadas
     if (business.allowExchangeBusiness == 1) {
       tags.add(
         const GamificationTagAtom(
           icon: Icons.group_work,
-          // l10n.translate('business_map.redeem_allies')
           label: 'Canje con empresas aliadas',
-        ),
-      );
-    }
-
-    // Si no hay ninguna opción específica, mostramos un genérico
-    if (tags.isEmpty) {
-      tags.add(
-        const GamificationTagAtom(
-          icon: Icons.videogame_asset,
-          // l10n.translate('business_map.game_active')
-          label: 'Juego activo',
         ),
       );
     }

@@ -15,7 +15,7 @@ class MarkerHelper {
       width: 60,
       height: 60,
       alignment: Alignment.center,
-      key: const ValueKey('current_location_marker'),
+      key: ValueKey<int>(-1),
       child: Image.asset(AppImages.pageBusinessMapMarkerPosition),
     );
   }
@@ -35,6 +35,7 @@ class MarkerHelper {
 
       late final Marker marker;
       marker = Marker(
+        key: ValueKey<int>(business.id),
         point: markerPoint,
         width: visual.width,
         height: visual.height,

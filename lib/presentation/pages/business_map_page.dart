@@ -437,23 +437,34 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
                     popupController: _popupController,
                     popupDisplayOptions: PopupDisplayOptions(
                       builder: (context, marker) {
-                        final business = _state.businesses.firstWhere(
-                          (b) =>
-                              b.streetLat == marker.point.latitude &&
-                              b.streetLng == marker.point.longitude,
-                          orElse: () => _state.businesses.first,
-                        );
-                        return BusinessPopupCardMolecule(
-                          business: business,
-                          onTap: () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    BusinessDetailPage(businessId: business.id),
-                              ),
-                            );
-                          },
-                        );
+                        late BusinessModel business;
+                        late int typeMarker = -1;
+                        final markerKey = marker.key;
+                        late final keyCurrent =
+                            (markerKey as ValueKey<int>).value;
+                        if (keyCurrent == -1) {
+                          typeMarker = 0;
+                          return const SizedBox.shrink(); // no muestra nada
+                        } else {
+                          typeMarker = 1;
+                          business = _state.businesses.firstWhere(
+                            (b) => b.id == keyCurrent,
+                            orElse: () => _state.businesses.first,
+                          );
+                          return BusinessPopupCardMolecule(
+                            business: business,
+                            type: typeMarker,
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (_) => BusinessDetailPage(
+                                    businessId: business.id,
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                        }
                       },
                     ),
                   ),
