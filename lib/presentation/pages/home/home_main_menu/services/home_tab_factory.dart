@@ -7,7 +7,7 @@ import 'package:meetclic_app/presentation/pages/dictionary_page.dart';
 import 'package:meetclic_app/presentation/pages/home/home_infinity.dart';
 import 'package:meetclic_app/presentation/pages/profile_page.dart';
 import 'package:meetclic_app/presentation/pages/project_lake_page.dart';
-import 'package:meetclic_app/presentation/pages/rive-example/vehicles_page.dart';
+import 'package:meetclic_app/presentation/pages/projects_pages.dart';
 import 'package:meetclic_app/presentation/widgets/template/custom_app_bar.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
@@ -119,12 +119,12 @@ class HomeTabFactory {
               DeepLinkInfo? pendingDeepLink,
               AppLocalizations localL10n,
             ) {
-              final title = localL10n.translate('pages.aboutUs');
-              return VehiclesScreenPage(title: title, itemsStatus: menuItems);
+              final title = localL10n.translate('pages.projects');
+              return ProjectsPages(title: title, itemsStatus: menuItems);
             },
         navItemBuilder: (localL10n) => HomeNavItemAtom.build(
           icon: Icons.emoji_events,
-          label: localL10n.translate('pages.gaming'),
+          label: localL10n.translate('pages.projects'),
         ),
       ),
 

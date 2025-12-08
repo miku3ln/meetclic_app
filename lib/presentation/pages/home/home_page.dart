@@ -1,17 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/domain/entities/module_model.dart';
 
-import 'home_main_menu.dart';
 import 'home_main_menu/widgets/organisms/home_main_menu_organism.dart';
-
-class HomeScreen extends StatefulWidget {
-  final List<ModuleModel> modules;
-
-  const HomeScreen({super.key, required this.modules});
-
-  @override
-  State<HomeScreen> createState() => HomeMainMenu();
-}
 
 class HomeScreenAllMenu extends StatelessWidget {
   final List<ModuleModel> modules;
