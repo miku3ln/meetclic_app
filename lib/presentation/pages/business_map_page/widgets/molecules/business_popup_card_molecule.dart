@@ -4,7 +4,6 @@ import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:meetclic_app/domain/models/business_model.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 
-import '../../models/business_model.dart';
 import '../atoms/gamification_tag_atom.dart';
 
 class BusinessPopupCardMolecule extends StatelessWidget {
@@ -55,6 +54,11 @@ class BusinessPopupCardMolecule extends StatelessWidget {
                 // ===== HEADER: Estrellas (izquierda) + nombre empresa (derecha) =====
                 _buildHeader(theme, resolvedTitleColor),
 
+                const SizedBox(height: 6),
+
+                // ===== NUEVA FILA: logo + categoría + teléfono =====
+                _buildInfoRow(theme),
+
                 const SizedBox(height: 8),
 
                 // Estado de premios / juegos
@@ -75,7 +79,7 @@ class BusinessPopupCardMolecule extends StatelessWidget {
   /// Header con rating a la izquierda y nombre empresa a la derecha
   Widget _buildHeader(ThemeData theme, Color titleColor) {
     // Aseguramos rango de 0 a 5
-    final double rawRating = business.qualification;
+    final double rawRating = business.summary!.rating.averageStars;
     final double rating = rawRating.isNaN
         ? 0.0
         : rawRating.clamp(0.0, 5.0).toDouble();
@@ -121,12 +125,80 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     );
   }
 
+  /// Fila con logo, categoría y teléfono
+  Widget _buildInfoRow(ThemeData theme) {
+    final hasLogo =
+        business.sourceLogo.isNotEmpty; // normalmente URL o path relativo
+    final hasCategory = business.subcategoryName.isNotEmpty;
+    final hasPhone = business.phoneValue.isNotEmpty;
+
+    if (!hasLogo && !hasCategory && !hasPhone) {
+      return const SizedBox.shrink();
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        if (hasLogo) ...[
+          CircleAvatar(
+            radius: 16,
+            backgroundColor: theme.colorScheme.surfaceVariant,
+            backgroundImage: NetworkImage(business.sourceLogo),
+            onBackgroundImageError: (_, __) {},
+          ),
+          const SizedBox(width: 8),
+        ],
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (hasCategory)
+                Text(
+                  business.subcategoryName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: theme.colorScheme.primary,
+                  ),
+                ),
+              if (hasPhone) ...[
+                const SizedBox(height: 2),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.phone,
+                      size: 14,
+                      color: theme.colorScheme.onSurfaceVariant,
+                    ),
+                    const SizedBox(width: 4),
+                    Flexible(
+                      child: Text(
+                        business.phoneValue,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildRewardsRow(
     ThemeData theme,
     AppLocalizations l10n,
     Color iconColor,
   ) {
-    if (!business.hasGamification) {
+    if (business.gamificationId <= 0) {
       return Row(
         children: [
           Icon(Icons.videogame_asset_off, size: 18, color: theme.disabledColor),
@@ -159,15 +231,16 @@ class BusinessPopupCardMolecule extends StatelessWidget {
   }
 
   Widget _buildGamificationTags(ThemeData theme, AppLocalizations l10n) {
-    if (!business.hasGamification) {
+    if (business.gamificationId <= 0) {
       return const SizedBox.shrink();
     }
 
     final List<Widget> tags = [];
 
-    if (business.canRedeemHere) {
+    // canjear en esta empresa
+    if (business.allowExchange == 1) {
       tags.add(
-        GamificationTagAtom(
+        const GamificationTagAtom(
           icon: Icons.store_mall_directory,
           // l10n.translate('business_map.redeem_here')
           label: 'Canje en esta empresa',
@@ -175,9 +248,10 @@ class BusinessPopupCardMolecule extends StatelessWidget {
       );
     }
 
-    if (business.canRedeemWithAllies) {
+    // canjear en empresas aliadas
+    if (business.allowExchangeBusiness == 1) {
       tags.add(
-        GamificationTagAtom(
+        const GamificationTagAtom(
           icon: Icons.group_work,
           // l10n.translate('business_map.redeem_allies')
           label: 'Canje con empresas aliadas',
@@ -188,7 +262,7 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     // Si no hay ninguna opción específica, mostramos un genérico
     if (tags.isEmpty) {
       tags.add(
-        GamificationTagAtom(
+        const GamificationTagAtom(
           icon: Icons.videogame_asset,
           // l10n.translate('business_map.game_active')
           label: 'Juego activo',
@@ -196,6 +270,6 @@ class BusinessPopupCardMolecule extends StatelessWidget {
       );
     }
 
-    return Wrap(children: tags);
+    return Wrap(spacing: 8, runSpacing: 4, children: tags);
   }
 }
