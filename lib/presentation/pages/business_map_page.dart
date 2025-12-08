@@ -15,6 +15,7 @@ import '../../../shared/utils/deep_link_type.dart';
 import '../../aplication/usecases/check_location_permission_usecase.dart';
 import '../../infrastructure/services/geolocator_service.dart';
 import 'business_detail_page.dart';
+import 'business_map_page/helpers/business_marker_visual_resolver.dart';
 import 'business_map_page/helpers/map_refresh_helper.dart';
 import 'business_map_page/helpers/marker_helper.dart';
 import 'business_map_page/models/business_position.dart';
@@ -173,7 +174,6 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
     double? zoom,
     bool moveCamera = true,
   }) {
-    // Actualizar manager
     manager.updateCurrentPosition(
       BusinessPosition(
         latitude: center.latitude,
@@ -182,15 +182,15 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
       ),
     );
 
-    // Construir markers por helper
     final currentMarker = MarkerHelper.buildCurrentLocationMarker(center);
+
     final businessMarkers = MarkerHelper.buildBusinessMarkers(
       businesses: newBusinesses,
       mapController: _mapController,
       popupController: _popupController,
+      resolveVisual: BusinessMarkerVisualResolver.resolve,
     );
 
-    // Mover cámara solo si se indica
     if (moveCamera) {
       _mapController.move(center, zoom ?? manager.currentZoom);
     }

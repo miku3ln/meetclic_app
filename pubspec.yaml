@@ -111,6 +111,10 @@ flutter:
     - assets/gamification/yapitas.png
     - assets/gamification/yapitas-premium.png
     - assets/gamification/reputation.png
+    - assets/gamification/business/basic-chakana.png
+    - assets/gamification/business/none-rumy.png
+    - assets/gamification/business/redeemAlliesChakanaAyllu.png
+    - assets/gamification/business/redeemLocalInti.png
     #  - assets/totems/
     #  - assets/totems/examples/HORNET.glb
     # - assets/totems/examples/mikasa/gothic__elegance_texture_anime_girl.glb

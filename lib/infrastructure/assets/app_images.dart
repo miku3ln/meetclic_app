@@ -28,6 +28,22 @@ class AppImages {
   static const pageLoginInit = 'assets/pages/login/init-login-register.png';
   static const pageBusinessMapMarkerPosition = 'assets/icons/pututuMarker.png';
   static const rewardTypeReputation = 'assets/gamification/reputation.png';
+
+  static const businessMarkerNoGamification =
+      'assets/gamification/business/none-rumy.png';
+  static const businessMarkerBasicGamification =
+      'assets/gamification/business/basic-chakana.png';
+  static const businessMarkerRedeemLocalIntiGamification =
+      'assets/gamification/business/redeemLocalInti.png';
+  static const businessMarkerRedeemAlliesGamification =
+      'assets/gamification/business/redeemAlliesChakanaAyllu.png';
+  static const businessMarkerRewardsAndAllies =
+      'assets/gamification/yapitas.png';
+  static const businessMarkerRewards =
+      'assets/gamification/yapitas-premium.png';
+  static const businessMarkerAllies = 'assets/pages/profile/following.png';
+  static const businessMarkerDefault = 'assets/pages/profile/profile.png';
+
   // Puedes agrupar por tipo si deseas más orden
   static const illustrations = [onboarding1, onboarding2];
 }
