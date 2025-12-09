@@ -71,51 +71,68 @@ class _BusinessDetailPageState extends State<BusinessDetailPage> {
     final Color colorMainCard = theme.primaryColor;
     return Scaffold(
       appBar: CustomAppBar(
+        //HEADER MENU
         title: '',
         items: [],
         borderAllow: false,
         backgroundColor: colorMainCard,
         textColor: Colors.white,
         leadingIcon: Icons.arrow_back_ios_new,
-        leadingIconColor: Colors.white, // o AppColors.textPrimaryLight, etc.
+        leadingIconColor: Colors.white,
+        // o AppColors.textPrimaryLight, etc.
         onLeadingPressed: () => Navigator.of(context).pop(),
       ),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(child: Stack(children: [_pages[_selectedIndex]])),
-      bottomNavigationBar: BottomAppBar(
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
-        child: SizedBox(
-          height: 64,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _buildNavIcon(
-                icon: Icons.info_outline,
-                index: 0,
-                label: appLocalizations.translate(
-                  'pages.businessSection.information',
+      bottomNavigationBar: Container(
+        //FOOTER MENU
+        decoration: const BoxDecoration(
+          border: Border(
+            top: BorderSide(
+              color: AppColors.borderSoft, // mismo borde suave que arriba
+              width: 0.8,
+            ),
+          ),
+        ),
+        child: BottomAppBar(
+          shape: const CircularNotchedRectangle(),
+          notchMargin: 8.0,
+          child: SizedBox(
+            height: 64,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildNavIcon(
+                  icon: Icons.info_outline,
+                  index: 0,
+                  label: appLocalizations.translate(
+                    'pages.businessSection.information',
+                  ),
                 ),
-              ),
-              _buildNavIcon(
-                icon: Icons.shopping_bag,
-                index: 1,
-                label: appLocalizations.translate('pages.businessSection.shop'),
-              ),
-              const SizedBox(width: 40),
-              _buildNavIcon(
-                icon: Icons.newspaper,
-                index: 2,
-                label: appLocalizations.translate('pages.businessSection.news'),
-              ),
-              _buildNavIcon(
-                icon: Icons.emoji_events,
-                index: 3,
-                label: appLocalizations.translate(
-                  'pages.businessSection.gaming',
+                _buildNavIcon(
+                  icon: Icons.shopping_bag,
+                  index: 1,
+                  label: appLocalizations.translate(
+                    'pages.businessSection.shop',
+                  ),
                 ),
-              ),
-            ],
+                const SizedBox(width: 40),
+                _buildNavIcon(
+                  icon: Icons.newspaper,
+                  index: 2,
+                  label: appLocalizations.translate(
+                    'pages.businessSection.news',
+                  ),
+                ),
+                _buildNavIcon(
+                  icon: Icons.emoji_events,
+                  index: 3,
+                  label: appLocalizations.translate(
+                    'pages.businessSection.gaming',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
