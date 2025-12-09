@@ -1,1 +1,10 @@
-enum HomeTabId { home, explore, shop, gaming, projects, dictionary, profile }
+enum HomeTabId {
+  home,
+  explore,
+  shop,
+  gaming,
+  projects,
+  dictionary,
+  profile,
+  more,
+}

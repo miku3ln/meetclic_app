@@ -21,6 +21,12 @@ class CategoryExpansionMolecule extends StatelessWidget {
   bool get _hasAnySelected =>
       category.subcategories.any((s) => selectedSubcategoryIds.contains(s.id));
 
+  bool get _isAllSelected =>
+      category.subcategories.isNotEmpty &&
+      category.subcategories.every(
+        (s) => selectedSubcategoryIds.contains(s.id),
+      );
+
   @override
   Widget build(BuildContext context) {
     // Cambios de color cuando hay subcategorías seleccionadas
@@ -44,7 +50,7 @@ class CategoryExpansionMolecule extends StatelessWidget {
       tilePadding: EdgeInsets.zero,
       childrenPadding: const EdgeInsets.only(left: 28, right: 8, bottom: 8),
 
-      // ICONO DE CATEGORÍA
+      // ICONO DE CATEGORÍA (círculo de la izquierda)
       leading: CircleAvatar(
         backgroundColor: iconBgColor,
         child: Icon(category.icon, size: 18, color: iconColor),
@@ -56,6 +62,29 @@ class CategoryExpansionMolecule extends StatelessWidget {
         style: TextStyle(color: textColor, fontWeight: textWeight),
       ),
 
+      // ✅ CHECKBOX DE CABECERA (seleccionar/deseleccionar TODAS)
+      trailing: Checkbox(
+        value: _isAllSelected,
+        onChanged: (value) {
+          final shouldSelectAll = value ?? false;
+
+          for (final sub in category.subcategories) {
+            final isSelected = selectedSubcategoryIds.contains(sub.id);
+
+            if (shouldSelectAll && !isSelected) {
+              // seleccionar las que faltan
+              onToggleSubcategory(sub.id);
+            } else if (!shouldSelectAll && isSelected) {
+              // deseleccionar las que estaban
+              onToggleSubcategory(sub.id);
+            }
+          }
+        },
+        activeColor: colors.checkboxActiveColor,
+        checkColor: colors.checkboxCheckColor,
+      ),
+
+      // SOLO las subcategorías
       children: category.subcategories.map((sub) {
         final selected = selectedSubcategoryIds.contains(sub.id);
 

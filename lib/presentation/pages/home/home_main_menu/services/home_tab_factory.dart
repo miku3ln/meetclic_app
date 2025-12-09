@@ -2,16 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/domain/services/session_service.dart';
 import 'package:meetclic_app/presentation/pages/business_map_page.dart';
-import 'package:meetclic_app/presentation/pages/dictionary_page.dart';
 import 'package:meetclic_app/presentation/pages/home/home_infinity.dart';
 import 'package:meetclic_app/presentation/pages/profile_page.dart';
-import 'package:meetclic_app/presentation/pages/project_lake_page.dart';
 import 'package:meetclic_app/presentation/pages/projects_pages.dart';
 import 'package:meetclic_app/presentation/widgets/template/custom_app_bar.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import 'package:meetclic_app/shared/utils/deep_link_type.dart';
 
+import '../../../more_page.dart';
 import '../models/home_tab_definition.dart';
 import '../models/home_tab_id.dart';
 // Átomo para construir items del BottomNavigationBar
@@ -84,72 +83,6 @@ class HomeTabFactory {
       ),
 
       // =========================================================
-      // 🎮 TAB: GAMING (RIVE / JUEGOS)
-      // =========================================================
-      HomeTabDefinition(
-        id: HomeTabId.gaming,
-        isVisible: (_) => true,
-        builder:
-            (
-              SessionService session,
-              List<MenuTabUpItem> menuItems,
-              DeepLinkInfo? pendingDeepLink,
-              AppLocalizations localL10n,
-            ) {
-              final title = localL10n.translate('pages.projects');
-              return ProjectsPages(title: title, itemsStatus: menuItems);
-            },
-        navItemBuilder: (localL10n) => HomeNavItemAtom.build(
-          icon: Icons.emoji_events,
-          label: localL10n.translate('pages.projects'),
-        ),
-      ),
-
-      // =========================================================
-      // 📁 TAB: PROJECTS (solo si está logueado)
-      // =========================================================
-      HomeTabDefinition(
-        id: HomeTabId.projects,
-        isVisible: (SessionService session) => session.isLoggedIn,
-        builder:
-            (
-              SessionService session,
-              List<MenuTabUpItem> menuItems,
-              DeepLinkInfo? pendingDeepLink,
-              AppLocalizations localL10n,
-            ) {
-              final title = localL10n.translate('pages.projects');
-              return ProjectLakePage(title: title, itemsStatus: menuItems);
-            },
-        navItemBuilder: (localL10n) => HomeNavItemAtom.build(
-          icon: Icons.folder,
-          label: localL10n.translate('pages.projects'),
-        ),
-      ),
-
-      // =========================================================
-      // 📚 TAB: DICTIONARY
-      // =========================================================
-      HomeTabDefinition(
-        id: HomeTabId.dictionary,
-        isVisible: (_) => true,
-        builder:
-            (
-              SessionService session,
-              List<MenuTabUpItem> menuItems,
-              DeepLinkInfo? pendingDeepLink,
-              AppLocalizations localL10n,
-            ) {
-              final title = localL10n.translate('pages.dictionary');
-              return DictionaryPage(title: title, itemsStatus: menuItems);
-            },
-        navItemBuilder: (localL10n) => HomeNavItemAtom.build(
-          icon: Icons.book_outlined,
-          label: localL10n.translate('pages.dictionary'),
-        ),
-      ),
-
-      // =========================================================
       // 👤 TAB: PROFILE (solo si está logueado)
       // =========================================================
       HomeTabDefinition(
@@ -172,6 +105,46 @@ class HomeTabFactory {
         navItemBuilder: (localL10n) => HomeNavItemAtom.build(
           icon: Icons.person,
           label: localL10n.translate('pages.profile'),
+        ),
+      ),
+      // =========================================================
+      // 🎮 TAB: GAMING (RIVE / JUEGOS)
+      // =========================================================
+      HomeTabDefinition(
+        id: HomeTabId.shop,
+        isVisible: (SessionService session) => session.isLoggedIn,
+        builder:
+            (
+              SessionService session,
+              List<MenuTabUpItem> menuItems,
+              DeepLinkInfo? pendingDeepLink,
+              AppLocalizations localL10n,
+            ) {
+              final title = localL10n.translate('pages.shop');
+              return ProjectsPages(title: title, itemsStatus: menuItems);
+            },
+        navItemBuilder: (localL10n) => HomeNavItemAtom.build(
+          icon: Icons.storefront_rounded,
+          label: localL10n.translate('pages.shop'),
+        ),
+      ),
+
+      HomeTabDefinition(
+        id: HomeTabId.more,
+        isVisible: (_) => true,
+        builder:
+            (
+              SessionService session,
+              List<MenuTabUpItem> menuItems,
+              DeepLinkInfo? pendingDeepLink,
+              AppLocalizations localL10n,
+            ) {
+              final title = localL10n.translate('pages.more');
+              return MorePage(title: title, itemsStatus: menuItems);
+            },
+        navItemBuilder: (localL10n) => HomeNavItemAtom.build(
+          icon: Icons.more_horiz,
+          label: localL10n.translate('pages.more'),
         ),
       ),
     ];
