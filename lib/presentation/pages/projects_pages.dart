@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/presentation/pages/projects_pages/models/project_item_ui_model.dart';
+import 'package:meetclic_app/presentation/pages/projects_pages/models/projects_id.dart';
 import 'package:meetclic_app/presentation/pages/projects_pages/services/projects_mapper_service.dart';
 import 'package:meetclic_app/presentation/pages/projects_pages/state/%20projects_state.dart';
 import 'package:meetclic_app/presentation/pages/projects_pages/widgets/organisms/projects_list_organism.dart';
 import 'package:rive/rive.dart';
 
 import '../widgets/template/custom_app_bar.dart';
+import 'ar_management_view/ar_management_view.dart';
 
 class ProjectsPages extends StatefulWidget {
   final String title;
@@ -32,7 +34,7 @@ class _ProjectsPagesState extends State<ProjectsPages> {
   void initState() {
     super.initState();
 
-    final uiItems = _mapper.mapFromMenuItems(widget.itemsStatus);
+    final uiItems = _mapper.mapFromMenuItems();
     _state = ProjectsState(items: uiItems);
 
     // si quisieras crear controllers por item:
@@ -47,9 +49,11 @@ class _ProjectsPagesState extends State<ProjectsPages> {
   // ==== Callbacks ====
 
   void _onItemTap(ProjectItemUiModel item) {
-    // aquí llamas a tus métodos, navegación o Rive
-    // ejemplo: print / log
-    debugPrint('Tap en item: ${item.index} - ${item.title}');
+    if (ProjectsId.ar.value == item.index) {
+      Navigator.of(
+        context,
+      ).push(MaterialPageRoute(builder: (_) => ARManagementView()));
+    }
   }
 
   void _onItemLongPress(ProjectItemUiModel item) {

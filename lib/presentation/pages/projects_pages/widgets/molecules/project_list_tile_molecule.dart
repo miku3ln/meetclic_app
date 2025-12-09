@@ -44,7 +44,7 @@ class ProjectListTileMolecule extends StatelessWidget {
                   children: [
                     ProjectTitleAtom(text: item.title),
                     const SizedBox(height: 4),
-                    ProjectSubtitleAtom(text: item.subtitle),
+                    ProjectSubtitleAtom(text: item.description),
                   ],
                 ),
               ),
