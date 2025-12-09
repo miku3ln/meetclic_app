@@ -126,8 +126,16 @@ class _HomeMainMenuOrganismState extends State<HomeMainMenuOrganism> {
       context: context,
       config: _config,
       session: session,
-      setFlagCallback: setState,
+      setFlagCallback: _onFlagChanged,
     );
+  }
+
+  /// Se llamará desde el modal de idioma
+  void _onFlagChanged(VoidCallback fn) {
+    setState(() {
+      fn(); // lo que ya hacía antes (ej: actualizar lista, etc.)
+      _tabCache.clear(); // 👈 MUY IMPORTANTE: forzar rebuild de todos los tabs
+    });
   }
 
   /// Construye (o recupera desde caché) el widget del tab actual.
