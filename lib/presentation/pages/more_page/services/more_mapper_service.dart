@@ -33,10 +33,9 @@ class MoreMapperService {
             icon: Icons.business_center_outlined,
           ),
           MoreItemModel(
-            id: MoreItemProcessId.dictionary.value,
-            title: "Diccionario Kichwa",
-            description:
-                "Accede al diccionario digital Kichwa–Español–Inglés integrado en MeetClic.",
+            id: MoreItemProcessId.projects.value,
+            title: "Proyectos",
+            description: "Accede a modulos exclusivos para MeetClic.",
             icon: Icons.menu_book_outlined,
           ),
         ],
@@ -51,6 +50,13 @@ class MoreMapperService {
         description:
             "Conecta con otras personas, participa en actividades y eventos.",
         items: [
+          MoreItemModel(
+            id: MoreItemProcessId.dictionaryCenter.value,
+            title: "Diccionario",
+            description:
+                "Encuentra  información sobre idiomas tal como kichwa a español.",
+            icon: Icons.menu_book,
+          ),
           MoreItemModel(
             id: MoreItemProcessId.eliteSquad.value,
             title: "Escuadra Elite de MeetClic",

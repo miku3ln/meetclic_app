@@ -1,6 +1,9 @@
 // more_navigation.dart
 import 'package:flutter/material.dart';
 
+import '../../../../shared/localization/app_localizations.dart';
+import '../../dictionary_page.dart';
+import '../../projects_pages.dart';
 import '../models/more_item_id.dart';
 
 class MoreNavigation {
@@ -40,6 +43,18 @@ class MoreNavigation {
       case MoreItemProcessId.helpCenter:
         _toHelpCenter(context);
         break;
+
+      case MoreItemProcessId.arBusiness:
+        _toHelpCenter(context);
+        break;
+
+      case MoreItemProcessId.projects:
+        _toProjectsBusiness(context);
+        break;
+
+      case MoreItemProcessId.dictionaryCenter:
+        _toDictionary(context);
+        break;
     }
   }
 
@@ -66,11 +81,27 @@ class MoreNavigation {
   }
 
   static void _toDictionary(BuildContext context) {
+    final translationApi = AppLocalizations.of(context);
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            const Scaffold(body: Center(child: Text("Diccionario Kichwa"))),
+        builder: (_) => DictionaryPage(
+          title: translationApi.translate('pages.dictionary'),
+          itemsStatus: [],
+        ),
+      ),
+    );
+  }
+
+  static void _toProjectsBusiness(BuildContext context) {
+    final translationApi = AppLocalizations.of(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ProjectsPages(
+          title: translationApi.translate('pages.projects'),
+          itemsStatus: [],
+        ),
       ),
     );
   }

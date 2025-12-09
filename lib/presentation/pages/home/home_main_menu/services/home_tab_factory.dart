@@ -4,13 +4,13 @@ import 'package:meetclic_app/domain/services/session_service.dart';
 import 'package:meetclic_app/presentation/pages/business_map_page.dart';
 import 'package:meetclic_app/presentation/pages/home/home_infinity.dart';
 import 'package:meetclic_app/presentation/pages/profile_page.dart';
-import 'package:meetclic_app/presentation/pages/projects_pages.dart';
 import 'package:meetclic_app/presentation/widgets/template/custom_app_bar.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import 'package:meetclic_app/shared/utils/deep_link_type.dart';
 
 import '../../../more_page.dart';
+import '../../../store_page.dart';
 import '../models/home_tab_definition.dart';
 import '../models/home_tab_id.dart';
 // Átomo para construir items del BottomNavigationBar
@@ -121,7 +121,7 @@ class HomeTabFactory {
               AppLocalizations localL10n,
             ) {
               final title = localL10n.translate('pages.shop');
-              return ProjectsPages(title: title, itemsStatus: menuItems);
+              return StorePage(title: title, itemsStatus: menuItems);
             },
         navItemBuilder: (localL10n) => HomeNavItemAtom.build(
           icon: Icons.storefront_rounded,

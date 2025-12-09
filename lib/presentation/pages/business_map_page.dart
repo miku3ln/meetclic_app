@@ -463,6 +463,8 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
                                 ),
                               );
                             },
+                            verticalOffset:
+                                40.0, // prueba 32–56 hasta que te guste
                           );
                         }
                       },

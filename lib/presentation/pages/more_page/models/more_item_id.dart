@@ -13,6 +13,8 @@ enum MoreItemProcessId {
   addBusiness(1),
   exploreBusiness(2),
   dictionary(3),
+  arBusiness(4),
+  projects(5),
 
   // Comunidad
   eliteSquad(20),
@@ -22,7 +24,8 @@ enum MoreItemProcessId {
 
   // Configuración y soporte
   settings(40),
-  helpCenter(41);
+  helpCenter(41),
+  dictionaryCenter(44);
 
   final int value;
   const MoreItemProcessId(this.value);

@@ -16,6 +16,7 @@ class BusinessPopupCardMolecule extends StatelessWidget {
   // Colores opcionales (con defaults)
   final Color? cardColor;
   final Color? titleColor;
+  final double verticalOffset;
 
   const BusinessPopupCardMolecule({
     super.key,
@@ -24,6 +25,7 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     required this.type,
     this.cardColor,
     this.titleColor,
+    this.verticalOffset = 0.0,
   });
 
   @override
@@ -34,37 +36,41 @@ class BusinessPopupCardMolecule extends StatelessWidget {
     final Color resolvedCardColor = cardColor ?? Colors.white;
     final Color resolvedTitleColor = titleColor ?? theme.colorScheme.onSurface;
 
-    return GestureDetector(
-      onTap: onTap,
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.7,
-        child: Card(
-          elevation: 6,
-          margin: const EdgeInsets.all(8),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          color: resolvedCardColor,
-          child: Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // 1) Header: rating + nombre empresa
-                BusinessHeaderAtom(
-                  business: business,
-                  titleColor: resolvedTitleColor,
-                ),
-                const SizedBox(height: 6),
+    return Transform.translate(
+      // ✅ bajamos todo el popup en Y
+      offset: Offset(0, verticalOffset),
+      child: GestureDetector(
+        onTap: onTap,
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.7,
+          child: Card(
+            elevation: 6,
+            margin: const EdgeInsets.all(8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            color: resolvedCardColor,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // 1) Header: rating + nombre empresa
+                  BusinessHeaderAtom(
+                    business: business,
+                    titleColor: resolvedTitleColor,
+                  ),
+                  const SizedBox(height: 6),
 
-                // 2) Info: logo + categoría + teléfono
-                BusinessInfoRowAtom(business: business),
-                const SizedBox(height: 10),
+                  // 2) Info: logo + categoría + teléfono
+                  BusinessInfoRowAtom(business: business),
+                  const SizedBox(height: 10),
 
-                // 3) Sección de gamificación completa
-                BusinessGamificationSectionMolecule(business: business),
-              ],
+                  // 3) Sección de gamificación completa
+                  BusinessGamificationSectionMolecule(business: business),
+                ],
+              ),
             ),
           ),
         ),
