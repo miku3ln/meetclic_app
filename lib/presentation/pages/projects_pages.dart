@@ -5,6 +5,7 @@ import 'package:meetclic_app/presentation/pages/projects_pages/models/projects_i
 import 'package:meetclic_app/presentation/pages/projects_pages/services/projects_mapper_service.dart';
 import 'package:meetclic_app/presentation/pages/projects_pages/state/%20projects_state.dart';
 import 'package:meetclic_app/presentation/pages/projects_pages/widgets/organisms/projects_list_organism.dart';
+import 'package:meetclic_app/presentation/pages/rive-example/vehicles_page.dart';
 import 'package:rive/rive.dart';
 
 import '../widgets/template/custom_app_bar.dart';
@@ -34,30 +35,35 @@ class _ProjectsPagesState extends State<ProjectsPages> {
   void initState() {
     super.initState();
 
+    // ⚠️ FALTABA EL PARÁMETRO widget.itemsStatus
     final uiItems = _mapper.mapFromMenuItems();
     _state = ProjectsState(items: uiItems);
 
-    // si quisieras crear controllers por item:
     _controllers.addAll(
-      List.generate(
-        uiItems.length,
-        (_) => SimpleAnimation('idle'), // nombre de tu state machine/anim
-      ),
+      List.generate(uiItems.length, (_) => SimpleAnimation('idle')),
     );
   }
 
   // ==== Callbacks ====
-
   void _onItemTap(ProjectItemUiModel item) {
-    if (ProjectsId.ar.value == item.index) {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (_) => ARManagementView()));
-    }
+    debugPrint("Tap lógico: ${item.index} - ${item.title}");
   }
 
   void _onItemLongPress(ProjectItemUiModel item) {
     debugPrint('LongPress en item: ${item.index}');
+  }
+
+  // ==== NUEVO: BUILDER PARA NAVEGACIÓN CON OpenContainer ====
+  Widget _openPageBuilder(ProjectItemUiModel item) {
+    if (item.index == ProjectsId.ar.value) {
+      return const ARManagementView();
+    }
+
+    if (item.index == ProjectsId.rive.value) {
+      return VehiclesScreenPage(title: "Rive", itemsStatus: []);
+    }
+
+    return const Scaffold(body: Center(child: Text("Módulo en construcción")));
   }
 
   @override
@@ -72,6 +78,9 @@ class _ProjectsPagesState extends State<ProjectsPages> {
           items: _state.items,
           onItemTap: _onItemTap,
           onItemLongPress: _onItemLongPress,
+
+          // 👇 AQUÍ PASAMOS EL OPEN BUILDER PARA OpenContainer
+          openBuilder: _openPageBuilder,
         ),
       ),
     );

@@ -7,8 +7,12 @@ import '../molecules/project_list_tile_molecule.dart';
 
 class ProjectsListOrganism extends StatelessWidget {
   final List<ProjectItemUiModel> items;
+
   final OnProjectTap? onItemTap;
   final OnProjectLongPress? onItemLongPress;
+
+  /// 👇👇 NUEVO: Builder para la animación OpenContainer
+  final Widget Function(ProjectItemUiModel item)? openBuilder;
 
   // ==== parámetros para la línea divisoria ====
   final double dividerWidthFactor; // 0.0 - 1.0
@@ -22,11 +26,13 @@ class ProjectsListOrganism extends StatelessWidget {
     required this.items,
     this.onItemTap,
     this.onItemLongPress,
+    this.openBuilder, // 👈 NECESARIO PARA OPENCONTAINER
+
     this.dividerWidthFactor = ProjectsDividerDefaults.widthFactor,
     this.dividerHeight = ProjectsDividerDefaults.height,
     this.dividerThickness = ProjectsDividerDefaults.thickness,
     this.dividerAlignment = ProjectsDividerDefaults.alignmentRight,
-    this.dividerColor, // si viene null usamos el theme por defecto
+    this.dividerColor,
   });
 
   @override
@@ -36,6 +42,7 @@ class ProjectsListOrganism extends StatelessWidget {
 
     return ListView.separated(
       itemCount: items.length,
+
       separatorBuilder: (_, __) => Align(
         alignment: dividerAlignment,
         child: FractionallySizedBox(
@@ -47,12 +54,17 @@ class ProjectsListOrganism extends StatelessWidget {
           ),
         ),
       ),
+
       itemBuilder: (context, index) {
         final item = items[index];
+
         return ProjectListTileMolecule(
           item: item,
           onTap: onItemTap,
           onLongPress: onItemLongPress,
+
+          /// 👇 PASAMOS EL OPENBUILDER HACIA EL MOLECULE
+          openBuilder: openBuilder,
         );
       },
     );

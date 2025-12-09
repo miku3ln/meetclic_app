@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/domain/services/session_service.dart';
-import 'package:meetclic_app/presentation/pages/ar_management_view/ar_management_view.dart';
 import 'package:meetclic_app/presentation/pages/business_map_page.dart';
 import 'package:meetclic_app/presentation/pages/dictionary_page.dart';
 import 'package:meetclic_app/presentation/pages/home/home_infinity.dart';
@@ -81,28 +80,6 @@ class HomeTabFactory {
         navItemBuilder: (localL10n) => HomeNavItemAtom.build(
           icon: Icons.language,
           label: localL10n.translate('pages.explore'),
-        ),
-      ),
-
-      // =========================================================
-      // 🛍️ TAB: SHOP (AR / COMPRAS)
-      // =========================================================
-      HomeTabDefinition(
-        id: HomeTabId.shop,
-        isVisible: (_) => true,
-        builder:
-            (
-              SessionService session,
-              List<MenuTabUpItem> menuItems,
-              DeepLinkInfo? pendingDeepLink,
-              AppLocalizations localL10n,
-            ) {
-              // ARManagementView actualmente no necesita session ni menú
-              return const ARManagementView();
-            },
-        navItemBuilder: (localL10n) => HomeNavItemAtom.build(
-          icon: Icons.shopping_bag,
-          label: localL10n.translate('pages.shop'),
         ),
       ),
 
