@@ -14,6 +14,7 @@ import 'package:meetclic_app/shared/models/app_config.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import 'package:meetclic_app/shared/utils/deep_link_type.dart';
 
+import '../../../../../../shared/themes/app_colors.dart';
 import '../../models/home_tab_definition.dart';
 import '../../models/home_tab_id.dart';
 import '../../services/home_deep_link_service.dart';
@@ -212,22 +213,38 @@ class _HomeMainMenuOrganismState extends State<HomeMainMenuOrganism> {
         );
 
         return Scaffold(
+          //FOOTER MENU
           key: _scaffoldKey,
           backgroundColor: theme.scaffoldBackgroundColor,
           drawer: const HomeDrawerWidget(),
           body: currentBody,
-          bottomNavigationBar: BottomNavigationBar(
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: theme.colorScheme.primary,
-            selectedItemColor: theme.colorScheme.secondary,
-            unselectedItemColor: Colors.white,
-            currentIndex: currentIndex,
-            onTap: (index) {
-              setState(() {
-                _state = _state.copyWith(currentTab: visibleDefs[index].id);
-              });
-            },
-            items: itemsMenu,
+
+          // ✅ Footer con borde superior suave + colores de marca
+          bottomNavigationBar: Container(
+            decoration: const BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: AppColors.borderSoft, // línea sutil azulada
+                  width: 0.8,
+                ),
+              ),
+            ),
+            child: BottomNavigationBar(
+              type: BottomNavigationBarType.fixed,
+              backgroundColor: theme.colorScheme.surface, // blanco
+
+              selectedItemColor: theme.colorScheme.primary, // azulClic
+              unselectedItemColor:
+                  AppColors.textSecondaryLight, // gris suave juvenil
+
+              currentIndex: currentIndex,
+              onTap: (index) {
+                setState(() {
+                  _state = _state.copyWith(currentTab: visibleDefs[index].id);
+                });
+              },
+              items: itemsMenu,
+            ),
           ),
         );
       },

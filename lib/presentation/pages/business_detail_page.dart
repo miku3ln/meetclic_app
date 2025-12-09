@@ -8,6 +8,7 @@ import 'package:meetclic_app/infrastructure/repositories/implementations/busines
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 
 import '../../../presentation/widgets/template/custom_app_bar.dart';
+import '../../shared/themes/app_colors.dart';
 import '../widgets/home-business/gamification_business_section.dart';
 import '../widgets/home-business/home_business_section.dart';
 import '../widgets/home-business/news_business_section.dart';
@@ -67,9 +68,18 @@ class _BusinessDetailPageState extends State<BusinessDetailPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appLocalizations = AppLocalizations.of(context);
-
+    final Color colorMainCard = theme.primaryColor;
     return Scaffold(
-      appBar: CustomAppBar(title: '', items: []),
+      appBar: CustomAppBar(
+        title: '',
+        items: [],
+        borderAllow: false,
+        backgroundColor: colorMainCard,
+        textColor: Colors.white,
+        leadingIcon: Icons.arrow_back_ios_new,
+        leadingIconColor: Colors.white, // o AppColors.textPrimaryLight, etc.
+        onLeadingPressed: () => Navigator.of(context).pop(),
+      ),
       backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(child: Stack(children: [_pages[_selectedIndex]])),
       bottomNavigationBar: BottomAppBar(
@@ -136,6 +146,7 @@ class _BusinessDetailPageState extends State<BusinessDetailPage> {
     final isSelected = _selectedIndex == index;
 
     return Expanded(
+      //FOOTER MENU
       child: InkWell(
         onTap: () => _onNavTap(index),
         borderRadius: BorderRadius.circular(12),
@@ -149,8 +160,8 @@ class _BusinessDetailPageState extends State<BusinessDetailPage> {
                 icon,
                 size: 24,
                 color: isSelected
-                    ? theme.colorScheme.secondary
-                    : theme.colorScheme.onPrimary,
+                    ? theme.colorScheme.primary
+                    : AppColors.textSecondaryLight,
               ),
               const SizedBox(height: 4),
               Flexible(
@@ -162,8 +173,8 @@ class _BusinessDetailPageState extends State<BusinessDetailPage> {
                   style: TextStyle(
                     fontSize: 10,
                     color: isSelected
-                        ? theme.colorScheme.secondary
-                        : theme.colorScheme.onPrimary,
+                        ? theme.colorScheme.primary
+                        : AppColors.textSecondaryLight,
                     fontWeight: isSelected
                         ? FontWeight.bold
                         : FontWeight.normal,
