@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/domain/services/session_service.dart';
 import 'package:meetclic_app/presentation/pages/business_map_page.dart';
-import 'package:meetclic_app/presentation/pages/home/home_infinity.dart';
 import 'package:meetclic_app/presentation/pages/profile_page.dart';
-import 'package:meetclic_app/presentation/widgets/template/custom_app_bar.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import 'package:meetclic_app/shared/utils/deep_link_type.dart';
 
+import '../../../../widgets/template/custom_app_bar.dart';
 import '../../../more_page.dart';
 import '../../../store_page.dart';
+import '../../home_infinity.dart';
 import '../models/home_tab_definition.dart';
 import '../models/home_tab_id.dart';
 // Átomo para construir items del BottomNavigationBar
@@ -44,12 +44,12 @@ class HomeTabFactory {
             ) {
               final theme = Theme.of(context);
               final title = localL10n.translate('pages.home');
-
               return Scaffold(
                 backgroundColor: theme.scaffoldBackgroundColor,
                 appBar: CustomAppBar(title: title, items: menuItems),
                 body: const HomeScrollView(),
               );
+              // return GamificationPage(title: "", itemsStatus: menuItems);
             },
         navItemBuilder: (localL10n) => HomeNavItemAtom.build(
           icon: Icons.home,
