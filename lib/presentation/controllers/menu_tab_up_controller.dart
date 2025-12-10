@@ -40,12 +40,12 @@ class MenuTabUpController {
 
     // Esta es la lista REAL que se usará en el AppBar
     final List<MenuTabUpItem> items = [];
-
+    final urlFlag = config.getUrlFlag();
     // Item de idioma (bandera)
     final itemLanguage = MenuTabUpItem(
       id: 1,
       name: 'idioma',
-      asset: 'assets/flags/$locale.png',
+      asset: urlFlag,
       number: idioma,
       onTap: () => showTopLanguageModal(
         LanguageModalConfig(

@@ -8,12 +8,16 @@ import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/domain/models/business_model.dart';
 import 'package:meetclic_app/domain/usecases/get_nearby_businesses_usecase.dart';
 import 'package:meetclic_app/infrastructure/repositories/implementations/business_repository_impl.dart';
+import 'package:meetclic_app/presentation/pages/services/presentation_services_all.dart';
 import 'package:meetclic_app/presentation/widgets/template/custom_app_bar.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 
 import '../../../shared/utils/deep_link_type.dart';
 import '../../aplication/usecases/check_location_permission_usecase.dart';
 import '../../infrastructure/services/geolocator_service.dart';
+import '../../shared/models/app_config.dart';
+import '../../shared/models/language_modal_config.dart';
+import '../../shared/providers_session.dart';
 import 'business_detail_page.dart';
 import 'business_map_page/helpers/business_marker_visual_resolver.dart';
 import 'business_map_page/helpers/map_refresh_helper.dart';
@@ -31,6 +35,7 @@ import 'business_map_page/widgets/atoms/loading_overlay_atom.dart';
 import 'business_map_page/widgets/molecules/business_popup_card_molecule.dart';
 import 'business_map_page/widgets/molecules/top_search_bar_molecule.dart';
 import 'business_map_page/widgets/organisms/business_filters_bottom_sheet_organism.dart';
+import 'home/modals/language_modal.dart';
 
 class BusinessMapPage extends StatefulWidget {
   final DeepLinkInfo? info;
@@ -45,6 +50,9 @@ class BusinessMapPage extends StatefulWidget {
 class _BusinessMapPageState extends State<BusinessMapPage> {
   final PopupController _popupController = PopupController();
   final MapController _mapController = MapController();
+  final TextEditingController _searchController = TextEditingController();
+  bool _hasSearchText = false;
+  late final AppConfig config = Provider.of<AppConfig>(context, listen: false);
 
   /// Manager responsable de la posición “principal” del mapa
   late final ManagerBusiness manager = ManagerBusiness();
@@ -124,6 +132,11 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadNearbyBusinesses();
+    });
+    _searchController.addListener(() {
+      setState(() {
+        _hasSearchText = _searchController.text.trim().isNotEmpty;
+      });
     });
   }
 
@@ -401,6 +414,27 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
   // ============================================================
   //   UI
   // ============================================================
+  void _onSearch(String value) {
+    print('Buscar definitivamente: $value');
+    // aquí tu lógica real de búsqueda
+  }
+
+  void _onFlagChanged(VoidCallback fn) {
+    setState(() {
+      fn(); // lo que ya hacía antes (ej: actualizar lista, etc.)
+    });
+  }
+
+  void onLanguage() {
+    showTopLanguageModal(
+      LanguageModalConfig(
+        context: context,
+        onChanged: (newLocale) => config.setLocale(Locale(newLocale)),
+        menuTabUpItems: [], // 👉 referencia a la MISMA lista
+        setStateFn: _onFlagChanged, // 👉 setState de HomeMainMenu
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -409,7 +443,18 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
     ).translate('pages.business');
 
     return Scaffold(
-      appBar: CustomAppBar(title: title, items: widget.itemsStatus),
+      appBar: CustomAppBar(
+        title: title,
+        items: widget.itemsStatus,
+        config: buildInputWithThreeButtons(
+          searchController: _searchController,
+          onOpenFilters: _openFilters,
+          hasText: _hasSearchText,
+          onSearch: _onSearch,
+          config: config,
+          onLanguage: onLanguage,
+        ),
+      ),
       body: Stack(
         children: [
           // MAPA

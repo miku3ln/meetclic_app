@@ -53,6 +53,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final effectiveConfig = config ?? HeaderLayoutPresets.none;
 
     return AppBar(
+      toolbarHeight: 150,
       elevation: 0,
       titleSpacing: 12,
       backgroundColor: backgroundColor,

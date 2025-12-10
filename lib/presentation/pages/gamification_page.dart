@@ -8,7 +8,9 @@ import 'package:meetclic_app/domain/gamification/usecases/get_c2b_tasks_usecase.
 import 'package:meetclic_app/infrastructure/gamification/datasources/business_c2b_config_local_source.dart';
 import 'package:meetclic_app/infrastructure/gamification/datasources/c2b_gamification_task_local_source.dart';
 import 'package:meetclic_app/infrastructure/gamification/repositories/gamification_task_repository_impl.dart';
+import 'package:meetclic_app/presentation/pages/services/presentation_services_all.dart';
 
+import '../../infrastructure/assets/app_images.dart';
 import '../widgets/template/custom_app_bar.dart';
 import 'gamification_page/services/gamification_business_service.dart';
 import 'gamification_page/state/gamification_business_state.dart';
@@ -129,10 +131,29 @@ class _GamificationPageState extends State<GamificationPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
+    final headerConfig = buildRightImageWithThreeButtons(
+      imageWidget: Image.asset(
+        AppImages.splashBackground, // o tu logo / avatar
+        width: 50,
+        height: 50,
+      ),
+      onFirstPressed: () {
+        print("onFirstPressed");
+      },
+      onSecondPressed: () {
+        print("onSecondPressed");
+      },
+      onThirdPressed: () {
+        print("onThirdPressed");
+      },
+    );
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: CustomAppBar(title: widget.title, items: widget.itemsStatus),
+      appBar: CustomAppBar(
+        title: widget.title,
+        items: widget.itemsStatus,
+        config: headerConfig,
+      ),
       body: Column(
         children: [
           // ======= HEADER DE ACCIONES / FILTROS =======
