@@ -15,8 +15,8 @@ import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import '../../../shared/utils/deep_link_type.dart';
 import '../../aplication/usecases/check_location_permission_usecase.dart';
 import '../../infrastructure/services/geolocator_service.dart';
+import '../../shared/language/language_modal_mixin.dart';
 import '../../shared/models/app_config.dart';
-import '../../shared/models/language_modal_config.dart';
 import '../../shared/providers_session.dart';
 import 'business_detail_page.dart';
 import 'business_map_page/helpers/business_marker_visual_resolver.dart';
@@ -35,7 +35,6 @@ import 'business_map_page/widgets/atoms/loading_overlay_atom.dart';
 import 'business_map_page/widgets/molecules/business_popup_card_molecule.dart';
 import 'business_map_page/widgets/molecules/top_search_bar_molecule.dart';
 import 'business_map_page/widgets/organisms/business_filters_bottom_sheet_organism.dart';
-import 'home/modals/language_modal.dart';
 
 class BusinessMapPage extends StatefulWidget {
   final DeepLinkInfo? info;
@@ -47,7 +46,8 @@ class BusinessMapPage extends StatefulWidget {
   State<BusinessMapPage> createState() => _BusinessMapPageState();
 }
 
-class _BusinessMapPageState extends State<BusinessMapPage> {
+class _BusinessMapPageState extends State<BusinessMapPage>
+    with LanguageModalMixin {
   final PopupController _popupController = PopupController();
   final MapController _mapController = MapController();
   final TextEditingController _searchController = TextEditingController();
@@ -426,14 +426,7 @@ class _BusinessMapPageState extends State<BusinessMapPage> {
   }
 
   void onLanguage() {
-    showTopLanguageModal(
-      LanguageModalConfig(
-        context: context,
-        onChanged: (newLocale) => config.setLocale(Locale(newLocale)),
-        menuTabUpItems: [], // 👉 referencia a la MISMA lista
-        setStateFn: _onFlagChanged, // 👉 setState de HomeMainMenu
-      ),
-    );
+    showLanguageModal(config: config, menuTabUpItems: []);
   }
 
   @override

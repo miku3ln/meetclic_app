@@ -10,7 +10,10 @@ import 'package:meetclic_app/infrastructure/gamification/datasources/c2b_gamific
 import 'package:meetclic_app/infrastructure/gamification/repositories/gamification_task_repository_impl.dart';
 import 'package:meetclic_app/presentation/pages/services/presentation_services_all.dart';
 
-import '../../infrastructure/assets/app_images.dart';
+import '../../shared/language/language_modal_mixin.dart';
+import '../../shared/models/app_config.dart';
+import '../../shared/providers_session.dart';
+import '../../shared/themes/app_colors.dart';
 import '../widgets/template/custom_app_bar.dart';
 import 'gamification_page/services/gamification_business_service.dart';
 import 'gamification_page/state/gamification_business_state.dart';
@@ -29,9 +32,11 @@ class GamificationPage extends StatefulWidget {
   State<GamificationPage> createState() => _GamificationPageState();
 }
 
-class _GamificationPageState extends State<GamificationPage> {
+class _GamificationPageState extends State<GamificationPage>
+    with LanguageModalMixin {
   late final GamificationBusinessService _service;
   GamificationBusinessState _state = GamificationBusinessState.initial();
+  late final AppConfig config = Provider.of<AppConfig>(context, listen: false);
 
   @override
   void initState() {
@@ -128,24 +133,26 @@ class _GamificationPageState extends State<GamificationPage> {
     }
   }
 
+  void onLanguage() {
+    showLanguageModal(config: config, menuTabUpItems: []);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final headerConfig = buildRightImageWithThreeButtons(
-      imageWidget: Image.asset(
-        AppImages.splashBackground, // o tu logo / avatar
-        width: 50,
-        height: 50,
-      ),
-      onFirstPressed: () {
+    final appConfig = Provider.of<AppConfig>(context);
+
+    final headerConfig = buildTitleWithThreeButtons(
+      title: 'Meetclic',
+      onOpenFilters: () {
         print("onFirstPressed");
       },
-      onSecondPressed: () {
-        print("onSecondPressed");
-      },
-      onThirdPressed: () {
-        print("onThirdPressed");
-      },
+      onLanguage: onLanguage,
+      config: appConfig,
+      // opcional:
+      titleColor: AppColors.azulClic, // o el que definas
+      titleFontSize: 30,
+      titleFontWeight: FontWeight.bold,
     );
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,

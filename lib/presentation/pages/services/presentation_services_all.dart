@@ -2,7 +2,83 @@ import 'package:flutter/material.dart';
 
 import '../../../infrastructure/assets/app_images.dart';
 import '../../../shared/models/app_config.dart';
+import '../../../shared/themes/app_colors.dart';
 import '../../widgets/template/custom_app_bar/models/custom_app_bar_all_model.dart';
+
+HeaderLayoutConfiguration buildTitleWithThreeButtons({
+  required String title,
+  required VoidCallback onOpenFilters,
+  required VoidCallback onLanguage,
+  required AppConfig config,
+  Color? titleColor,
+  double titleFontSize = 18,
+  FontWeight titleFontWeight = FontWeight.w600,
+}) {
+  final double space = 10;
+  final String urlFlag = config.getUrlFlag();
+
+  // Color por defecto desde MeetClic (ejemplo usando AppColors)
+  final Color resolvedTitleColor = titleColor ?? AppColors.azulClic;
+  // Cambia AppColors.primary por azulClic o el que tengas definido
+
+  return HeaderLayoutConfiguration(
+    layoutType: HeaderLayoutType.doubleColumnLeftWeighted,
+    percentages: const [0.60, 0.40],
+    sections: [
+      // 🟡 60% TEXTO (no input)
+      HeaderSectionModel(
+        type: HeaderSectionType.textInput, // podemos seguir usando este tipo
+        content: Align(
+          alignment: Alignment.centerLeft,
+          child: Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              color: resolvedTitleColor,
+              fontSize: titleFontSize,
+              fontWeight: titleFontWeight,
+            ),
+          ),
+        ),
+      ),
+
+      // 🔵 40% BOTONES
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            GestureDetector(
+              onTap: onOpenFilters,
+              child: const Icon(Icons.tune, size: 26),
+            ),
+            SizedBox(width: space),
+            GestureDetector(
+              onTap: onLanguage,
+              child: Image.asset(urlFlag, width: 26, height: 26),
+            ),
+            SizedBox(width: space),
+            GestureDetector(
+              onTap: () => print("gamificación"),
+              child: Image.asset(
+                AppImages.rewardTypeTrophy,
+                width: 26,
+                height: 26,
+              ),
+            ),
+            SizedBox(width: space),
+            GestureDetector(
+              onTap: () => print("ventas"),
+              child: const Icon(Icons.storefront_rounded, size: 26),
+            ),
+            SizedBox(width: space),
+          ],
+        ),
+      ),
+    ],
+  );
+}
 
 HeaderLayoutConfiguration buildInputWithThreeButtons({
   required TextEditingController searchController,
