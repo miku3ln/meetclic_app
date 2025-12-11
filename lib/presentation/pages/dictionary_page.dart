@@ -10,6 +10,7 @@ import '../pages/dictionary_page/repositories/dictionary_repository.dart';
 import '../pages/dictionary_page/search_language_app_bar.dart';
 import '../pages/dictionary_page/services/mock_dictionary_service.dart';
 import '../pages/dictionary_page/word_tile.dart';
+import 'business_map_page/widgets/atoms/loading_overlay_atom.dart';
 
 class DictionaryPage extends StatefulWidget {
   final String title;
@@ -90,7 +91,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
       ),
       body: SafeArea(
         child: _vm.isInitialLoading
-            ? const Center(child: CircularProgressIndicator())
+            ? LoadingOverlayAtom(isLoading: _vm.isInitialLoading)
             : AbsorbPointer(
                 absorbing: _vm.scrollLocked,
                 child: RefreshIndicator(
@@ -168,7 +169,7 @@ class _DictionaryPageState extends State<DictionaryPage> {
 
                         if (_vm.isLoadingMore) ...[
                           const SizedBox(height: 16),
-                          const Center(child: CircularProgressIndicator()),
+                          LoadingOverlayAtom(isLoading: _vm.isLoadingMore),
                         ],
                         if (!_vm.hasMore && _vm.items.isNotEmpty) ...[
                           const SizedBox(height: 12),

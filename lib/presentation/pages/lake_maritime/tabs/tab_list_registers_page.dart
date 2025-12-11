@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../../../../domain/models/maritime_departure_model.dart';
 import '../../../../infrastructure/services/maritime_departure_service.dart';
+import '../../business_map_page/widgets/atoms/loading_overlay_atom.dart';
 
 class TabListRegistersPage extends StatefulWidget {
   const TabListRegistersPage({super.key});
@@ -136,7 +137,7 @@ class _TabListRegistersPageState extends State<TabListRegistersPage> {
           child: RefreshIndicator(
             onRefresh: _refreshList,
             child: _isLoading && _items.isEmpty
-                ? const Center(child: CircularProgressIndicator())
+                ? LoadingOverlayAtom(isLoading: _isLoading)
                 : ListView.builder(
                     controller: _scrollController,
                     itemCount: _items.length,

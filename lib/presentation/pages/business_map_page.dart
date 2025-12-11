@@ -527,7 +527,10 @@ class _BusinessMapPageState extends State<BusinessMapPage>
           ),
 
           // Overlay de carga
-          LoadingOverlayAtom(isLoading: _state.isLoading),
+          LoadingOverlayAtom(
+            isLoading: _state.isLoading,
+            type: LoadingOverlayType.image,
+          ),
         ],
       ),
       floatingActionButton: CurrentLocationFabAtom(

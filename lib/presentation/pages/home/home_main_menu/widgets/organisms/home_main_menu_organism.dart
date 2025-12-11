@@ -8,7 +8,6 @@ import 'package:meetclic_app/aplication/services/access_manager_service.dart';
 import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:meetclic_app/infrastructure/deep_links/deep_link_handler.dart';
 import 'package:meetclic_app/presentation/controllers/menu_tab_up_controller.dart';
-import 'package:meetclic_app/presentation/widgets/home_drawer_widget.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import 'package:meetclic_app/shared/models/app_config.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
@@ -216,8 +215,14 @@ class _HomeMainMenuOrganismState extends State<HomeMainMenuOrganism> {
           //FOOTER MENU
           key: _scaffoldKey,
           backgroundColor: theme.scaffoldBackgroundColor,
-          drawer: const HomeDrawerWidget(),
-          body: currentBody,
+          extendBody: true,
+          // drawer: const HomeDrawerWidget(),
+          body: SafeArea(
+            top: true,
+            bottom: false,
+            // 👈 dejamos libre la parte de abajo para el fondo del footer
+            child: currentBody,
+          ),
 
           // ✅ Footer con borde superior suave + colores de marca
           bottomNavigationBar: Container(
@@ -231,12 +236,13 @@ class _HomeMainMenuOrganismState extends State<HomeMainMenuOrganism> {
             ),
             child: BottomNavigationBar(
               type: BottomNavigationBarType.fixed,
-              backgroundColor: theme.colorScheme.surface, // blanco
+              backgroundColor: theme.colorScheme.surface,
+              // blanco
+              selectedItemColor: theme.colorScheme.primary,
+              // azulClic
+              unselectedItemColor: AppColors.textSecondaryLight,
 
-              selectedItemColor: theme.colorScheme.primary, // azulClic
-              unselectedItemColor:
-                  AppColors.textSecondaryLight, // gris suave juvenil
-
+              // gris suave juvenil
               currentIndex: currentIndex,
               onTap: (index) {
                 setState(() {
