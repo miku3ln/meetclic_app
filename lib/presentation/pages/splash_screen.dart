@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/data/data-sources/module_api_fake.dart';
-import 'package:meetclic_app/infrastructure/assets/app_images.dart';
 import 'package:meetclic_app/presentation/pages/home/home_page.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -10,77 +9,40 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> {
   final ModuleApiFake api = ModuleApiFake();
-  late final AnimationController _controller;
-  late final Animation<double> _fadeIn;
 
   @override
   void initState() {
     super.initState();
-
-    // Configura la animación
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 100),
-      vsync: this,
-    );
-    _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
-
-    // Inicia carga de recursos después del primer frame
-    WidgetsBinding.instance.addPostFrameCallback((_) => loadResources());
+    // Inicia la carga después del primer frame
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadResources());
   }
 
-  Future<void> loadResources() async {
+  Future<void> _loadResources() async {
     try {
-      await precacheImage(
-        const AssetImage(AppImages.splashBackground),
-        context,
-      );
-      _controller.forward(); // inicia animación
+      // Aquí podrías cargar cosas reales, por ahora nada:
+      // await api.loadModules();
+
+      // (Opcional) pequeña pausa para que se vea el loading
+      // await Future.delayed(const Duration(milliseconds: 500));
 
       if (!mounted) return;
-      Navigator.pushReplacement(
-        context,
+
+      Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => HomeScreenAllMenu(modules: [])),
       );
-    } catch (e) {
+    } catch (e, st) {
       debugPrint('Error cargando datos: $e');
+      debugPrint('$st');
     }
   }
 
   @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return SafeArea(
-      child: Scaffold(
-        backgroundColor: colorScheme.background,
-        body: Stack(
-          children: [
-            Center(
-              child: FadeTransition(
-                opacity: _fadeIn,
-                child: Image.asset(
-                  AppImages.splashBackground,
-                  width: 200,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-            Container(
-              color: colorScheme.background.withOpacity(0.4),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-          ],
-        ),
-      ),
+    return const Scaffold(
+      backgroundColor: Colors.white,
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

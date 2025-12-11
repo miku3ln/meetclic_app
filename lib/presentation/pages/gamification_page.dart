@@ -15,8 +15,10 @@ import '../../shared/models/app_config.dart';
 import '../../shared/providers_session.dart';
 import '../../shared/themes/app_colors.dart';
 import '../widgets/template/custom_app_bar.dart';
+import 'gamification_page/models/gamification_page_all_model.dart';
 import 'gamification_page/services/gamification_business_service.dart';
 import 'gamification_page/state/gamification_business_state.dart';
+import 'gamification_page/utils/gamification_task_card_resolver.dart';
 
 class GamificationPage extends StatefulWidget {
   final String title;
@@ -137,10 +139,45 @@ class _GamificationPageState extends State<GamificationPage>
     showLanguageModal(config: config, menuTabUpItems: []);
   }
 
+  getDataResult(List<C2BGamificationTask> tasks) {
+    final Map<GamificationCardLayout, List<C2BGamificationTask>> map = {
+      GamificationCardLayout.imageLeft: [],
+      GamificationCardLayout.full: [],
+      GamificationCardLayout.compact: [],
+      GamificationCardLayout.others: [],
+    };
+    tasks.forEach((task) {
+      final variant = GamificationCardTypeResolver.resolve(task);
+
+      switch (variant.layout) {
+        case GamificationCardLayout.imageLeft:
+          map[GamificationCardLayout.imageLeft]!.add(task);
+          break;
+
+        case GamificationCardLayout.full:
+          map[GamificationCardLayout.full]!.add(task);
+          break;
+
+        case GamificationCardLayout.compact:
+          map[GamificationCardLayout.compact]!.add(task);
+          break;
+
+        case GamificationCardLayout.others:
+        default:
+          map[GamificationCardLayout.others]!.add(task);
+          break;
+      }
+    });
+
+    return map;
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final appConfig = Provider.of<AppConfig>(context);
+    final data = _state.tasks;
+    final group = getDataResult(data);
 
     final headerConfig = buildTitleWithThreeButtons(
       title: 'Meetclic',
@@ -150,7 +187,8 @@ class _GamificationPageState extends State<GamificationPage>
       onLanguage: onLanguage,
       config: appConfig,
       // opcional:
-      titleColor: AppColors.azulClic, // o el que definas
+      titleColor: AppColors.azulClic,
+      // o el que definas
       titleFontSize: 30,
       titleFontWeight: FontWeight.bold,
     );
