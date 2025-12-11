@@ -21,6 +21,9 @@ enum HeaderSectionType {
   textInput, // textos o inputs
   imageIcon, // imagen o icono
   none, // vacío
+
+  searchToggle, // botón lupa que abre/cierra búsqueda
+  backButton, // botón atrás para salir de búsqueda
 }
 
 enum HeaderLayoutType {

@@ -163,3 +163,91 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 }
+
+class SearchableAppBar extends StatefulWidget implements PreferredSizeWidget {
+  final String title;
+
+  const SearchableAppBar({super.key, required this.title});
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
+  @override
+  State<SearchableAppBar> createState() => _SearchableAppBarState();
+}
+
+class _SearchableAppBarState extends State<SearchableAppBar> {
+  bool _isSearching = false;
+  final TextEditingController _controller = TextEditingController();
+  final FocusNode _focusNode = FocusNode();
+
+  // Entrar a modo búsqueda
+  void _startSearch() {
+    setState(() => _isSearching = true);
+
+    // Espera un microtask para que se abra el teclado
+    Future.delayed(const Duration(milliseconds: 50), () {
+      _focusNode.requestFocus();
+    });
+  }
+
+  // Salir de modo búsqueda
+  void _stopSearch() {
+    setState(() => _isSearching = false);
+    _controller.clear();
+    _focusNode.unfocus();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppBar(
+      automaticallyImplyLeading: false, // Manejas tu propio botón back
+      titleSpacing: 0,
+
+      leading: _isSearching
+          ? IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: _stopSearch,
+            )
+          : null,
+
+      title: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 200),
+        child: _isSearching
+            ? TextField(
+                key: const ValueKey("searchField"),
+                controller: _controller,
+                focusNode: _focusNode,
+                decoration: const InputDecoration(
+                  hintText: 'Buscar',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.symmetric(horizontal: 12),
+                ),
+                onChanged: (text) {
+                  // Aquí filtras los resultados si quieres
+                },
+              )
+            : Padding(
+                key: const ValueKey("normalTitle"),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: Text(widget.title),
+              ),
+      ),
+
+      actions: _isSearching
+          ? [
+              if (_controller.text.isNotEmpty)
+                IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () => setState(() => _controller.clear()),
+                ),
+            ]
+          : [
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: _startSearch,
+              ),
+            ],
+    );
+  }
+}
