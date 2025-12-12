@@ -465,6 +465,7 @@ class HeaderSearchVisualConfig {
   final Color? focusedBorderColor;
   final double borderRadius;
   final double borderWidth;
+  final double fieldHeight;
   const HeaderSearchVisualConfig({
     // INPUT
     this.hintText = 'Buscar en MeetClic',
@@ -486,6 +487,7 @@ class HeaderSearchVisualConfig {
     this.focusedBorderColor,
     this.borderRadius = 24,
     this.borderWidth = 1,
+    this.fieldHeight = 40,
   });
 
   static const defaults = HeaderSearchVisualConfig();

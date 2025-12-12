@@ -301,6 +301,192 @@ HeaderLayoutConfiguration buildMeetclicHeader({
   );
 }
 
+HeaderLayoutConfiguration buildSearchHeaderLayoutOther({
+  required SearchHeaderContext ctx,
+  required AppConfig config,
+  required List<HeaderActionItem> rightActions,
+  HeaderSearchVisualConfig searchStyle = HeaderSearchVisualConfig.defaults,
+  ValueChanged<String>? onChangedSearch,
+  ValueChanged<String>? onSubmittedSearch,
+}) {
+  const double space = 10;
+  final bool isSearching = ctx.isSearching;
+
+  // === defaults MeetClic ===
+  final Color resolvedFillColor = searchStyle.fillColor ?? AppColors.blanco;
+  final Color resolvedBorderColor =
+      searchStyle.borderColor ?? AppColors.azulClic.withOpacity(0.15);
+  final Color resolvedFocusedBorderColor =
+      searchStyle.focusedBorderColor ?? AppColors.azulClic;
+  final Color resolvedCursorColor =
+      searchStyle.cursorColor ?? AppColors.azulClic;
+
+  OutlineInputBorder _buildBorder(Color color) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(searchStyle.borderRadius),
+      borderSide: BorderSide(color: color, width: searchStyle.borderWidth),
+    );
+  }
+
+  // ========= WIDGET TÍTULO / INPUT =========
+  Widget buildSearchTextField() {
+    return TextField(
+      controller: ctx.searchController,
+      focusNode: ctx.searchFocusNode,
+      cursorColor: resolvedCursorColor,
+      style:
+          searchStyle.textStyle ??
+          const TextStyle(fontSize: 16, color: AppColors.grisOscuro),
+      decoration: InputDecoration(
+        hintText: searchStyle.hintText,
+        hintStyle:
+            searchStyle.hintStyle ??
+            const TextStyle(fontSize: 16, color: Colors.grey),
+        isDense: true,
+        filled: searchStyle.filled,
+        fillColor: resolvedFillColor,
+        contentPadding: searchStyle.contentPadding,
+        border: _buildBorder(resolvedBorderColor),
+        enabledBorder: _buildBorder(resolvedBorderColor),
+        focusedBorder: _buildBorder(resolvedFocusedBorderColor),
+      ),
+      onChanged: (value) {
+        if (onChangedSearch != null) onChangedSearch(value);
+      },
+      onSubmitted: (value) {
+        if (onSubmittedSearch != null) onSubmittedSearch(value);
+      },
+    );
+  }
+
+  const titleWidget = Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      'Meetclic',
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: TextStyle(
+        color: AppColors.azulClic,
+        fontSize: 26,
+        fontWeight: FontWeight.bold,
+      ),
+    ),
+  );
+
+  // ========= ACCIONES =========
+  final normalActions = rightActions; // todas
+  final searchActions = rightActions
+      .where((a) => !a.hideWhenSearching)
+      .toList(); // visibles en search
+
+  // ========= MODO BÚSQUEDA =========
+  if (isSearching) {
+    // back común
+    final backButton = GestureDetector(
+      onTap: ctx.stopSearch,
+      child: const Icon(Icons.arrow_back, size: 22, color: AppColors.azulClic),
+    );
+
+    if (searchActions.isEmpty) {
+      // 🔹 NO HAY BOTONES EN BÚSQUEDA → 20 / 80 (back + input)
+      return HeaderLayoutConfiguration(
+        layoutType: HeaderLayoutType.doubleColumnLeftWeighted,
+        percentages: const [0.20, 0.80],
+        sections: [
+          HeaderSectionModel(
+            type: HeaderSectionType.buttons,
+            content: backButton,
+            visible: true,
+          ),
+          HeaderSectionModel(
+            type: HeaderSectionType.textInput,
+            content: buildSearchTextField(),
+            visible: true,
+          ),
+        ],
+      );
+    } else {
+      // 🔹 SÍ HAY BOTONES EN BÚSQUEDA → 20 / 65 / 15 (back + input + botones)
+      final List<Widget> rightSearchChildren = [];
+      for (int i = 0; i < searchActions.length; i++) {
+        final action = searchActions[i];
+        rightSearchChildren.add(
+          GestureDetector(onTap: action.onTap, child: action.icon),
+        );
+        if (i < searchActions.length - 1) {
+          rightSearchChildren.add(const SizedBox(width: space));
+        }
+      }
+
+      final rightSearchRow = Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: rightSearchChildren,
+      );
+
+      return HeaderLayoutConfiguration(
+        layoutType: HeaderLayoutType.tripleColumnCenterWeighted,
+        percentages: const [0.20, 0.65, 0.15],
+        sections: [
+          HeaderSectionModel(
+            type: HeaderSectionType.buttons,
+            content: backButton,
+            visible: true,
+          ),
+          HeaderSectionModel(
+            type: HeaderSectionType.textInput,
+            content: buildSearchTextField(),
+            visible: true,
+          ),
+          HeaderSectionModel(
+            type: HeaderSectionType.buttons,
+            content: rightSearchRow,
+            visible: true,
+          ),
+        ],
+      );
+    }
+  }
+
+  // ========= MODO NORMAL (20 / 50 / 30) =========
+  final List<Widget> rightNormalChildren = [];
+  for (int i = 0; i < normalActions.length; i++) {
+    final action = normalActions[i];
+    rightNormalChildren.add(
+      GestureDetector(onTap: action.onTap, child: action.icon),
+    );
+    if (i < normalActions.length - 1) {
+      rightNormalChildren.add(const SizedBox(width: space));
+    }
+  }
+
+  final rightNormalRow = Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: rightNormalChildren,
+  );
+
+  return HeaderLayoutConfiguration(
+    layoutType: HeaderLayoutType.tripleColumnCenterWeighted,
+    percentages: const [0.20, 0.50, 0.30],
+    sections: [
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: const SizedBox(), // nada a la izquierda
+        visible: true,
+      ),
+      HeaderSectionModel(
+        type: HeaderSectionType.textInput,
+        content: titleWidget,
+        visible: true,
+      ),
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: rightNormalRow,
+        visible: true,
+      ),
+    ],
+  );
+}
+
 HeaderLayoutConfiguration buildSearchHeaderLayout({
   required SearchHeaderContext ctx,
   required AppConfig config,
@@ -513,6 +699,256 @@ HeaderLayoutConfiguration buildMeetclicHeaderLayout({
       HeaderSectionModel(
         type: HeaderSectionType.buttons,
         content: rightButtons,
+        visible: true,
+      ),
+    ],
+  );
+}
+
+HeaderLayoutConfiguration buildSearchHeaderLayout20_80({
+  required SearchHeaderContext ctx,
+  HeaderSearchVisualConfig searchStyle = HeaderSearchVisualConfig.defaults,
+  ValueChanged<String>? onChangedSearch,
+  ValueChanged<String>? onSubmittedSearch,
+}) {
+  // 20 = back
+  final backButton = Padding(
+    padding: searchStyle.backIconPadding,
+    child: IconButton(
+      icon: Icon(
+        searchStyle.backIcon,
+        size: searchStyle.backIconSize,
+        color: searchStyle.backIconColor ?? AppColors.azulClic,
+      ),
+      onPressed: ctx.stopSearch,
+    ),
+  );
+
+  // 80 = input (usa el helper de arriba)
+  final input = buildSearchTextField(
+    ctx: ctx,
+    searchStyle: searchStyle,
+    onChangedSearch: onChangedSearch,
+    onSubmittedSearch: onSubmittedSearch,
+  );
+
+  return HeaderLayoutConfiguration(
+    layoutType: HeaderLayoutType.doubleColumnLeftWeighted,
+    percentages: const [0.20, 0.80],
+    sections: [
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: Align(alignment: Alignment.centerLeft, child: backButton),
+        visible: true,
+      ),
+      HeaderSectionModel(
+        type: HeaderSectionType.textInput,
+        content: Align(
+          alignment:
+              Alignment.centerLeft, // centrado vertical dentro del AppBar
+          child: input,
+        ),
+        visible: true,
+      ),
+    ],
+  );
+}
+
+Widget buildSearchTextField({
+  required SearchHeaderContext ctx,
+  required HeaderSearchVisualConfig searchStyle,
+  ValueChanged<String>? onChangedSearch,
+  ValueChanged<String>? onSubmittedSearch,
+}) {
+  // 🎨 Colores
+  final Color resolvedFillColor = searchStyle.fillColor ?? AppColors.blanco;
+  final Color resolvedBorderColor =
+      searchStyle.borderColor ?? AppColors.azulClic.withOpacity(0.15);
+  final Color resolvedFocusedBorderColor =
+      searchStyle.focusedBorderColor ?? AppColors.azulClic;
+  final Color resolvedCursorColor =
+      searchStyle.cursorColor ?? AppColors.azulClic;
+
+  // 🎨 Estilos base + merge
+  const TextStyle baseTextStyle = TextStyle(
+    fontSize: 16,
+    color: AppColors.grisOscuro,
+  );
+  const TextStyle baseHintStyle = TextStyle(fontSize: 16, color: Colors.grey);
+
+  final TextStyle resolvedTextStyle = baseTextStyle.merge(
+    searchStyle.textStyle,
+  );
+  final TextStyle resolvedHintStyle = baseHintStyle.merge(
+    searchStyle.hintStyle,
+  );
+
+  OutlineInputBorder _buildBorder(Color color) {
+    return OutlineInputBorder(
+      borderRadius: BorderRadius.circular(searchStyle.borderRadius),
+      borderSide: BorderSide(color: color, width: searchStyle.borderWidth),
+    );
+  }
+
+  // 🧮 Calculamos padding vertical a partir de fieldHeight (aprox)
+  // Altura “natural” de la línea ~ 24 px (fontSize 16 * 1.5 aprox)
+  const double baseInnerHeight = 24;
+  final double desired = searchStyle.fieldHeight; // 40, 44, etc.
+  final double extra = (desired - baseInnerHeight).clamp(0, 40);
+  final double verticalPadding = extra / 2;
+  final contentPadding = searchStyle.contentPadding.add(
+    EdgeInsets.symmetric(vertical: verticalPadding),
+  );
+  return Padding(
+    padding: const EdgeInsets.symmetric(
+      vertical: 4,
+    ), // respiro dentro del AppBar
+    child: TextField(
+      controller: ctx.searchController,
+      focusNode: ctx.searchFocusNode,
+      cursorColor: resolvedCursorColor,
+      style: resolvedTextStyle,
+      textAlignVertical: TextAlignVertical.center,
+      decoration: InputDecoration(
+        hintText: searchStyle.hintText,
+        hintStyle: resolvedHintStyle,
+        isDense: false,
+        filled: searchStyle.filled,
+        fillColor: resolvedFillColor,
+        contentPadding: contentPadding,
+        border: _buildBorder(resolvedBorderColor),
+        enabledBorder: _buildBorder(resolvedBorderColor),
+        focusedBorder: _buildBorder(resolvedFocusedBorderColor),
+      ),
+      onChanged: (value) => onChangedSearch?.call(value),
+      onSubmitted: (value) => onSubmittedSearch?.call(value),
+    ),
+  );
+}
+
+HeaderLayoutConfiguration buildSearchHeaderLayout20_50_30({
+  required SearchHeaderContext ctx,
+  required List<HeaderActionItem> searchActions, // solo los de búsqueda
+  HeaderSearchVisualConfig searchStyle = HeaderSearchVisualConfig.defaults,
+  ValueChanged<String>? onChangedSearch,
+  ValueChanged<String>? onSubmittedSearch,
+}) {
+  const double space = 10;
+
+  // 20 = back
+  final backButton = GestureDetector(
+    onTap: ctx.stopSearch,
+    child: const Icon(Icons.arrow_back, size: 22, color: AppColors.azulClic),
+  );
+
+  // 50 = input búsqueda
+  final input = buildSearchTextField(
+    ctx: ctx,
+    searchStyle: searchStyle,
+    onChangedSearch: onChangedSearch,
+    onSubmittedSearch: onSubmittedSearch,
+  );
+
+  // 30 = botones lado derecho (solo los que le pases aquí)
+  final List<Widget> rightChildren = [];
+  for (int i = 0; i < searchActions.length; i++) {
+    final action = searchActions[i];
+    rightChildren.add(GestureDetector(onTap: action.onTap, child: action.icon));
+    if (i < searchActions.length - 1) {
+      rightChildren.add(const SizedBox(width: space));
+    }
+  }
+  final rightButtons = Row(
+    mainAxisAlignment: MainAxisAlignment.end,
+    children: rightChildren,
+  );
+
+  return HeaderLayoutConfiguration(
+    layoutType: HeaderLayoutType.tripleColumnCenterWeighted,
+    percentages: const [0.20, 0.50, 0.30],
+    sections: [
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: backButton,
+        visible: true,
+      ),
+      HeaderSectionModel(
+        type: HeaderSectionType.textInput,
+        content: input,
+        visible: true,
+      ),
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: rightButtons,
+        visible: true,
+      ),
+    ],
+  );
+}
+
+HeaderLayoutConfiguration buildNormalHeaderLayout20_50_30({
+  required SearchHeaderContext ctx,
+  required AppConfig config,
+  required List<HeaderActionItem> rightActions,
+  String title = 'Meetclic',
+  TextStyle? titleTextStyle,
+}) {
+  const double space = 10;
+
+  // ===== CENTRO (título) =====
+  final Widget centerTitle = Align(
+    alignment: Alignment.centerLeft,
+    child: Text(
+      title,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style:
+          titleTextStyle ??
+          const TextStyle(
+            color: AppColors.azulClic,
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
+    ),
+  );
+
+  // ===== DERECHA (botones normales) =====
+  final List<Widget> rightChildren = [];
+  for (int i = 0; i < rightActions.length; i++) {
+    final action = rightActions[i];
+
+    rightChildren.add(GestureDetector(onTap: action.onTap, child: action.icon));
+
+    if (i < rightActions.length - 1) {
+      rightChildren.add(const SizedBox(width: space));
+    }
+  }
+
+  final Widget rightButtons = Align(
+    alignment: Alignment.centerRight,
+    child: FittedBox(
+      fit: BoxFit.scaleDown, // 👈 evita overflow: encoge si no cabe
+      child: Row(mainAxisSize: MainAxisSize.min, children: rightChildren),
+    ),
+  );
+
+  return HeaderLayoutConfiguration(
+    layoutType: HeaderLayoutType.tripleColumnCenterWeighted,
+    percentages: const [0.03, 0.57, 0.4],
+    sections: [
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: const SizedBox(), // 20% izquierda vacío
+        visible: true,
+      ),
+      HeaderSectionModel(
+        type: HeaderSectionType.textInput,
+        content: centerTitle, // 50% centro
+        visible: true,
+      ),
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: rightButtons, // 30% derecha (ahora sin overflow)
         visible: true,
       ),
     ],
