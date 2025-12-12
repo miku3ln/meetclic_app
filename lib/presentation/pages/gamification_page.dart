@@ -10,6 +10,7 @@ import 'package:meetclic_app/infrastructure/gamification/datasources/c2b_gamific
 import 'package:meetclic_app/infrastructure/gamification/repositories/gamification_task_repository_impl.dart';
 import 'package:meetclic_app/presentation/pages/services/presentation_services_all.dart';
 
+import '../../infrastructure/assets/app_images.dart';
 import '../../shared/language/language_modal_mixin.dart';
 import '../../shared/models/app_config.dart';
 import '../../shared/providers_session.dart';
@@ -163,7 +164,6 @@ class _GamificationPageState extends State<GamificationPage>
           break;
 
         case GamificationCardLayout.others:
-        default:
           map[GamificationCardLayout.others]!.add(task);
           break;
       }
@@ -179,25 +179,61 @@ class _GamificationPageState extends State<GamificationPage>
     final data = _state.tasks;
     final group = getDataResult(data);
 
-    final headerConfig = buildTitleWithThreeButtons(
-      title: 'Meetclic',
-      onOpenFilters: () {
-        print("onFirstPressed");
-      },
-      onLanguage: onLanguage,
-      config: appConfig,
-      // opcional:
-      titleColor: AppColors.azulClic,
-      // o el que definas
-      titleFontSize: 30,
-      titleFontWeight: FontWeight.bold,
-    );
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: CustomAppBar(
-        title: widget.title,
-        items: widget.itemsStatus,
-        config: headerConfig,
+      appBar: SearchableHeaderAppBar(
+        layoutBuilder: (ctx) {
+          final String urlFlag = appConfig.getUrlFlag();
+          final actions = <HeaderActionItem>[
+            HeaderActionItem(
+              icon: const Icon(Icons.search, size: 22),
+              onTap: ctx.startSearch,
+            ),
+            HeaderActionItem(
+              icon: const Icon(Icons.tune, size: 22),
+              onTap: () => print('filters'),
+            ),
+            HeaderActionItem(
+              icon: Image.asset(urlFlag, width: 22, height: 22),
+              onTap: onLanguage,
+            ),
+            HeaderActionItem(
+              icon: Image.asset(
+                AppImages.rewardTypeTrophy,
+                width: 22,
+                height: 22,
+              ),
+              onTap: () => print('gamificación'),
+            ),
+            HeaderActionItem(
+              icon: Image.asset(
+                AppImages.basketEcommerce,
+                width: 24,
+                height: 24,
+              ),
+              onTap: () => print('ventas'),
+            ),
+          ];
+
+          return buildSearchHeaderLayout(
+            ctx: ctx,
+            config: appConfig,
+            rightActions: actions,
+            onChangedSearch: (value) => {print('onChangedSearch $value')},
+            onSubmittedSearch: (value) => {print('onSubmittedSearch $value')},
+            searchStyle: const HeaderSearchVisualConfig(
+              hintText: 'Buscar tareas',
+              contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              textStyle: TextStyle(fontSize: 16, color: AppColors.azulClic),
+              hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+              cursorColor: AppColors.azulClic,
+              backIcon: Icons.arrow_back,
+              backIconSize: 20,
+              backIconColor: AppColors.azulClic,
+              backIconPadding: EdgeInsets.only(right: 4),
+            ),
+          );
+        },
       ),
       body: Column(
         children: [

@@ -52,11 +52,13 @@ class HeaderLayoutConfiguration {
   final HeaderLayoutType layoutType;
   final List<double> percentages;
   final List<HeaderSectionModel> sections; // ordenados según layout
+  final bool borderAllow;
 
   const HeaderLayoutConfiguration({
     required this.layoutType,
     required this.percentages,
     required this.sections,
+    this.borderAllow = true,
   });
 }
 
