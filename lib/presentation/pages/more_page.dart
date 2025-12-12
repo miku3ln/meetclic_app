@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/services/presentation_services_all.dart';
 
 import '../../domain/entities/menu_tab_up_item.dart';
-import '../widgets/template/custom_app_bar.dart';
+import '../../shared/language/language_modal_mixin.dart';
+import '../../shared/models/app_config.dart';
+import '../../shared/providers_session.dart';
 import 'more_page/services/more_mapper_service.dart';
 import 'more_page/state/more_state.dart';
 import 'more_page/widgets/organisms/more_sections_list_organism.dart';
@@ -16,12 +19,12 @@ class MorePage extends StatefulWidget {
   State<MorePage> createState() => _MorePageState();
 }
 
-class _MorePageState extends State<MorePage> {
+class _MorePageState extends State<MorePage> with LanguageModalMixin {
   late final MoreState _state;
   final _mapper = const MoreMapperService();
   final ScrollController _scrollController = ScrollController();
   double _previousOffset = 0;
-
+  late final AppConfig config = Provider.of<AppConfig>(context, listen: false);
   void _loadSections() {
     final sections = _mapper.buildSections(context);
     print('📌 Sections generadas: ${sections.length}');
@@ -71,13 +74,24 @@ class _MorePageState extends State<MorePage> {
     });
   }
 
+  void onLanguage() {
+    showLanguageModal(config: config, menuTabUpItems: []);
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: CustomAppBar(title: widget.title, items: widget.itemsStatus),
+      appBar: generateSearchAppBar(
+        onEccomerceCallback: () => {},
+        onGamificationCallback: () => {},
+        onLanguageCallback: onLanguage,
+        appConfig: config,
+        onSearchActionsCallback: () => {},
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: MoreSectionsListOrganism(

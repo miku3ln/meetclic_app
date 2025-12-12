@@ -330,7 +330,8 @@ class _GamificationPageState extends State<GamificationPage>
 
         const searchStyle = HeaderSearchVisualConfig(
           hintText: 'Buscar tareas',
-          fieldHeight: 40, // 👈 aquí decides el alto del pill
+          fieldHeight: 40,
+          // 👈 aquí decides el alto del pill
           contentPadding: EdgeInsets.symmetric(horizontal: 4, vertical: 6),
           textStyle: TextStyle(fontSize: 16, color: AppColors.azulClic),
           hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
@@ -374,7 +375,13 @@ class _GamificationPageState extends State<GamificationPage>
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: searchAppButtons(appConfig),
+      appBar: generateSearchAppBar(
+        onEccomerceCallback: () => {},
+        onGamificationCallback: () => {},
+        onLanguageCallback: onLanguage,
+        appConfig: appConfig,
+        onSearchActionsCallback: () => {},
+      ),
       body: Column(
         children: [
           // ======= HEADER DE ACCIONES / FILTROS =======
