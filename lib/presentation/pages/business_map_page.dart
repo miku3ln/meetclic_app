@@ -14,10 +14,12 @@ import 'package:meetclic_app/shared/localization/app_localizations.dart';
 
 import '../../../shared/utils/deep_link_type.dart';
 import '../../aplication/usecases/check_location_permission_usecase.dart';
+import '../../infrastructure/assets/app_images.dart';
 import '../../infrastructure/services/geolocator_service.dart';
 import '../../shared/language/language_modal_mixin.dart';
 import '../../shared/models/app_config.dart';
 import '../../shared/providers_session.dart';
+import '../../shared/themes/app_colors.dart';
 import 'business_detail_page.dart';
 import 'business_map_page/helpers/business_marker_visual_resolver.dart';
 import 'business_map_page/helpers/map_refresh_helper.dart';
@@ -429,25 +431,73 @@ class _BusinessMapPageState extends State<BusinessMapPage>
     showLanguageModal(config: config, menuTabUpItems: []);
   }
 
+  searchAppButtons(appConfig) {
+    return SearchableHeaderAppBar(
+      layoutBuilder: (ctx) {
+        final String urlFlag = appConfig.getUrlFlag();
+        // BOTONES NORMALES (modo normal)
+        final normalActions = <HeaderActionItem>[
+          HeaderActionItem(
+            icon: Image.asset(urlFlag, width: 22, height: 22),
+            onTap: onLanguage,
+          ),
+          HeaderActionItem(
+            icon: Image.asset(
+              AppImages.rewardTypeTrophy,
+              width: 22,
+              height: 22,
+            ),
+            onTap: () => print('gamificación'),
+          ),
+          HeaderActionItem(
+            icon: Image.asset(AppImages.basketEcommerce, width: 24, height: 28),
+            onTap: () => print('ventas'),
+          ),
+        ];
+
+        const searchStyle = HeaderSearchVisualConfig(
+          hintText: 'Buscar tareas',
+          fieldHeight: 44,
+          contentPadding: EdgeInsets.symmetric(horizontal: 12),
+          textStyle: TextStyle(fontSize: 16, color: AppColors.azulClic),
+          hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+          cursorColor: AppColors.azulClic,
+          backIcon: Icons.arrow_back,
+          backIconSize: 20,
+          backIconColor: AppColors.azulClic,
+          backIconPadding: EdgeInsets.only(right: 4),
+        );
+
+        if (ctx.isSearching) {
+          // 👉 AQUÍ entra el layout 20/50/30 para búsqueda
+          return buildSearchHeaderLayout20_50_302(
+            ctx: ctx,
+            searchActions: [],
+            searchStyle: searchStyle,
+            onChangedSearch: (v) => print('onChangedSearch $v'),
+            onSubmittedSearch: (v) => print('onSubmittedSearch $v'),
+          );
+        }
+
+        // 👉 modo normal: título + botones (20/50/30 clásico)
+        return buildNormalHeaderLayout20_50_30(
+          ctx: ctx,
+          config: appConfig,
+          rightActions: normalActions,
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final String title = AppLocalizations.of(
       context,
     ).translate('pages.business');
+    final appConfig = Provider.of<AppConfig>(context);
 
     return Scaffold(
-      appBar: CustomAppBar(
-        title: title,
-        items: widget.itemsStatus,
-        config: buildInputWithThreeButtons(
-          searchController: _searchController,
-          onOpenFilters: _openFilters,
-          hasText: _hasSearchText,
-          onSearch: _onSearch,
-          config: config,
-          onLanguage: onLanguage,
-        ),
-      ),
+      appBar: searchAppButtons(appConfig),
       body: Stack(
         children: [
           // MAPA

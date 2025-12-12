@@ -229,16 +229,11 @@ class _GamificationPageState extends State<GamificationPage>
     return SearchableHeaderAppBar(
       layoutBuilder: (ctx) {
         final String urlFlag = appConfig.getUrlFlag();
-
         // BOTONES NORMALES (modo normal)
         final normalActions = <HeaderActionItem>[
           HeaderActionItem(
             icon: const Icon(Icons.search, size: 22),
             onTap: ctx.startSearch,
-          ),
-          HeaderActionItem(
-            icon: const Icon(Icons.tune, size: 22),
-            onTap: () => print('filters'),
           ),
           HeaderActionItem(
             icon: Image.asset(urlFlag, width: 22, height: 22),
@@ -253,25 +248,13 @@ class _GamificationPageState extends State<GamificationPage>
             onTap: () => print('gamificación'),
           ),
           HeaderActionItem(
-            icon: Image.asset(AppImages.basketEcommerce, width: 22, height: 22),
+            icon: Image.asset(AppImages.basketEcommerce, width: 24, height: 28),
             onTap: () => print('ventas'),
           ),
         ];
 
         // BOTONES ESPECIALES SOLO PARA SEARCH (los del 30%)
         final searchActions = <HeaderActionItem>[
-          HeaderActionItem(
-            icon: const Icon(Icons.tune, size: 22),
-            onTap: () => print('filters en search'),
-          ),
-          HeaderActionItem(
-            icon: const Icon(Icons.tune, size: 22),
-            onTap: () => print('filters en search'),
-          ),
-          HeaderActionItem(
-            icon: const Icon(Icons.tune, size: 22),
-            onTap: () => print('filters en search'),
-          ),
           HeaderActionItem(
             icon: const Icon(Icons.tune, size: 22),
             onTap: () => print('filters en search'),
