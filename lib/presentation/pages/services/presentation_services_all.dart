@@ -826,6 +826,82 @@ Widget buildSearchTextField({
   );
 }
 
+HeaderLayoutConfiguration buildSearchHeaderLayout20_50_302({
+  required SearchHeaderContext ctx,
+  required List<HeaderActionItem> searchActions, // BOTONES NUEVOS DE SEARCH
+  HeaderSearchVisualConfig searchStyle = HeaderSearchVisualConfig.defaults,
+  ValueChanged<String>? onChangedSearch,
+  ValueChanged<String>? onSubmittedSearch,
+}) {
+  const double space = 10;
+
+  // 20% = botón regresar
+  final backButton = Padding(
+    padding: searchStyle.backIconPadding,
+    child: IconButton(
+      icon: Icon(
+        searchStyle.backIcon,
+        size: searchStyle.backIconSize,
+        color: searchStyle.backIconColor ?? AppColors.azulClic,
+      ),
+      onPressed: ctx.stopSearch,
+    ),
+  );
+
+  // 50% = input búsqueda
+  final input = buildSearchTextField(
+    ctx: ctx,
+    searchStyle: searchStyle,
+    onChangedSearch: onChangedSearch,
+    onSubmittedSearch: onSubmittedSearch,
+  );
+
+  // 30% = botones especiales de búsqueda (derecha)
+  final List<Widget> rightChildren = [];
+  for (int i = 0; i < searchActions.length; i++) {
+    final action = searchActions[i];
+
+    rightChildren.add(GestureDetector(onTap: action.onTap, child: action.icon));
+
+    if (i < searchActions.length - 1) {
+      rightChildren.add(const SizedBox(width: space));
+    }
+  }
+
+  final rightButtons = Align(
+    alignment: Alignment.centerRight,
+    child: FittedBox(
+      fit: BoxFit.scaleDown, // evita overflow si son muchos
+      child: Row(mainAxisSize: MainAxisSize.min, children: rightChildren),
+    ),
+  );
+
+  return HeaderLayoutConfiguration(
+    layoutType: HeaderLayoutType.tripleColumnCenterWeighted,
+    percentages: const [0.10, 0.7, 0.30], // 20 / 50 / 30
+    sections: [
+      // 20% IZQUIERDA → back
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: Align(alignment: Alignment.centerLeft, child: backButton),
+        visible: true,
+      ),
+      // 50% CENTRO → input
+      HeaderSectionModel(
+        type: HeaderSectionType.textInput,
+        content: Align(alignment: Alignment.centerLeft, child: input),
+        visible: true,
+      ),
+      // 30% DERECHA → botones search
+      HeaderSectionModel(
+        type: HeaderSectionType.buttons,
+        content: rightButtons,
+        visible: searchActions.isNotEmpty,
+      ),
+    ],
+  );
+}
+
 HeaderLayoutConfiguration buildSearchHeaderLayout20_50_30({
   required SearchHeaderContext ctx,
   required List<HeaderActionItem> searchActions, // solo los de búsqueda

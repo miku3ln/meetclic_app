@@ -225,6 +225,94 @@ class _GamificationPageState extends State<GamificationPage>
     );
   }
 
+  searchAppButtons(appConfig) {
+    return SearchableHeaderAppBar(
+      layoutBuilder: (ctx) {
+        final String urlFlag = appConfig.getUrlFlag();
+
+        // BOTONES NORMALES (modo normal)
+        final normalActions = <HeaderActionItem>[
+          HeaderActionItem(
+            icon: const Icon(Icons.search, size: 22),
+            onTap: ctx.startSearch,
+          ),
+          HeaderActionItem(
+            icon: const Icon(Icons.tune, size: 22),
+            onTap: () => print('filters'),
+          ),
+          HeaderActionItem(
+            icon: Image.asset(urlFlag, width: 22, height: 22),
+            onTap: onLanguage,
+          ),
+          HeaderActionItem(
+            icon: Image.asset(
+              AppImages.rewardTypeTrophy,
+              width: 22,
+              height: 22,
+            ),
+            onTap: () => print('gamificación'),
+          ),
+          HeaderActionItem(
+            icon: Image.asset(AppImages.basketEcommerce, width: 22, height: 22),
+            onTap: () => print('ventas'),
+          ),
+        ];
+
+        // BOTONES ESPECIALES SOLO PARA SEARCH (los del 30%)
+        final searchActions = <HeaderActionItem>[
+          HeaderActionItem(
+            icon: const Icon(Icons.tune, size: 22),
+            onTap: () => print('filters en search'),
+          ),
+          HeaderActionItem(
+            icon: const Icon(Icons.tune, size: 22),
+            onTap: () => print('filters en search'),
+          ),
+          HeaderActionItem(
+            icon: const Icon(Icons.tune, size: 22),
+            onTap: () => print('filters en search'),
+          ),
+          HeaderActionItem(
+            icon: const Icon(Icons.tune, size: 22),
+            onTap: () => print('filters en search'),
+          ),
+          // puedes agregar más si quieres
+        ];
+
+        const searchStyle = HeaderSearchVisualConfig(
+          hintText: 'Buscar tareas',
+          fieldHeight: 44,
+          contentPadding: EdgeInsets.symmetric(horizontal: 12),
+          textStyle: TextStyle(fontSize: 16, color: AppColors.azulClic),
+          hintStyle: TextStyle(fontSize: 16, color: Colors.grey),
+          cursorColor: AppColors.azulClic,
+          backIcon: Icons.arrow_back,
+          backIconSize: 20,
+          backIconColor: AppColors.azulClic,
+          backIconPadding: EdgeInsets.only(right: 4),
+        );
+
+        if (ctx.isSearching) {
+          // 👉 AQUÍ entra el layout 20/50/30 para búsqueda
+          return buildSearchHeaderLayout20_50_302(
+            ctx: ctx,
+            searchActions: searchActions,
+            searchStyle: searchStyle,
+            onChangedSearch: (v) => print('onChangedSearch $v'),
+            onSubmittedSearch: (v) => print('onSubmittedSearch $v'),
+          );
+        }
+
+        // 👉 modo normal: título + botones (20/50/30 clásico)
+        return buildNormalHeaderLayout20_50_30(
+          ctx: ctx,
+          config: appConfig,
+          rightActions: normalActions,
+        );
+      },
+    );
+  }
+
   searchApp2080(appConfig) {
     return SearchableHeaderAppBar(
       layoutBuilder: (ctx) {
@@ -303,7 +391,7 @@ class _GamificationPageState extends State<GamificationPage>
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      appBar: searchApp2080(appConfig),
+      appBar: searchAppButtons(appConfig),
       body: Column(
         children: [
           // ======= HEADER DE ACCIONES / FILTROS =======
