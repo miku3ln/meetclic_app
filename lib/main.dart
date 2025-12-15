@@ -9,7 +9,6 @@ Future<void> main() async {
   WidgetsBinding.instance.renderView.automaticSystemUiAdjustment = false;
   // Permitir dibujar detrás de las barras (edge-to-edge)
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
