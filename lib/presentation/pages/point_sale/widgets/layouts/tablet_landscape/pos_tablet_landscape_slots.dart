@@ -42,7 +42,7 @@ class PosTabletLandscapeSlots {
         columns: 5,
       ),
 
-      right: const PosRightPanel(),
+      right: PosRightPanel(),
 
       footer: PosActionBar(
         menuCategories: menuDataActions,

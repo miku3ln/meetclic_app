@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../models/pos_product_item.dart';
 
+String _ticketIdNow() => DateTime.now().microsecondsSinceEpoch.toString();
 
 class PosTabletLandscapeController extends ChangeNotifier {
   // UI triggers
@@ -40,11 +41,11 @@ class PosTabletLandscapeController extends ChangeNotifier {
 
     selectedProductCategoryId =
         initialSelectedProductCategoryId ??
-            (productCategories.isNotEmpty ? productCategories.first.id : null);
+        (productCategories.isNotEmpty ? productCategories.first.id : null);
 
     selectedMenuCategoryId =
         initialSelectedMenuCategoryId ??
-            (menuCategories.isNotEmpty ? menuCategories.first.id : null);
+        (menuCategories.isNotEmpty ? menuCategories.first.id : null);
 
     _applyFilters();
     notifyListeners();
@@ -86,11 +87,6 @@ class PosTabletLandscapeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void onProductTap(PosProductItem product) {
-    // add to ticket...
-    notifyListeners();
-  }
-
   // Filters (1 + 2 + 3)
   void _applyFilters() {
     final q = query.trim().toLowerCase();
@@ -112,6 +108,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
 
     products = result.toList(growable: false);
   }
+
   void onSave() {
     // Guardar ticket (borrador) / guardar cambios
     // Recomendación: si no hay turno abierto, no guardes venta.
@@ -140,4 +137,152 @@ class PosTabletLandscapeController extends ChangeNotifier {
     notifyListeners();
   }
 
+  // -------------------------
+  // ✅ TICKET STATE (para PosRightPanel)
+  // -------------------------
+  String? currentTicketId;
+  String? currentCustomerId;
+  String? currentTicketDescription;
+
+  final List<PostTicketItem> _ticketItems = [];
+
+  List<PostTicketItem> get ticketItems => List.unmodifiable(_ticketItems);
+
+  double _subtotal = 0;
+  double _subtotalTax = 0;
+  double _total = 0;
+
+  double get subtotal => _subtotal;
+
+  double get subtotalTax => _subtotalTax;
+
+  double get total => _total;
+
+  // -------------------------
+  // ✅ PRODUCT TAP => afecta PosRightPanel
+  // -------------------------
+  void onProductTap(PosProductItem product) {
+    _ensureTicket();
+
+    // Si quieres bloquear agregar cuando no hay turno:
+    if (!isShiftOpen) {
+      debugPrint('onProductTap -> turno cerrado');
+      onRequestOpenShift?.call();
+      return;
+    }
+
+    final idx = _ticketItems.indexWhere((i) => i.productItem.id == product.id);
+
+    if (idx == -1) {
+      final qty = 1.0;
+      final unit = product.unitPrice;
+      final sub = unit * qty;
+      final tax = _calcTax(sub, product.taxPercentage);
+      final tot = sub + tax;
+
+      _ticketItems.add(
+        PostTicketItem(
+          productItem: product,
+          amount: qty,
+          unitPrice: unit,
+          subtotal: sub,
+          tax: tax,
+          total: tot,
+        ),
+      );
+    } else {
+      final old = _ticketItems[idx];
+      final qty = old.amount + 1.0;
+      final unit = old.unitPrice; // o product.unitPrice
+      final sub = unit * qty;
+      final tax = _calcTax(sub, product.taxPercentage);
+      final tot = sub + tax;
+
+      _ticketItems[idx] = PostTicketItem(
+        productItem: old.productItem,
+        amount: qty,
+        unitPrice: unit,
+        subtotal: sub,
+        tax: tax,
+        total: tot,
+        description: old.description,
+        discount: old.discount,
+      );
+    }
+
+    _recalculateTotals();
+    notifyListeners();
+  }
+
+  // ✅ Cambiar cantidad desde el panel derecho
+  void changeItemQty(String productId, double newQty) {
+    if (newQty <= 0) {
+      removeItem(productId);
+      return;
+    }
+    final idx = _ticketItems.indexWhere((i) => i.productItem.id == productId);
+    if (idx == -1) return;
+
+    final old = _ticketItems[idx];
+    final unit = old.unitPrice;
+    final sub = unit * newQty;
+    final tax = _calcTax(sub, old.productItem.taxPercentage);
+    final tot = sub + tax;
+
+    _ticketItems[idx] = PostTicketItem(
+      productItem: old.productItem,
+      amount: newQty,
+      unitPrice: unit,
+      subtotal: sub,
+      tax: tax,
+      total: tot,
+      description: old.description,
+      discount: old.discount,
+    );
+
+    _recalculateTotals();
+    notifyListeners();
+  }
+
+  void removeItem(String productId) {
+    _ticketItems.removeWhere((i) => i.productItem.id == productId);
+    _recalculateTotals();
+    notifyListeners();
+  }
+
+  void clearTicket() {
+    _ticketItems.clear();
+    _recalculateTotals();
+    // opcional: generar nuevo ticket id
+    currentTicketId = _ticketIdNow();
+    notifyListeners();
+  }
+
+  // -------------------------
+  // ✅ HELPERS
+  // -------------------------
+  void _ensureTicket() {
+    currentTicketId ??= _ticketIdNow();
+  }
+
+  double _calcTax(double subtotal, double taxPercentage) {
+    // porcentaje (ej 16) => 0.16
+    return subtotal * (taxPercentage / 100.0);
+  }
+
+  void _recalculateTotals() {
+    double sub = 0;
+    double tax = 0;
+    double tot = 0;
+
+    for (final i in _ticketItems) {
+      sub += i.subtotal;
+      tax += i.tax;
+      tot += i.total;
+    }
+
+    _subtotal = sub;
+    _subtotalTax = tax;
+    _total = tot;
+  }
 }
