@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../organisms/pos_header_bar.dart';
+import '../models/pos_product_item.dart'; // PosCategoryItem
+import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
 class PosTabletPortraitLayout extends StatefulWidget {
   const PosTabletPortraitLayout({super.key});
@@ -10,32 +12,47 @@ class PosTabletPortraitLayout extends StatefulWidget {
 }
 
 class _PosTabletPortraitLayoutState extends State<PosTabletPortraitLayout> {
-  final filters = const ['Todos los artículos', 'Favoritos', 'Promociones'];
-  String selected = 'Todos los artículos';
+  late final List<PosCategoryItem> productCategories;
+  String? selectedProductCategoryId;
+
+  String query = '';
+
+  @override
+  void initState() {
+    super.initState();
+    productCategories = PosTabletLandscapeFixtures.getProductCategoriesData();
+    selectedProductCategoryId =
+    productCategories.isNotEmpty ? productCategories.first.id : null;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar:  PosHeaderBar(
-        dropdownItems: filters,
-        selectedItem: selected,
+      appBar: PosHeaderBar(
+        productCategories: productCategories,
+        selectedProductCategoryId: selectedProductCategoryId,
+        onProductCategoryChanged: (id) {
+          setState(() => selectedProductCategoryId = id);
+          debugPrint('productCategory => $id');
+        },
         onMenuTap: () {},
         onUserTap: () {},
         onMoreTap: () {},
-        onDropdownChanged: (v) {
-          if (v == null) return;
-          setState(() => selected = v);
-        },
         onSearchChanged: (text) {
-          // aquí filtras tu lista en vivo
+          setState(() => query = text);
           debugPrint('search: $text');
         },
         onSearchSubmitted: (text) {
-          // enter del teclado
+          setState(() => query = text);
           debugPrint('submit: $text');
         },
       ),
-      body: const Center(child: Text('POS Tablet Portrait')),
+      body: Center(
+        child: Text(
+          'POS Tablet Portrait\ncategory=$selectedProductCategoryId\nquery="$query"',
+          textAlign: TextAlign.center,
+        ),
+      ),
     );
   }
 }

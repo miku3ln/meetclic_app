@@ -1,26 +1,32 @@
 import 'package:flutter/material.dart';
+import '../models/pos_product_item.dart';
 import '../organisms/pos_search_overlay.dart';
 
-class PosHeaderDefaultLayout extends StatefulWidget implements PreferredSizeWidget {
-  final List<String> dropdownItems;
-  final String selectedItem;
 
+class PosHeaderDefaultLayout extends StatefulWidget
+    implements PreferredSizeWidget {
+  // ✅ (1) Product categories (dropdown)
+  final List<PosCategoryItem> productCategories;
+  final String? selectedProductCategoryId;
+  final ValueChanged<String?> onProductCategoryChanged;
+
+  // top actions
   final VoidCallback onMenuTap;
   final VoidCallback onUserTap;
   final VoidCallback onMoreTap;
 
-  final ValueChanged<String?> onDropdownChanged;
+  // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
 
   const PosHeaderDefaultLayout({
     super.key,
-    required this.dropdownItems,
-    required this.selectedItem,
+    required this.productCategories,
+    required this.selectedProductCategoryId,
+    required this.onProductCategoryChanged,
     required this.onMenuTap,
     required this.onUserTap,
     required this.onMoreTap,
-    required this.onDropdownChanged,
     this.onSearchChanged,
     this.onSearchSubmitted,
   });
@@ -38,6 +44,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
 
   void _toggleSearch() {
     setState(() => _open = !_open);
+
     if (_open) {
       PosSearchOverlay.show(
         context: context,
@@ -63,6 +70,19 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     final w = MediaQuery.of(context).size.width;
     final dropdownMax = (w < 600) ? 220.0 : 340.0;
 
+    final hasCats = widget.productCategories.isNotEmpty;
+
+    // ✅ asegura que el selected exista dentro de los items
+    String? safeSelectedId = widget.selectedProductCategoryId;
+    if (hasCats) {
+      final exists =
+      widget.productCategories.any((c) => c.id == safeSelectedId);
+      safeSelectedId =
+      exists ? safeSelectedId : widget.productCategories.first.id;
+    } else {
+      safeSelectedId = null;
+    }
+
     return AppBar(
       elevation: 0,
       centerTitle: true,
@@ -83,28 +103,41 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
       ],
       title: Row(
         children: [
-          // IZQUIERDA: “Todos los artículos” + dropdown
+          // IZQUIERDA: dropdown (categorías de producto)
           ConstrainedBox(
             constraints: BoxConstraints(maxWidth: dropdownMax),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                value: widget.selectedItem,
+                value: safeSelectedId,
                 isExpanded: true,
                 icon: const Icon(Icons.arrow_drop_down),
-                items: widget.dropdownItems
-                    .map((e) => DropdownMenuItem(
-                  value: e,
-                  child: Text(e, overflow: TextOverflow.ellipsis),
-                ))
-                    .toList(),
-                onChanged: widget.onDropdownChanged,
+                items: hasCats
+                    ? widget.productCategories
+                    .map(
+                      (c) => DropdownMenuItem<String>(
+                    value: c.id,
+                    child: Text(
+                      c.value,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                )
+                    .toList()
+                    : const [
+                  DropdownMenuItem<String>(
+                    value: null,
+                    child: Text('Sin categorías'),
+                  ),
+                ],
+                onChanged:
+                hasCats ? widget.onProductCategoryChanged : null,
               ),
             ),
           ),
 
           const Spacer(),
 
-          // IZQUIERDA (antes de Ticket): 🔍 search
+          // 🔍 Search
           IconButton(
             key: _searchKey,
             onPressed: _toggleSearch,
@@ -113,7 +146,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
 
           const SizedBox(width: 10),
 
-          // DERECHA: Ticket
+          // DERECHA: Ticket (placeholder como antes)
           const Text('Ticket', maxLines: 1, overflow: TextOverflow.ellipsis),
 
           const Spacer(),

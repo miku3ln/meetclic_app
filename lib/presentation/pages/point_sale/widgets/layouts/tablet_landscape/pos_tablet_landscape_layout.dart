@@ -1,18 +1,15 @@
 import 'package:flutter/material.dart';
-
-import '../dialogs/pos_open_shift_dialog.dart';
-import '../templates/pos_split_template.dart';
-
-import 'tablet_landscape/pos_tablet_landscape_controller.dart';
-import 'tablet_landscape/pos_tablet_landscape_slots.dart';
-import 'tablet_landscape/pos_tablet_landscape_fixtures.dart';
+import '../../dialogs/pos_open_shift_dialog.dart';
+import '../../templates/pos_split_template.dart';
+import 'pos_tablet_landscape_controller.dart';
+import 'pos_tablet_landscape_fixtures.dart';
+import 'pos_tablet_landscape_slots.dart';
 
 class PosTabletLandscapeLayout extends StatefulWidget {
   const PosTabletLandscapeLayout({super.key});
 
   @override
-  State<PosTabletLandscapeLayout> createState() =>
-      _PosTabletLandscapeLayoutState();
+  State<PosTabletLandscapeLayout> createState() => _PosTabletLandscapeLayoutState();
 }
 
 class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
@@ -22,51 +19,42 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
   void initState() {
     super.initState();
 
-    controller = PosTabletLandscapeController()..addListener(_onChanged);
-
-    // ✅ Conecta request del controller al modal (porque aquí sí hay context)
+    controller = PosTabletLandscapeController()..addListener(_onControllerChanged);
     controller.onRequestOpenShift = _showOpenShiftModal;
 
-    // ✅ Carga data inicial (fixtures)
     controller.init(
       initialProducts: PosTabletLandscapeFixtures.products(),
       initialProductCategories: PosTabletLandscapeFixtures.getProductCategoriesData(),
       initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
-      // opcional:
-      // initialSelectedProductCategoryId: 'all',
-      // initialSelectedMenuCategoryId: 'all',
+      initialSelectedProductCategoryId:"all", //PosTabletLandscapeFixtures.all, // 'all'
+      initialSelectedMenuCategoryId: "all"//PosTabletLandscapeFixtures.all,    // 'all'
     );
   }
 
-  void _onChanged() {
+  void _onControllerChanged() {
     if (!mounted) return;
     setState(() {});
   }
 
   @override
   void dispose() {
-    controller.removeListener(_onChanged);
+    controller.removeListener(_onControllerChanged);
     controller.dispose();
     super.dispose();
   }
 
-  // ✅ Modal vive aquí
   Future<void> _showOpenShiftModal() async {
-    final amount = await showDialog<double>(
+    final initialCash = await showDialog<double>(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (_) => const PosOpenShiftDialog(),
     );
-
-    if (!mounted) return;
-    if (amount == null) return;
-
-    await controller.openShift(amount);
+    if (initialCash == null) return;
+    await controller.openShift(initialCash);
   }
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Slots ahora solo necesitan el controller
     final slots = PosTabletLandscapeSlots.build(controller: controller);
     return PosSplitTemplate(slots: slots);
   }

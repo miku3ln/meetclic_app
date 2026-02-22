@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
+
+import '../../helpers/pos_responsive.dart';
 import '../layouts/pos_header_default.dart';
 import '../layouts/pos_header_mobile_portrait.dart';
-import '../../helpers/pos_responsive.dart';
+import '../models/pos_product_item.dart';
+
+
 
 class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
-  final List<String> dropdownItems;
-  final String selectedItem;
+  // ✅ (1) Product categories (dropdown)
+  final List<PosCategoryItem> productCategories;
+  final String? selectedProductCategoryId;
+  final ValueChanged<String?> onProductCategoryChanged;
 
+  // top actions
   final VoidCallback onMenuTap;
   final VoidCallback onUserTap;
   final VoidCallback onMoreTap;
 
-  final ValueChanged<String?> onDropdownChanged;
+  // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
 
   const PosHeaderBar({
     super.key,
-    required this.dropdownItems,
-    required this.selectedItem,
+    required this.productCategories,
+    required this.selectedProductCategoryId,
+    required this.onProductCategoryChanged,
     required this.onMenuTap,
     required this.onUserTap,
     required this.onMoreTap,
-    required this.onDropdownChanged,
     this.onSearchChanged,
     this.onSearchSubmitted,
   });
@@ -32,16 +39,14 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    final showMobilePortraitHeader =
-    PosResponsive.isMobile(context);
+    final showMobilePortraitHeader = PosResponsive.isMobile(context);
 
     if (showMobilePortraitHeader) {
-      // ✅ Mobile Portrait (sin Ticket)
       return PosHeaderMobilePortraitLayout(
-        dropdownItems: dropdownItems,
-        selectedItem: selectedItem,
+        productCategories: productCategories,
+        selectedProductCategoryId: selectedProductCategoryId,
         onMenuTap: onMenuTap,
-        onDropdownChanged: onDropdownChanged,
+        onProductCategoryChanged: onProductCategoryChanged,
         onSearchChanged: onSearchChanged,
         onSearchSubmitted: onSearchSubmitted,
         onUserTap: onUserTap,
@@ -49,12 +54,11 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
-    // ✅ Default: mobile landscape + tablet portrait + tablet landscape
     return PosHeaderDefaultLayout(
-      dropdownItems: dropdownItems,
-      selectedItem: selectedItem,
+      productCategories: productCategories,
+      selectedProductCategoryId: selectedProductCategoryId,
       onMenuTap: onMenuTap,
-      onDropdownChanged: onDropdownChanged,
+      onProductCategoryChanged: onProductCategoryChanged,
       onSearchChanged: onSearchChanged,
       onSearchSubmitted: onSearchSubmitted,
       onUserTap: onUserTap,
