@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 
+import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 class PosRightPanel extends StatelessWidget {
-  const PosRightPanel({super.key});
+  final PosTabletLandscapeController controller;
+  const PosRightPanel({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.all(12),
-      child: Text('RIGHT PANEL (Ticket / Totales)'),
+    return AnimatedBuilder(
+      animation: controller,
+      builder: (_, __) {
+        // leer: controller.ticketItems, controller.total, etc.
+        return Container(
+          child: Text('Items: ${controller.ticketItems.length}'),
+        );
+      },
     );
   }
 }
