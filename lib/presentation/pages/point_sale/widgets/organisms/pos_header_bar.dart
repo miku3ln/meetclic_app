@@ -12,7 +12,6 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMoreTap;
 
   final ValueChanged<String?> onDropdownChanged;
-
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
 
@@ -30,12 +29,14 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+
   @override
   Widget build(BuildContext context) {
-    final isMobilePortrait =
-        PosResponsive.isMobile(context) && PosResponsive.isPortrait(context);
-    // ✅ En mobile portrait: SIN Ticket (layout específico)
-    if (isMobilePortrait) {
+    final showMobilePortraitHeader =
+    PosResponsive.isMobile(context);
+
+    if (showMobilePortraitHeader) {
+      // ✅ Mobile Portrait (sin Ticket)
       return PosHeaderMobilePortraitLayout(
         dropdownItems: dropdownItems,
         selectedItem: selectedItem,
@@ -48,7 +49,7 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
       );
     }
 
-    // ✅ Normal: mobile landscape + tablet portrait + tablet landscape
+    // ✅ Default: mobile landscape + tablet portrait + tablet landscape
     return PosHeaderDefaultLayout(
       dropdownItems: dropdownItems,
       selectedItem: selectedItem,
