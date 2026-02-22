@@ -1,4 +1,5 @@
 enum HomeTabId {
+  pointSale,
   home,
   explore,
   shop,
