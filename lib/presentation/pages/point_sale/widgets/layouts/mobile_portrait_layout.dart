@@ -20,7 +20,7 @@ class _PosMobilePortraitLayoutState extends State<PosMobilePortraitLayout> {
   @override
   void initState() {
     super.initState();
-    productCategories = PosTabletLandscapeFixtures.getProductCategoriesData();
+    productCategories = PosTabletLandscapeFixtures.getCategoriesData();
     selectedProductCategoryId =
     productCategories.isNotEmpty ? productCategories.first.id : null;
   }

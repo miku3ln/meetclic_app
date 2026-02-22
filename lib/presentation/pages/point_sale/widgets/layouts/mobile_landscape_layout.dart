@@ -22,7 +22,7 @@ class _PosMobileLandscapeLayoutState extends State<PosMobileLandscapeLayout> {
   @override
   void initState() {
     super.initState();
-    productCategories = PosTabletLandscapeFixtures.getProductCategoriesData();
+    productCategories = PosTabletLandscapeFixtures.getCategoriesData();
     selectedProductCategoryId =
     productCategories.isNotEmpty ? productCategories.first.id : null;
   }

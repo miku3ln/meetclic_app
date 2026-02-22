@@ -29,8 +29,8 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
 
     // ✅ Carga data inicial (fixtures)
     controller.init(
-      initialProducts: PosTabletLandscapeFixtures.products(),
-      initialProductCategories: PosTabletLandscapeFixtures.getProductCategoriesData(),
+      initialProducts: PosTabletLandscapeFixtures.getProductsData(),
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
       initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
       // opcional:
       // initialSelectedProductCategoryId: 'all',

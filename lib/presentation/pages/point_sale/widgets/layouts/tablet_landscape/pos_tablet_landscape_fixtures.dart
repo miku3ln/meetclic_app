@@ -6,7 +6,7 @@ class PosTabletLandscapeFixtures {
   // -------------------------
   // (1) PRODUCT CATEGORIES (Dropdown)
   // -------------------------
-  static List<PosCategoryItem> getProductCategoriesData() {
+  static List<PosCategoryItem> getCategoriesData() {
     return const [
       PosCategoryItem(id: 'all', value: 'Todos', description: 'Todos los productos'),
       PosCategoryItem(id: 'mains', value: 'Platos fuertes', description: 'Hamburguesas, pollo, carne'),
@@ -60,7 +60,7 @@ class PosTabletLandscapeFixtures {
   // (3) PRODUCTS
   //  - Cada producto: productCategoryId + menuCategoryId
   // -------------------------
-  static List<PosProductItem> products() {
+  static List<PosProductItem> getProductsData() {
     return const [
       // ========= MENU (platos fuertes) =========
       PosProductItem(
@@ -69,6 +69,9 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_carne/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
+        taxPercentage: 16,
+        unitPrice: 2.50
+
       ),
       PosProductItem(
         id: 'prd_arroz_pollo',
@@ -76,6 +79,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_pollo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_arroz_huevo',
@@ -83,6 +88,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_huevo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_arroz_salchicha',
@@ -90,6 +97,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_salchicha/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= BURGERS =========
@@ -99,6 +108,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_clasica/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_burger_doble',
@@ -106,6 +117,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_doble/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_burger_pollo',
@@ -113,6 +126,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_pollo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_burger_queso',
@@ -120,6 +135,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_queso/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= CHICKEN =========
@@ -129,6 +146,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/pollo_2/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'chicken',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_pollo_crispy_3p',
@@ -136,6 +155,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/pollo_3/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'chicken',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_alitas_6',
@@ -143,6 +164,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/alitas_6/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'chicken',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= SNACKS =========
@@ -152,6 +175,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/papas_med/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'snacks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_papas_gran',
@@ -159,6 +184,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/papas_gran/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'snacks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_nuggets_6',
@@ -166,6 +193,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/nuggets_6/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'snacks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_nuggets_10',
@@ -173,6 +202,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/nuggets_10/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'snacks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= SIDES (acompañamientos) =========
@@ -182,6 +213,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'menu',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_ensalada',
@@ -189,6 +222,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/ensalada/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'menu',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= DRINKS =========
@@ -198,6 +233,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/agua/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_cola_500',
@@ -205,6 +242,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/cola_500/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_jugo',
@@ -212,6 +251,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/jugo/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_cafe',
@@ -219,6 +260,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/cafe/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= DESSERTS =========
@@ -228,6 +271,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/brownie/600/600',
         productCategoryId: 'desserts',
         menuCategoryId: 'desserts',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_helado',
@@ -235,6 +280,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/helado/600/600',
         productCategoryId: 'desserts',
         menuCategoryId: 'desserts',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= EXTRAS =========
@@ -244,6 +291,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/salsa_tomate/600/600',
         productCategoryId: 'extras',
         menuCategoryId: 'snacks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_mayonesa',
@@ -251,6 +300,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/mayo/600/600',
         productCategoryId: 'extras',
         menuCategoryId: 'snacks',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_queso_extra',
@@ -258,6 +309,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/queso_extra/600/600',
         productCategoryId: 'extras',
         menuCategoryId: 'burgers',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= BREAKFAST =========
@@ -267,6 +320,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/desayuno_huevo/600/600',
         productCategoryId: 'breakfast',
         menuCategoryId: 'breakfast',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_desayuno_huevo_salchicha',
@@ -274,6 +329,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/desayuno_salchicha/600/600',
         productCategoryId: 'breakfast',
         menuCategoryId: 'breakfast',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
 
       // ========= COMBOS =========
@@ -283,6 +340,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/combo_burger/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'combos',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
       PosProductItem(
         id: 'prd_combo_pollo',
@@ -290,6 +349,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/combo_pollo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'combos',
+          taxPercentage: 16,
+          unitPrice: 2.50
       ),
     ];
   }

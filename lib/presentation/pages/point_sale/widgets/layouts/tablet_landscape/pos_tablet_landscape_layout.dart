@@ -23,8 +23,8 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
     controller.onRequestOpenShift = _showOpenShiftModal;
 
     controller.init(
-      initialProducts: PosTabletLandscapeFixtures.products(),
-      initialProductCategories: PosTabletLandscapeFixtures.getProductCategoriesData(),
+      initialProducts: PosTabletLandscapeFixtures.getProductsData(),
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
       initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
       initialSelectedProductCategoryId:"all", //PosTabletLandscapeFixtures.all, // 'all'
       initialSelectedMenuCategoryId: "all"//PosTabletLandscapeFixtures.all,    // 'all'
