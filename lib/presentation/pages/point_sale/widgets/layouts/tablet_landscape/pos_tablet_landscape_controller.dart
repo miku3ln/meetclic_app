@@ -210,7 +210,10 @@ class PosTabletLandscapeController extends ChangeNotifier {
   // ✅ Cambiar cantidad desde el panel derecho
   void changeItemQty(String productId, int newQty) {
     if (newQty <= 0) {
-      removeItem(productId);
+      final item = getItemByProductId(productId);
+      if (item != null) {
+        removeItem(item);
+      }
       return;
     }
     final idx = _ticketItems.indexWhere((i) => i.productItem.id == productId);
@@ -236,9 +239,17 @@ class PosTabletLandscapeController extends ChangeNotifier {
     _recalculateTotals();
     notifyListeners();
   }
-
-  void removeItem(String productId) {
-    _ticketItems.removeWhere((i) => i.productItem.id == productId);
+  PostTicketItem? getItemByProductId(String productId) {
+    try {
+      return _ticketItems.firstWhere(
+            (i) => i.productItem.id == productId,
+      );
+    } catch (e) {
+      return null; // si no existe
+    }
+  }
+  void removeItem (PostTicketItem item) {
+    _ticketItems.removeWhere((i) => i.productItem.id == item.productItem.id);
     _recalculateTotals();
     notifyListeners();
   }
@@ -304,5 +315,38 @@ class PosTabletLandscapeController extends ChangeNotifier {
       case PosPaymentMethod.qr:
         return 'QR';
     }
+  }
+
+  // ✅ Variables (si quieres controlar modales desde la UI)
+  PostTicketItem? editingItem;
+  PostTicketItem? optionsItem;
+
+// ------------------------------------
+// ✅ TICKET ACTIONS (Right Panel)
+// ------------------------------------
+  void decreaseItem(PostTicketItem item) {
+    final newQty = item.amount - 1;
+    changeItemQty(item.productItem.id, newQty);
+  }
+
+  void increaseItem(PostTicketItem item) {
+    final newQty = item.amount + 1;
+    changeItemQty(item.productItem.id, newQty);
+  }
+
+// Abre edición (por ejemplo: nota/observación, descuento, cambiar precio, etc.)
+  void editTicketItem(PostTicketItem item) {
+    editingItem = item;
+    // Si usas modal en el panel:
+    // onRequestEditTicketItem?.call(item);  // (si quieres callback)
+    notifyListeners();
+  }
+
+// Abre opciones (por ejemplo: eliminar, duplicar, mover, etc.)
+  void openTicketItemOptions(PostTicketItem item) {
+    optionsItem = item;
+    // Si usas modal en el panel:
+    // onRequestOpenTicketItemOptions?.call(item); // (si quieres callback)
+    notifyListeners();
   }
 }
