@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../models/pos_action_item.dart';
 
 class PosActionBar extends StatelessWidget {
+  final PosTabletLandscapeController controller;
+
   // ✅ Menu categories (bottom bar)
   final List<PosMenuActionItem> menuCategories;
   final String? selectedMenuCategoryId;
@@ -18,6 +21,7 @@ class PosActionBar extends StatelessWidget {
 
   const PosActionBar({
     super.key,
+    required this.controller,
     required this.menuCategories,
     required this.selectedMenuCategoryId,
     required this.onMenuCategoryTap,
@@ -30,6 +34,8 @@ class PosActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final hasItems = controller.ticketItems.isNotEmpty;
+
     return Material(
       elevation: 8,
       child: SizedBox(
@@ -55,6 +61,7 @@ class PosActionBar extends StatelessWidget {
               SizedBox(
                 width: rightWidth,
                 child: _RightFixedActions(
+                  allowProcess: hasItems,
                   onSave: onSave,
                   onPay: onPay,
                 ),
@@ -155,19 +162,25 @@ class _ChipButton extends StatelessWidget {
 class _RightFixedActions extends StatelessWidget {
   final VoidCallback onSave;
   final VoidCallback onPay;
+  final bool allowProcess;
 
   const _RightFixedActions({
     required this.onSave,
     required this.onPay,
+    required this.allowProcess,
+
+
   });
 
   @override
   Widget build(BuildContext context) {
+    final hasItems =allowProcess;
+
     return Row(
       children: [
         Expanded(
           child: ElevatedButton(
-            onPressed: onSave,
+            onPressed: hasItems ? onSave: null,
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: const RoundedRectangleBorder(),
@@ -178,7 +191,9 @@ class _RightFixedActions extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: ElevatedButton(
-            onPressed: onPay,
+
+            onPressed: hasItems ? onPay: null,
+
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 18),
               shape: const RoundedRectangleBorder(),

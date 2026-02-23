@@ -26,24 +26,25 @@ class PosRightPanel extends StatelessWidget {
         final items = controller.ticketItems; // tu lista
         return Container(
           padding: const EdgeInsets.all(12),
-          child: Column(
-            children: [
-              PosTicketHeader(title: 'Ticket', itemsCount: items.length),
-
-              const SizedBox(height: 8),
-              const Divider(height: 1),
-              PosTicketBody(
-                items: controller.ticketItems,
-                // List<PostTicketItem>
-                styles: styles,
-                onMinus: (it) => controller.decreaseItem(it),
-                onPlus: (it) => controller.increaseItem(it),
-                onEdit: (it) => controller.editTicketItem(it),
-                onDelete: (it) => controller.removeItem(it),
-              ),
-              PosTicketCheckout(controller: controller),
-            ],
-          ),
+          child: controller.isShiftOpen
+              ? Column(
+                  children: [
+                    PosTicketHeader(title: 'Ticket', itemsCount: items.length),
+                    const SizedBox(height: 8),
+                    const Divider(height: 1),
+                    PosTicketBody(
+                      items: controller.ticketItems,
+                      // List<PostTicketItem>
+                      styles: styles,
+                      onMinus: (it) => controller.decreaseItem(it),
+                      onPlus: (it) => controller.increaseItem(it),
+                      onEdit: (it) => controller.editTicketItem(it),
+                      onDelete: (it) => controller.removeItem(it),
+                    ),
+                    PosTicketCheckout(controller: controller),
+                  ],
+                )
+              : const SizedBox.shrink(),
         );
       },
     );

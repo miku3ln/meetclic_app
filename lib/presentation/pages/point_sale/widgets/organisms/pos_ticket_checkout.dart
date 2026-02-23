@@ -17,12 +17,14 @@ class PosTicketCheckout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!controller.isShiftOpen) return const SizedBox.shrink();
+
     final s = PosCheckoutStyle.of(context);
 
     final subtotal = controller.subtotal;
     final tax = controller.subtotalTax;
     final total = controller.total;
-
+    final hasItems = controller.ticketItems.isNotEmpty;
     return Column(
       children: [
         const Divider(height: 1),
@@ -36,10 +38,11 @@ class PosTicketCheckout extends StatelessWidget {
                   PosPaymentMethodsBar(controller: controller),
                   const SizedBox(height: 10),
                   SizedBox(
+
                     width: double.infinity,
                     height: s.saveHeight,
                     child: ElevatedButton(
-                      onPressed: controller.saveTicket,
+                      onPressed: hasItems ? controller.saveTicket : null, // ✅ null = disabled
                       style: s.saveButtonStyle,
                       child: const Text('Guardar'),
                     ),

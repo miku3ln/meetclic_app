@@ -42,15 +42,18 @@ class PosTabletLandscapeSlots {
         columns: 5,
       ),
 
-      right: PosRightPanel(controller:controller),
+      right: PosRightPanel(controller: controller),
 
-      footer: PosActionBar(
-        menuCategories: menuDataActions,
-        selectedMenuCategoryId: controller.selectedMenuCategoryId,
-        onMenuCategoryTap: controller.onMenuCategoryTap,
-        onSave: controller.onSave,
-        onPay: controller.onPay,
-      ),
+      footer: controller.isShiftOpen
+          ? PosActionBar(
+              controller: controller,
+              menuCategories: menuDataActions,
+              selectedMenuCategoryId: controller.selectedMenuCategoryId,
+              onMenuCategoryTap: controller.onMenuCategoryTap,
+              onSave: controller.onSave,
+              onPay: controller.onPay,
+            )
+          : const SizedBox.shrink(),
     );
   }
 }
