@@ -35,10 +35,12 @@ class PosLeftPanel extends StatelessWidget {
           if (!isShiftOpen)
             _ShiftClosedView(onOpenTap: onOpenShiftTap)
           else
-            PosProductGrid(
-              products: products,
-              columns: columns,
-              onProductTap: onProductTap,
+            Expanded(
+              child: PosProductGrid(
+                products: products,
+                columns: columns,
+                onProductTap: onProductTap,
+              ),
             ),
         ],
       ),

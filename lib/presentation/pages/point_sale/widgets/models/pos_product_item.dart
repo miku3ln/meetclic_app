@@ -84,7 +84,7 @@ class PostTicketItem {
   final double unitPrice;
 
 
-  final double amount;
+  final int amount;
   final double discount;
 
   const PostTicketItem({

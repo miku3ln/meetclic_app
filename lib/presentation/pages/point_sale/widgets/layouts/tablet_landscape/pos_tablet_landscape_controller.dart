@@ -163,18 +163,10 @@ class PosTabletLandscapeController extends ChangeNotifier {
   // -------------------------
   void onProductTap(PosProductItem product) {
     _ensureTicket();
-
-    // Si quieres bloquear agregar cuando no hay turno:
-    if (!isShiftOpen) {
-      debugPrint('onProductTap -> turno cerrado');
-      onRequestOpenShift?.call();
-      return;
-    }
-
     final idx = _ticketItems.indexWhere((i) => i.productItem.id == product.id);
 
     if (idx == -1) {
-      final qty = 1.0;
+      final qty = 1;
       final unit = product.unitPrice;
       final sub = unit * qty;
       final tax = _calcTax(sub, product.taxPercentage);
@@ -192,7 +184,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
       );
     } else {
       final old = _ticketItems[idx];
-      final qty = old.amount + 1.0;
+      final qty = old.amount + 1;
       final unit = old.unitPrice; // o product.unitPrice
       final sub = unit * qty;
       final tax = _calcTax(sub, product.taxPercentage);
@@ -215,7 +207,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
   }
 
   // ✅ Cambiar cantidad desde el panel derecho
-  void changeItemQty(String productId, double newQty) {
+  void changeItemQty(String productId, int newQty) {
     if (newQty <= 0) {
       removeItem(productId);
       return;
