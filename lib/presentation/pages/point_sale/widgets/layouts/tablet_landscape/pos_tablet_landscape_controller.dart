@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../models/pos_payment_method.dart';
 import '../../models/pos_product_item.dart';
 
 String _ticketIdNow() => DateTime.now().microsecondsSinceEpoch.toString();
@@ -242,7 +243,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void clearTicket() {
+  void saveTicket() {
     _ticketItems.clear();
     _recalculateTotals();
     // opcional: generar nuevo ticket id
@@ -276,5 +277,32 @@ class PosTabletLandscapeController extends ChangeNotifier {
     _subtotal = sub;
     _subtotalTax = tax;
     _total = tot;
+  }
+
+  PosPaymentMethod _paymentMethod = PosPaymentMethod.cash;
+
+  PosPaymentMethod get paymentMethod => _paymentMethod;
+
+  void setPaymentMethod(PosPaymentMethod value) {
+    if (_paymentMethod == value) return; // evita rebuild innecesario
+    _paymentMethod = value;
+    notifyListeners();
+  }
+
+
+  bool get isCash => _paymentMethod == PosPaymentMethod.cash;
+  bool get isCard => _paymentMethod == PosPaymentMethod.card;
+  bool get isQr => _paymentMethod == PosPaymentMethod.qr;
+
+  // ejemplo: si quieres un "code" para backend
+  String get paymentMethodCode {
+    switch (_paymentMethod) {
+      case PosPaymentMethod.cash:
+        return 'CASH';
+      case PosPaymentMethod.card:
+        return 'CARD';
+      case PosPaymentMethod.qr:
+        return 'QR';
+    }
   }
 }

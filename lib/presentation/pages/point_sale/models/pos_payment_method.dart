@@ -1,0 +1,1 @@
+enum PosPaymentMethod { cash, card, qr }
