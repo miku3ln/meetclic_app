@@ -37,8 +37,8 @@ class PosTicketCheckout extends StatelessWidget {
                 children: [
                   PosPaymentMethodsBar(controller: controller),
                   const SizedBox(height: 10),
-                  SizedBox(
 
+                /*  SizedBox(
                     width: double.infinity,
                     height: s.saveHeight,
                     child: ElevatedButton(
@@ -46,7 +46,7 @@ class PosTicketCheckout extends StatelessWidget {
                       style: s.saveButtonStyle,
                       child: const Text('Guardar'),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ),

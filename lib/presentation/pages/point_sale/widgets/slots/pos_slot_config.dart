@@ -7,8 +7,8 @@ class PosSlotConfig {
   final double footerHeight;
 
   const PosSlotConfig({
-    this.leftFlex = 70,
-    this.rightFlex = 30,
+    this.leftFlex = 60,
+    this.rightFlex = 40,
     this.footerHeight = 96, // 🔥 sube para que se note
   });
 }
