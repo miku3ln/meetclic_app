@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../organisms/pos_action_bar.dart';
 import '../../organisms/pos_header_bar.dart';
-import '../../sections/pos_action_bar.dart';
+
 import '../../sections/pos_left_panel.dart';
 import '../../sections/pos_right_panel.dart';
 import '../../slots/pos_layout_slots.dart';
@@ -21,11 +22,9 @@ class PosTabletLandscapeSlots {
         productCategories: controller.productCategories,
         selectedProductCategoryId: controller.selectedProductCategoryId,
         onProductCategoryChanged: controller.onProductCategoryChanged,
-
         // ✅ (3) search
         onSearchChanged: controller.onSearchChanged,
         onSearchSubmitted: controller.onSearchSubmitted,
-
         // (otros icons)
         onMenuTap: () {},
         onUserTap: () {},
@@ -48,10 +47,7 @@ class PosTabletLandscapeSlots {
           ? PosActionBar(
               controller: controller,
               menuCategories: menuDataActions,
-              selectedMenuCategoryId: controller.selectedMenuCategoryId,
-              onMenuCategoryTap: controller.onMenuCategoryTap,
-              onSave: controller.onSave,
-              onPay: controller.onPay,
+
             )
           : const SizedBox.shrink(),
     );

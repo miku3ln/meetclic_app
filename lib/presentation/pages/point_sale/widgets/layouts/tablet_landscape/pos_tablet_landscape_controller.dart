@@ -349,4 +349,9 @@ class PosTabletLandscapeController extends ChangeNotifier {
     // onRequestOpenTicketItemOptions?.call(item); // (si quieres callback)
     notifyListeners();
   }
+
+
+  final ValueNotifier<bool> isSummaryExpanded = ValueNotifier<bool>(false);
+
+  void toggleSummary() => isSummaryExpanded.value = !isSummaryExpanded.value;
 }
