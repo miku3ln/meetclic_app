@@ -29,23 +29,22 @@ class PosTicketBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: ListView.separated(
-        padding: styles.listPadding,
-        itemCount: items.length,
-        separatorBuilder: (_, __) => Divider(height: styles.dividerHeight, color: styles.dividerColor),
-        itemBuilder: (_, i) {
-          final it = items[i];
-          return PosTicketRow(
-            item: it,
-            styles: styles,
-            onMinus: () => onMinus(it),
-            onPlus: () => onPlus(it),
-            onEdit: () => onEdit(it),
-            onDelete: () => onDelete(it),
-          );
-        },
-      ),
+    return ListView.separated(
+      padding: styles.listPadding,
+      itemCount: items.length,
+      separatorBuilder: (_, __) =>
+          Divider(height: styles.dividerHeight, color: styles.dividerColor),
+      itemBuilder: (_, i) {
+        final it = items[i];
+        return PosTicketRow(
+          item: it,
+          styles: styles,
+          onMinus: () => onMinus(it),
+          onPlus: () => onPlus(it),
+          onEdit: () => onEdit(it),
+          onDelete: () => onDelete(it),
+        );
+      },
     );
   }
 }
