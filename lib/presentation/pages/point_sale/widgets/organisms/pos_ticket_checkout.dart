@@ -37,23 +37,18 @@ class PosTicketCheckout extends StatelessWidget {
                 children: [
                   PosPaymentMethodsBar(controller: controller),
                   const SizedBox(height: 10),
-
-                /*  SizedBox(
-                    width: double.infinity,
-                    height: s.saveHeight,
-                    child: ElevatedButton(
-                      onPressed: hasItems ? controller.saveTicket : null, // ✅ null = disabled
-                      style: s.saveButtonStyle,
-                      child: const Text('Guardar'),
-                    ),
-                  ),*/
                 ],
               ),
             ),
             const SizedBox(width: 12),
             SizedBox(
               width: totalsCardWidth,
-              child: PosTotalsCard(subtotal: subtotal, tax: tax, total: total),
+              child: PosTotalsCardBox(
+                widthFactor: 1, // 85% del ancho de esa columna derecha
+                subtotal: controller.subtotal,
+                tax: controller.subtotalTax,
+                total: controller.total,
+              ),
             ),
           ],
         ),
@@ -61,4 +56,3 @@ class PosTicketCheckout extends StatelessWidget {
     );
   }
 }
-

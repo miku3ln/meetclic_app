@@ -1,48 +1,56 @@
 import 'package:flutter/material.dart';
+import '../atoms/pos_menu_carousel.dart';
+import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../molecules/pos_product_grid.dart';
-import '../models/pos_product_item.dart';
+
 
 class PosLeftPanel extends StatelessWidget {
-  final bool isShiftOpen;
-
-  /// ✅ evento: el panel pide abrir turno (el layout muestra modal)
-  final VoidCallback onOpenShiftTap;
-
-  /// productos visibles (ya filtrados por controller)
-  final List<PosProductItem> products;
-  final ValueChanged<PosProductItem> onProductTap;
-
-  /// UI
+  final PosTabletLandscapeController controller;
   final int columns;
 
   const PosLeftPanel({
     super.key,
-    required this.isShiftOpen,
-    required this.onOpenShiftTap,
-    required this.products,
-    required this.onProductTap,
+    required this.controller,
     this.columns = 5,
   });
 
   @override
   Widget build(BuildContext context) {
+    final menuDataActions = PosTabletLandscapeFixtures.getMenuDataActions(
+      onTap: controller.onMenuCategoryTap,
+    );
+
     return Padding(
       padding: const EdgeInsets.all(12),
-      child: Column(
-        mainAxisSize: MainAxisSize.min, // ✅ seguro si vive dentro de scroll
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (!isShiftOpen)
-            _ShiftClosedView(onOpenTap: onOpenShiftTap)
-          else
-            Expanded(
-              child: PosProductGrid(
-                products: products,
-                columns: columns,
-                onProductTap: onProductTap,
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final carouselH = c.maxHeight * 0.28; // ✅ 10% fijo
+          final gridH = c.maxHeight - carouselH - 18; // - SizedBox(height:10)
+          return Column(
+            children: [
+              SizedBox(
+                height: gridH, // ✅ 90% (aprox) para productos
+                child: !controller.isShiftOpen
+                    ? _ShiftClosedView(onOpenTap: controller.onOpenShiftTap)
+                    : PosProductGrid(
+                  products: controller.products,
+                  columns: columns,
+                  onProductTap: controller.onProductTap,
+                ),
               ),
-            ),
-        ],
+
+              SizedBox(
+                height: 50, // ✅ 10% fijo
+                child: controller.isShiftOpen?PosMenuCarousel(
+                  items: menuDataActions,
+                  selectedId: controller.selectedMenuCategoryId,
+                  onTap: controller.onMenuCategoryTap,
+                ):SizedBox.shrink(),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

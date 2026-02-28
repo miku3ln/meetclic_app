@@ -25,11 +25,7 @@ class PosSplitTemplate extends StatelessWidget {
             ],
           ),
         ),
-        if (slots.footer != null)
-          SafeArea(
-            top: false,
-            child: SizedBox(height: config.footerHeight, child: slots.footer),
-          ),
+
       ],
     );
   }

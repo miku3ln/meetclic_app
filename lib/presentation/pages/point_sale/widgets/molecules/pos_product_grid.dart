@@ -5,15 +5,9 @@ import '../models/pos_product_item.dart';
 class PosProductGrid extends StatelessWidget {
   final List<PosProductItem> products;
   final ValueChanged<PosProductItem> onProductTap;
-
-  /// Tablet Landscape: 5 columnas
   final int columns;
-
-  /// estilos globales (fallback)
   final Color placeholderColor;
   final Color titleColor;
-
-  /// separaciones
   final double spacing;
   final double runSpacing;
 
@@ -31,12 +25,9 @@ class PosProductGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      // ✅ NO shrinkWrap
-      // ✅ SÍ scroll
       padding: EdgeInsets.zero,
-      primary: false,
-      physics: const AlwaysScrollableScrollPhysics(),
-
+      primary: false, // ✅ importante si hay scroll arriba
+      physics: const ClampingScrollPhysics(), // ✅ Android tablet
       itemCount: products.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: columns,

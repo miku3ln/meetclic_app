@@ -4,12 +4,11 @@ class PosLayoutSlots {
   final PreferredSizeWidget? header;
   final Widget? left;
   final Widget? right;
-  final Widget? footer;
+
 
   const PosLayoutSlots({
     this.header,
     this.left,
-    this.right,
-    this.footer,
+    this.right
   });
 }
