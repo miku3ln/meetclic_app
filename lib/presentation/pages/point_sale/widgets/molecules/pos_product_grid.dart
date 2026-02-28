@@ -17,7 +17,7 @@ class PosProductGrid extends StatelessWidget {
     required this.onProductTap,
     this.columns = 5,
     this.placeholderColor = const Color(0xFF5A5A5A),
-    this.titleColor = Colors.white,
+    this.titleColor = Colors.black,
     this.spacing = 10,
     this.runSpacing = 10,
   });

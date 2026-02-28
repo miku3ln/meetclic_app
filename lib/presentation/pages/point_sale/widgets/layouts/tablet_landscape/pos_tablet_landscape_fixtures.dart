@@ -69,7 +69,7 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_carne/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
-        taxPercentage: 16,
+        taxPercentage: 0,
         unitPrice: 2.50
 
       ),

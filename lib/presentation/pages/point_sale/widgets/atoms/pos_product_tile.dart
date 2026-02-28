@@ -33,14 +33,14 @@ class PosProductTile extends StatelessWidget {
     this.badgesPadding = const EdgeInsets.all(8),
     this.badgeHeight = 26,
     this.badgeTextStyle = const TextStyle(
-      fontSize:9,
+      fontSize: 9,
       fontWeight: FontWeight.w800,
       color: Colors.white,
     ),
-    this.bottomBarHeight = 58,
+    this.bottomBarHeight = 45,
     this.bottomBarColor = const Color(0xFF9E9E9E), // gris barra
     this.titleStyle = const TextStyle(
-      fontSize: 12,
+      fontSize: 11,
       fontWeight: FontWeight.w700,
       color: Colors.white,
       height: 1.0,
@@ -50,20 +50,22 @@ class PosProductTile extends StatelessWidget {
   bool get _hasImage => (item.imageUrl ?? '').trim().isNotEmpty;
 
   String _money(double v) => '\$${v.toStringAsFixed(2)}';
-  String _iva(double pct) => 'Iva ${pct.toStringAsFixed(0)}%';
 
   @override
   Widget build(BuildContext context) {
     final bg = item.placeholderColor ?? defaultPlaceholderColor;
     final titleColor = item.titleColor ?? defaultTitleColor;
 
-    // si quieres que el titleStyle respete defaultTitleColor:
     final effectiveTitleStyle = titleStyle.copyWith(
-
-        color: titleStyle.color ?? titleColor,
-
-
+      color: titleStyle.color ?? titleColor,
     );
+
+    final bool hasTax = item.taxPercentage > 0;
+
+    // ✅ Color del precio según IVA
+    final Color priceBg = hasTax
+        ? const Color(0xFF2ECC71) // con IVA (azul)
+        : const Color(0xFF1E63FF); // sin IVA (verde)
 
     return Material(
       color: Colors.transparent,
@@ -85,29 +87,15 @@ class PosProductTile extends StatelessWidget {
               else
                 Container(color: bg),
 
-              // ✅ Badges arriba-izquierda (precio + IVA)
+              // ✅ Solo badge de precio
               Positioned(
                 left: badgesPadding.left,
                 top: badgesPadding.top,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _Pill(
-                      text: _money(item.unitPrice),
-                      height: badgeHeight,
-                      // turquesa como tu ejemplo
-                      background: const Color(0xFF11C5D9),
-                      style: badgeTextStyle,
-                    ),
-                    SizedBox(height: badgesGap),
-                    _Pill(
-                      text: _iva(item.taxPercentage),
-                      height: badgeHeight,
-                      // azul como tu ejemplo
-                      background: const Color(0xFF1E63FF),
-                      style: badgeTextStyle,
-                    ),
-                  ],
+                child: _Pill(
+                  text: _money(item.unitPrice),
+                  height: badgeHeight,
+                  background: priceBg,
+                  style: badgeTextStyle,
                 ),
               ),
 
