@@ -2,8 +2,62 @@ import 'package:flutter/material.dart';
 import '../../../models/pos_payment_method.dart';
 import '../../models/pos_product_item.dart';
 
-String _ticketIdNow() => DateTime.now().microsecondsSinceEpoch.toString();
+String _ticketIdNow() =>
+    DateTime
+        .now()
+        .microsecondsSinceEpoch
+        .toString();
+enum PosCheckoutAction { pay, save }
 
+class PosCheckoutToggleColors {
+  final Color payActiveBg;
+  final Color payActiveFg;
+  final Color saveActiveBg;
+  final Color saveActiveFg;
+
+  final Color inactiveBg;
+  final Color inactiveFg;
+  final Color border;
+
+  const PosCheckoutToggleColors({
+    required this.payActiveBg,
+    required this.payActiveFg,
+    required this.saveActiveBg,
+    required this.saveActiveFg,
+    required this.inactiveBg,
+    required this.inactiveFg,
+    required this.border,
+  });
+
+  // Defaults (puedes mover luego a theme)
+  factory PosCheckoutToggleColors.defaults() {
+    return PosCheckoutToggleColors(
+      payActiveBg: Colors.green,
+      payActiveFg: Colors.white,
+      saveActiveBg: Colors.amber,
+      saveActiveFg: Colors.black,
+      inactiveBg: Colors.white,
+      inactiveFg: Colors.black87,
+      border: Colors.black12,
+    );
+  }
+}
+class PosCheckoutToggleIcons {
+  final IconData save;
+  final IconData pay;
+
+  const PosCheckoutToggleIcons({
+    required this.save,
+    required this.pay,
+  });
+
+  factory PosCheckoutToggleIcons.defaults() {
+    return const PosCheckoutToggleIcons(
+      save: Icons.save_rounded,
+      pay: Icons.payment_rounded, // o Icons.point_of_sale_rounded
+    );
+  }
+}
 class PosTabletLandscapeController extends ChangeNotifier {
   // UI triggers
   VoidCallback? onRequestOpenShift;
@@ -42,11 +96,11 @@ class PosTabletLandscapeController extends ChangeNotifier {
 
     selectedProductCategoryId =
         initialSelectedProductCategoryId ??
-        (productCategories.isNotEmpty ? productCategories.first.id : null);
+            (productCategories.isNotEmpty ? productCategories.first.id : null);
 
     selectedMenuCategoryId =
         initialSelectedMenuCategoryId ??
-        (menuCategories.isNotEmpty ? menuCategories.first.id : null);
+            (menuCategories.isNotEmpty ? menuCategories.first.id : null);
 
     _applyFilters();
     notifyListeners();
@@ -239,6 +293,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
     _recalculateTotals();
     notifyListeners();
   }
+
   PostTicketItem? getItemByProductId(String productId) {
     try {
       return _ticketItems.firstWhere(
@@ -248,7 +303,8 @@ class PosTabletLandscapeController extends ChangeNotifier {
       return null; // si no existe
     }
   }
-  void removeItem (PostTicketItem item) {
+
+  void removeItem(PostTicketItem item) {
     _ticketItems.removeWhere((i) => i.productItem.id == item.productItem.id);
     _recalculateTotals();
     notifyListeners();
@@ -302,7 +358,9 @@ class PosTabletLandscapeController extends ChangeNotifier {
 
 
   bool get isCash => _paymentMethod == PosPaymentMethod.cash;
+
   bool get isCard => _paymentMethod == PosPaymentMethod.card;
+
   bool get isQr => _paymentMethod == PosPaymentMethod.qr;
 
   // ejemplo: si quieres un "code" para backend
@@ -354,4 +412,40 @@ class PosTabletLandscapeController extends ChangeNotifier {
   final ValueNotifier<bool> isSummaryExpanded = ValueNotifier<bool>(false);
 
   void toggleSummary() => isSummaryExpanded.value = !isSummaryExpanded.value;
+
+
+// ✅ callbacks UI (eventos)
+  ValueChanged<PosCheckoutAction>? onCheckoutActionChanged;
+
+// ✅ estado seleccionado (default: cobrar)
+  PosCheckoutAction _checkoutAction = PosCheckoutAction.pay;
+
+  PosCheckoutAction get checkoutAction => _checkoutAction;
+
+  bool get isPaySelected => _checkoutAction == PosCheckoutAction.pay;
+
+  bool get isSaveSelected => _checkoutAction == PosCheckoutAction.save;
+
+// ✅ config de colores (objeto)
+  PosCheckoutToggleColors toggleColors = PosCheckoutToggleColors.defaults();
+
+  void setCheckoutAction(PosCheckoutAction value) {
+    if (_checkoutAction == value) return;
+    _checkoutAction = value;
+
+    // 🔥 evento para que el template/checkout cambie info
+    onCheckoutActionChanged?.call(value);
+
+    notifyListeners();
+  }
+
+// ✅ acción principal según toggle
+  void onPrimaryCheckoutTap() {
+    if (_checkoutAction == PosCheckoutAction.pay) {
+      onPay();
+    } else {
+      onSave();
+    }
+  }
+  PosCheckoutToggleIcons toggleIcons = PosCheckoutToggleIcons.defaults();
 }

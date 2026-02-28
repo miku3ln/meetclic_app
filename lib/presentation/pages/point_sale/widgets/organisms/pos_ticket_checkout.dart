@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../theme/pos_checkout_style.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../molecules/pos_checkout_action_toggle.dart';
+import '../molecules/pos_checkout_primary_button.dart';
 import '../molecules/pos_payment_methods_bar.dart';
 import '../molecules/pos_totals_card.dart';
 
@@ -31,24 +33,60 @@ class PosTicketCheckout extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
-                    flex: 4, // 40%
-                    child: Container(height: 80, color: Colors.black12),
+                    flex: 4,
+                    child: SizedBox(
+                      height: 80,
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: PosCheckoutActionToggle(controller: controller),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     flex: 6, // 60%
-                    child: Container(height: 80, color: Colors.black26),
+                    child: SizedBox(
+                      height: 80,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Text(
+                            'Formas de Pago',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 8),
+                          // ✅ el bar ocupa el ancho disponible
+                          Expanded(
+                            child: Align(
+                              alignment: Alignment.topLeft,
+                              child: PosPaymentMethodsBar(
+                                controller: controller,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
                 ],
               ),
 
-              const SizedBox(height: 12),
+
 
               // ✅ Fila 2: 100%
-              Container(
-                height: 120,
+              SizedBox(
+                height: 40,
                 width: double.infinity,
-                color: Colors.black38,
+                child: PosCheckoutPrimaryButton(
+                  controller: controller,
+                  height: 40,
+                ),
               ),
             ],
           ),

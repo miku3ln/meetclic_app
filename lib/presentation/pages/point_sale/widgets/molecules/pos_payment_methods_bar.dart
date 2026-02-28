@@ -18,34 +18,35 @@ class PosPaymentMethodsBar extends StatelessWidget {
     final selected = controller.paymentMethod;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+   //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: s.barBg,
         borderRadius: BorderRadius.circular(s.radius),
-        border: Border.all(color: s.border),
+       // border: Border.all(color: s.border),
       ),
       child: SizedBox(
         height: s.chipHeight,
         child: ScrollConfiguration(
           behavior: const NoGlowScrollBehavior(),
           child: ListView(
+            padding: EdgeInsets.zero, // ✅ sin padding interno
             scrollDirection: Axis.horizontal,
             physics: const BouncingScrollPhysics(),
             children: [
               PosPaymentChip(
-                label: 'Cash',
+                label: 'Efectivo',
                 icon: Icons.payments_outlined,
                 selected: selected == PosPaymentMethod.cash,
                 onTap: () => controller.setPaymentMethod(PosPaymentMethod.cash),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 9),
               PosPaymentChip(
-                label: 'Credit/Debit Card',
+                label: 'Tarjetas ',
                 icon: Icons.credit_card_outlined,
                 selected: selected == PosPaymentMethod.card,
                 onTap: () => controller.setPaymentMethod(PosPaymentMethod.card),
               ),
-              const SizedBox(width: 10),
+              const SizedBox(width: 9),
               PosPaymentChip(
                 label: 'QR Code',
                 icon: Icons.qr_code_2_outlined,
