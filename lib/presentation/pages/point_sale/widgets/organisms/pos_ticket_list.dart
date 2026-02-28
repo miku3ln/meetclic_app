@@ -3,10 +3,6 @@ import 'package:flutter/material.dart';
 import '../../theme/pos_ticket_styles.dart';
 import '../models/pos_product_item.dart';
 import '../organisms/pos_ticket_row.dart';
-
-// usa tu modelo real
-
-
 class PosTicketBody extends StatelessWidget {
   final List<PostTicketItem> items;
   final PosTicketStyles styles;

@@ -109,9 +109,7 @@ class PosTotalsCardBox extends StatelessWidget {
             subtotal: subtotal,
             tax: tax,
             total: total,
-            variant: compact
-                ? PosTotalsCardVariant.compact
-                : PosTotalsCardVariant.full,
+            variant:PosTotalsCardVariant.full,
           );
         },
       ),

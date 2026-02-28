@@ -16,41 +16,61 @@ class PosTicketCheckout extends StatelessWidget {
   });
 
   @override
+  @override
   Widget build(BuildContext context) {
-    if (!controller.isShiftOpen) return const SizedBox.shrink();
-
-    final s = PosCheckoutStyle.of(context);
-
-    final subtotal = controller.subtotal;
-    final tax = controller.subtotalTax;
-    final total = controller.total;
-    final hasItems = controller.ticketItems.isNotEmpty;
-    return Column(
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Divider(height: 1),
-        const SizedBox(height: 10),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
+        // ✅ Columna izquierda 60%
+        Expanded(
+          flex: 6,
+          child: Column(
+            children: [
+              // ✅ Fila 1: 40% / 60%
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  PosPaymentMethodsBar(controller: controller),
-                  const SizedBox(height: 10),
+                  Expanded(
+                    flex: 4, // 40%
+                    child: Container(height: 80, color: Colors.black12),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    flex: 6, // 60%
+                    child: Container(height: 80, color: Colors.black26),
+                  ),
                 ],
               ),
-            ),
-            const SizedBox(width: 12),
-            SizedBox(
-              width: totalsCardWidth,
+
+              const SizedBox(height: 12),
+
+              // ✅ Fila 2: 100%
+              Container(
+                height: 120,
+                width: double.infinity,
+                color: Colors.black38,
+              ),
+            ],
+          ),
+        ),
+
+        const SizedBox(width: 12),
+
+        // ✅ Columna derecha 40%
+        Expanded(
+          flex: 4,
+          child: Align(
+            alignment: Alignment.topRight,
+            child: SizedBox(
+              width: totalsCardWidth, // tu ancho fijo
               child: PosTotalsCardBox(
-                widthFactor: 1, // 85% del ancho de esa columna derecha
+                widthFactor: 1,
                 subtotal: controller.subtotal,
                 tax: controller.subtotalTax,
                 total: controller.total,
               ),
             ),
-          ],
+          ),
         ),
       ],
     );
