@@ -13,12 +13,18 @@ import 'package:meetclic_app/shared/models/app_config.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import 'package:meetclic_app/shared/utils/deep_link_type.dart';
 
+
+import '../../../../../../shared/controllers/app_controller.dart';
 import '../../../../../../shared/themes/app_colors.dart';
 import '../../models/home_tab_definition.dart';
 import '../../models/home_tab_id.dart';
 import '../../services/home_deep_link_service.dart';
 import '../../services/home_tab_factory.dart';
 import '../../state/home_shell_state.dart';
+
+
+import 'package:meetclic_app/presentation/widgets/home_drawer_widget.dart';
+
 
 /// Organism principal que representa la “cáscara” del Home:
 /// - Maneja tabs
@@ -50,9 +56,7 @@ class _HomeMainMenuOrganismState extends State<HomeMainMenuOrganism> {
   @override
   void initState() {
     super.initState();
-
     _deepLinkService = HomeDeepLinkService(DeepLinkHandler());
-
     // ✅ Inicializamos dependencias que usan context con listen:false
     _accessManager = AccessManagerService(context);
     _config = Provider.of<AppConfig>(context, listen: false);
@@ -210,13 +214,14 @@ class _HomeMainMenuOrganismState extends State<HomeMainMenuOrganism> {
         final currentIndex = visibleDefs.indexWhere(
           (d) => d.id == _state.currentTab,
         );
-
+        final app = context.watch<AppController>(); // ✅ aquí
         return Scaffold(
           //FOOTER MENU
           key: _scaffoldKey,
           backgroundColor: theme.scaffoldBackgroundColor,
           extendBody: true,
-          // drawer: const HomeDrawerWidget(),
+       //   drawer: const HomeDrawerWidget(),//TODO MENU SEND UTTIL CONFIG
+          drawer: app.enableDrawer ? const HomeDrawerWidget() : null,
           body: SafeArea(
             top: true,
             bottom: false,

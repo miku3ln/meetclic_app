@@ -5,7 +5,6 @@ import '../pages/point_sale/widgets/layouts/mobile_portrait_layout.dart';
 import '../pages/point_sale/widgets/layouts/mobile_landscape_layout.dart';
 import '../pages/point_sale/widgets/layouts/tablet_portrait_layout.dart';
 import '../pages/point_sale/widgets/layouts/tablet_landscape_layout.dart';
-
 class PointSalePage extends StatelessWidget {
   const PointSalePage({super.key});
 
@@ -13,12 +12,14 @@ class PointSalePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final device = DeviceGestureObserver.snapshotOf(context);
 
-    return DeviceGestureObserver(
-      onEvent: (d, e) {
-        debugPrint('DEVICE => $d');
-        debugPrint('EVENT  => $e');
-      },
-      child: _buildByLayout(device.layoutType),
+    return Scaffold(
+      body: DeviceGestureObserver(
+        onEvent: (d, e) {
+          debugPrint('DEVICE => $d');
+          debugPrint('EVENT  => $e');
+        },
+        child: _buildByLayout(device.layoutType),
+      ),
     );
   }
 

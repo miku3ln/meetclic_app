@@ -4,7 +4,6 @@ import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../molecules/pos_product_grid.dart';
 
-
 class PosLeftPanel extends StatelessWidget {
   final PosTabletLandscapeController controller;
   final int columns;
@@ -21,36 +20,36 @@ class PosLeftPanel extends StatelessWidget {
       onTap: controller.onMenuCategoryTap,
     );
 
+    final showMenu = controller.isShiftOpen;
+
     return Padding(
       padding: const EdgeInsets.all(12),
-      child: LayoutBuilder(
-        builder: (context, c) {
-          final carouselH = c.maxHeight * 0.28; // ✅ 10% fijo
-          final gridH = c.maxHeight - carouselH - 18; // - SizedBox(height:10)
-          return Column(
-            children: [
-              SizedBox(
-                height: gridH, // ✅ 90% (aprox) para productos
-                child: !controller.isShiftOpen
-                    ? _ShiftClosedView(onOpenTap: controller.onOpenShiftTap)
-                    : PosProductGrid(
-                  products: controller.products,
-                  columns: columns,
-                  onProductTap: controller.onProductTap,
-                ),
-              ),
+      child: Column(
+        children: [
+          // ✅ Ocupa todo el espacio disponible y evita cálculos frágiles
+          Expanded(
+            child: !controller.isShiftOpen
+                ? _ShiftClosedView(onOpenTap: controller.onOpenShiftTap)
+                : PosProductGrid(
+              products: controller.products,
+              columns: columns,
+              onProductTap: controller.onProductTap,
+            ),
+          ),
 
-              SizedBox(
-                height: 50, // ✅ 10% fijo
-                child: controller.isShiftOpen?PosMenuCarousel(
-                  items: menuDataActions,
-                  selectedId: controller.selectedMenuCategoryId,
-                  onTap: controller.onMenuCategoryTap,
-                ):SizedBox.shrink(),
+          // ✅ Menú inferior solo cuando el turno está abierto (igual que tu lógica)
+          if (showMenu) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              height: 50,
+              child: PosMenuCarousel(
+                items: menuDataActions,
+                selectedId: controller.selectedMenuCategoryId,
+                onTap: controller.onMenuCategoryTap,
               ),
-            ],
-          );
-        },
+            ),
+          ],
+        ],
       ),
     );
   }
@@ -62,30 +61,34 @@ class _ShiftClosedView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ✅ Scroll por seguridad: si el panel queda bajo (teclado, split view, etc.)
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Icons.access_time, size: 72, color: Colors.grey),
-            const SizedBox(height: 10),
-            const Text(
-              'El turno está cerrado',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 6),
-            const Text(
-              'Abra el turno para realizar ventas',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 18),
-            ElevatedButton(
-              onPressed: onOpenTap,
-              child: const Text('ABRIR EL TURNO'),
-            ),
-          ],
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(vertical: 24),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 420),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.access_time, size: 72, color: Colors.grey),
+              const SizedBox(height: 10),
+              const Text(
+                'El turno está cerrado',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              const Text(
+                'Abra el turno para realizar ventas',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 18),
+              ElevatedButton(
+                onPressed: onOpenTap,
+                child: const Text('ABRIR EL TURNO'),
+              ),
+            ],
+          ),
         ),
       ),
     );

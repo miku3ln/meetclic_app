@@ -55,7 +55,7 @@ class MovementSummary {
       'reputation': reputation.toJson(),
       'trophies': trophies.toJson(),
       'visits': visits.toJson(),
-      'rating': visits.toJson(),
+      'rating': rating.toJson(),
 
     };
   }
