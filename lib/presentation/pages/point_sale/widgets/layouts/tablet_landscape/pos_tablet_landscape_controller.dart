@@ -448,4 +448,21 @@ class PosTabletLandscapeController extends ChangeNotifier {
     }
   }
   PosCheckoutToggleIcons toggleIcons = PosCheckoutToggleIcons.defaults();
+
+
+  VoidCallback? onRequestOpenDrawer; // ✅ nuevo
+  void onMenuTap() {
+    debugPrint('onMenuTap ->click');
+    onRequestOpenDrawer?.call(); // ✅ dispara evento UI
+
+
+  }
+  void onMoreTap() {
+    debugPrint('onMoreTap ->click');
+  }
+  void onUserTap() {
+    debugPrint('onUserTap ->click');
+  }
+
+
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../dialogs/pos_open_shift_dialog.dart';
+import '../drawers/pos_app_drawer.dart';
 import '../templates/pos_split_template.dart';
 
 import 'tablet_landscape/pos_tablet_landscape_controller.dart';
@@ -17,7 +18,7 @@ class PosTabletLandscapeLayout extends StatefulWidget {
 
 class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
   late final PosTabletLandscapeController controller;
-
+  final _scaffoldKey = GlobalKey<ScaffoldState>(); // ✅
   @override
   void initState() {
     super.initState();
@@ -26,7 +27,10 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
 
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
     controller.onRequestOpenShift = _showOpenShiftModal;
-
+    // ✅ Conecta evento del controller al Drawer
+    controller.onRequestOpenDrawer = () {
+      _scaffoldKey.currentState?.openDrawer();
+    };
     // ✅ Carga data inicial (fixtures)
     controller.init(
       initialProducts: PosTabletLandscapeFixtures.getProductsData(),
@@ -36,6 +40,7 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
       // initialSelectedProductCategoryId: 'all',
       // initialSelectedMenuCategoryId: 'all',
     );
+
   }
 
   void _onChanged() {
@@ -66,8 +71,12 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Slots ahora solo necesitan el controller
     final slots = PosTabletLandscapeSlots.build(controller: controller);
-    return PosSplitTemplate(slots: slots);
+
+    return Scaffold(
+      key: _scaffoldKey,
+      drawer: const PosAppDrawer(), // ✅ tu drawer estilo Drive
+      body: PosSplitTemplate(slots: slots),
+    );
   }
 }

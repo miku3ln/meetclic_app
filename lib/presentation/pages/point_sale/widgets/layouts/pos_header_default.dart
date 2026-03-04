@@ -145,9 +145,8 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
           ),
 
           const SizedBox(width: 10),
-
           // DERECHA: Ticket (placeholder como antes)
-          const Text('Ticket', maxLines: 1, overflow: TextOverflow.ellipsis),
+          const Text('Tickets', maxLines: 1, overflow: TextOverflow.ellipsis),
 
           const Spacer(),
         ],

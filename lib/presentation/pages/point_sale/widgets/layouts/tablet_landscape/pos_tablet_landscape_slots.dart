@@ -1,4 +1,6 @@
 
+import 'package:flutter/cupertino.dart';
+
 import '../../organisms/pos_header_bar.dart';
 
 import '../../sections/pos_left_panel.dart';
@@ -22,9 +24,9 @@ class PosTabletLandscapeSlots {
         onSearchChanged: controller.onSearchChanged,
         onSearchSubmitted: controller.onSearchSubmitted,
         // (otros icons)
-        onMenuTap: () {},
-        onUserTap: () {},
-        onMoreTap: () {},
+        onMenuTap:controller.onMenuTap,
+        onUserTap:controller.onUserTap,
+        onMoreTap:controller.onMoreTap,
       ),
 
       left: PosLeftPanel(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../app/di/app_providers.dart';
 import '../../domain/services/session_service.dart';
 import '../models/app_config.dart';
 
@@ -87,6 +88,47 @@ class AppController extends ChangeNotifier {
 
   Future<void> logout() async {
     await session.clearSession();
+    goToGate();
     notifyListeners();
+
+  }
+
+  // ✅ Navegación global (sin context)
+  final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
+  void goToGate() {
+    final nav = navigatorKey.currentState;
+    if (nav == null) return;
+    nav.pushNamedAndRemoveUntil('/gate', (route) => false);
+  }
+  /// (opcional) helper por si quieres navegar a cualquier ruta
+  void goToNamed2(String route, {Object? arguments}) {
+    final nav = navigatorKey.currentState;
+    if (nav == null) return;
+    nav.pushNamed(route, arguments: arguments);
+  }
+  void goToNamed(String route, {Object? arguments}) {
+    final nav = navigatorKey.currentState;
+    if (nav == null) return;
+    nav.pushNamed(route, arguments: arguments);
+  }
+  /// (Opcional) si algún día necesitas limpiar sin navegar
+  Future<void> logoutSilently() async {
+    await session.clearSession();
+    notifyListeners();
+  }
+
+  bool get isLoginRequired => startPolicy == AppStartPolicy.requireLogin;
+
+// si quieres el modo “alto nivel” para comparar fácil:
+  AppMode get appMode =>
+      (startPolicy == AppStartPolicy.requireLogin &&
+          afterLoginDestination == AppAfterLoginDestination.pointSale)
+          ? AppMode.requireLoginPos
+          : AppMode.guestHome;
+
+
+  void closeDrawerIfOpen() {
+    navigatorKey.currentState?.maybePop();// si el drawer está abierto, esto lo cierra
   }
 }

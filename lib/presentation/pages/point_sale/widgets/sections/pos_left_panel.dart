@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/shared/providers_session.dart';
+import '../../../../../shared/controllers/app_controller.dart';
 import '../atoms/pos_menu_carousel.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
@@ -16,14 +18,17 @@ class PosLeftPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final app = context.watch<AppController>(); // ✅ lee modo global
+    final bool isLoginMode = app.isLoginRequired;
+    final double heightSliderMenu=isLoginMode?80:50;
+    final double heightSliderBox=isLoginMode?0:16;
+    final double paddingAll=isLoginMode?45:12;
     final menuDataActions = PosTabletLandscapeFixtures.getMenuDataActions(
       onTap: controller.onMenuCategoryTap,
     );
-
     final showMenu = controller.isShiftOpen;
-
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding:  EdgeInsets.all(paddingAll),
       child: Column(
         children: [
           // ✅ Ocupa todo el espacio disponible y evita cálculos frágiles
@@ -39,9 +44,9 @@ class PosLeftPanel extends StatelessWidget {
 
           // ✅ Menú inferior solo cuando el turno está abierto (igual que tu lógica)
           if (showMenu) ...[
-            const SizedBox(height: 8),
+             SizedBox(height: heightSliderBox),
             SizedBox(
-              height: 50,
+              height: heightSliderMenu,
               child: PosMenuCarousel(
                 items: menuDataActions,
                 selectedId: controller.selectedMenuCategoryId,
@@ -58,7 +63,6 @@ class PosLeftPanel extends StatelessWidget {
 class _ShiftClosedView extends StatelessWidget {
   final VoidCallback onOpenTap;
   const _ShiftClosedView({required this.onOpenTap});
-
   @override
   Widget build(BuildContext context) {
     // ✅ Scroll por seguridad: si el panel queda bajo (teclado, split view, etc.)

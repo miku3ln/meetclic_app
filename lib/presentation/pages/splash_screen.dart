@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'package:meetclic_app/data/data-sources/module_api_fake.dart';
 import 'package:meetclic_app/presentation/pages/home/home_page.dart';
 import 'package:meetclic_app/presentation/pages/point_sale_page.dart';
-import 'package:meetclic_app/shared/providers_session.dart';
 
 import '../../shared/controllers/app_controller.dart';
+import '../../shared/controllers/app_drawer_controller.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,39 +21,43 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    // Inicia la carga después del primer frame
     WidgetsBinding.instance.addPostFrameCallback((_) => _loadResources());
   }
 
   Future<void> _loadResources() async {
     try {
-      // Aquí podrías cargar cosas reales, por ahora nada:
-      // await api.loadModules();
-
-      // (Opcional) pequeña pausa para que se vea el loading
-      // await Future.delayed(const Duration(milliseconds: 500));
       final app = context.read<AppController>();
+      final drawer = context.read<AppDrawerController>(); // ✅ nuevo
 
-      Widget target;
-      // ✅ si está logueado, respeta tu configuración post-login
+      // ✅ Decide el target (MISMO flujo que ya tienes)
+      late final Widget target;
+      late final String selectedMenuId; // ✅ para marcar menú activo
+
       if (app.isLoggedIn) {
         switch (app.afterLoginDestination) {
           case AppAfterLoginDestination.pointSale:
-            target = PointSalePage();
+            target = const PointSalePage();
+            selectedMenuId = 'pos'; // ✅ debe coincidir con tu item id
             break;
+
           case AppAfterLoginDestination.home:
-            target = HomeScreenAllMenu(modules: []);
+            target = HomeScreenAllMenu(modules: const []);
+            selectedMenuId = 'home';
             break;
         }
       } else {
-        // ✅ si NO está logueado, sigue tu flujo normal
-        target = HomeScreenAllMenu(modules: []);
+        // ✅ default: tu otro proyecto / home principal
+        target = HomeScreenAllMenu(modules: const []);
+        selectedMenuId = 'home';
       }
+
+      // ✅ setear menú activo ANTES de navegar (punto 8)
+      drawer.setSelected(selectedMenuId);
 
       if (!mounted) return;
 
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) =>target),
+        MaterialPageRoute(builder: (_) => target),
       );
     } catch (e, st) {
       debugPrint('Error cargando datos: $e');
