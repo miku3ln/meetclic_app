@@ -26,9 +26,9 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
     controller = PosTabletLandscapeController()..addListener(_onChanged);
 
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
-    controller.onRequestOpenShift = _showOpenShiftModal;
+    controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta evento del controller al Drawer
-    controller.onRequestOpenDrawer = () {
+    controller.ui.onRequestOpenDrawer = () {
       _scaffoldKey.currentState?.openDrawer();
     };
     // ✅ Carga data inicial (fixtures)
@@ -66,7 +66,7 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
     if (!mounted) return;
     if (amount == null) return;
 
-    await controller.openShift(amount);
+    await controller.shift.openShift(amount);
   }
 
   @override

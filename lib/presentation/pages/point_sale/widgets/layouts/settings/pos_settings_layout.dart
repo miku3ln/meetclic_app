@@ -24,7 +24,7 @@ class _PosSettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Configuración'),
+        title: const Text('Configuración s'),
       ),
       body: Row(
         children: const [

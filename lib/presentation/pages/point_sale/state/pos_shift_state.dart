@@ -1,12 +1,15 @@
 import 'package:flutter/foundation.dart';
+class PosShiftState extends ChangeNotifier {
+  VoidCallback? onRequestOpenShift;
 
-@immutable
-class PosShiftState {
-  final bool isOpen;
+  bool isShiftOpen = false;
 
-  const PosShiftState({required this.isOpen});
+  void onOpenShiftTap() => onRequestOpenShift?.call();
 
-  PosShiftState copyWith({bool? isOpen}) => PosShiftState(
-    isOpen: isOpen ?? this.isOpen,
-  );
+  Future<void> openShift(double initialCash) async {
+    isShiftOpen = true;
+    notifyListeners();
+  }
+
+  bool get canSell => isShiftOpen;
 }

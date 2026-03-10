@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../state/pos_checkout_state.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 
 class PosCheckoutPrimaryButton extends StatelessWidget {
@@ -13,15 +14,15 @@ class PosCheckoutPrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colors = controller.toggleColors;
+    final colors = controller.checkout.toggleColors;
 
-    final isPay = controller.checkoutAction == PosCheckoutAction.pay;
+    final isPay = controller.checkout.checkoutAction == PosCheckoutAction.pay;
 
     final String label = isPay ? 'Cobrar' : 'Guardar';
     final Color bg = isPay ? colors.payActiveBg : colors.saveActiveBg;
     final Color fg = isPay ? colors.payActiveFg : colors.saveActiveFg;
 
-    final bool enabled = controller.isShiftOpen && controller.ticketItems.isNotEmpty;
+    final bool enabled = controller.shift.isShiftOpen && controller.ticket.items.isNotEmpty;
 
     return SizedBox(
       width: double.infinity,

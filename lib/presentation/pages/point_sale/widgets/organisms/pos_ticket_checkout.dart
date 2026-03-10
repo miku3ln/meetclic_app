@@ -103,9 +103,9 @@ class PosTicketCheckout extends StatelessWidget {
               width: totalsCardWidth, // tu ancho fijo
               child: PosTotalsCardBox(
                 widthFactor: 1,
-                subtotal: controller.subtotal,
-                tax: controller.subtotalTax,
-                total: controller.total,
+                subtotal: controller.ticket.subtotal,
+                tax: controller.ticket.subtotalTax,
+                total: controller.ticket.total,
               ),
             ),
           ),

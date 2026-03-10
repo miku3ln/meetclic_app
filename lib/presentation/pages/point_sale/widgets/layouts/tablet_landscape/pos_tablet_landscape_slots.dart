@@ -9,33 +9,29 @@ import '../../slots/pos_layout_slots.dart';
 import 'pos_tablet_landscape_controller.dart';
 
 
+
 class PosTabletLandscapeSlots {
   static PosLayoutSlots build({
     required PosTabletLandscapeController controller,
   }) {
-
     return PosLayoutSlots(
       header: PosHeaderBar(
-        // ✅ (1) dropdown usa PosCategoryItem
-        productCategories: controller.productCategories,
-        selectedProductCategoryId: controller.selectedProductCategoryId,
-        onProductCategoryChanged: controller.onProductCategoryChanged,
-        // ✅ (3) search
-        onSearchChanged: controller.onSearchChanged,
-        onSearchSubmitted: controller.onSearchSubmitted,
-        // (otros icons)
-        onMenuTap:controller.onMenuTap,
-        onUserTap:controller.onUserTap,
-        onMoreTap:controller.onMoreTap,
+        productCategories: controller.browser.productCategories,
+        selectedProductCategoryId: controller.browser.selectedProductCategoryId,
+        onProductCategoryChanged: controller.browser.onProductCategoryChanged,
+        onSearchChanged: controller.browser.onSearchChanged,
+        onSearchSubmitted: controller.browser.onSearchSubmitted,
+        onMenuTap: controller.ui.onMenuTap,
+        onUserTap: controller.ui.onUserTap,
+        onMoreTap: controller.ui.onMoreTap,
       ),
-
       left: PosLeftPanel(
         controller: controller,
         columns: 5,
       ),
-
-      right: PosRightPanel(controller: controller),
-
+      right: PosRightPanel(
+        controller: controller,
+      ),
     );
   }
 }

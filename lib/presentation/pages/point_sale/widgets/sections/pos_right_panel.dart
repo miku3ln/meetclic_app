@@ -25,10 +25,10 @@ class PosRightPanel extends StatelessWidget {
     return AnimatedBuilder(
       animation: controller,
       builder: (_, __) {
-        final items = controller.ticketItems;
+        final items = controller.ticket.items;
         return Container(
           padding: const EdgeInsets.all(12),
-          child: controller.isShiftOpen
+          child: controller.shift. isShiftOpen
               ? Column(
             children: [
               PosTicketHeader(title: 'Ticket', itemsCount: items.length),
@@ -37,12 +37,12 @@ class PosRightPanel extends StatelessWidget {
               // ✅ Lista ocupa todo menos checkout
               Expanded(
                 child: PosTicketBody(
-                  items: controller.ticketItems,
+                  items: controller.ticket.items,
                   styles: styles,
-                  onMinus: (it) => controller.decreaseItem(it),
-                  onPlus: (it) => controller.increaseItem(it),
-                  onEdit: (it) => controller.editTicketItem(it),
-                  onDelete: (it) => controller.removeItem(it),
+                  onMinus: (it) => controller.ticket. decreaseItem(it),
+                  onPlus: (it) => controller.ticket.increaseItem(it),
+                  onEdit: (it) => controller.ticket.editTicketItem(it),
+                  onDelete: (it) => controller.ticket.removeItem(it),
                 ),
               ),
 

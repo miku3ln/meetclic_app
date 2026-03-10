@@ -24,19 +24,19 @@ class PosLeftPanel extends StatelessWidget {
     final double heightSliderBox=isLoginMode?0:16;
     final double paddingAll=isLoginMode?45:12;
     final menuDataActions = PosTabletLandscapeFixtures.getMenuDataActions(
-      onTap: controller.onMenuCategoryTap,
+      onTap: controller.browser.onMenuCategoryTap,
     );
-    final showMenu = controller.isShiftOpen;
+    final showMenu = controller.shift.isShiftOpen;
     return Padding(
       padding:  EdgeInsets.all(paddingAll),
       child: Column(
         children: [
           // ✅ Ocupa todo el espacio disponible y evita cálculos frágiles
           Expanded(
-            child: !controller.isShiftOpen
-                ? _ShiftClosedView(onOpenTap: controller.onOpenShiftTap)
+            child: !controller.shift.isShiftOpen
+                ? _ShiftClosedView(onOpenTap: controller.shift.onOpenShiftTap)
                 : PosProductGrid(
-              products: controller.products,
+              products: controller.browser.products,
               columns: columns,
               onProductTap: controller.onProductTap,
             ),
@@ -49,8 +49,8 @@ class PosLeftPanel extends StatelessWidget {
               height: heightSliderMenu,
               child: PosMenuCarousel(
                 items: menuDataActions,
-                selectedId: controller.selectedMenuCategoryId,
-                onTap: controller.onMenuCategoryTap,
+                selectedId: controller.browser. selectedMenuCategoryId,
+                onTap: controller.browser.onMenuCategoryTap,
               ),
             ),
           ],

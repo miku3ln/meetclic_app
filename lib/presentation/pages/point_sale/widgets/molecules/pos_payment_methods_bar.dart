@@ -15,7 +15,7 @@ class PosPaymentMethodsBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = PosCheckoutStyle.of(context);
-    final selected = controller.paymentMethod;
+    final selected = controller.payment.paymentMethod;
 
     return Container(
    //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -37,21 +37,21 @@ class PosPaymentMethodsBar extends StatelessWidget {
                 label: 'Efectivo',
                 icon: Icons.payments_outlined,
                 selected: selected == PosPaymentMethod.cash,
-                onTap: () => controller.setPaymentMethod(PosPaymentMethod.cash),
+                onTap: () => controller.payment.setPaymentMethod(PosPaymentMethod.cash),
               ),
               const SizedBox(width: 9),
               PosPaymentChip(
                 label: 'Tarjetas ',
                 icon: Icons.credit_card_outlined,
                 selected: selected == PosPaymentMethod.card,
-                onTap: () => controller.setPaymentMethod(PosPaymentMethod.card),
+                onTap: () => controller.payment.setPaymentMethod(PosPaymentMethod.card),
               ),
               const SizedBox(width: 9),
               PosPaymentChip(
                 label: 'QR Code',
                 icon: Icons.qr_code_2_outlined,
                 selected: selected == PosPaymentMethod.qr,
-                onTap: () => controller.setPaymentMethod(PosPaymentMethod.qr),
+                onTap: () => controller.payment.setPaymentMethod(PosPaymentMethod.qr),
               ),
             ],
           ),

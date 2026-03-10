@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../state/pos_checkout_state.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 
 class PosCheckoutActionToggle extends StatelessWidget {
@@ -14,8 +15,9 @@ class PosCheckoutActionToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final c = controller.toggleColors;
-    final i = controller.toggleIcons;
+    final checkout = controller.checkout;
+    final c = checkout.toggleColors;
+    final i = checkout.toggleIcons;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -37,26 +39,28 @@ class PosCheckoutActionToggle extends StatelessWidget {
             border: Border.all(color: c.border),
           ),
           child: CupertinoSlidingSegmentedControl<PosCheckoutAction>(
-            groupValue: controller.checkoutAction,
+            groupValue: checkout.checkoutAction,
             padding: const EdgeInsets.all(4),
-            thumbColor: controller.isPaySelected ? c.payActiveBg : c.saveActiveBg,
+            thumbColor: checkout.isPaySelected
+                ? c.payActiveBg
+                : c.saveActiveBg,
             children: {
               PosCheckoutAction.save: _segIcon(
                 icon: i.save,
-                active: controller.isSaveSelected,
+                active: checkout.isSaveSelected,
                 activeFg: c.saveActiveFg,
                 inactiveFg: c.inactiveFg,
               ),
               PosCheckoutAction.pay: _segIcon(
                 icon: i.pay,
-                active: controller.isPaySelected,
+                active: checkout.isPaySelected,
                 activeFg: c.payActiveFg,
                 inactiveFg: c.inactiveFg,
               ),
             },
             onValueChanged: (v) {
               if (v == null) return;
-              controller.setCheckoutAction(v);
+              checkout.setCheckoutAction(v);
             },
           ),
         ),

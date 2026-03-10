@@ -20,7 +20,7 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
     super.initState();
 
     controller = PosTabletLandscapeController()..addListener(_onControllerChanged);
-    controller.onRequestOpenShift = _showOpenShiftModal;
+    controller.shift.onRequestOpenShift = _showOpenShiftModal;
 
     controller.init(
       initialProducts: PosTabletLandscapeFixtures.getProductsData(),
@@ -50,7 +50,7 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
       builder: (_) => const PosOpenShiftDialog(),
     );
     if (initialCash == null) return;
-    await controller.openShift(initialCash);
+    await controller.shift.openShift(initialCash);
   }
 
   @override
