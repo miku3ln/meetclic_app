@@ -33,7 +33,8 @@ class MeetclicMaterialApp extends StatelessWidget {
       localeResolutionCallback: resolveLocale,
       debugShowCheckedModeBanner: false,
       navigatorKey: app.navigatorKey,
-      routes: AppRouter.routes(),
+     // routes: AppRouter.routes(),
+      onGenerateRoute: AppRouter.onGenerateRoute,
       home: const AppGate(),
     );
   }

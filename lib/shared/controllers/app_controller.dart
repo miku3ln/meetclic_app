@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/di/app_providers.dart';
+import '../../domain/models/user_data_login.dart';
 import '../../domain/services/session_service.dart';
 import '../models/app_config.dart';
 
@@ -27,6 +28,7 @@ class DrawerItemDef {
 }
 
 class AppController extends ChangeNotifier {
+
   final AppConfig config;
   final SessionService session;
 
@@ -50,6 +52,8 @@ class AppController extends ChangeNotifier {
 
   // --- Helpers (solo lectura) ---
   bool get isLoggedIn => session.isLoggedIn;
+  UserDataLogin? _currentUser;
+  UserDataLogin? get currentUser => session.currentSession;
 
   /// ✅ Por defecto será FALSE (no obliga login)
   bool get shouldShowLogin =>
@@ -130,5 +134,11 @@ class AppController extends ChangeNotifier {
 
   void closeDrawerIfOpen() {
     navigatorKey.currentState?.maybePop();// si el drawer está abierto, esto lo cierra
+  }
+  void goToNamedReplacement(String routeName, {Object? arguments}) {
+    navigatorKey.currentState?.pushReplacementNamed(
+      routeName,
+      arguments: arguments,
+    );
   }
 }

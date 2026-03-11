@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../shared/controllers/app_controller.dart';
 import '../dialogs/pos_open_shift_dialog.dart';
 import '../drawers/pos_app_drawer.dart';
 import '../templates/pos_split_template.dart';
@@ -7,6 +8,7 @@ import '../templates/pos_split_template.dart';
 import 'tablet_landscape/pos_tablet_landscape_controller.dart';
 import 'tablet_landscape/pos_tablet_landscape_slots.dart';
 import 'tablet_landscape/pos_tablet_landscape_fixtures.dart';
+import 'package:provider/provider.dart';
 
 class PosTabletLandscapeLayout extends StatefulWidget {
   const PosTabletLandscapeLayout({super.key});
@@ -22,9 +24,9 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
   @override
   void initState() {
     super.initState();
-
-    controller = PosTabletLandscapeController()..addListener(_onChanged);
-
+    final app = context.read<AppController>();
+    controller = PosTabletLandscapeController(app: app)..addListener(_onChanged);
+    controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta evento del controller al Drawer
@@ -37,10 +39,9 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
       initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
       initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
       // opcional:
-      // initialSelectedProductCategoryId: 'all',
-      // initialSelectedMenuCategoryId: 'all',
+       initialSelectedProductCategoryId: 'all',
+       initialSelectedMenuCategoryId: 'all',
     );
-
   }
 
   void _onChanged() {
@@ -57,16 +58,15 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
 
   // ✅ Modal vive aquí
   Future<void> _showOpenShiftModal() async {
-    final amount = await showDialog<double>(
+    final opened = await showDialog<bool>(
       context: context,
-      barrierDismissible: false,
-      builder: (_) => const PosOpenShiftDialog(),
+      barrierDismissible: true,
+      builder: (_) => PosOpenShiftDialog(controller: controller),
     );
 
     if (!mounted) return;
-    if (amount == null) return;
+    if (opened != true) return;
 
-    await controller.shift.openShift(amount);
   }
 
   @override

@@ -47,7 +47,7 @@ class PosAppDrawer extends StatelessWidget {
                 leading: Icon(item.icon),
                 title: Text(item.title),
                 selected: drawer.selectedId == item.id,
-                onTap: () => drawer.onItemTap(item),
+                onTap: () => drawer.onItemTap(context,item),
               ),
 
             const Spacer(),

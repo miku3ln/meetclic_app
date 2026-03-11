@@ -11,6 +11,8 @@ import 'pos_tablet_landscape_controller.dart';
 
 
 class PosTabletLandscapeSlots {
+
+
   static PosLayoutSlots build({
     required PosTabletLandscapeController controller,
   }) {

@@ -16,4 +16,20 @@ class PosSettingsController extends ChangeNotifier {
     _section = value;
     notifyListeners();
   }
+
+  String get sectionTitle {
+    switch (_section) {
+      case PosSettingsSection.printers:
+        return 'Impresoras';
+
+      case PosSettingsSection.customerScreen:
+        return 'Pantalla para clientes';
+
+      case PosSettingsSection.taxes:
+        return 'Impuestos';
+
+      case PosSettingsSection.general:
+        return 'General';
+    }
+  }
 }

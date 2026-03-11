@@ -31,7 +31,6 @@ class PosLeftPanel extends StatelessWidget {
       padding:  EdgeInsets.all(paddingAll),
       child: Column(
         children: [
-          // ✅ Ocupa todo el espacio disponible y evita cálculos frágiles
           Expanded(
             child: !controller.shift.isShiftOpen
                 ? _ShiftClosedView(onOpenTap: controller.shift.onOpenShiftTap)
@@ -89,7 +88,7 @@ class _ShiftClosedView extends StatelessWidget {
               const SizedBox(height: 18),
               ElevatedButton(
                 onPressed: onOpenTap,
-                child: const Text('ABRIR EL TURNO'),
+                child: const Text('ABRIR EL TURNO OK'),
               ),
             ],
           ),

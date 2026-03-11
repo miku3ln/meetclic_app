@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../app/router/app_router.dart';
 import 'app_controller.dart';
-
+enum DrawerNavigationMode {
+  replace,
+  push,
+}
 class AppDrawerItem {
   final String id;
   final String title;
@@ -11,22 +14,25 @@ class AppDrawerItem {
 
   /// permisos simples
   final bool requireLogin;
-
+  final DrawerNavigationMode navigationMode;
   const AppDrawerItem({
     required this.id,
     required this.title,
     required this.icon,
     required this.routeName,
     this.requireLogin = false,
+    this.navigationMode = DrawerNavigationMode.replace,
   });
 }
+
 class AppDrawerController extends ChangeNotifier {
   final AppController app;
 
   AppDrawerController({required this.app});
 
   // cuál está activo
-  String _selectedId = 'home';
+  String _selectedId = 'pos';
+
   String get selectedId => _selectedId;
 
   // items (config central)
@@ -37,12 +43,14 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.point_of_sale_rounded,
       routeName: AppRoutes.pos,
       requireLogin: true, // POS solo con login (si quieres)
+      navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: 'settings',
       title: 'Settings & account',
       icon: Icons.settings,
       routeName: AppRoutes.settings,
+      navigationMode: DrawerNavigationMode.push,
     ),
   ];
 
@@ -55,23 +63,30 @@ class AppDrawerController extends ChangeNotifier {
   }
 
   /// ✅ Tap de item
-  void onItemTap(AppDrawerItem item) {
-    // permiso simple
+  void onItemTap(BuildContext context,AppDrawerItem item) {
     if (item.requireLogin && !app.isLoggedIn) {
-      // si exige login, vuelve al gate para que muestre login (si tu config es requireLogin)
-      app.goToGate();
+      Navigator.of(context).pop();
+      Future.microtask(() => app.goToGate());
       return;
     }
 
     _selectedId = item.id;
     notifyListeners();
 
-    // navega (usa navigatorKey global del AppController)
-    app.goToNamed(item.routeName);
+    Navigator.of(context).pop();
 
-    // cierra el drawer si está abierto
-    app.closeDrawerIfOpen();
+    Future.microtask(() {
+      switch (item.navigationMode) {
+        case DrawerNavigationMode.replace:
+          app.goToNamedReplacement(item.routeName);
+          break;
+        case DrawerNavigationMode.push:
+          app.goToNamed(item.routeName);
+          break;
+      }
+    });
   }
+
   void setSelected(String id) {
     _selectedId = id;
     notifyListeners();
