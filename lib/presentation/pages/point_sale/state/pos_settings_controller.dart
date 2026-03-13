@@ -8,7 +8,7 @@ enum PosSettingsSection {
 }
 
 class PosSettingsController extends ChangeNotifier {
-  PosSettingsSection _section = PosSettingsSection.customerScreen;
+  PosSettingsSection _section = PosSettingsSection.printers;
   PosSettingsSection get section => _section;
 
   void setSection(PosSettingsSection value) {

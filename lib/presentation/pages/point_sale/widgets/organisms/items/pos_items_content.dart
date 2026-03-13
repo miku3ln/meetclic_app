@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_discounts_management_section.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_modifiers_management_section.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../../../shared/pagination_response.dart';
-import '../../../state/pos_settings_controller.dart';
-import '../../sections/settings/pos_settings_customer_screen_section.dart';
-import '../../sections/settings/pos_settings_general_section.dart';
-import '../../sections/settings/pos_settings_printers_section.dart';
-import '../../sections/settings/pos_settings_taxes_section.dart';
+import '../../../state/pos_items_controller.dart';
 import 'dart:async';
-class PosSettingsContent extends StatelessWidget {
-  const PosSettingsContent({super.key});
+
+import '../../sections/items/pos_items_management_section.dart';
+class PosItemsContent extends StatelessWidget {
+  const PosItemsContent({super.key});
   @override
   Widget build(BuildContext context) {
-    final section = context.watch<PosSettingsController>().section;
+    final section = context.watch<PosItemsController>().section;
     return Container(
       color: Colors.white,
       child: Column(
@@ -22,25 +22,25 @@ class PosSettingsContent extends StatelessWidget {
       ),
     );
   }
-  Widget _buildSection(PosSettingsSection s) {
+  Widget _buildSection(PosItemsSection s) {
     switch (s) {
-      case PosSettingsSection.printers:
-        return const PosSettingsPrintersSection();
-      case PosSettingsSection.customerScreen:
-        return const PosSettingsCustomerScreenSection();
-      case PosSettingsSection.taxes:
-        return const PosSettingsTaxesSection();
-      case PosSettingsSection.general:
-        return const PosSettingsGeneralSection();
+      case PosItemsSection.items:
+        return const PosItemsManagementSection();
+      case PosItemsSection.categories:
+        return const PosCategoriesManagementSection();
+      case PosItemsSection.modifiers:
+        return const PosModifiersManagementSection();
+      case PosItemsSection.discounts:
+        return const PosDiscountsManagementSection();
     }
   }
 }
 
 
-class FakePrintersApi {
+class FakeItemsApi {
   final int total;
 
-  const FakePrintersApi({
+  const FakeItemsApi({
     required this.total,
   });
 
@@ -67,7 +67,7 @@ class FakePrintersApi {
 
       return GenericListItem<Map<String, dynamic>>(
         id: itemNumber,
-        title: 'Impresora $itemNumber',
+        title: 'Producto $itemNumber',
         subtitle: 'Estado: activa',
         description: 'Impresora de recibos y cocina #$itemNumber',
         image: null,

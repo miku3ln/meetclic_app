@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/models/sections_data.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
-import '../../../state/pos_settings_controller.dart';
-import '../../drawers/pos_app_drawer.dart';
-import '../../organisms/pos_settings_app_bar.dart';
-import '../../organisms/settings/pos_settings_content.dart';
-import '../../organisms/settings/pos_settings_menu.dart';
 
-class PosSettingsLayout extends StatelessWidget {
+import '../../../state/pos_items_controller.dart';
+import '../../drawers/pos_app_drawer.dart';
+import '../../organisms/items/pos_items_content.dart';
+import '../../organisms/items/pos_items_menu.dart';
+import '../../organisms/pos_settings_app_bar.dart';
+
+
+class PosItemsLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
 
-  const PosSettingsLayout({
+  const PosItemsLayout({
     super.key,
     this.onMenuTap,
   });
@@ -19,28 +22,28 @@ class PosSettingsLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => PosSettingsController(),
-      child: const _PosSettingsView(),
+      create: (_) => PosItemsController(),
+      child: const _PosItemsView(),
     );
   }
 }
 
-class _PosSettingsView extends StatelessWidget {
-  const _PosSettingsView();
+class _PosItemsView extends StatelessWidget {
+  const _PosItemsView();
 
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
     final scaffoldKey = GlobalKey<ScaffoldState>();
-    final sectionTitle = context.watch<PosSettingsController>().sectionTitle;
+    final sectionTitle = context.watch<PosItemsController>().sectionTitle;
 
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: colors.background,
       drawer: const PosAppDrawer(),
       appBar: PosSettingsAppBar(
-        titlePrimary: 'Configuración',
-        titleSecondary: sectionTitle,
+        titlePrimary: Sections.getTitleItems(PosItemsSection.items),
+        titleSecondary:sectionTitle,
         onMenuTap: () {
           scaffoldKey.currentState?.openDrawer();
         },
@@ -59,11 +62,11 @@ class _PosSettingsView extends StatelessWidget {
         children: [
           Expanded(
             flex: 30,
-            child: PosSettingsMenu(),
+            child: PosItemsMenu(),
           ),
           Expanded(
             flex: 70,
-            child: PosSettingsContent(),
+            child: PosItemsContent(),
           ),
         ],
       ),

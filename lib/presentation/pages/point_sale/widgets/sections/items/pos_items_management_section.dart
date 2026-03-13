@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import '../../../../../widgets/empty_data.dart';
+import '../../../models/sections_data.dart';
+import '../../../state/pos_items_controller.dart';
 
-class PosSettingsCustomerScreenSection extends StatelessWidget {
-  const PosSettingsCustomerScreenSection({super.key});
+class PosItemsManagementSection extends StatelessWidget {
+  const PosItemsManagementSection({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         EmptyData(
-          icon: Icons.desktop_windows_rounded,
-          title: 'Todavía no tienes pantallas',
-          descriptionText: 'Aquí puedes conectar tu pantalla de clientes.',
+          icon: Sections.getIconItems(PosItemsSection.items),
+          title: 'Todavía no existe productos',
+          descriptionText: 'Aquí puedes gestionar los articulos',
           linkText: 'Más información',
           onLinkTap: () {
-            debugPrint('Abrir más información de pantallas');
+            debugPrint('Abrir más información de este proceso');
           },
         ),
         Positioned(
@@ -22,7 +24,7 @@ class PosSettingsCustomerScreenSection extends StatelessWidget {
           bottom: 80,
           child: FloatingActionButton(
             onPressed: () {
-              debugPrint('Agregar impresora');
+              debugPrint('Agregar proceso');
             },
             child: const Icon(Icons.add),
           ),
