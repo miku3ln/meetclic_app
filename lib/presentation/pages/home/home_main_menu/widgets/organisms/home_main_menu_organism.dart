@@ -15,7 +15,8 @@ import 'package:meetclic_app/shared/utils/deep_link_type.dart';
 
 
 import '../../../../../../shared/controllers/app_controller.dart';
-import '../../../../../../shared/themes/app_colors.dart';
+
+import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../models/home_tab_definition.dart';
 import '../../models/home_tab_id.dart';
 import '../../services/home_deep_link_service.dart';

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
-import 'app_colors.dart';
-import 'app_text_styles.dart';
+import '../../presentation/pages/home/modals/show_register_user.dart';
+import '../theme/configuration/app_text_styles.dart';
+import '../theme/configuration/app_theme_tokens.dart';
+
+
+
 
 class AppTheme {
   static ThemeData get darkTheme {
@@ -22,7 +26,7 @@ class AppTheme {
           height: 1.3,
         ),
       ),
-      colorScheme: const ColorScheme.dark(
+      colorScheme:  ColorScheme.dark(
         primary: AppColors.azulClic,
         secondary: AppColors.amarilloVital,
         background: AppColors.grisOscuro,

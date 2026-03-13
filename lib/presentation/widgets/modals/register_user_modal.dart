@@ -5,7 +5,9 @@ import 'package:meetclic_app/presentation/widgets/atoms/date_picker_atom.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/input_text_atom.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/intro_logo.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
-import 'package:meetclic_app/shared/themes/app_spacing.dart';
+
+import '../../../shared/theme/configuration/app_spacing.dart';
+
 
 Widget buildRegisterStepperView({
   required AppLocalizations appLocalizations,

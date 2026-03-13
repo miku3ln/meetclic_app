@@ -8,7 +8,8 @@ import 'package:meetclic_app/infrastructure/repositories/implementations/busines
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 
 import '../../../presentation/widgets/template/custom_app_bar.dart';
-import '../../shared/themes/app_colors.dart';
+import '../../shared/theme/configuration/app_theme_tokens.dart';
+
 import '../widgets/home-business/gamification_business_section.dart';
 import '../widgets/home-business/home_business_section.dart';
 import '../widgets/home-business/news_business_section.dart';

@@ -3,7 +3,8 @@ import 'package:meetclic_app/shared/models/app_config.dart';
 import 'package:provider/provider.dart';
 
 import '../../../domain/entities/menu_tab_up_item.dart';
-import '../../../shared/themes/app_colors.dart';
+
+import '../../../shared/theme/configuration/app_theme_tokens.dart';
 import 'custom_app_bar/models/custom_app_bar_all_model.dart';
 
 // ===============================================

@@ -4,9 +4,10 @@ import 'package:meetclic_app/infrastructure/assets/app_images.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/input_text_atom.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/intro_logo.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
-import 'package:meetclic_app/shared/themes/app_spacing.dart';
+
 
 import '../../../domain/models/api_response_model.dart';
+import '../../../shared/theme/configuration/app_spacing.dart';
 
 /// Callback estándar: retorna bool indicando éxito del login
 typedef LoginActionCallback =

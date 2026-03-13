@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../shared/controllers/app_controller.dart';
 import '../shared/models/app_config.dart';
+import '../shared/theme/configuration/app_theme_controller.dart';
 import '../shared/themes/app_theme.dart';
 import '../shared/localization/app_localizations.dart';
 
@@ -22,6 +23,7 @@ class MeetclicMaterialApp extends StatelessWidget {
     return MaterialApp(
       title: 'Meetclic',
       theme: AppTheme.lightTheme,
+
       locale: config.locale,
       supportedLocales: const [Locale('es'), Locale('en'), Locale('it')],
       localizationsDelegates: const [

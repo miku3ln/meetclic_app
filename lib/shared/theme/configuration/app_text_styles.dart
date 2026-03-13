@@ -1,8 +1,63 @@
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
+import 'app_theme_tokens.dart';
 
-/// 🎨 Estilos tipográficos base sin color aplicado
 class AppTextStyles {
+  AppTextStyles._();
+
+  static TextStyle title(BuildContext context) {
+    final c = AppThemeTokens.of(context);
+    return TextStyle(
+      fontSize: 22,
+      fontWeight: FontWeight.w600,
+      color: c.textPrimary,
+    );
+  }
+
+  static TextStyle body(BuildContext context) {
+    final c = AppThemeTokens.of(context);
+    return TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w400,
+      color: c.textPrimary,
+    );
+  }
+
+  static TextStyle bodySecondary(BuildContext context) {
+    final c = AppThemeTokens.of(context);
+    return TextStyle(
+      fontSize: 15,
+      fontWeight: FontWeight.w400,
+      color: c.textSecondary,
+    );
+  }
+
+  static TextStyle menuItem(BuildContext context, {required bool selected}) {
+    final c = AppThemeTokens.of(context);
+    return TextStyle(
+      fontSize: 18,
+      fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+      color: selected ? c.selectedForeground : c.textPrimary,
+    );
+  }
+
+  static TextStyle button(BuildContext context) {
+    final c = AppThemeTokens.of(context);
+    return TextStyle(
+      fontSize: 16,
+      fontWeight: FontWeight.w700,
+      color: c.textPrimary,
+    );
+  }
+
+  static TextStyle badge(BuildContext context) {
+    final c = AppThemeTokens.of(context);
+    return TextStyle(
+      fontSize: 12,
+      fontWeight: FontWeight.w700,
+      color: c.badgeText,
+    );
+  }
+
   static const TextStyle bodyMedium = TextStyle(fontSize: 14.0, height: 1.4);
   static const TextStyle titleLarge = TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold, height: 1.3);
   static const TextStyle displayLarge = TextStyle(fontSize: 57.0, height: 1.12);
@@ -39,4 +94,5 @@ TextTheme generateTextTheme(Color color) {
     labelMedium: AppTextStyles.labelMedium.copyWith(color: color),
     labelSmall: AppTextStyles.labelSmall.copyWith(color: color),
   );
+
 }

@@ -3,7 +3,8 @@ import 'package:meetclic_app/domain/entities/menu_tab_up_item.dart';
 import 'package:rive/rive.dart';
 
 import '../../../presentation/widgets/template/custom_app_bar.dart';
-import '../../../shared/themes/app_colors.dart';
+
+import '../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../shared/utils/rive_util_common.dart';
 
 class VehiclesScreenPage extends StatefulWidget {

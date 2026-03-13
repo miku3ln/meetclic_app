@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:meetclic_app/shared/themes/app_colors.dart';
+
+
 
 import '../../../shared/localization/app_localizations.dart';
+import '../../../shared/theme/configuration/app_theme_tokens.dart';
 import 'models/word_item.dart';
 
 class WordTile extends StatelessWidget {

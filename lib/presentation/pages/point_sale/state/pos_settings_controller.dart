@@ -21,7 +21,6 @@ class PosSettingsController extends ChangeNotifier {
     switch (_section) {
       case PosSettingsSection.printers:
         return 'Impresoras';
-
       case PosSettingsSection.customerScreen:
         return 'Pantalla para clientes';
 

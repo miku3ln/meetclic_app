@@ -9,12 +9,11 @@ import 'package:meetclic_app/infrastructure/gamification/datasources/business_c2
 import 'package:meetclic_app/infrastructure/gamification/datasources/c2b_gamification_task_local_source.dart';
 import 'package:meetclic_app/infrastructure/gamification/repositories/gamification_task_repository_impl.dart';
 import 'package:meetclic_app/presentation/pages/services/presentation_services_all.dart';
-
 import '../../infrastructure/assets/app_images.dart';
 import '../../shared/language/language_modal_mixin.dart';
 import '../../shared/models/app_config.dart';
 import '../../shared/providers_session.dart';
-import '../../shared/themes/app_colors.dart';
+import '../../shared/theme/configuration/app_theme_tokens.dart';
 import '../widgets/template/custom_app_bar.dart';
 import 'gamification_page/models/gamification_page_all_model.dart';
 import 'gamification_page/services/gamification_business_service.dart';

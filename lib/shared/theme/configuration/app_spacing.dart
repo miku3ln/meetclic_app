@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 
+
 class AppSpacing {
-  // Espaciado general modular (por tamaños)
+  AppSpacing._();
+
   static const double xs = 4;
+  static const double sm = 8;
+  static const double md = 12;
+  static const double lg = 16;
+  static const double xl = 24;
+  static const double xxl = 32;
+
+
   static const double s = 8;
   static const double m = 16;
   static const double l = 24;
-  static const double xl = 32;
-  static const double xxl = 40;
-
   // Espaciados tipificados (orientados al uso)
 
   /// Espaciado entre campos de formulario (inputs).

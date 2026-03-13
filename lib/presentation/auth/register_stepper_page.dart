@@ -3,7 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../shared/localization/app_localizations.dart';
-import '../../shared/themes/app_spacing.dart';
+
+import '../../shared/theme/configuration/app_spacing.dart';
 import '../widgets/atoms/date_picker_atom.dart';
 import '../widgets/atoms/input_text_atom.dart';
 

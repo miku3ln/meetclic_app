@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
-class AppColors {
-  static const Color azulClic = Color(0xFF4C4CFF);
-  static const Color amarilloVital = Color(0xFFFFCC00);
-  static const Color blanco = Color(0xFFFFFFFF);
-  static const Color grisOscuro = Color(0xFF2C2C2C);
-  static const Color moradoSuave = Color(0xFF5C5CFF);
-}
+import '../../../../shared/theme/configuration/app_theme_tokens.dart';
+
 
 class AppStyles {
   static const TextStyle textFieldStyle = TextStyle(

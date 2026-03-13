@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:meetclic_app/domain/gamification/entities/c2b_gamification_task.dart';
-import 'package:meetclic_app/shared/themes/app_colors.dart';
 
+
+import '../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../models/gamification_page_all_model.dart';
 import '../utils/gamification_task_card_resolver.dart';
 

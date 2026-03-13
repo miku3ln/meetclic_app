@@ -4,7 +4,9 @@ import 'package:meetclic_app/infrastructure/assets/app_images.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/intro_logo.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/social_icon.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
-import 'package:meetclic_app/shared/themes/app_spacing.dart';
+
+import '../../../shared/theme/configuration/app_spacing.dart';
+
 
 void showManagementLoginModal(
   BuildContext context,

@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../infrastructure/assets/app_images.dart';
 import '../../../shared/models/app_config.dart';
-import '../../../shared/themes/app_colors.dart';
+
+import '../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../widgets/template/custom_app_bar.dart';
 import '../../widgets/template/custom_app_bar/models/custom_app_bar_all_model.dart';
 

@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:meetclic_app/presentation/auth/register_stepper_page.dart';
 import 'package:meetclic_app/infrastructure/assets/app_images.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
-import 'package:meetclic_app/shared/themes/app_spacing.dart';
+
 
 import 'package:meetclic_app/presentation/widgets/atoms/input_text_atom.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/intro_logo.dart';
@@ -12,6 +12,7 @@ import 'package:meetclic_app/presentation/widgets/atoms/intro_logo.dart';
 import 'package:meetclic_app/domain/services/session_service.dart';
 import 'package:meetclic_app/domain/services/fake_auth_service.dart';
 
+import '../../shared/theme/configuration/app_spacing.dart';
 import '../pages/splash_screen.dart';
 
 class LoginPage extends StatefulWidget {
