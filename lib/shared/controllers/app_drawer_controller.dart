@@ -30,7 +30,7 @@ class AppDrawerController extends ChangeNotifier {
 
   AppDrawerController({required this.app});
 
-  String _selectedId = AppRoutes.sales;
+  String _selectedId = AppRoutes.salesKey;
 
   String get selectedId => _selectedId;
 
@@ -92,33 +92,30 @@ class AppDrawerController extends ChangeNotifier {
       Future.microtask(app.goToGate);
       return;
     }
-    final routeCurrent = item.id;
-    final isAlreadySelected = _selectedId == routeCurrent;
-    if (!isAlreadySelected) {
-      final isCurrentRoute = app.currentRouteName == item.routeName;
-
-      if (item.preventReloadIfSelected &&
-          (isAlreadySelected || isCurrentRoute)) {
-        Navigator.of(context).pop();
-        return;
-      }
-      _selectedId = item.id;
-      notifyListeners();
+    final isSameSelected = _selectedId == item.id;
+    final isSameRoute = app.currentRouteName == item.routeName;
+    if (isSameSelected || isSameRoute) {
       Navigator.of(context).pop();
-      Future.microtask(() {
-        switch (item.navigationMode) {
-          case DrawerNavigationMode.replace:
-            app.goToNamedReplacement(item.routeName);
-            break;
-          case DrawerNavigationMode.push:
-            app.goToNamed(item.routeName);
-            break;
-          case DrawerNavigationMode.restoreIfExists:
-            app.restoreRouteOrPush(item.routeName);
-            break;
-        }
-      });
+      return;
     }
+    _selectedId = item.id;
+    notifyListeners();
+    Navigator.of(context).pop();
+    Future.microtask(() {
+      switch (item.navigationMode) {
+        case DrawerNavigationMode.replace:
+          app.goToNamedReplacement(item.routeName);
+          break;
+
+        case DrawerNavigationMode.push:
+          app.goToNamed(item.routeName);
+          break;
+
+        case DrawerNavigationMode.restoreIfExists:
+          app.restoreRouteOrPush(item.routeName);
+          break;
+      }
+    });
   }
 
   void setSelected(String id) {

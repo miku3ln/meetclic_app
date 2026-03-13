@@ -33,33 +33,39 @@ class _SplashScreenState extends State<SplashScreen> {
       // ✅ Decide el target (MISMO flujo que ya tienes)
       late final Widget target;
       late final String selectedMenuId; // ✅ para marcar menú activo
-
+      late final String targetRoute;
+      late bool typePoint = false;
       if (app.isLoggedIn) {
+        typePoint = true;
         switch (app.afterLoginDestination) {
           case AppAfterLoginDestination.pointSale:
+            targetRoute = AppRoutes.sales;
             target = const PointSalePage();
-            selectedMenuId = AppRoutes.salesKey; // ✅ debe coincidir con tu item id
+            selectedMenuId =
+                AppRoutes.salesKey; // ✅ debe coincidir con tu item id
             break;
 
           case AppAfterLoginDestination.home:
+            targetRoute = AppRoutes.home;
             target = HomeScreenAllMenu(modules: const []);
-            selectedMenuId =AppRoutes.home;
+            selectedMenuId = AppRoutes.home;
             break;
         }
       } else {
-        // ✅ default: tu otro proyecto / home principal
+        typePoint = false;
         target = HomeScreenAllMenu(modules: const []);
         selectedMenuId = AppRoutes.home;
       }
 
-      // ✅ setear menú activo ANTES de navegar (punto 8)
-      drawer.setSelected(selectedMenuId);
-
       if (!mounted) return;
 
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => target),
-      );
+      if (typePoint) {
+        app.goToNamedReplacement(targetRoute);
+      } else {
+        Navigator.of(
+          context,
+        ).pushReplacement(MaterialPageRoute(builder: (_) => target));
+      }
     } catch (e, st) {
       debugPrint('Error cargando datos: $e');
       debugPrint('$st');

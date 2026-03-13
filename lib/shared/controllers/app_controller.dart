@@ -162,10 +162,13 @@ class AppController extends ChangeNotifier {
     bool found = false;
 
     nav.popUntil((route) {
-      final sameRoute = route.settings.name == routeName;
+      final routeNameInStack = route.settings.name;
+      final sameRoute = routeNameInStack == routeName;
+
       if (sameRoute) {
         found = true;
       }
+
       return sameRoute || route.isFirst;
     });
 
