@@ -4,6 +4,7 @@ import '../../app/di/app_providers.dart';
 import '../../domain/models/user_data_login.dart';
 import '../../domain/services/session_service.dart';
 import '../models/app_config.dart';
+import '../../app/router/app_router.dart';
 
 /// 🔒 IMPORTANTE:
 /// - Por defecto NO obliga login (igual que tu app actual)
@@ -105,15 +106,11 @@ class AppController extends ChangeNotifier {
     if (nav == null) return;
     nav.pushNamedAndRemoveUntil('/gate', (route) => false);
   }
-  /// (opcional) helper por si quieres navegar a cualquier ruta
-  void goToNamed2(String route, {Object? arguments}) {
-    final nav = navigatorKey.currentState;
-    if (nav == null) return;
-    nav.pushNamed(route, arguments: arguments);
-  }
+
   void goToNamed(String route, {Object? arguments}) {
     final nav = navigatorKey.currentState;
     if (nav == null) return;
+    _currentRouteName = route;
     nav.pushNamed(route, arguments: arguments);
   }
   /// (Opcional) si algún día necesitas limpiar sin navegar
@@ -136,9 +133,49 @@ class AppController extends ChangeNotifier {
     navigatorKey.currentState?.maybePop();// si el drawer está abierto, esto lo cierra
   }
   void goToNamedReplacement(String routeName, {Object? arguments}) {
-    navigatorKey.currentState?.pushReplacementNamed(
-      routeName,
-      arguments: arguments,
-    );
+    final nav = navigatorKey.currentState;
+    if (nav == null) return;
+    _currentRouteName = routeName;
+    nav.pushReplacementNamed(routeName, arguments: arguments);
+  }
+  String? _currentRouteName=AppRoutes.sales;
+  String? get currentRouteName => _currentRouteName;
+  void setCurrentRoute(String routeName) {
+    _currentRouteName = routeName;
+    notifyListeners();
+  }
+  void goToNamedIfNotCurrent(String routeName, {Object? arguments}) {
+    if (_currentRouteName == routeName) return;
+    goToNamed(routeName, arguments: arguments);
+  }
+  void goToNamedReplacementIfNotCurrent(String routeName, {Object? arguments}) {
+    if (_currentRouteName == routeName) return;
+    goToNamedReplacement(routeName, arguments: arguments);
+  }
+  /// 🔥 IMPORTANTE:
+  /// Si la ruta ya existe en el stack, vuelve a esa misma instancia.
+  /// Si no existe, la abre nueva.
+  void restoreRouteOrPush(String routeName, {Object? arguments}) {
+    final nav = navigatorKey.currentState;
+    if (nav == null) return;
+
+    bool found = false;
+
+    nav.popUntil((route) {
+      final sameRoute = route.settings.name == routeName;
+      if (sameRoute) {
+        found = true;
+      }
+      return sameRoute || route.isFirst;
+    });
+
+    if (found) {
+      _currentRouteName = routeName;
+      notifyListeners();
+      return;
+    }
+
+    _currentRouteName = routeName;
+    nav.pushNamed(routeName, arguments: arguments);
   }
 }

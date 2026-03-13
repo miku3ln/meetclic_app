@@ -3,11 +3,8 @@ import 'package:provider/provider.dart';
 import '../../../../../domain/services/session_service.dart';
 import '../../../../../shared/controllers/app_controller.dart';
 import '../../../../../shared/controllers/app_drawer_controller.dart';
-
-
 class PosAppDrawer extends StatelessWidget {
   const PosAppDrawer({super.key});
-
   @override
   Widget build(BuildContext context) {
     final drawer = context.watch<AppDrawerController>();

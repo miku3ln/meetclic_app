@@ -7,6 +7,7 @@ import 'package:meetclic_app/presentation/pages/point_sale_page.dart';
 
 import '../../shared/controllers/app_controller.dart';
 import '../../shared/controllers/app_drawer_controller.dart';
+import '../../app/router/app_router.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -37,18 +38,18 @@ class _SplashScreenState extends State<SplashScreen> {
         switch (app.afterLoginDestination) {
           case AppAfterLoginDestination.pointSale:
             target = const PointSalePage();
-            selectedMenuId = 'pos'; // ✅ debe coincidir con tu item id
+            selectedMenuId = AppRoutes.salesKey; // ✅ debe coincidir con tu item id
             break;
 
           case AppAfterLoginDestination.home:
             target = HomeScreenAllMenu(modules: const []);
-            selectedMenuId = 'home';
+            selectedMenuId =AppRoutes.home;
             break;
         }
       } else {
         // ✅ default: tu otro proyecto / home principal
         target = HomeScreenAllMenu(modules: const []);
-        selectedMenuId = 'home';
+        selectedMenuId = AppRoutes.home;
       }
 
       // ✅ setear menú activo ANTES de navegar (punto 8)
