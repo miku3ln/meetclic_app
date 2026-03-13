@@ -18,8 +18,6 @@ class PosSettingsContent extends StatelessWidget {
       color: Colors.white,
       child: Column(
         children: [
-          _Header(title: _title(section)),
-          const Divider(height: 1),
           Expanded(child: _buildSection(section)),
         ],
       ),
