@@ -19,11 +19,12 @@ class MeetclicMaterialApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final config = context.watch<AppConfig>();
     final app = context.watch<AppController>();
-
+    final themeController = context.watch<AppThemeController>();
     return MaterialApp(
       title: 'Meetclic',
       theme: AppTheme.lightTheme,
-
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeController.themeMode,
       locale: config.locale,
       supportedLocales: const [Locale('es'), Locale('en'), Locale('it')],
       localizationsDelegates: const [

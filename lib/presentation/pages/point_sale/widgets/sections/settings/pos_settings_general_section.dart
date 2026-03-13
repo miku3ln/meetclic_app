@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../../../shared/theme/configuration/app_spacing.dart';
+import '../../../../../../shared/theme/configuration/app_text_styles.dart';
+import '../../../../../../shared/theme/configuration/app_theme_controller.dart';
+import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 
 class PosSettingsGeneralSection extends StatefulWidget {
   const PosSettingsGeneralSection({super.key});
@@ -11,15 +17,19 @@ class PosSettingsGeneralSection extends StatefulWidget {
 class _PosSettingsGeneralSectionState
     extends State<PosSettingsGeneralSection> {
   bool useCameraScanner = false;
-  bool darkMode = false;
 
   String itemLayout = 'Cuadrícula';
   String languageLabel = 'Usar ajustes del dispositivo';
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeTokens.of(context);
+    final themeController = context.watch<AppThemeController>();
+
+    final isDarkMode = themeController.themeMode == ThemeMode.dark;
+
     return ListView(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
       children: [
         _SettingsSwitchTile(
           title: 'Utilice la cámara para escanear códigos de barras',
@@ -32,11 +42,13 @@ class _PosSettingsGeneralSectionState
         ),
         _SettingsSwitchTile(
           title: 'Modo oscuro',
-          value: darkMode,
+          value: isDarkMode,
           onChanged: (value) {
-            setState(() {
-              darkMode = value;
-            });
+            if (value) {
+              themeController.setDark();
+            } else {
+              themeController.setLight();
+            }
           },
         ),
         _SettingsValueTile(
@@ -71,13 +83,18 @@ class _SettingsSwitchTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeTokens.of(context);
+
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: AppTextStyles.body(context).copyWith(
           fontSize: 18,
-          color: Colors.black87,
+          color: colors.textPrimary,
           fontWeight: FontWeight.w400,
         ),
       ),
@@ -102,23 +119,28 @@ class _SettingsValueTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeTokens.of(context);
+
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: AppTextStyles.body(context).copyWith(
           fontSize: 18,
-          color: Colors.black87,
+          color: colors.textPrimary,
           fontWeight: FontWeight.w400,
         ),
       ),
       subtitle: Padding(
-        padding: const EdgeInsets.only(top: 4),
+        padding: const EdgeInsets.only(top: AppSpacing.xs),
         child: Text(
           subtitle,
-          style: const TextStyle(
+          style: AppTextStyles.bodySecondary(context).copyWith(
             fontSize: 15,
-            color: Colors.black54,
+            color: colors.textSecondary,
           ),
         ),
       ),

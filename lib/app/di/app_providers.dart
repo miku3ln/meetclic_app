@@ -5,6 +5,8 @@ import '../../shared/controllers/app_drawer_controller.dart';
 import '../../shared/models/app_config.dart';
 import '../../domain/services/session_service.dart';
 import 'package:provider/single_child_widget.dart';
+
+import '../../shared/theme/configuration/app_theme_controller.dart';
 enum AppMode {
   guestHome,        // allowGuest + home
   requireLoginPos,  // requireLogin + pointSale
@@ -13,7 +15,7 @@ List<SingleChildWidget> buildAppProviders(AppMode mode) {
   return [
     ChangeNotifierProvider(create: (_) => AppConfig()),
     ChangeNotifierProvider(create: (_) => SessionService()),
-
+    ChangeNotifierProvider(create: (_) => AppThemeController()),
     ChangeNotifierProxyProvider2<AppConfig, SessionService, AppController>(
       create: (context) {
         final controller = AppController(

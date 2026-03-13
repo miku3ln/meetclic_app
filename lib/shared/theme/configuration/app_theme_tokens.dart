@@ -3,10 +3,12 @@ import 'package:flutter/material.dart';
 class AppThemeTokens {
   final Color primary;
   final Color secondary;
+  final Color accent;
 
   final Color background;
   final Color surface;
   final Color surfaceMuted;
+  final Color cardBackground;
 
   final Color textPrimary;
   final Color textSecondary;
@@ -14,124 +16,170 @@ class AppThemeTokens {
 
   final Color divider;
   final Color border;
+  final Color shadow;
+  final Color overlay;
+  final Color disabled;
 
   final Color success;
+  final Color successBackground;
   final Color warning;
+  final Color warningBackground;
   final Color error;
+  final Color errorBackground;
   final Color info;
+  final Color infoBackground;
 
   final Color badge;
   final Color badgeText;
 
   final Color selectedBackground;
   final Color selectedForeground;
+  final Color hoverBackground;
 
   final Color iconPrimary;
   final Color iconMuted;
 
   final Color buttonPrimaryBackground;
   final Color buttonPrimaryForeground;
-
   final Color buttonSecondaryBackground;
   final Color buttonSecondaryForeground;
+
+  final Color inputFill;
+  final Color link;
 
   const AppThemeTokens({
     required this.primary,
     required this.secondary,
+    required this.accent,
     required this.background,
     required this.surface,
     required this.surfaceMuted,
+    required this.cardBackground,
     required this.textPrimary,
     required this.textSecondary,
     required this.textInverse,
     required this.divider,
     required this.border,
+    required this.shadow,
+    required this.overlay,
+    required this.disabled,
     required this.success,
+    required this.successBackground,
     required this.warning,
+    required this.warningBackground,
     required this.error,
+    required this.errorBackground,
     required this.info,
+    required this.infoBackground,
     required this.badge,
     required this.badgeText,
     required this.selectedBackground,
     required this.selectedForeground,
+    required this.hoverBackground,
     required this.iconPrimary,
     required this.iconMuted,
     required this.buttonPrimaryBackground,
     required this.buttonPrimaryForeground,
     required this.buttonSecondaryBackground,
     required this.buttonSecondaryForeground,
+    required this.inputFill,
+    required this.link,
   });
 
   static const AppThemeTokens light = AppThemeTokens(
-    primary: Color(0xFF2E7D32),
-    secondary: Color(0xFF4CAF50),
+    primary: AppColors.azulClic,
+    secondary: AppColors.amarilloVital,
+    accent: AppColors.moradoSuave,
 
-    background: Color(0xFFF7F7F7),
-    surface: Color(0xFFFFFFFF),
-    surfaceMuted: Color(0xFFF1F1F1),
+    background: AppColors.backgroundLight,
+    surface: AppColors.surfaceLight,
+    surfaceMuted: AppColors.surfaceMutedLight,
+    cardBackground: AppColors.surfaceLight,
 
-    textPrimary: Color(0xFF222222),
-    textSecondary: Color(0xFF757575),
-    textInverse: Color(0xFFFFFFFF),
+    textPrimary: AppColors.textPrimaryLight,
+    textSecondary: AppColors.textSecondaryLight,
+    textInverse: AppColors.blanco,
 
-    divider: Color(0x1F000000),
-    border: Color(0x1F000000),
+    divider: AppColors.borderSoftLight,
+    border: AppColors.borderSoftLight,
+    shadow: Color(0x14000000),
+    overlay: Color(0x66000000),
+    disabled: Color(0xFFB0B3C7),
 
-    success: Color(0xFF2E7D32),
-    warning: Color(0xFFF9A825),
-    error: Color(0xFFC62828),
-    info: Color(0xFF1565C0),
+    success: AppColors.verdeSalud,
+    successBackground: AppColors.successLightBg,
+    warning: AppColors.naranjaWarning,
+    warningBackground: AppColors.warningLightBg,
+    error: AppColors.rojoMarca,
+    errorBackground: AppColors.errorLightBg,
+    info: AppColors.azulInfo,
+    infoBackground: AppColors.infoLightBg,
 
-    badge: Color(0xFFE8F5E9),
-    badgeText: Color(0xFF2E7D32),
+    badge: Color(0xFFE8EAFF),
+    badgeText: AppColors.azulClic,
 
-    selectedBackground: Color(0x14388E3C),
-    selectedForeground: Color(0xFF558B2F),
+    selectedBackground: Color(0x144C4CFF),
+    selectedForeground: AppColors.azulClic,
+    hoverBackground: Color(0x0D4C4CFF),
 
-    iconPrimary: Color(0xFF616161),
-    iconMuted: Color(0xFF9E9E9E),
+    iconPrimary: AppColors.textPrimaryLight,
+    iconMuted: AppColors.textSecondaryLight,
 
-    buttonPrimaryBackground: Color(0xFF2E7D32),
-    buttonPrimaryForeground: Color(0xFFFFFFFF),
+    buttonPrimaryBackground: AppColors.azulClic,
+    buttonPrimaryForeground: AppColors.blanco,
+    buttonSecondaryBackground: AppColors.blanco,
+    buttonSecondaryForeground: AppColors.textPrimaryLight,
 
-    buttonSecondaryBackground: Color(0xFFFFFFFF),
-    buttonSecondaryForeground: Color(0xFF222222),
+    inputFill: Color(0xFFF6F7FC),
+    link: AppColors.azulClic,
   );
 
   static const AppThemeTokens dark = AppThemeTokens(
-    primary: Color(0xFF66BB6A),
-    secondary: Color(0xFF81C784),
+    primary: AppColors.amarilloVital,
+    secondary: AppColors.azulClic,
+    accent: AppColors.moradoSuave,
 
-    background: Color(0xFF121212),
-    surface: Color(0xFF1E1E1E),
-    surfaceMuted: Color(0xFF2A2A2A),
+    background: AppColors.backgroundDark,
+    surface: AppColors.surfaceDark,
+    surfaceMuted: AppColors.surfaceMutedDark,
+    cardBackground: AppColors.surfaceDark,
 
-    textPrimary: Color(0xFFF5F5F5),
-    textSecondary: Color(0xFFBDBDBD),
-    textInverse: Color(0xFF121212),
+    textPrimary: AppColors.textPrimaryDark,
+    textSecondary: AppColors.textSecondaryDark,
+    textInverse: AppColors.grisOscuro,
 
-    divider: Color(0x33FFFFFF),
-    border: Color(0x33FFFFFF),
+    divider: AppColors.borderSoftDark,
+    border: AppColors.borderSoftDark,
+    shadow: Color(0x33000000),
+    overlay: Color(0x99000000),
+    disabled: Color(0xFF6C7088),
 
-    success: Color(0xFF66BB6A),
-    warning: Color(0xFFFFCA28),
-    error: Color(0xFFEF5350),
-    info: Color(0xFF42A5F5),
+    success: Color(0xFF5BD37A),
+    successBackground: AppColors.successDarkBg,
+    warning: Color(0xFFFFC74D),
+    warningBackground: AppColors.warningDarkBg,
+    error: Color(0xFFFF7B7B),
+    errorBackground: AppColors.errorDarkBg,
+    info: Color(0xFF6EB6FF),
+    infoBackground: AppColors.infoDarkBg,
 
-    badge: Color(0xFF1B5E20),
-    badgeText: Color(0xFFC8E6C9),
+    badge: Color(0xFF31365A),
+    badgeText: AppColors.amarilloVital,
 
-    selectedBackground: Color(0x2632CD32),
-    selectedForeground: Color(0xFFA5D6A7),
+    selectedBackground: Color(0x26FFCC00),
+    selectedForeground: AppColors.amarilloVital,
+    hoverBackground: Color(0x14FFFFFF),
 
-    iconPrimary: Color(0xFFE0E0E0),
-    iconMuted: Color(0xFF9E9E9E),
+    iconPrimary: AppColors.textPrimaryDark,
+    iconMuted: AppColors.textSecondaryDark,
 
-    buttonPrimaryBackground: Color(0xFF66BB6A),
-    buttonPrimaryForeground: Color(0xFF121212),
+    buttonPrimaryBackground: AppColors.amarilloVital,
+    buttonPrimaryForeground: AppColors.grisOscuro,
+    buttonSecondaryBackground: AppColors.surfaceDark,
+    buttonSecondaryForeground: AppColors.textPrimaryDark,
 
-    buttonSecondaryBackground: Color(0xFF1E1E1E),
-    buttonSecondaryForeground: Color(0xFFF5F5F5),
+    inputFill: Color(0xFF24283A),
+    link: AppColors.amarilloVital,
   );
 
   static AppThemeTokens of(BuildContext context) {
@@ -142,6 +190,7 @@ class AppThemeTokens {
 
 
 class AppColors {
+  AppColors._();
   // 🎯 Colores principales de marca
   static const Color azulClic = Color(0xFF4C4CFF); // Primary
   static const Color amarilloVital = Color(
@@ -187,6 +236,33 @@ class AppColors {
   static const Color textPrimaryLight = Color(0xFF2F3153); // gris azulado
   static const Color textSecondaryLight = Color(0xFF6C7088); // gris suave
   static const Color borderSoft = Color(0xFFE2E4FF); // borde sutil azulado
+  static const Color naranjaWarning = Color(0xFFFFA000);
+  static const Color azulInfo = Color(0xFF2196F3);
+
+  static const Color borderSoftLight = Color(0xFFE2E4FF);
+  static const Color backgroundLight = Color(0xFFF8F9FF);
+  static const Color surfaceLight = Color(0xFFFFFFFF);
+  static const Color surfaceMutedLight = Color(0xFFF3F4FA);
+
+  // Dark neutrals
+  static const Color textPrimaryDark = Color(0xFFF4F5FF);
+  static const Color textSecondaryDark = Color(0xFFB6B9D1);
+  static const Color borderSoftDark = Color(0xFF35385A);
+  static const Color backgroundDark = Color(0xFF12131C);
+  static const Color surfaceDark = Color(0xFF1C1E2B);
+  static const Color surfaceMutedDark = Color(0xFF262938);
+
+  // Estados derivados
+  static const Color successLightBg = Color(0xFFE8F5E9);
+  static const Color warningLightBg = Color(0xFFFFF8E1);
+  static const Color errorLightBg = Color(0xFFFFEBEE);
+  static const Color infoLightBg = Color(0xFFE3F2FD);
+
+  static const Color successDarkBg = Color(0xFF12351C);
+  static const Color warningDarkBg = Color(0xFF3A2C00);
+  static const Color errorDarkBg = Color(0xFF3B1212);
+  static const Color infoDarkBg = Color(0xFF102A43);
+
   // 🌈 Fondo degradado institucional
   static const Gradient fondoGradiente = LinearGradient(
     begin: Alignment.topLeft,
