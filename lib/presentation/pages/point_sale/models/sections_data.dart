@@ -25,9 +25,9 @@ class Sections {
   static IconData getIconItems(PosItemsSection type) {
     switch (type) {
       case PosItemsSection.items:
-        return Icons.menu;
+        return  Icons.format_list_bulleted;
       case PosItemsSection.categories:
-        return Icons.crop_square_rounded;
+        return Icons.copy_rounded;
 
       case PosItemsSection.modifiers:
         return Icons.note_alt_outlined;
