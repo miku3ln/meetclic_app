@@ -4,6 +4,7 @@ import 'package:meetclic_app/presentation/pages/point_sale/widgets/organisms/ite
 import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/receipts/pos_receipts_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/settings/pos_settings_layout.dart';
+import '../../presentation/pages/point_sale/widgets/layouts/shift/pos_shift_layout.dart';
 import '../../presentation/pages/point_sale_page.dart';
 import '../app_gate.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +67,7 @@ class AppRouter {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) =>
-              const Scaffold(body: Center(child: Text('Shift Page'))),
+          PosShiftManagementLayout(),
         );
       case AppRoutes.items:
         return MaterialPageRoute(
