@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/items/pos_items_layout.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/organisms/items/pos_items_content.dart';
 import '../../presentation/pages/home/home_page.dart';
+import '../../presentation/pages/point_sale/widgets/layouts/receipts/pos_receipts_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/settings/pos_settings_layout.dart';
 import '../../presentation/pages/point_sale_page.dart';
 import '../app_gate.dart';
@@ -58,8 +59,7 @@ class AppRouter {
       case AppRoutes.receipts:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) =>
-              const Scaffold(body: Center(child: Text('Receipts Page'))),
+          builder: (_) => PosReceiptsLayout(),
         );
 
       case AppRoutes.shift:
@@ -71,8 +71,7 @@ class AppRouter {
       case AppRoutes.items:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) =>
-          PosItemsLayout(),
+          builder: (_) => PosItemsLayout(),
         );
       default:
         return MaterialPageRoute(
