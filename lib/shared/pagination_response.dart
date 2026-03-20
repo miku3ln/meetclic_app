@@ -18,6 +18,8 @@ class GenericListItem<T> {
   final String description;
   final String? image;
   final T? data;
+  final String? businessId;
+  final int? countData;
 
   const GenericListItem({
     required this.id,
@@ -26,5 +28,8 @@ class GenericListItem<T> {
     required this.description,
     this.image,
     this.data,
+    this.businessId,
+    this.countData,
+
   });
 }

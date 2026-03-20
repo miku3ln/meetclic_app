@@ -1,4 +1,5 @@
 typedef Validator<T> = String? Function(T value);
+enum CrudType { create, update }
 class ValidationResult {
   final bool success;
   final Map<String, String?> errors;

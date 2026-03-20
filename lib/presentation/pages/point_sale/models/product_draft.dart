@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import '../../../../shared/pagination_response.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 import 'product_category.dart';
 import 'product_subcategory.dart';
@@ -77,6 +78,33 @@ class ProductMapper {
       sellType: SellType.unit,
 
       image: null,
+    );
+  }
+}
+
+
+
+
+class ProductCategoryDraft {
+  final String name;
+
+
+  final String? image;
+
+  ProductCategoryDraft({
+    required this.name,
+    required this.image,
+  });
+}
+class ProductCategoryMapper {
+  ProductCategoryMapper._();
+
+  static ProductCategoryDraft fromMap( GenericListItem<Map<String, dynamic>>item) {
+    final m = item ;
+
+    return ProductCategoryDraft(
+      name: m.title.toString() ?? '',
+      image:  m.image?.toString() ?? '',
     );
   }
 }

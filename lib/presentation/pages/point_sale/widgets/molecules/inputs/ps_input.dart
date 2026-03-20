@@ -13,6 +13,7 @@ class PsInput extends StatefulWidget {
   final bool isTouched;
   final bool isValid;
 
+  final bool selectAllOnFocus;
   const PsInput({
     super.key,
     required this.label,
@@ -23,6 +24,7 @@ class PsInput extends StatefulWidget {
     this.requiredField = false,
     this.isTouched = false,
     this.isValid = false,
+    this.selectAllOnFocus = true, // 👈 nuevo
   });
 
   @override
@@ -31,10 +33,26 @@ class PsInput extends StatefulWidget {
 
 class _PsInputState extends State<PsInput> {
   late TextEditingController _controller;
-
+  late FocusNode _focusNode;
   @override
   void initState() {
+
+
     _controller = TextEditingController(text: widget.value ?? "");
+
+    _focusNode =  FocusNode();
+
+    _focusNode.addListener(() {
+      if (_focusNode.hasFocus && widget.selectAllOnFocus) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _controller.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _controller.text.length,
+          );
+        });
+      }
+    });
+
     super.initState();
   }
 
@@ -43,9 +61,15 @@ class _PsInputState extends State<PsInput> {
     if (oldWidget.value != widget.value) {
       _controller.text = widget.value ?? "";
     }
+
     super.didUpdateWidget(oldWidget);
   }
+  @override
+  void dispose() {
 
+    _controller.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     final c = AppThemeTokens.of(context);
@@ -86,6 +110,7 @@ class _PsInputState extends State<PsInput> {
         AppSpacing.spaceBetweenInputs,
 
         TextField(
+          focusNode: _focusNode, // 👈 clave
           controller: _controller,
           onChanged: widget.onChanged,
           keyboardType: widget.keyboardType,

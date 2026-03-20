@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section.dart';
+
 
 import '../../../../shared/utils/validators/validators.dart';
 import '../models/product_category.dart';
@@ -474,6 +474,200 @@ class ProductModalController extends ChangeNotifier {
     codeBarError = null;
     categoryError = null;
     subcategoryError = null;
+    imageError = null;
+  }
+}
+class CategoriaModalController extends ChangeNotifier {
+  /// =========================
+  /// 🧾 DATA
+  /// =========================
+  String name = "";
+
+
+
+  /// =========================
+  /// 👆 TOUCHED
+  /// =========================
+  bool nameTouched = false;
+
+  bool imageTouched = false;
+
+  /// =========================
+  /// ⚠️ ERRORS
+  /// =========================
+  String? nameError;
+  String? imageError;
+
+
+
+  /// =========================
+  /// 🖼 IMAGE
+  /// =========================
+  File? image;
+
+  /// =========================
+  /// 🧠 INIT
+  /// =========================
+  Future<void> init() async {
+
+    notifyListeners();
+  }
+
+  /// =========================
+  /// ✍️ SETTERS
+  /// =========================
+
+  void setName(String value) {
+    name = value;
+    nameTouched = true;
+
+    nameError = ValidatorsUtil.validate(value, [
+      ValidatorsUtil.required("Nombre"),
+      ValidatorsUtil.minLength(3),
+    ]);
+
+    notifyListeners();
+  }
+
+  void setImage(File file) {
+    image = file;
+    imageTouched = true;
+    imageError = null;
+    notifyListeners();
+  }
+
+  void removeImage() {
+    image = null;
+    imageTouched = true;
+    imageError = "Imagen requerida";
+    notifyListeners();
+  }
+
+  /// =========================
+  /// ✅ VALIDATE ALL
+  /// =========================
+  bool submitted = false;
+
+  ValidationResult validate() {
+    submitted = true;
+
+    /// =========================
+    /// 🧠 NORMALIZADOR (FIX NULL)
+    /// =========================
+    String normalize(num? value) => value == null ? "" : value.toString();
+
+    /// =========================
+    /// 📦 MAP DE ERRORES
+    /// =========================
+    final errors = <String, String?>{
+      /// TEXTOS
+      'name': ValidatorsUtil.validate(name, [
+        ValidatorsUtil.required("Nombre"),
+      ]),
+      'image': image == null ? "Imagen requerida" : null,
+    };
+
+    /// =========================
+    /// 🔥 ASIGNAR A VARIABLES (CLAVE)
+    /// =========================
+    nameError = errors['name'];
+    imageError = errors['image'];
+
+
+    /// =========================
+    /// ✅ RESULTADO FINAL
+    /// =========================
+    final hasErrors = errors.values.any((e) => e != null);
+    notifyListeners();
+    return ValidationResult(
+      success: !hasErrors,
+      errors: errors,
+      message: hasErrors
+          ? "Formulario inválido, revisa los campos"
+          : "Formulario válido",
+    );
+  }
+
+  CrudType mode = CrudType.create;
+
+  /// =========================
+  /// 🧠 FORM STATE
+  /// =========================
+  bool get canSubmit {
+    if (mode == CrudType.update) {
+      return validate().success;
+    }
+
+    return isFormValid &&
+        nameTouched &&
+        imageTouched ;
+  }
+
+  bool get isFormValid {
+    return [
+      nameError,
+      imageError,
+    ].every((e) => e == null);
+  }
+
+  void loadAndValidate(ProductCategoryDraft draft) {
+    load(draft);
+  }
+
+  void load(ProductCategoryDraft draft) async {
+    mode = CrudType.update;
+    /// =========================
+    /// 🧾 DATA
+    /// =========================
+    name = draft.name;
+
+    image = draft.image as File?;
+
+
+    /// =========================
+    /// ⚠️ RESET TOUCH
+    /// =========================
+    nameTouched = false;
+
+    imageTouched = false;
+
+
+    /// =========================
+    /// ❌ RESET ERRORES
+    /// =========================
+    nameError = null;
+
+    imageError = null;
+
+    validate();
+    notifyListeners();
+  }
+
+  /// =========================
+  /// 💾 SAVE
+  /// =========================
+
+  ProductCategoryDraft save(CrudType type) {
+    if (!validate().success) {
+      throw Exception("Formulario inválido");
+    }
+
+    return ProductCategoryDraft(
+      name: name,
+      image: ""
+    );
+  }
+
+  void _resetTouched() {
+    nameTouched = false;
+
+    imageTouched = false;
+
+  }
+
+  void _resetErrors() {
+    nameError = null;
+
     imageError = null;
   }
 }

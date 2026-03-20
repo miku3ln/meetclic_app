@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
+import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../widgets/empty_data.dart';
 
 import '../../../models/product_draft.dart';
@@ -270,7 +271,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 }
 
-enum CrudType { create, update }
 
 Future<void> showProductModal({
   required BuildContext context,
