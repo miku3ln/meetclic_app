@@ -9,12 +9,17 @@ class PsModalLayout extends StatelessWidget {
   final String title;
   final Widget body;
   final VoidCallback?  onSave;
+  final String btnCancelTitle;
+  final String btnSaveTitle;
 
   const PsModalLayout({
     super.key,
     required this.title,
     required this.body,
     required this.onSave,
+    required this.btnCancelTitle,
+    required this.btnSaveTitle,
+
   });
 
   @override
@@ -52,7 +57,7 @@ class PsModalLayout extends StatelessWidget {
               children: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text("Cancelar"),
+                  child:  Text(btnCancelTitle),
                 ),
                 const SizedBox(width: AppSpacing.s),
                 ElevatedButton(
@@ -61,7 +66,7 @@ class PsModalLayout extends StatelessWidget {
                     backgroundColor:
                     onSave == null ? c.disabled : c.secondary,
                   ),
-                  child: const Text("Guardar"),
+                  child:  Text(btnSaveTitle),
                 )
               ],
             )

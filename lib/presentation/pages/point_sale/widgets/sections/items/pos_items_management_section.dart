@@ -4,6 +4,7 @@ import '../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../widgets/empty_data.dart';
 
+import '../../../models/product_draft.dart';
 import '../../../models/sections_data.dart';
 import '../../../state/pos_items_controller.dart';
 import '../../../state/product_modal_controller.dart';
@@ -125,23 +126,24 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     }
   }
 
-  void _onTapItem(GenericListItem<Map<String, dynamic>> item) {
-    showDialog(
+  void _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
+    if (item.data == null) {
+      /// puedes manejar error o simplemente salir
+      return;
+    }
+
+    final controller = ProductModalController();
+    await controller.init();
+    final draft = ProductMapper.fromMap(item.data!);
+    controller.loadAndValidate(draft);
+    await showProductModal(
       context: context,
-      builder: (_) => AlertDialog(
-        title: Text(item.title),
-        content: Text(
-          'ID: ${item.id}\n'
-          'Subtitle: ${item.subtitle}\n'
-          'Description: ${item.description}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
+      btnSaveTitle: "Actualizar",
+      btnCancelTitle: "Cancelar",
+      barrierDismissible: false,
+      controller: controller,
+      title: "Actualizar Producto",
+      type: CrudType.update,
     );
   }
 
@@ -180,207 +182,14 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
             onPressed: () async {
               final controller = ProductModalController();
               await controller.init();
-              await showDialog(
+              showProductModal(
+                barrierDismissible: false,
                 context: context,
-                builder: (_) => AnimatedBuilder(
-                  animation: controller,
-                  builder: (_, __) {
-                    return PsModalLayout(
-                      title: "Producto",
-                      onSave: controller.canSubmit
-                          ? () {
-                        if (controller.validate()) {
-                          final product = controller.save();
-                          Navigator.pop(context);
-                        }
-                      }
-                          : null,
-
-                      body: Column(
-                        children: [
-                          /// =========================
-                          /// 📦 INFORMACIÓN
-                          /// =========================
-                          PsSectionCard(
-                            title: "Información",
-                            child: Column(
-                              children: [
-                                PsFieldRow(
-                                  children: [
-                                    /// 🔥 NOMBRE
-                                    PsInput(
-                                      label: "Nombre",
-                                      requiredField: true,
-                                      onChanged: controller.setName,
-                                      error: controller.nameError,
-                                      isTouched: controller.nameTouched,
-                                      isValid:
-                                          controller.nameError == null &&
-                                          controller.name.isNotEmpty,
-                                    ),
-                                    Center(
-                                      child: PsImagePicker(
-                                        image: controller.image,
-                                        error: controller.imageError,
-                                        onPick: () async {
-                                          final mediaService =
-                                              MediaPickerService();
-                                          final file =
-                                              await showImageSourceSelector(
-                                                context,
-                                                mediaService.pickFromCamera,
-                                                mediaService.pickFromGallery,
-                                              );
-
-                                          if (file != null) {
-                                            controller.setImage(file);
-                                          }
-                                        },
-                                        onRemove: controller.removeImage,
-                                        requiredField: true,
-                                        isTouched: controller.imageTouched,
-                                        isValid: controller.image != null,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-
-                                AppSpacing.spaceBetweenInputs,
-
-                                PsFieldRow(
-                                  children: [
-                                    /// 🔥 CATEGORÍA
-                                    PsDropdown(
-                                      label: "Categoría",
-                                      items: controller.categories,
-                                      value: controller.selectedCategory,
-                                      getLabel: (e) => e.value,
-                                      onChanged: controller.selectCategory,
-                                      error: controller.categoryError,
-                                      requiredField: true,
-                                      isTouched: controller.categoryTouched,
-                                      isValid:
-                                          controller.selectedCategory != null,
-                                    ),
-
-                                    /// 🔥 SUBCATEGORÍA
-                                    PsDropdown(
-                                      label: "Subcategoría",
-                                      items: controller.subcategories,
-                                      value: controller.selectedSubcategory,
-                                      getLabel: (e) => e.value,
-                                      onChanged: controller.selectSubcategory,
-                                      error: controller.subcategoryError,
-                                      requiredField: true,
-                                      isTouched: controller.subcategoryTouched,
-                                      isValid:
-                                          controller.selectedSubcategory !=
-                                          null,
-                                    ),
-                                  ],
-                                ),
-
-                                AppSpacing.spaceBetweenInputs,
-                                PsFieldRow(
-                                  children: [
-                                    PsInput(
-                                      requiredField: true,
-                                      label: "REF",
-                                      keyboardType: TextInputType.text,
-                                      onChanged: controller.setRef,
-                                      error: controller.refError,
-                                      isTouched: controller.refTouched,
-                                      isValid:
-                                      controller.refError == null ,
-                                    ),
-                                    PsInput(
-                                      requiredField: true,
-                                      label: "Codigo de Barras",
-                                      keyboardType: TextInputType.text,
-                                      onChanged: controller.setCodeBar,
-                                      error: controller.codeBarError,
-                                      isTouched: controller.codeBarTouched,
-                                      isValid:
-                                      controller.codeBarError == null ,
-                                    ),
-                                  ],
-                                ),
-                                /// 🔥 NUEVO COMPONENTE
-                                PsSellTypeSelector(
-                                  value: controller.sellType,
-                                  onChanged: controller.setSellType,
-                                ),
-                                AppSpacing.spaceBetweenInputs,
-                                /// 🔥 PRECIO + COSTE
-                                PsFieldRow(
-                                  children: [
-                                    PsInput(
-                                      requiredField: true,
-                                      label: "Precio",
-                                      keyboardType: TextInputType.number,
-                                      onChanged: controller.setPrice,
-                                      error: controller.priceError,
-                                      isTouched: controller.priceTouched,
-                                      isValid:
-                                      controller.priceError == null ,
-                                    ),
-                                    PsInput(
-                                      requiredField: true,
-                                      label: "Coste",
-                                      keyboardType: TextInputType.number,
-                                      onChanged: controller.setCost,
-                                      error: controller.costError,
-                                      isTouched: controller.costTouched,
-                                      isValid:
-                                      controller.costError == null ,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          AppSpacing.spaceBetweenSections,
-
-                          /// =========================
-                          /// 📦 INVENTARIO
-                          /// =========================
-                          PsSectionCard(
-                            title: "Inventario",
-                            child: Column(
-                              children: [
-                                PsFieldRow(
-                                  children: [
-                                    PsInput(
-                                      requiredField: true,
-                                      label: "Stock",
-                                      keyboardType: TextInputType.number,
-                                      onChanged: controller.setStock,
-                                      isTouched: controller.stockTouched,
-                                      error: controller.stockError,
-
-                                      isValid:
-                                      controller.stockError == null ,
-                                    ),
-                                    PsInput(
-                                      requiredField: true,
-                                      label: "Stock mínimo",
-                                      keyboardType: TextInputType.number,
-                                      onChanged: controller.setLowStock,
-                                      error: controller.lowStockError,
-                                      isTouched: controller.lowStockTouched,
-                                      isValid:
-                                      controller.lowStockError == null ,
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                controller: controller,
+                btnSaveTitle: "Guardar",
+                btnCancelTitle: "Cancelar",
+                title: "Crear Producto",
+                type: CrudType.create,
               );
             },
             child: const Icon(Icons.add),
@@ -459,4 +268,234 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       ),
     );
   }
+}
+
+enum CrudType { create, update }
+
+Future<void> showProductModal({
+  required BuildContext context,
+  required ProductModalController controller,
+  required String title,
+  required String btnCancelTitle,
+  required String btnSaveTitle,
+
+  CrudType type = CrudType.update,
+  required bool barrierDismissible
+}) async {
+  await showDialog(
+    barrierDismissible: barrierDismissible,
+    context: context,
+    builder: (_) => AnimatedBuilder(
+      animation: controller,
+      builder: (_, __) {
+        return PsModalLayout(
+          title: title,
+          btnCancelTitle: btnCancelTitle,
+          btnSaveTitle: btnSaveTitle,
+          onSave: controller.canSubmit
+              ? () {
+                  if (controller.validate().success) {
+                    final product = controller.save(type);
+
+                    Navigator.pop(context);
+                  }
+                }
+              : null,
+          body: _buildProductBody(context, controller, type, title),
+        );
+      },
+    ),
+  );
+}
+
+Widget _buildProductBody(
+  BuildContext context,
+  ProductModalController controller,
+  CrudType type,
+  String title,
+) {
+  return Column(
+    children: [
+      /// =========================
+      /// 📦 INFORMACIÓN
+      /// =========================
+      PsSectionCard(
+        title: "Información",
+        child: Column(
+          children: [
+            PsFieldRow(
+              children: [
+                /// 🔥 NOMBRE
+                PsInput(
+                  label: "Nombre",
+                  requiredField: true,
+                  value: controller.name,
+                  onChanged: controller.setName,
+                  error: controller.nameError,
+                  isTouched: controller.nameTouched,
+                  isValid:
+                      controller.nameError == null &&
+                      controller.name.isNotEmpty,
+                ),
+                Center(
+                  child: PsImagePicker(
+                    image: controller.image,
+                    error: controller.imageError,
+                    onPick: () async {
+                      final mediaService = MediaPickerService();
+                      final file = await showImageSourceSelector(
+                        context,
+                        mediaService.pickFromCamera,
+                        mediaService.pickFromGallery,
+                      );
+
+                      if (file != null) {
+                        controller.setImage(file);
+                      }
+                    },
+                    onRemove: controller.removeImage,
+                    requiredField: true,
+                    isTouched: controller.imageTouched,
+                    isValid: controller.image != null,
+                  ),
+                ),
+              ],
+            ),
+
+            AppSpacing.spaceBetweenInputs,
+
+            PsFieldRow(
+              children: [
+                /// 🔥 CATEGORÍA
+                PsDropdown(
+                  label: "Categoría",
+                  items: controller.categories,
+                  value: controller.selectedCategory,
+                  getLabel: (e) => e.value,
+                  onChanged: controller.selectCategory,
+                  error: controller.categoryError,
+                  requiredField: true,
+                  isTouched: controller.categoryTouched,
+                  isValid: controller.selectedCategory != null,
+                ),
+
+                /// 🔥 SUBCATEGORÍA
+                PsDropdown(
+                  label: "Subcategoría",
+                  items: controller.subcategories,
+                  value: controller.selectedSubcategory,
+                  getLabel: (e) => e.value,
+                  onChanged: controller.selectSubcategory,
+                  error: controller.subcategoryError,
+                  requiredField: true,
+                  isTouched: controller.subcategoryTouched,
+                  isValid: controller.selectedSubcategory != null,
+                ),
+              ],
+            ),
+
+            AppSpacing.spaceBetweenInputs,
+            PsFieldRow(
+              children: [
+                PsInput(
+                  requiredField: true,
+                  label: "REF",
+                  value: controller.ref,
+                  keyboardType: TextInputType.text,
+                  onChanged: controller.setRef,
+                  error: controller.refError,
+                  isTouched: controller.refTouched,
+                  isValid: controller.refError == null,
+                ),
+                PsInput(
+                  requiredField: true,
+                  label: "Codigo de Barras",
+                  value: controller.codeBar,
+
+                  keyboardType: TextInputType.text,
+                  onChanged: controller.setCodeBar,
+                  error: controller.codeBarError,
+                  isTouched: controller.codeBarTouched,
+                  isValid: controller.codeBarError == null,
+                ),
+              ],
+            ),
+
+            /// 🔥 NUEVO COMPONENTE
+            PsSellTypeSelector(
+              value: controller.sellType,
+              onChanged: controller.setSellType,
+            ),
+            AppSpacing.spaceBetweenInputs,
+
+            /// 🔥 PRECIO + COSTE
+            PsFieldRow(
+              children: [
+                PsInput(
+                  value: controller.price.toString(),
+                  requiredField: true,
+                  label: "Precio",
+                  keyboardType: TextInputType.number,
+                  onChanged: controller.setPrice,
+                  error: controller.priceError,
+                  isTouched: controller.priceTouched,
+                  isValid: controller.priceError == null,
+                ),
+                PsInput(
+                  requiredField: true,
+                  value: controller.cost.toString(),
+
+                  label: "Coste",
+                  keyboardType: TextInputType.number,
+                  onChanged: controller.setCost,
+                  error: controller.costError,
+                  isTouched: controller.costTouched,
+                  isValid: controller.costError == null,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      AppSpacing.spaceBetweenSections,
+
+      /// =========================
+      /// 📦 INVENTARIO
+      /// =========================
+      PsSectionCard(
+        title: "Inventario",
+        child: Column(
+          children: [
+            PsFieldRow(
+              children: [
+                PsInput(
+                  requiredField: true,
+                  value: controller.stock.toString(),
+
+                  label: "Stock",
+                  keyboardType: TextInputType.number,
+                  onChanged: controller.setStock,
+                  isTouched: controller.stockTouched,
+                  error: controller.stockError,
+
+                  isValid: controller.stockError == null,
+                ),
+                PsInput(
+                  value: controller.lowStock.toString(),
+
+                  requiredField: true,
+                  label: "Stock mínimo",
+                  keyboardType: TextInputType.number,
+                  onChanged: controller.setLowStock,
+                  error: controller.lowStockError,
+                  isTouched: controller.lowStockTouched,
+                  isValid: controller.lowStockError == null,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ],
+  );
 }

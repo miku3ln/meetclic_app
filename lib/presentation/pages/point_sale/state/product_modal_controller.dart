@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section.dart';
 
 import '../../../../shared/utils/validators/validators.dart';
 import '../models/product_category.dart';
@@ -13,10 +14,10 @@ class ProductModalController extends ChangeNotifier {
   /// 🧾 DATA
   /// =========================
   String name = "";
-  double? price;
-  double? cost;
-  double? stock;
-  double? lowStock;
+  double? price = 0;
+  double? cost = 0;
+  double? stock = 0;
+  double? lowStock = 0;
 
   String? ref;
   String? codeBar;
@@ -91,8 +92,7 @@ class ProductModalController extends ChangeNotifier {
 
   void setPrice(String value) {
     priceTouched = true;
-    price = double.tryParse(value);
-
+    price == null ? "" : double.tryParse(value);
     priceError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Precio"),
       ValidatorsUtil.number(),
@@ -104,7 +104,7 @@ class ProductModalController extends ChangeNotifier {
 
   void setCost(String value) {
     costTouched = true;
-    cost = double.tryParse(value);
+    cost == null ? "" : double.tryParse(value);
 
     costError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Coste"),
@@ -117,7 +117,8 @@ class ProductModalController extends ChangeNotifier {
 
   void setStock(String value) {
     stockTouched = true;
-    stock = double.tryParse(value);
+
+    stock == null ? "" : double.tryParse(value);
 
     stockError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Stock"),
@@ -130,7 +131,8 @@ class ProductModalController extends ChangeNotifier {
 
   void setLowStock(String value) {
     lowStockTouched = true;
-    lowStock = double.tryParse(value);
+
+    lowStock == null ? "" : double.tryParse(value);
 
     lowStockError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Stock mínimo"),
@@ -221,64 +223,108 @@ class ProductModalController extends ChangeNotifier {
   /// ✅ VALIDATE ALL
   /// =========================
   bool submitted = false;
-  bool validate() {
+
+  ValidationResult validate() {
     submitted = true;
 
-    nameError = ValidatorsUtil.validate(name, [
-      ValidatorsUtil.required("Nombre"),
-    ]);
+    /// =========================
+    /// 🧠 NORMALIZADOR (FIX NULL)
+    /// =========================
+    String normalize(num? value) => value == null ? "" : value.toString();
 
-    priceError = ValidatorsUtil.validate(price?.toString(), [
-      ValidatorsUtil.required("Precio"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.positive(),
-    ]);
+    /// =========================
+    /// 📦 MAP DE ERRORES
+    /// =========================
+    final errors = <String, String?>{
+      /// TEXTOS
+      'name': ValidatorsUtil.validate(name, [
+        ValidatorsUtil.required("Nombre"),
+      ]),
 
-    costError = ValidatorsUtil.validate(cost?.toString(), [
-      ValidatorsUtil.required("Coste"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.nonNegative(),
-    ]);
+      'ref': ValidatorsUtil.validate(ref, [
+        ValidatorsUtil.required("REF"),
+        ValidatorsUtil.alphanumeric(),
+      ]),
 
-    stockError = ValidatorsUtil.validate(stock?.toString(), [
-      ValidatorsUtil.required("Stock"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.nonNegative(),
-    ]);
+      'codeBar': ValidatorsUtil.validate(codeBar, [
+        ValidatorsUtil.required("Código"),
+        ValidatorsUtil.alphanumeric(),
+      ]),
 
-    lowStockError = ValidatorsUtil.validate(lowStock?.toString(), [
-      ValidatorsUtil.required("Stock mínimo"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.nonNegative(),
-    ]);
+      /// NUMÉRICOS
+      'price': ValidatorsUtil.validate(normalize(price), [
+        ValidatorsUtil.required("Precio"),
+        ValidatorsUtil.number(),
+        ValidatorsUtil.positive(),
+      ]),
 
-    refError = ValidatorsUtil.validate(ref, [
-      ValidatorsUtil.required("REF"),
-      ValidatorsUtil.alphanumeric(),
-    ]);
+      'cost': ValidatorsUtil.validate(normalize(cost), [
+        ValidatorsUtil.required("Coste"),
+        ValidatorsUtil.number(),
+        ValidatorsUtil.nonNegative(),
+      ]),
 
-    codeBarError = ValidatorsUtil.validate(codeBar, [
-      ValidatorsUtil.required("Código"),
-      ValidatorsUtil.alphanumeric(),
-    ]);
+      'stock': ValidatorsUtil.validate(normalize(stock), [
+        ValidatorsUtil.required("Stock"),
+        ValidatorsUtil.number(),
+        ValidatorsUtil.nonNegative(),
+      ]),
 
-    categoryError =
-    selectedCategory == null ? "Selecciona una categoría" : null;
+      'lowStock': ValidatorsUtil.validate(normalize(lowStock), [
+        ValidatorsUtil.required("Stock mínimo"),
+        ValidatorsUtil.number(),
+        ValidatorsUtil.nonNegative(),
+      ]),
 
-    subcategoryError =
-    selectedSubcategory == null ? "Selecciona una subcategoría" : null;
+      /// RELACIONES
+      'category': selectedCategory == null ? "Selecciona una categoría" : null,
 
-    imageError = image == null ? "Imagen requerida" : null;
+      'subcategory': selectedSubcategory == null
+          ? "Selecciona una subcategoría"
+          : null,
 
+      'image': image == null ? "Imagen requerida" : null,
+    };
+
+    /// =========================
+    /// 🔥 ASIGNAR A VARIABLES (CLAVE)
+    /// =========================
+    nameError = errors['name'];
+    priceError = errors['price'];
+    costError = errors['cost'];
+    stockError = errors['stock'];
+    lowStockError = errors['lowStock'];
+    refError = errors['ref'];
+    codeBarError = errors['codeBar'];
+    categoryError = errors['category'];
+    subcategoryError = errors['subcategory'];
+    imageError = errors['image'];
+
+
+    /// =========================
+    /// ✅ RESULTADO FINAL
+    /// =========================
+    final hasErrors = errors.values.any((e) => e != null);
     notifyListeners();
-
-    return isFormValid;
+    return ValidationResult(
+      success: !hasErrors,
+      errors: errors,
+      message: hasErrors
+          ? "Formulario inválido, revisa los campos"
+          : "Formulario válido",
+    );
   }
+
+  CrudType mode = CrudType.create;
 
   /// =========================
   /// 🧠 FORM STATE
   /// =========================
   bool get canSubmit {
+    if (mode == CrudType.update) {
+      return validate().success;
+    }
+
     return isFormValid &&
         nameTouched &&
         priceTouched &&
@@ -291,9 +337,8 @@ class ProductModalController extends ChangeNotifier {
         categoryTouched &&
         subcategoryTouched;
   }
+
   bool get isFormValid {
-
-
     return [
       nameError,
       priceError,
@@ -315,12 +360,79 @@ class ProductModalController extends ChangeNotifier {
     notifyListeners();
   }
 
+  void loadAndValidate(ProductDraft draft) {
+    load(draft);
+  }
+
+  void load(ProductDraft draft) async {
+    mode = CrudType.update;
+    /// =========================
+    /// 🧾 DATA
+    /// =========================
+    name = draft.name;
+    price = draft.price;
+    cost = draft.cost;
+    stock = draft.stock;
+    lowStock = draft.lowStock;
+
+    ref = draft.code;
+    codeBar = draft.barcode;
+
+    if (draft.category.id > 0) {
+      selectedCategory = categories.firstWhere(
+        (c) => c.id == draft.category.id,
+        orElse: () => ProductCategory.empty(),
+      );
+      subcategories = await _service.getSubcategories(selectedCategory!.id);
+      if (draft.subcategory.id > 0) {
+        selectedSubcategory = subcategories.firstWhere(
+          (s) => s.id == draft.subcategory.id,
+          orElse: () => ProductSubcategory.empty(),
+        );
+      }
+    }
+
+    image = draft.image;
+    sellType = draft.sellType;
+
+    /// =========================
+    /// ⚠️ RESET TOUCH
+    /// =========================
+    nameTouched = false;
+    priceTouched = false;
+    costTouched = false;
+    stockTouched = false;
+    lowStockTouched = false;
+    refTouched = false;
+    codeBarTouched = false;
+    imageTouched = false;
+    categoryTouched = false;
+    subcategoryTouched = false;
+
+    /// =========================
+    /// ❌ RESET ERRORES
+    /// =========================
+    nameError = null;
+    priceError = null;
+    costError = null;
+    stockError = null;
+    lowStockError = null;
+    refError = null;
+    codeBarError = null;
+    categoryError = null;
+    subcategoryError = null;
+    imageError = null;
+
+    validate();
+    notifyListeners();
+  }
+
   /// =========================
   /// 💾 SAVE
   /// =========================
 
-  ProductDraft save() {
-    if (!validate()) {
+  ProductDraft save(CrudType type) {
+    if (!validate().success) {
       throw Exception("Formulario inválido");
     }
 
@@ -337,5 +449,31 @@ class ProductModalController extends ChangeNotifier {
       image: image!,
       sellType: sellType,
     );
+  }
+
+  void _resetTouched() {
+    nameTouched = false;
+    priceTouched = false;
+    costTouched = false;
+    stockTouched = false;
+    lowStockTouched = false;
+    refTouched = false;
+    codeBarTouched = false;
+    imageTouched = false;
+    categoryTouched = false;
+    subcategoryTouched = false;
+  }
+
+  void _resetErrors() {
+    nameError = null;
+    priceError = null;
+    costError = null;
+    stockError = null;
+    lowStockError = null;
+    refError = null;
+    codeBarError = null;
+    categoryError = null;
+    subcategoryError = null;
+    imageError = null;
   }
 }

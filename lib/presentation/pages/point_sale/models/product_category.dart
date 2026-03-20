@@ -19,4 +19,19 @@ class ProductCategory {
       source: json['source'],
     );
   }
+
+  factory ProductCategory.empty() {
+    return ProductCategory(
+      id: -1,
+      value: '',description: "",source: ""
+    );
+  }
+  /// 🔥 CLAVE
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is ProductCategory && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

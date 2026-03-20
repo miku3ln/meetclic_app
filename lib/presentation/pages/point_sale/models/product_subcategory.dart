@@ -22,4 +22,17 @@ class ProductSubcategory {
       productCategoryId: json['product_category_id'],
     );
   }
+  factory ProductSubcategory.empty() {
+    return ProductSubcategory(
+      id: 0,description: "",
+      value: '',source: "",productCategoryId: -1
+    );
+  }
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is ProductSubcategory && other.id == id;
+
+  @override
+  int get hashCode => id.hashCode;
 }

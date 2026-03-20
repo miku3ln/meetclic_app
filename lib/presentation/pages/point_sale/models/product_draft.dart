@@ -21,7 +21,7 @@ class ProductDraft {
   final String code;
   final String barcode;
 
-  final File image;
+  final File? image;
 
   ProductDraft({
     required this.name,
@@ -36,4 +36,47 @@ class ProductDraft {
     required this.barcode,
     required this.image,
   });
+}
+class ProductMapper {
+  ProductMapper._();
+
+  static ProductDraft fromMap(Map<String, dynamic>? map) {
+    final m = map ?? {};
+
+    return ProductDraft(
+      name: m['title']?.toString() ?? '',
+
+      price: (m['price'] is num)
+          ? (m['price'] as num).toDouble()
+          : 0.0,
+
+      cost: (m['cost'] is num)
+          ? (m['cost'] as num).toDouble()
+          : 0.0,
+
+      stock: (m['stock'] is num)
+          ? (m['stock'] as num).toDouble()
+          : 0.0,
+
+      lowStock: (m['lowStock'] is num)
+          ? (m['lowStock'] as num).toDouble()
+          : 0.0,
+
+      code: m['code']?.toString() ?? '',
+      barcode: m['barcode']?.toString() ?? '',
+
+      /// ⚠️ AQUÍ ESTÁ LO CRÍTICO
+      category: m['category'] is ProductCategory
+          ? m['category']
+          : ProductCategory.empty(), // 👈 debes crear esto
+
+      subcategory: m['subcategory'] is ProductSubcategory
+          ? m['subcategory']
+          : ProductSubcategory.empty(),
+
+      sellType: SellType.unit,
+
+      image: null,
+    );
+  }
 }

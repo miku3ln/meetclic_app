@@ -1,4 +1,15 @@
 typedef Validator<T> = String? Function(T value);
+class ValidationResult {
+  final bool success;
+  final Map<String, String?> errors;
+  final String message;
+
+  ValidationResult({
+    required this.success,
+    required this.errors,
+    required this.message,
+  });
+}
 class ValidatorsUtil {
   ValidatorsUtil._();
 
