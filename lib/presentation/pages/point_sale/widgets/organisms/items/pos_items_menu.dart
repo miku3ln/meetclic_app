@@ -40,14 +40,13 @@ class PosItemsMenu extends StatelessWidget {
                   onTap: () =>
                       settings.setSection(PosItemsSection.categories),
                 ),
-                menuItem(
+               /* menuItem(
                   context,
                   icon: Sections.getIconItems(PosItemsSection.modifiers),
-
                   title: Sections.getTitleItems(PosItemsSection.modifiers),
                   selected: settings.section == PosItemsSection.modifiers,
                   onTap: () => settings.setSection(PosItemsSection.modifiers),
-                ),
+                ),*/
                 menuItem(
                   context,
                   icon: Sections.getIconItems(PosItemsSection.discounts),
