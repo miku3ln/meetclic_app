@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../../shared/controllers/app_controller.dart';
 import '../../../state/pos_product_browser_state.dart';
+import '../../dialogs/moda_managerl.dart';
 import '../../models/pos_product_item.dart';
 import '../../../state/pos_shift_state.dart';
 import '../../../state/pos_ticket_state.dart';
@@ -26,17 +27,13 @@ class PosTabletLandscapeController extends ChangeNotifier {
     PosPaymentState? payment,
     PosCheckoutState? checkout,
     PosUiState? ui,
-  })  : app = app,
-        shift = shift ??
-            PosShiftState(
-              app: app,
-              storage: PosShiftStorage(),
-            ),
-        browser = browser ?? PosProductBrowserState(),
-        ticket = ticket ?? PosTicketState(),
-        payment = payment ?? PosPaymentState(),
-        checkout = checkout ?? PosCheckoutState(),
-        ui = ui ?? PosUiState() {
+  }) : app = app,
+       shift = shift ?? PosShiftState(app: app, storage: PosShiftStorage()),
+       browser = browser ?? PosProductBrowserState(),
+       ticket = ticket ?? PosTicketState(),
+       payment = payment ?? PosPaymentState(),
+       checkout = checkout ?? PosCheckoutState(),
+       ui = ui ?? PosUiState() {
     _bindStates();
   }
 
@@ -108,5 +105,13 @@ class PosTabletLandscapeController extends ChangeNotifier {
     ui.removeListener(notifyListeners);
     ui.isSummaryExpanded.dispose();
     super.dispose();
+  }
+
+  CustomerModelPosCurrent? selectedCustomer;
+
+  void setCustomerTicket(CustomerModelPosCurrent? selectedCustomerCurrent) {
+    selectedCustomer = selectedCustomerCurrent;
+    notifyListeners();
+
   }
 }

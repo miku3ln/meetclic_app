@@ -2,11 +2,14 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 
 
+
 import '../../../../shared/utils/validators/validators.dart';
 import '../models/product_category.dart';
 import '../models/product_draft.dart';
 import '../models/product_subcategory.dart';
 import '../services/product_catalog_service.dart';
+import '../widgets/dialogs/moda_managerl.dart';
+import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 
 class ProductModalController extends ChangeNotifier {
@@ -669,5 +672,223 @@ class CategoriaModalController extends ChangeNotifier {
     nameError = null;
 
     imageError = null;
+  }
+}
+enum CustomerDetailTab {
+  profile,
+  redeem,
+  purchases,
+}
+enum CustomerViewType {
+  list,
+  create,
+  detail,
+}
+
+class CustomerModalController extends ChangeNotifier {
+
+  /// =========================
+  /// VIEW STATE
+  /// =========================
+  CustomerViewType view = CustomerViewType.list;
+
+  /// =========================
+  /// DATA
+  /// =========================
+  List<CustomerModelPosCurrent> customers = [];
+  CustomerModelPosCurrent? selectedCustomer;
+
+  /// =========================
+  /// SEARCH
+  /// =========================
+  String search = "";
+
+  void setSearch(String val) {
+    search = val;
+    notifyListeners();
+  }
+
+  List<CustomerModelPosCurrent> get filteredCustomers {
+    if (search.isEmpty) return customers;
+
+    return customers
+        .where((c) =>
+        c.name.toLowerCase().contains(search.toLowerCase()))
+        .toList();
+  }
+
+  /// =========================
+  /// FORM DATA
+  /// =========================
+  String name = "";
+  String email = "";
+  String phone = "";
+  String city = "";
+
+  /// =========================
+  /// TOUCHED
+  /// =========================
+  bool nameTouched = false;
+
+  /// =========================
+  /// ERRORS
+  /// =========================
+  String? nameError;
+
+  /// =========================
+  /// SETTERS
+  /// =========================
+  void setName(String val) {
+    name = val;
+    nameTouched = true;
+
+    nameError = ValidatorsUtil.validate(val, [
+      ValidatorsUtil.required("Nombre"),
+      ValidatorsUtil.minLength(3),
+    ]);
+
+    notifyListeners();
+  }
+
+  void setEmail(String val) {
+    email = val;
+    notifyListeners();
+  }
+
+  void setPhone(String val) {
+    phone = val;
+    notifyListeners();
+  }
+
+  void setCity(String val) {
+    city = val;
+    notifyListeners();
+  }
+
+  /// =========================
+  /// VALIDATION
+  /// =========================
+  bool get isFormValid => nameError == null && name.isNotEmpty;
+
+  bool get canSubmit {
+    if (view == CustomerViewType.create) {
+      return isFormValid && nameTouched;
+    }
+
+    return false;
+  }
+
+  ValidationResult validate() {
+    nameError = ValidatorsUtil.validate(name, [
+      ValidatorsUtil.required("Nombre"),
+    ]);
+
+    notifyListeners();
+
+    final success = nameError == null;
+
+    return ValidationResult(
+      success: success,
+      errors: {'name': nameError},
+      message: success ? "OK" : "Formulario inválido",
+    );
+  }
+
+  /// =========================
+  /// NAVIGATION
+  /// =========================
+  void goToCreate() {
+    _resetForm();
+    view = CustomerViewType.create;
+    notifyListeners();
+  }
+
+  void goToDetail(CustomerModelPosCurrent c) {
+    selectedCustomer = c;
+    view = CustomerViewType.detail;
+    notifyListeners();
+  }
+
+  void back() {
+    view = CustomerViewType.list;
+    notifyListeners();
+  }
+
+  /// =========================
+  /// SAVE
+  /// =========================
+  CustomerModelPosCurrent save() {
+    final customer = CustomerModelPosCurrent(
+      id: DateTime.now().toString(),
+      name: name,
+      email: email,
+      phone: phone,
+      city: city,
+    );
+
+    customers.add(customer);
+
+    view = CustomerViewType.list;
+
+    notifyListeners();
+
+    return customer;
+  }
+
+  void _resetForm() {
+    name = "";
+    email = "";
+    phone = "";
+    city = "";
+
+    nameTouched = false;
+    nameError = null;
+  }
+  bool isSelectedInTicket = false;
+  CustomerModelPosCurrent? customerInTicket;
+  bool isCustomerSelected(CustomerModelPosCurrent c) {
+    return customerInTicket?.id == c.id;
+  }
+  void toggleCustomerInTicket() {
+    if (selectedCustomer == null) return;
+
+    /// SI YA ES EL MISMO → QUITAR
+    if (customerInTicket?.id == selectedCustomer!.id) {
+      customerInTicket = null;
+    } else {
+      /// SI ES OTRO → REEMPLAZAR
+      customerInTicket = selectedCustomer;
+    }
+
+    notifyListeners();
+  }
+  CustomerDetailTab detailTab = CustomerDetailTab.profile;
+
+  void setDetailTab(CustomerDetailTab tab) {
+    detailTab = tab;
+    notifyListeners();
+  }
+  CrudType mode = CrudType.create;
+  void goToEdit() {
+    final c = selectedCustomer;
+    if (c == null) return;
+
+    /// 👉 SET MODE
+    mode = CrudType.update;
+
+    /// 👉 CARGAR DATA
+    name = c.name;
+    email = c.email ?? "";
+    phone = c.phone ?? "";
+    city = c.city ?? "";
+
+    /// 👉 RESET VALIDATION
+    nameTouched = false;
+    nameError = null;
+
+    /// 👉 CAMBIAR VISTA
+    view = CustomerViewType.create;
+
+    notifyListeners();
   }
 }

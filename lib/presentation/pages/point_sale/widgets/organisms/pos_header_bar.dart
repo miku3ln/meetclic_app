@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../helpers/pos_responsive.dart';
 import '../layouts/pos_header_default.dart';
 import '../layouts/pos_header_mobile_portrait.dart';
+import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../models/pos_product_item.dart';
 
 
@@ -15,13 +16,13 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
 
   // top actions
   final VoidCallback onMenuTap;
-  final VoidCallback onUserTap;
+  final void Function(BuildContext context, dynamic data) onUserTap;
   final VoidCallback onMoreTap;
 
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
-
+  final PosTabletLandscapeController controllerMain;
   const PosHeaderBar({
     super.key,
     required this.productCategories,
@@ -32,6 +33,8 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onMoreTap,
     this.onSearchChanged,
     this.onSearchSubmitted,
+    required  this.controllerMain,
+
   });
 
   @override
@@ -55,6 +58,7 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
     }
 
     return PosHeaderDefaultLayout(
+      controllerMain: controllerMain,
       productCategories: productCategories,
       selectedProductCategoryId: selectedProductCategoryId,
       onMenuTap: onMenuTap,

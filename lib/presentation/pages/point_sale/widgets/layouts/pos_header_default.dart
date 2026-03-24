@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../models/pos_product_item.dart';
 import '../organisms/pos_search_overlay.dart';
-
 
 class PosHeaderDefaultLayout extends StatefulWidget
     implements PreferredSizeWidget {
@@ -12,12 +12,13 @@ class PosHeaderDefaultLayout extends StatefulWidget
 
   // top actions
   final VoidCallback onMenuTap;
-  final VoidCallback onUserTap;
+  final void Function(BuildContext context, dynamic data) onUserTap;
   final VoidCallback onMoreTap;
 
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
+  final PosTabletLandscapeController controllerMain;
 
   const PosHeaderDefaultLayout({
     super.key,
@@ -29,6 +30,7 @@ class PosHeaderDefaultLayout extends StatefulWidget
     required this.onMoreTap,
     this.onSearchChanged,
     this.onSearchSubmitted,
+    required this.controllerMain,
   });
 
   @override
@@ -75,14 +77,18 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     // ✅ asegura que el selected exista dentro de los items
     String? safeSelectedId = widget.selectedProductCategoryId;
     if (hasCats) {
-      final exists =
-      widget.productCategories.any((c) => c.id == safeSelectedId);
-      safeSelectedId =
-      exists ? safeSelectedId : widget.productCategories.first.id;
+      final exists = widget.productCategories.any(
+        (c) => c.id == safeSelectedId,
+      );
+      safeSelectedId = exists
+          ? safeSelectedId
+          : widget.productCategories.first.id;
     } else {
       safeSelectedId = null;
     }
-
+    bool isAddCustomer = widget.controllerMain.selectedCustomer == null
+        ? true
+        : false;
     return AppBar(
       elevation: 0,
       centerTitle: true,
@@ -93,8 +99,15 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
       ),
       actions: [
         IconButton(
-          onPressed: widget.onUserTap,
-          icon: const Icon(Icons.person_add_alt_1),
+          onPressed: () => widget.onUserTap(context, {
+            "source": "header",
+            "type": isAddCustomer ? "create_user" : "update_user",
+          }),
+          icon: Icon(
+            isAddCustomer
+                ? Icons.person_add_alt_1   // ➕ agregar
+                : Icons.verified_user,     // ✅ ya agregado
+          ),
         ),
         IconButton(
           onPressed: widget.onMoreTap,
@@ -113,24 +126,23 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
                 icon: const Icon(Icons.arrow_drop_down),
                 items: hasCats
                     ? widget.productCategories
-                    .map(
-                      (c) => DropdownMenuItem<String>(
-                    value: c.id,
-                    child: Text(
-                      c.value,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                )
-                    .toList()
+                          .map(
+                            (c) => DropdownMenuItem<String>(
+                              value: c.id,
+                              child: Text(
+                                c.value,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          )
+                          .toList()
                     : const [
-                  DropdownMenuItem<String>(
-                    value: null,
-                    child: Text('Sin categorías'),
-                  ),
-                ],
-                onChanged:
-                hasCats ? widget.onProductCategoryChanged : null,
+                        DropdownMenuItem<String>(
+                          value: null,
+                          child: Text('Sin categorías'),
+                        ),
+                      ],
+                onChanged: hasCats ? widget.onProductCategoryChanged : null,
               ),
             ),
           ),

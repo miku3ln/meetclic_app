@@ -13,7 +13,7 @@ class PosHeaderMobilePortraitLayout extends StatefulWidget
 
   // top actions
   final VoidCallback onMenuTap;
-  final VoidCallback onUserTap;
+  final void Function(BuildContext context, dynamic data) onUserTap;
   final VoidCallback onMoreTap;
 
   // ✅ (3) search
@@ -92,7 +92,10 @@ class _PosHeaderMobilePortraitLayoutState
       ),
       actions: [
         IconButton(
-          onPressed: widget.onUserTap,
+          onPressed: ()=> widget.onUserTap(context, {
+            "source": "header",
+            "type": "create_user",
+          }),
           icon: const Icon(Icons.person_add_alt_1),
         ),
         IconButton(
