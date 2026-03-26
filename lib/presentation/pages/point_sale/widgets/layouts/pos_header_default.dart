@@ -89,6 +89,8 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     bool isAddCustomer = widget.controllerMain.selectedCustomer == null
         ? true
         : false;
+
+    String fullName=!isAddCustomer?widget.controllerMain.selectedCustomer!.name:"";
     return AppBar(
       elevation: 0,
       centerTitle: true,
@@ -103,10 +105,28 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
             "source": "header",
             "type": isAddCustomer ? "create_user" : "update_user",
           }),
-          icon: Icon(
-            isAddCustomer
-                ? Icons.person_add_alt_1   // ➕ agregar
-                : Icons.verified_user,     // ✅ ya agregado
+          icon: isAddCustomer
+              ? const Icon(
+            Icons.person_add_alt_1,
+            color: Colors.orange,
+          )
+              : Row(
+            mainAxisSize: MainAxisSize.min,
+            children:  [
+              Text(
+                fullName,
+                style: TextStyle(
+                  color: Colors.green,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              SizedBox(width: 6),
+              Icon(
+                Icons.quick_contacts_mail_outlined,
+                color: Colors.green,
+                size: 20,
+              ),
+            ],
           ),
         ),
         IconButton(

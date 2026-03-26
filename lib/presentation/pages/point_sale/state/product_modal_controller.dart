@@ -682,6 +682,7 @@ enum CustomerDetailTab {
 enum CustomerViewType {
   list,
   create,
+  update,
   detail,
 }
 
@@ -830,7 +831,8 @@ class CustomerModalController extends ChangeNotifier {
 
     /// NORMAL FLOW
     if (view == CustomerViewType.detail ||
-        view == CustomerViewType.create) {
+        view == CustomerViewType.create||
+        view == CustomerViewType.update) {
       view = CustomerViewType.list;
     }
 
@@ -935,7 +937,7 @@ class CustomerModalController extends ChangeNotifier {
     nameError = null;
 
     /// 👉 CAMBIAR VISTA
-    view = CustomerViewType.create;
+    view = CustomerViewType.update;
 
     notifyListeners();
   }

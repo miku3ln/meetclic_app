@@ -22,6 +22,7 @@ class ModalManagerLayout extends StatelessWidget {
 
   final bool showBack;
   final VoidCallback? onBack;
+  final bool viewActions;
 
   const ModalManagerLayout({
     super.key,
@@ -33,6 +34,7 @@ class ModalManagerLayout extends StatelessWidget {
     required this.btnSaveTitle,
     required this.showBack,
     required this.onBack,
+    required this.viewActions,
   });
 
   @override
@@ -93,25 +95,28 @@ class ModalManagerLayout extends StatelessWidget {
             /// =========================
             /// FOOTER
             /// =========================
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: Text(btnCancelTitle),
-                ),
-
-                const SizedBox(width: AppSpacing.s),
-
-                ElevatedButton(
-                  onPressed: onSave,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: onSave == null ? c.disabled : c.secondary,
+            if (viewActions)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(btnCancelTitle),
                   ),
-                  child: Text(btnSaveTitle),
-                ),
-              ],
-            ),
+
+                  const SizedBox(width: AppSpacing.s),
+
+                  ElevatedButton(
+                    onPressed: onSave,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: onSave == null
+                          ? c.disabled
+                          : c.secondary,
+                    ),
+                    child: Text(btnSaveTitle),
+                  ),
+                ],
+              ),
           ],
         ),
       ),
@@ -136,8 +141,10 @@ Future<void> showCustomerModal({
           headerAction: _buildHeaderAction(controller, controllerMain),
           body: _buildBody(context, controller, controllerMain),
           btnCancelTitle: "Cancelar",
-          btnSaveTitle: "Guardar",
-
+          btnSaveTitle: controller.view == CustomerViewType.detail
+              ? ""
+              :  _getTitleButtons(controller),
+          viewActions: controller.view == CustomerViewType.create||controller.view == CustomerViewType.update,
           onSave:
               controller.view == CustomerViewType.create && controller.canSubmit
               ? () {
@@ -157,8 +164,6 @@ Widget _buildBody(
   CustomerModalController controller,
   PosTabletLandscapeController controllerMain,
 ) {
-
-
   /// 🔥 LOADING GLOBAL
   if (controller.isLoading) {
     return const Center(child: CircularProgressIndicator());
@@ -175,9 +180,12 @@ Widget _buildBody(
 
     case CustomerViewType.create:
       return CustomerCreateView(controller);
-
+    case CustomerViewType.update:
+      return CustomerCreateView(controller);
     case CustomerViewType.detail:
       return CustomerDetailView(controller);
+
+
   }
 }
 
@@ -209,6 +217,7 @@ Widget? _buildHeaderAction(
 
 class CustomerDetailView extends StatelessWidget {
   final CustomerModalController controller;
+
   const CustomerDetailView(this.controller, {super.key});
 
   @override
@@ -410,27 +419,46 @@ class CustomerListView extends StatelessWidget {
 
         Column(
           children: controller.filteredCustomers.map((c) {
+            final isSelected = controller.isCustomerSelected(c);
+
             return ListTile(
+              tileColor: isSelected ? Colors.green.withOpacity(0.1) : null,
+
               title: Text(c.name),
               subtitle: Text(c.email ?? ""),
-              trailing: controller.isCustomerSelected(c)
+
+              trailing: isSelected
                   ? const Icon(Icons.check, color: Colors.green)
                   : null,
+
               onTap: () => controller.goToDetail(c),
             );
           }).toList(),
-        ),
+        )
       ],
     );
   }
 }
-
+String _getTitleButtons(CustomerModalController c) {
+  switch (c.view) {
+    case CustomerViewType.list:
+      return "";
+    case CustomerViewType.create:
+      return "Guardar";
+    case CustomerViewType.update:
+      return "Actualizar ";
+    case CustomerViewType.detail:
+      return "Perfil";
+  }
+}
 String _getTitle(CustomerModalController c) {
   switch (c.view) {
     case CustomerViewType.list:
       return "Añadir cliente al ticket";
     case CustomerViewType.create:
       return "Crear cliente";
+    case CustomerViewType.update:
+      return "Actualizar cliente";
     case CustomerViewType.detail:
       return "Perfil del cliente";
   }
