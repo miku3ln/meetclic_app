@@ -114,4 +114,5 @@ class PosTabletLandscapeController extends ChangeNotifier {
     notifyListeners();
 
   }
+  bool get hasCustomerSelected => selectedCustomer != null;
 }

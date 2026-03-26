@@ -707,7 +707,10 @@ class CustomerModalController extends ChangeNotifier {
     search = val;
     notifyListeners();
   }
-
+  void setTypeView(CustomerViewType val) {
+    view = val;
+    notifyListeners();
+  }
   List<CustomerModelPosCurrent> get filteredCustomers {
     if (search.isEmpty) return customers;
 
@@ -716,7 +719,7 @@ class CustomerModalController extends ChangeNotifier {
         c.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
   }
-
+  bool initialized = false;
   /// =========================
   /// FORM DATA
   /// =========================
@@ -810,10 +813,29 @@ class CustomerModalController extends ChangeNotifier {
   }
 
   void back() {
-    view = CustomerViewType.list;
+    /// 🔥 CASO ESPECIAL
+    if (openedWithCustomer && view == CustomerViewType.detail) {
+      openedWithCustomer = false;
+
+      view = CustomerViewType.list;
+
+      /// 👇 Cargar lista si no existe
+      if (customers.isEmpty) {
+        initLoadData();
+      }
+
+      notifyListeners();
+      return;
+    }
+
+    /// NORMAL FLOW
+    if (view == CustomerViewType.detail ||
+        view == CustomerViewType.create) {
+      view = CustomerViewType.list;
+    }
+
     notifyListeners();
   }
-
   /// =========================
   /// SAVE
   /// =========================
@@ -834,7 +856,13 @@ class CustomerModalController extends ChangeNotifier {
 
     return customer;
   }
-
+  void reset() {
+    view = CustomerViewType.list;
+    selectedCustomer = null;
+    customerInTicket = null;
+    detailTab = CustomerDetailTab.profile;
+    initialized = false;
+  }
   void _resetForm() {
     name = "";
     email = "";
@@ -859,6 +887,26 @@ class CustomerModalController extends ChangeNotifier {
       /// SI ES OTRO → REEMPLAZAR
       customerInTicket = selectedCustomer;
     }
+
+    notifyListeners();
+  }
+  void setCustomerInitTicket(CustomerModelPosCurrent c){
+    customerInTicket = c;
+    selectedCustomer=c;
+    notifyListeners();
+  }
+  bool openedWithCustomer = false;
+  void initWithCustomer(CustomerModelPosCurrent customer) {
+    selectedCustomer = customer;
+    customerInTicket = customer;
+
+    openedWithCustomer = true; // 🔥 CLAVE
+    view = CustomerViewType.detail;
+
+    notifyListeners();  selectedCustomer = customer;
+    customerInTicket = customer;
+
+    view = CustomerViewType.detail;
 
     notifyListeners();
   }
@@ -890,5 +938,32 @@ class CustomerModalController extends ChangeNotifier {
     view = CustomerViewType.create;
 
     notifyListeners();
+  }
+
+  final CustomerService _service;
+
+  CustomerModalController(this._service);
+
+  bool isLoading = false;
+  String? errorMessage;
+
+  Future<void> initLoadData() async {
+    try {
+      isLoading = true;
+      notifyListeners();
+
+      /// 👇 SIMULACIÓN REAL
+      await Future.delayed(const Duration(seconds: 2));
+
+      final data = await _service.fetchCustomers();
+
+      customers = data;
+
+    } catch (e) {
+      errorMessage = "Error al cargar clientes";
+    } finally {
+      isLoading = false;
+      notifyListeners();
+    }
   }
 }

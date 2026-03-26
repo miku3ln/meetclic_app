@@ -23,7 +23,7 @@ class PosTabletLandscapeSlots {
         onSearchChanged: controller.browser.onSearchChanged,
         onSearchSubmitted: controller.browser.onSearchSubmitted,
         onMenuTap: controller.ui.onMenuTap,
-        onUserTap: (context, data) => controller.ui.onUserTap(context,null,controller),
+        onUserTap: (context, data) => controller.ui.onUserTap(context,{"type":"lan"},controller),
         onMoreTap: controller.ui.onMoreTap,
       ),
       left: PosLeftPanel(

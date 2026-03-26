@@ -45,14 +45,12 @@ class ModalManagerLayout extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-
             /// =========================
             /// HEADER
             /// =========================
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-
                 /// 🔙 BACK + TITLE
                 Row(
                   children: [
@@ -62,10 +60,7 @@ class ModalManagerLayout extends StatelessWidget {
                         onPressed: onBack,
                       ),
 
-                    Text(
-                      title,
-                      style: AppTextStyles.title(context),
-                    ),
+                    Text(title, style: AppTextStyles.title(context)),
                   ],
                 ),
 
@@ -91,11 +86,7 @@ class ModalManagerLayout extends StatelessWidget {
             /// =========================
             /// BODY
             /// =========================
-            Flexible(
-              child: SingleChildScrollView(
-                child: body,
-              ),
-            ),
+            Flexible(child: SingleChildScrollView(child: body)),
 
             AppSpacing.spaceBetweenSections,
 
@@ -115,13 +106,12 @@ class ModalManagerLayout extends StatelessWidget {
                 ElevatedButton(
                   onPressed: onSave,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                    onSave == null ? c.disabled : c.secondary,
+                    backgroundColor: onSave == null ? c.disabled : c.secondary,
                   ),
                   child: Text(btnSaveTitle),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),
@@ -129,12 +119,10 @@ class ModalManagerLayout extends StatelessWidget {
   }
 }
 
-
 Future<void> showCustomerModal({
   required BuildContext context,
   required CustomerModalController controller,
   required PosTabletLandscapeController controllerMain,
-
 }) async {
   await showDialog(
     context: context,
@@ -143,29 +131,20 @@ Future<void> showCustomerModal({
       builder: (_, __) {
         return ModalManagerLayout(
           title: _getTitle(controller),
-
-          /// 🔥 BACK SOLO CUANDO NO ES LIST
           showBack: controller.view != CustomerViewType.list,
           onBack: controller.back,
-
-          /// 🔥 ACTION DINÁMICO
-          headerAction: _buildHeaderAction(controller,controllerMain),
-
-          /// 🔥 BODY DINÁMICO
-          body: _buildBody(context, controller),
-
-          /// 🔥 FOOTER CONTROLADO
+          headerAction: _buildHeaderAction(controller, controllerMain),
+          body: _buildBody(context, controller, controllerMain),
           btnCancelTitle: "Cancelar",
           btnSaveTitle: "Guardar",
 
-          onSave: controller.view == CustomerViewType.create &&
-              controller.canSubmit
+          onSave:
+              controller.view == CustomerViewType.create && controller.canSubmit
               ? () {
-            if (controller.validate().success) {
-              controller.save();
-           //   Navigator.pop(context);
-            }
-          }
+                  if (controller.validate().success) {
+                    controller.save();
+                  }
+                }
               : null,
         );
       },
@@ -174,9 +153,22 @@ Future<void> showCustomerModal({
 }
 
 Widget _buildBody(
-    BuildContext context,
-    CustomerModalController controller,
-    ) {
+  BuildContext context,
+  CustomerModalController controller,
+  PosTabletLandscapeController controllerMain,
+) {
+
+
+  /// 🔥 LOADING GLOBAL
+  if (controller.isLoading) {
+    return const Center(child: CircularProgressIndicator());
+  }
+
+  /// 🔥 ERROR
+  if (controller.errorMessage != null) {
+    return Center(child: Text(controller.errorMessage!));
+  }
+
   switch (controller.view) {
     case CustomerViewType.list:
       return CustomerListView(controller);
@@ -188,7 +180,11 @@ Widget _buildBody(
       return CustomerDetailView(controller);
   }
 }
-Widget? _buildHeaderAction(CustomerModalController c,PosTabletLandscapeController controllerMain) {
+
+Widget? _buildHeaderAction(
+  CustomerModalController c,
+  PosTabletLandscapeController controllerMain,
+) {
   if (c.view != CustomerViewType.detail) return null;
 
   final customer = c.selectedCustomer;
@@ -197,18 +193,12 @@ Widget? _buildHeaderAction(CustomerModalController c,PosTabletLandscapeControlle
   final isSelected = c.isCustomerSelected(customer);
 
   return TextButton(
-
     onPressed: () {
       c.toggleCustomerInTicket();
-
-      controllerMain.setCustomerTicket(
-        c.customerInTicket,
-      );
+      controllerMain.setCustomerTicket(c.customerInTicket);
     },
     child: Text(
-      isSelected
-          ? "Quitar del ticket"
-          : "Agregar al ticket",
+      isSelected ? "Quitar del ticket" : "Agregar al ticket",
       style: TextStyle(
         color: isSelected ? Colors.red : Colors.green,
         fontWeight: FontWeight.w600,
@@ -216,15 +206,14 @@ Widget? _buildHeaderAction(CustomerModalController c,PosTabletLandscapeControlle
     ),
   );
 }
+
 class CustomerDetailView extends StatelessWidget {
   final CustomerModalController controller;
-
   const CustomerDetailView(this.controller, {super.key});
 
   @override
   Widget build(BuildContext context) {
     final c = controller.selectedCustomer;
-
     if (c == null) {
       return const Center(child: Text("No hay cliente seleccionado"));
     }
@@ -233,7 +222,6 @@ class CustomerDetailView extends StatelessWidget {
 
     return Column(
       children: [
-
         /// 👤 HEADER PERFIL
         Column(
           children: [
@@ -243,10 +231,7 @@ class CustomerDetailView extends StatelessWidget {
               child: const Icon(Icons.person, size: 30),
             ),
             const SizedBox(height: 8),
-            Text(
-              c.name,
-              style: AppTextStyles.title(context),
-            ),
+            Text(c.name, style: AppTextStyles.title(context)),
           ],
         ),
 
@@ -267,10 +252,10 @@ class CustomerDetailView extends StatelessWidget {
   /// CONTENT SWITCH
   /// =========================
   Widget _buildTabContent(
-      BuildContext context,
-      CustomerModalController controller,
-      CustomerModelPosCurrent c,
-      ) {
+    BuildContext context,
+    CustomerModalController controller,
+    CustomerModelPosCurrent c,
+  ) {
     switch (controller.detailTab) {
       case CustomerDetailTab.profile:
         return _buildProfile(c);
@@ -344,6 +329,7 @@ class CustomerDetailView extends StatelessWidget {
     );
   }
 }
+
 class CustomerCreateView extends StatelessWidget {
   final CustomerModalController controller;
 
@@ -394,6 +380,7 @@ class CustomerCreateView extends StatelessWidget {
     );
   }
 }
+
 class CustomerListView extends StatelessWidget {
   final CustomerModalController controller;
 
@@ -437,6 +424,7 @@ class CustomerListView extends StatelessWidget {
     );
   }
 }
+
 String _getTitle(CustomerModalController c) {
   switch (c.view) {
     case CustomerViewType.list:
@@ -465,6 +453,7 @@ class CustomerModelPosCurrent {
     this.city,
   });
 }
+
 class _CustomerTabs extends StatelessWidget {
   final CustomerModalController controller;
 
@@ -501,5 +490,37 @@ class _CustomerTabs extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+class CustomerService {
+  Future<List<CustomerModelPosCurrent>> fetchCustomers() async {
+    /// Simula delay de API
+    await Future.delayed(const Duration(seconds: 2));
+
+    /// Data mock (simulación backend)
+    return [
+      CustomerModelPosCurrent(
+        id: "1",
+        name: "Juan Pérez",
+        email: "juan@mail.com",
+        phone: "0999999999",
+        city: "Quito",
+      ),
+      CustomerModelPosCurrent(
+        id: "2",
+        name: "María López",
+        email: "maria@mail.com",
+        phone: "0888888888",
+        city: "Otavalo",
+      ),
+      CustomerModelPosCurrent(
+        id: "3",
+        name: "Carlos Andrade",
+        email: "carlos@mail.com",
+        phone: "0777777777",
+        city: "Ibarra",
+      ),
+    ];
   }
 }
