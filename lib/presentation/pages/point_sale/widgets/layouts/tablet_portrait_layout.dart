@@ -18,10 +18,8 @@ class PosTabletPortraitLayout extends StatelessWidget {
       appBar: PosHeaderBar(
         controllerMain: controller,
         productCategories: controller.productCategories,
-        selectedProductCategoryId: controller.selectedProductCategoryId,
-        onProductCategoryChanged: (id) {
-          controller.setProductCategory(id!); // ✅
-        },
+        selectedProductCategoryId: controller.browser.selectedProductCategoryId,
+        onProductCategoryChanged: controller.browser.onProductCategoryChanged,
         onMenuTap: () {},
         onUserTap: (context, data) =>
             controller.ui.onUserTap(context, null, controller),

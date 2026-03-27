@@ -54,6 +54,8 @@ class _PointSalePageState extends State<PointSalePage> {
     selectedProductCategoryId = productCategories.isNotEmpty
         ? productCategories.first.id
         : null;
+    controller.setProductCategory(selectedProductCategoryId!);
+
   }
   // ✅ Modal vive aquí
   Future<void> _showOpenShiftModal() async {
@@ -88,7 +90,7 @@ class _PointSalePageState extends State<PointSalePage> {
   Widget _buildByLayout(LayoutType layout) {
     switch (layout) {
       case LayoutType.mobilePortrait:
-        return PosMobilePortraitLayout(controller: controller);
+        return PosMobilePortraitLayout(controller: controller,scaffoldKey: _scaffoldKey);
 
       case LayoutType.mobileLandscape:
         return PosMobileLandscapeLayout(controller: controller,scaffoldKey: _scaffoldKey);

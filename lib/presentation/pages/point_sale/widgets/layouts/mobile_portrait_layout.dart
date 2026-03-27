@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../organisms/pos_header_bar.dart';
+
 class PosMobilePortraitLayout extends StatelessWidget {
   final PosTabletLandscapeController controller;
-  const PosMobilePortraitLayout({super.key, required this.controller});
+  final GlobalKey<ScaffoldState> scaffoldKey;
+
+  const PosMobilePortraitLayout({
+    super.key,
+    required this.controller,
+    required this.scaffoldKey,
+  });
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -11,12 +19,10 @@ class PosMobilePortraitLayout extends StatelessWidget {
         controllerMain: controller,
         productCategories: controller.browser.productCategories,
         // 👈 opcional mover
-        selectedProductCategoryId: controller.selectedProductCategoryId,
-
+        selectedProductCategoryId:controller.browser.selectedProductCategoryId,
         onProductCategoryChanged: (id) {
-          controller.setProductCategory(id!);
+          controller.browser.onProductCategoryChanged(id);
         },
-
         onSearchChanged: (text) {
           controller.setQuery(text);
         },

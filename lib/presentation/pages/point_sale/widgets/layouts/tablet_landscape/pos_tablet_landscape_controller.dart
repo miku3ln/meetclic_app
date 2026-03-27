@@ -136,6 +136,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
   String? selectedProductCategoryId;
 
   void setProductCategory(String id) {
+
     selectedProductCategoryId = id;
     notifyListeners();
   }
