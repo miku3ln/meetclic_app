@@ -1,84 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../../../../../shared/controllers/app_controller.dart';
+import '../dialogs/pos_open_shift_dialog.dart';
 import '../organisms/pos_header_bar.dart';
 import '../models/pos_product_item.dart'; // PosCategoryItem
 import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import 'package:provider/provider.dart';
+class PosMobileLandscapeLayout extends StatelessWidget {
+  final PosTabletLandscapeController controller;
+  final GlobalKey<ScaffoldState> scaffoldKey;
 
-class PosMobileLandscapeLayout extends StatefulWidget {
-
-  const PosMobileLandscapeLayout({super.key,
-
-
+  const PosMobileLandscapeLayout({
+    super.key,
+    required this.controller,
+    required this.scaffoldKey,
   });
 
   @override
-  State<PosMobileLandscapeLayout> createState() =>
-      _PosMobileLandscapeLayoutState();
-}
-
-class _PosMobileLandscapeLayoutState extends State<PosMobileLandscapeLayout> {
-  late final PosTabletLandscapeController controller;
-  final _scaffoldKey = GlobalKey<ScaffoldState>(); // ✅
-
-  // ✅ (1) dropdown: product categories
-  late final List<PosCategoryItem> productCategories;
-  String? selectedProductCategoryId;
-
-  // ✅ (3) search
-  String query = '';
-
-  @override
-  void initState() {
-    super.initState();
-    final app = context.read<AppController>();
-    controller = PosTabletLandscapeController(app: app)..addListener(_onChanged);
-    productCategories = PosTabletLandscapeFixtures.getCategoriesData();
-    selectedProductCategoryId = productCategories.isNotEmpty
-        ? productCategories.first.id
-        : null;
-  }
-  void _onChanged() {
-    if (!mounted) return;
-    setState(() {});
-  }
-  @override
-  void dispose() {
-    controller.removeListener(_onChanged);
-    controller.dispose();
-    super.dispose();
-  }
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: scaffoldKey,
+
       appBar: PosHeaderBar(
         controllerMain: controller,
-        productCategories: productCategories,
-        selectedProductCategoryId: selectedProductCategoryId,
+
+        // ✅ TODO DESDE EL CONTROLLER
+        productCategories: controller.productCategories,
+        selectedProductCategoryId: controller.selectedProductCategoryId,
+
         onProductCategoryChanged: (id) {
-          setState(() => selectedProductCategoryId = id);
-          debugPrint('productCategory => $id');
-          // aquí luego filtras productos si corresponde
+          controller.setProductCategory(id!); // 🔥
         },
+
         onMenuTap: () {},
-        onUserTap: (BuildContext context, dynamic data) {
-          print('mobile_land_scape onUserTap ');
-        },
-        onMoreTap: () {},
+
+        onUserTap: (context, data) =>
+            controller.ui.onUserTap(context, null, controller),
+
+        onMoreTap: (context, data) =>
+            controller.ui.onMoreTap(context, null, controller),
+
         onSearchChanged: (text) {
-          setState(() => query = text);
-          debugPrint('search: $text');
-          // aquí luego filtras productos si corresponde
+          controller.setQuery(text); // 🔥
         },
+
         onSearchSubmitted: (text) {
-          setState(() => query = text);
-          debugPrint('submit: $text');
+          controller.setQuery(text); // 🔥
         },
       ),
+
       body: Center(
         child: Text(
-          'POS Mobile Landscape\ncategory=$selectedProductCategoryId\nquery="$query"',
+          'POS Mobile Landscape\n'
+              'category=${controller.selectedProductCategoryId}\n'
+              'query="${controller.query}"',
           textAlign: TextAlign.center,
         ),
       ),

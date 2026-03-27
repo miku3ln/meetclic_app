@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/state/product_modal_controller.dart';
+import '../shared/utils.dart';
 import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 
@@ -17,8 +18,42 @@ class PosUiState extends ChangeNotifier {
     onRequestOpenDrawer?.call();
   }
 
-  void onMoreTap() {
-    debugPrint('onMoreTap -> click');
+  void onMoreTap(      BuildContext context,
+      dynamic data,
+      PosTabletLandscapeController controllerMain) {
+    final result = 'onMoreTap -> click..${controllerMain.hasCustomerSelected}';
+    final hasCustomer = controllerMain.hasCustomerSelected;
+    debugPrint(result);
+    showMenu(
+      context: context,
+      position: const RelativeRect.fromLTRB(1000, 80, 20, 0),
+      items: [
+        BuildItemIconMenu(
+          icon: Icons.delete,
+          text: 'Despejar el ticket',
+          enabled: hasCustomer,
+          value: 'clear',
+        ),
+        BuildItemIconMenu(
+          icon: Icons.sync,
+          text: 'Sincronizar',
+          enabled: true,
+          value: 'sync',
+        ),
+      ],
+    ).then((value) {
+      if (value == null) return;
+
+      switch (value) {
+        case 'clear':
+          debugPrint('CLICK -> Despejar ticket');
+          break;
+
+        case 'sync':
+          debugPrint('CLICK -> Sincronizar');
+          break;
+      }
+    });
   }
 
   void onUserTap(

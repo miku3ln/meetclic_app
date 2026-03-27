@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
+import '../../../../../shared/controllers/app_controller.dart';
+import '../dialogs/pos_open_shift_dialog.dart';
 import '../models/pos_product_item.dart';
 import '../organisms/pos_search_overlay.dart';
+import 'package:provider/provider.dart';
 
 class PosHeaderDefaultLayout extends StatefulWidget
     implements PreferredSizeWidget {
@@ -13,7 +17,7 @@ class PosHeaderDefaultLayout extends StatefulWidget
   // top actions
   final VoidCallback onMenuTap;
   final void Function(BuildContext context, dynamic data) onUserTap;
-  final VoidCallback onMoreTap;
+  final void Function(BuildContext context, dynamic data)  onMoreTap;
 
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
@@ -41,6 +45,11 @@ class PosHeaderDefaultLayout extends StatefulWidget
 }
 
 class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
+  late final PosTabletLandscapeController controller;
+  late final List<PosCategoryItem> productCategories;
+  String? selectedProductCategoryId;
+  String query = '';
+  final _scaffoldKey = GlobalKey<ScaffoldState>(); // ✅
   final GlobalKey _searchKey = GlobalKey();
   bool _open = false;
 
@@ -60,7 +69,46 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
       widget.onSearchChanged?.call('');
     }
   }
+  void _onChanged() {
+    if (!mounted) return;
+    setState(() {});
+  }
+  // ✅ Modal vive aquí
+  Future<void> _showOpenShiftModal() async {
+    final opened = await showDialog<bool>(
+      context: context,
+      barrierDismissible: true,
+      builder: (_) => PosOpenShiftDialog(controller: controller),
+    );
 
+    if (!mounted) return;
+    if (opened != true) return;
+
+  }
+  void initControllerMain(){
+    final app = context.read<AppController>();
+    controller = PosTabletLandscapeController(app: app)..addListener(_onChanged);
+    controller.shift.onRequestOpenShift = _showOpenShiftModal;
+    // ✅ Conecta request del controller al modal (porque aquí sí hay context)
+    controller.shift.onRequestOpenShift = _showOpenShiftModal;
+    // ✅ Conecta evento del controller al Drawer
+    controller.ui.onRequestOpenDrawer = () {
+      _scaffoldKey.currentState?.openDrawer();
+    };
+    // ✅ Carga data inicial (fixtures)
+    controller.init(
+      initialProducts: PosTabletLandscapeFixtures.getProductsData(),
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
+      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
+      // opcional:
+      initialSelectedProductCategoryId: 'all',
+      initialSelectedMenuCategoryId: 'all',
+    );
+    productCategories = PosTabletLandscapeFixtures.getCategoriesData();
+    selectedProductCategoryId = productCategories.isNotEmpty
+        ? productCategories.first.id
+        : null;
+  }
   @override
   void dispose() {
     PosSearchOverlay.hide();
@@ -130,7 +178,10 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
           ),
         ),
         IconButton(
-          onPressed: widget.onMoreTap,
+          onPressed:()=> widget.onMoreTap(context, {
+          "source": "header",
+          "type":"",
+          }),
           icon: const Icon(Icons.more_vert),
         ),
       ],

@@ -9,8 +9,6 @@ import 'pos_tablet_landscape_controller.dart';
 
 
 class PosTabletLandscapeSlots {
-
-
   static PosLayoutSlots build({
     required PosTabletLandscapeController controller,
   }) {
@@ -23,8 +21,8 @@ class PosTabletLandscapeSlots {
         onSearchChanged: controller.browser.onSearchChanged,
         onSearchSubmitted: controller.browser.onSearchSubmitted,
         onMenuTap: controller.ui.onMenuTap,
-        onUserTap: (context, data) => controller.ui.onUserTap(context,{"type":"lan"},controller),
-        onMoreTap: controller.ui.onMoreTap,
+        onUserTap: (context, data) => controller.ui.onUserTap(context,data,controller),
+        onMoreTap: (context, data) => controller.ui.onMoreTap(context,data,controller),
       ),
       left: PosLeftPanel(
         controller: controller,

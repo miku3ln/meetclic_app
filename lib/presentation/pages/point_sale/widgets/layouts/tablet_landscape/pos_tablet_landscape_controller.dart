@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../../shared/controllers/app_controller.dart';
+import '../../../shared/utils.dart';
 import '../../../state/pos_product_browser_state.dart';
 import '../../dialogs/moda_managerl.dart';
 import '../../models/pos_product_item.dart';
@@ -34,6 +35,8 @@ class PosTabletLandscapeController extends ChangeNotifier {
        payment = payment ?? PosPaymentState(),
        checkout = checkout ?? PosCheckoutState(),
        ui = ui ?? PosUiState() {
+
+    typeService = typeServicesData.first; // 🔥 AQUÍ
     _bindStates();
   }
 
@@ -111,8 +114,40 @@ class PosTabletLandscapeController extends ChangeNotifier {
 
   void setCustomerTicket(CustomerModelPosCurrent? selectedCustomerCurrent) {
     selectedCustomer = selectedCustomerCurrent;
+
     notifyListeners();
 
   }
+  List<TypeService> typeServicesData = [
+  TypeService(label: 'Para servirse', icon: Icons.restaurant, value: 'servirse'),
+  TypeService(label: 'Para llevar', icon: Icons.shopping_bag, value: 'llevar'),
+  TypeService(label: 'A domicilio', icon: Icons.delivery_dining, value: 'domicilio'),
+  ];
   bool get hasCustomerSelected => selectedCustomer != null;
+  late TypeService typeService;
+  void setTypeService(TypeService typeSelected) {
+    typeService = typeSelected;
+    debugPrint('setTypeService: ${typeService.value}');
+
+    notifyListeners();
+
+  }
+  // 🔥 CATEGORY
+  String? selectedProductCategoryId;
+
+  void setProductCategory(String id) {
+    selectedProductCategoryId = id;
+    notifyListeners();
+  }
+
+// 🔥 SEARCH
+  String query = '';
+
+  void setQuery(String value) {
+    query = value;
+    notifyListeners();
+  }
+
+  List<PosCategoryItem> get productCategories =>
+      browser.productCategories;
 }

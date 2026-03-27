@@ -17,7 +17,7 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   // top actions
   final VoidCallback onMenuTap;
   final void Function(BuildContext context, dynamic data) onUserTap;
-  final VoidCallback onMoreTap;
+  final void Function(BuildContext context, dynamic data)  onMoreTap;
 
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;

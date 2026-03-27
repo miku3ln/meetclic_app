@@ -40,7 +40,90 @@ class ModalManagerLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppThemeTokens.of(context);
+    return Dialog(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.5,
+        height: MediaQuery.of(context).size.height * 0.7,
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.m),
+          child: Column(
+            children: [
+              /// =========================
+              /// HEADER
+              /// =========================
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  /// 🔙 BACK + TITLE
+                  Row(
+                    children: [
+                      if (showBack)
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: onBack,
+                        ),
 
+                      Text(title, style: AppTextStyles.title(context)),
+                    ],
+                  ),
+
+                  /// 🔥 ACTIONS (CLAVE)
+                  Row(
+                    children: [
+                      if (headerAction != null) ...[
+                        headerAction!,
+                        const SizedBox(width: 8),
+                      ],
+
+                      IconButton(
+                        icon: Icon(Icons.close, color: c.iconPrimary),
+                        onPressed: () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+
+              AppSpacing.spaceBetweenSections,
+
+              /// =========================
+              /// BODY
+              /// =========================
+              Flexible(child: SingleChildScrollView(child: body)),
+
+              AppSpacing.spaceBetweenSections,
+
+              /// =========================
+              /// FOOTER
+              /// =========================
+              if (viewActions)
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text(btnCancelTitle),
+                    ),
+
+                    const SizedBox(width: AppSpacing.s),
+
+                    ElevatedButton(
+                      onPressed: onSave,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: onSave == null
+                            ? c.disabled
+                            : c.secondary,
+                      ),
+                      child: Text(btnSaveTitle),
+                    ),
+                  ],
+                ),
+
+            ],
+          ),
+        ),
+      ),
+    );
     return Dialog(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.m),
@@ -138,7 +221,7 @@ Future<void> showCustomerModal({
           title: _getTitle(controller),
           showBack: controller.view != CustomerViewType.list,
           onBack: controller.back,
-          headerAction: _buildHeaderAction(controller, controllerMain),
+          headerAction: _buildHeaderAction(controller, controllerMain,context),
           body: _buildBody(context, controller, controllerMain),
           btnCancelTitle: "Cancelar",
           btnSaveTitle: controller.view == CustomerViewType.detail
@@ -192,6 +275,7 @@ Widget _buildBody(
 Widget? _buildHeaderAction(
   CustomerModalController c,
   PosTabletLandscapeController controllerMain,
+    BuildContext context, // 👈 NECESARIO
 ) {
   if (c.view != CustomerViewType.detail) return null;
 
@@ -202,8 +286,17 @@ Widget? _buildHeaderAction(
 
   return TextButton(
     onPressed: () {
+
+
+      final wasSelected = c.isCustomerSelected(customer);
+
       c.toggleCustomerInTicket();
       controllerMain.setCustomerTicket(c.customerInTicket);
+
+      /// 🔥 SOLO CIERRA SI AGREGA
+      if (!wasSelected) {
+        Navigator.pop(context);
+      }
     },
     child: Text(
       isSelected ? "Quitar del ticket" : "Agregar al ticket",
