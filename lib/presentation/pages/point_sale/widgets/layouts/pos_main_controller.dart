@@ -87,17 +87,26 @@ class PosMainController extends ChangeNotifier {
       shift.onRequestOpenShift?.call();
       return;
     }
+
+    final controller = PosPaymentLayoutController(main: this);
+
     showDialog(
       context: context,
       builder: (_) {
-        return Dialog(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-
-            /// 🔥 USAS TU CONFIG DIRECTO
-            child: buildPaymentModal(main: this),
-          ),
+        return AnimatedBuilder(
+          animation: this, // 🔥 ESCUCHA CAMBIOS DEL MAIN
+          builder: (_, __) {
+            return Dialog(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: buildPaymentModal(
+                  main: this,
+                  controller: controller,
+                ),
+              ),
+            );
+          },
         );
       },
     );

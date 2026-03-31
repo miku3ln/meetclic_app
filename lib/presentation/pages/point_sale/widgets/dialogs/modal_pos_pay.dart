@@ -11,6 +11,7 @@ import '../molecules/pos_ticket_header.dart';
 import '../molecules/pos_totals_card.dart';
 import '../organisms/pos_ticket_checkout.dart';
 import '../organisms/pos_ticket_list.dart';
+
 class PosPaymentLayoutController extends ChangeNotifier {
   final PosMainController main;
 
@@ -20,13 +21,16 @@ class PosPaymentLayoutController extends ChangeNotifier {
   /// ITEMS
   /// =============================
   List<PostTicketItem> get items => main.ticket.items;
+
   bool get hasItems => items.isNotEmpty;
 
   /// =============================
   /// TOTALS
   /// =============================
   double get total => main.ticket.total;
+
   double get subtotal => main.ticket.subtotal;
+
   double get tax => main.ticket.subtotalTax;
 
   /// =============================
@@ -42,8 +46,7 @@ class PosPaymentLayoutController extends ChangeNotifier {
     return (cash - total).clamp(0, double.infinity);
   }
 
-  bool get isValidCash =>
-      _cashReceived != null && _cashReceived! >= total;
+  bool get isValidCash => _cashReceived != null && _cashReceived! >= total;
 
   /// 🔥 SET DIRECTO (input manual)
   void setCash(double? value) {
@@ -122,6 +125,21 @@ class PosPaymentLayoutController extends ChangeNotifier {
     main.ticket.decreaseItem(item);
     notifyListeners();
   }
+
+  bool _isCompleted = false;
+
+  bool get isCompleted => _isCompleted;
+
+  void completePayment() {
+    _isCompleted = true;
+    notifyListeners();
+  }
+
+  void reset() {
+    _isCompleted = false;
+    _cashReceived = null;
+    notifyListeners();
+  }
 }
 
 /// =============================
@@ -145,10 +163,22 @@ class PosPaymentLayout extends StatelessWidget {
         return Row(
           children: [
             /// LEFT 30%
-            Expanded(flex: 4, child: PosDetails(controller: controller,mainController:mainController)),
+            Expanded(
+              flex: 4,
+              child: PosDetails(
+                controller: controller,
+                mainController: mainController,
+              ),
+            ),
 
             /// RIGHT 70%
-            Expanded(flex: 6, child: PosPaymentPanel(controller: controller,mainController:mainController)),
+            Expanded(
+              flex: 6,
+              child: PosPaymentPanel(
+                controller: controller,
+                mainController: mainController,
+              ),
+            ),
           ],
         );
       },
@@ -172,18 +202,19 @@ class PosDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.watch<AppController>(); // ✅ lee modo global
-late double totalsCardWidth=190;
+    late double totalsCardWidth = 190;
     final t = Theme.of(context);
     final bool isLoginMode = app.isLoginRequired;
 
-    final double heightPostTicket=isLoginMode?170:200;
+    final double heightPostTicket = isLoginMode ? 170 : 200;
 
     final styles = const PosTicketStyles().copyWith(
       leftThumbSize: 30,
       rightColumnWidth: 100,
       iconButtonSize: 25,
     );
-   final TextStyle totalLabelStyle= t.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800) ??
+    final TextStyle totalLabelStyle =
+        t.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800) ??
         const TextStyle(fontWeight: FontWeight.w800, fontSize: 16);
     late List<TypeService> tipos = mainController.typeServicesData;
     late TypeService selected = mainController.typeService;
@@ -211,7 +242,7 @@ late double totalsCardWidth=190;
               isEdit: false,
               items: mainController.ticket.items,
               styles: styles,
-              onMinus: (it) => mainController.ticket. decreaseItem(it),
+              onMinus: (it) => mainController.ticket.decreaseItem(it),
               onPlus: (it) => mainController.ticket.increaseItem(it),
               onEdit: (it) => mainController.ticket.editTicketItem(it),
               onDelete: (it) => mainController.ticket.removeItem(it),
@@ -220,7 +251,7 @@ late double totalsCardWidth=190;
           SizedBox(height: 25), // ✅ antes 50
           SizedBox(
             height: heightPostTicket,
-            child:Row(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(width: 10),
@@ -256,7 +287,11 @@ class PosPaymentPanel extends StatelessWidget {
   final PosPaymentLayoutController controller;
   final PosMainController mainController;
 
-  const PosPaymentPanel({super.key, required this.controller,required this.mainController});
+  const PosPaymentPanel({
+    super.key,
+    required this.controller,
+    required this.mainController,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -265,107 +300,11 @@ class PosPaymentPanel extends StatelessWidget {
       builder: (_, __) {
         return Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
 
-              /// =========================
-              /// FILA 1 → TOTAL CENTRADO
-              /// =========================
-              Column(
-                children: [
-                  Text(
-                    '\$${controller.total.toStringAsFixed(2)}',
-                    style: const TextStyle(
-                      fontSize: 40,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Importe total adeudado',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 24),
-
-              /// =========================
-              /// FILA 2 → INPUT + COBRAR
-              /// =========================
-              Row(
-                children: [
-                  /// INPUT EFECTIVO
-                  Expanded(
-                    child: CashInput(controller: controller),
-                  ),
-
-                  const SizedBox(width: 16),
-
-                  /// BOTÓN COBRAR
-                  SizedBox(
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: controller.hasItems
-                          ? () {
-                        controller.main.ticket.saveTicket();
-                        Navigator.pop(context);
-                      }
-                          : null,
-                      child: const Text('COBRAR'),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              /// =========================
-              /// FILA 3 → BOTONES RÁPIDOS
-              /// =========================
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: controller.suggestedAmounts.map((amount) {
-                  return SizedBox(
-                    width: 120,
-                    height: 48,
-                    child: OutlinedButton(
-                      onPressed: () => controller.setCash(amount),
-                      child: Text('\$${amount.toStringAsFixed(2)}'),
-                    ),
-                  );
-                }).toList(),
-              ),
-
-              const SizedBox(height: 24),
-
-              /// =========================
-              /// FILA 4 → MÉTODOS DE PAGO
-              /// =========================
-              Expanded(
-                child: Align(
-                  alignment: Alignment.topLeft,
-                  child: PosPaymentMethodsBar(
-                    controller: mainController,
-                  ),
-                ),
-              ),
-              const Spacer(),
-
-              /// CAMBIO
-              if (controller.cashReceived > 0)
-                Text(
-                  'Cambio: \$${controller.change.toStringAsFixed(2)}',
-                  textAlign: TextAlign.right,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-            ],
-          ),
+          /// 🔥 SWITCH ENTRE FORM Y SUCCESS
+          child: controller.isCompleted
+              ? PosPaymentSuccess(controller: controller)
+              : _buildPaymentForm(context, controller, mainController),
         );
       },
     );
@@ -375,11 +314,13 @@ class PosPaymentPanel extends StatelessWidget {
 /// =============================
 /// USO EN MODAL
 /// =============================
-Widget buildPaymentModal({required PosMainController main}) {
-  final controller = PosPaymentLayoutController(main: main);
-
+Widget buildPaymentModal({
+  required PosMainController main,
+  required PosPaymentLayoutController controller,
+}) {
   return PosPaymentLayout(controller: controller, mainController: main);
 }
+
 class CashInput extends StatefulWidget {
   final PosPaymentLayoutController controller;
 
@@ -423,8 +364,7 @@ class _CashInputState extends State<CashInput> {
     widget.controller.setCash(value);
 
     /// 🔥 refrescar texto con valor corregido
-    _textController.text =
-        widget.controller.cashReceived.toStringAsFixed(2);
+    _textController.text = widget.controller.cashReceived.toStringAsFixed(2);
   }
 
   @override
@@ -432,11 +372,9 @@ class _CashInputState extends State<CashInput> {
     super.didUpdateWidget(oldWidget);
 
     /// 🔥 sincronizar si cambia desde botones
-    final newValue =
-    widget.controller.cashReceived.toStringAsFixed(2);
+    final newValue = widget.controller.cashReceived.toStringAsFixed(2);
 
-    if (_textController.text != newValue &&
-        !_focusNode.hasFocus) {
+    if (_textController.text != newValue && !_focusNode.hasFocus) {
       _textController.text = newValue;
     }
   }
@@ -469,6 +407,179 @@ class _CashInputState extends State<CashInput> {
         _applyValue();
         FocusScope.of(context).unfocus();
       },
+    );
+  }
+}
+
+Widget _buildPaymentForm(BuildContext context,PosPaymentLayoutController controller,PosMainController mainController) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      /// =========================
+      /// FILA 1 → TOTAL CENTRADO
+      /// =========================
+      Column(
+        children: [
+          Text(
+            '\$${controller.total.toStringAsFixed(2)}',
+            style: const TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 4),
+          const Text(
+            'Importe total adeudado',
+            style: TextStyle(color: Colors.grey),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 24),
+
+      /// =========================
+      /// FILA 2 → INPUT + COBRAR
+      /// =========================
+      Row(
+        children: [
+          /// INPUT EFECTIVO
+          Expanded(child: CashInput(controller: controller)),
+
+          const SizedBox(width: 16),
+
+          /// BOTÓN COBRAR
+          SizedBox(
+            height: 56,
+            child: ElevatedButton(
+              onPressed: controller.hasItems
+                  ? () {
+              //  controller.main.ticket.saveTicket();
+
+                /// 🔥 CAMBIAR A SUCCESS UI
+                controller.completePayment();
+              }
+                  : null,
+              child: const Text('COBRAR'),
+            ),
+          ),
+        ],
+      ),
+
+      const SizedBox(height: 16),
+
+      /// =========================
+      /// FILA 3 → BOTONES RÁPIDOS
+      /// =========================
+      Wrap(
+        spacing: 12,
+        runSpacing: 12,
+        children: controller.suggestedAmounts.map((amount) {
+          return SizedBox(
+            width: 120,
+            height: 48,
+            child: OutlinedButton(
+              onPressed: () {
+                controller.setCash(amount);
+
+                /// opcional: cobrar directo
+               // controller.main.ticket.saveTicket();
+                controller.completePayment();
+              },
+              child: Text('\$${amount.toStringAsFixed(2)}'),
+            ),
+          );
+        }).toList(),
+      ),
+
+      const SizedBox(height: 24),
+
+      /// =========================
+      /// FILA 4 → MÉTODOS DE PAGO
+      /// =========================
+      Expanded(
+        child: Align(
+          alignment: Alignment.topLeft,
+          child: PosPaymentMethodsBar(controller: mainController),
+        ),
+      ),
+      const Spacer(),
+
+      /// CAMBIO
+      if (controller.cashReceived > 0)
+        Text(
+          'Cambio: \$${controller.change.toStringAsFixed(2)}',
+          textAlign: TextAlign.right,
+          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
+    ],
+  );
+}
+
+class PosPaymentSuccess extends StatelessWidget {
+  final PosPaymentLayoutController controller;
+
+  const PosPaymentSuccess({super.key, required this.controller});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        children: [
+          /// 🔥 TOTAL + CAMBIO
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Column(
+                children: [
+                  Text(
+                    '\$${controller.total.toStringAsFixed(2)}',
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  const Text('Total pagado'),
+                ],
+              ),
+              const SizedBox(width: 40),
+              Column(
+                children: [
+                  Text(
+                    '\$${controller.change.toStringAsFixed(2)}',
+                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  ),
+                  const Text('Cambio'),
+                ],
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 40),
+
+          /// EMAIL
+          Row(
+            children: const [
+              Icon(Icons.email_outlined),
+              SizedBox(width: 8),
+              Expanded(child: Text('cliente@email.com')),
+              Text('ENVIAR RECIBO', style: TextStyle(color: Colors.green)),
+            ],
+          ),
+
+          const Spacer(),
+
+          /// 🔥 NUEVA VENTA
+          SizedBox(
+            width: double.infinity,
+            height: 60,
+            child: ElevatedButton(
+              onPressed: () {
+                //  controller.main.ticket.clear(); // 🔥 limpia ticket
+                controller.reset(); // 🔥 resetea payment
+                controller.main.ticket.saveTicket();
+
+                Navigator.pop(context); // 🔥 cierra modal
+              },
+              child: const Text('NUEVA VENTA'),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
