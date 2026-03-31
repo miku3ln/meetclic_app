@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import '../organisms/pos_header_bar.dart';
 
 class PosMobilePortraitLayout extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
   final GlobalKey<ScaffoldState> scaffoldKey;
 
   const PosMobilePortraitLayout({

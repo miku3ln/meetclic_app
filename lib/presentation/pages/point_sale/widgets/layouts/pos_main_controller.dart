@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 
-import '../../../../../../shared/controllers/app_controller.dart';
-import '../../../shared/utils.dart';
-import '../../../state/pos_product_browser_state.dart';
-import '../../dialogs/moda_managerl.dart';
-import '../../models/pos_product_item.dart';
-import '../../../state/pos_shift_state.dart';
-import '../../../state/pos_ticket_state.dart';
-import '../../../state/pos_payment_state.dart';
-import '../../../state/pos_checkout_state.dart';
-import '../../../state/pos_ui_state.dart';
+import '../../../../../shared/controllers/app_controller.dart';
+import '../../shared/utils.dart';
+import '../../state/pos_product_browser_state.dart';
+import '../dialogs/moda_managerl.dart';
+import '../models/pos_product_item.dart';
+import '../../state/pos_shift_state.dart';
+import '../../state/pos_ticket_state.dart';
+import '../../state/pos_payment_state.dart';
+import '../../state/pos_checkout_state.dart';
+import '../../state/pos_ui_state.dart';
 
-class PosTabletLandscapeController extends ChangeNotifier {
+class PosMainController extends ChangeNotifier {
   final AppController app;
   final PosShiftState shift;
   final PosProductBrowserState browser;
@@ -20,7 +20,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
   final PosCheckoutState checkout;
   final PosUiState ui;
 
-  PosTabletLandscapeController({
+  PosMainController({
     required AppController app,
     PosShiftState? shift,
     PosProductBrowserState? browser,
@@ -81,7 +81,7 @@ class PosTabletLandscapeController extends ChangeNotifier {
     ticket.saveTicket();
   }
 
-  void onPay() {
+  void onPay(   ) {
     if (!shift.isShiftOpen) {
       shift.onRequestOpenShift?.call();
       return;

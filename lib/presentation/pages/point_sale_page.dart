@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/dialogs/pos_open_shift_dialog.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/models/pos_product_item.dart';
 import '../../shared/controllers/app_controller.dart';
@@ -19,7 +19,7 @@ class PointSalePage extends StatefulWidget {
   State<PointSalePage> createState() => _PointSalePageState();
 }
 class _PointSalePageState extends State<PointSalePage> {
-  late final PosTabletLandscapeController controller;
+  late final PosMainController controller;
   final _scaffoldKey = GlobalKey<ScaffoldState>(); // ✅
   late final List<PosCategoryItem> productCategories;
   String? selectedProductCategoryId;
@@ -33,7 +33,7 @@ class _PointSalePageState extends State<PointSalePage> {
   }
   void initControllerMain(){
     final app = context.read<AppController>();
-    controller = PosTabletLandscapeController(app: app)..addListener(_onChanged);
+    controller = PosMainController(app: app)..addListener(_onChanged);
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
     controller.shift.onRequestOpenShift = _showOpenShiftModal;

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 
 class PosOpenShiftDialog extends StatefulWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
 
   const PosOpenShiftDialog({
     super.key,

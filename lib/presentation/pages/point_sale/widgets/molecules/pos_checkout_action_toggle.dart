@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../state/pos_checkout_state.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 
 class PosCheckoutActionToggle extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
   final String title;
 
   const PosCheckoutActionToggle({

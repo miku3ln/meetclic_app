@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../../../../shared/controllers/app_controller.dart';
 import '../dialogs/pos_open_shift_dialog.dart';
@@ -22,7 +22,7 @@ class PosHeaderDefaultLayout extends StatefulWidget
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
-  final PosTabletLandscapeController controllerMain;
+  final PosMainController controllerMain;
 
   const PosHeaderDefaultLayout({
     super.key,
@@ -45,7 +45,7 @@ class PosHeaderDefaultLayout extends StatefulWidget
 }
 
 class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
-  late final PosTabletLandscapeController controller;
+  late final PosMainController controller;
   late final List<PosCategoryItem> productCategories;
   String? selectedProductCategoryId;
   String query = '';
@@ -87,7 +87,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
   }
   void initControllerMain(){
     final app = context.read<AppController>();
-    controller = PosTabletLandscapeController(app: app)..addListener(_onChanged);
+    controller = PosMainController(app: app)..addListener(_onChanged);
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
@@ -219,7 +219,6 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
           ),
 
           const Spacer(),
-
           // 🔍 Search
           IconButton(
             key: _searchKey,

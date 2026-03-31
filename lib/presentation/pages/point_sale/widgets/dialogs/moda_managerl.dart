@@ -5,7 +5,7 @@ import '../../../../../../shared/theme/configuration/app_text_styles.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../state/product_modal_controller.dart';
 
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 import '../molecules/inputs/ps_field_row.dart';
 import '../molecules/inputs/ps_input.dart';
 import '../sections/product/ps_section_card.dart';
@@ -124,93 +124,13 @@ class ModalManagerLayout extends StatelessWidget {
         ),
       ),
     );
-    return Dialog(
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.m),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            /// =========================
-            /// HEADER
-            /// =========================
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                /// 🔙 BACK + TITLE
-                Row(
-                  children: [
-                    if (showBack)
-                      IconButton(
-                        icon: const Icon(Icons.arrow_back),
-                        onPressed: onBack,
-                      ),
-
-                    Text(title, style: AppTextStyles.title(context)),
-                  ],
-                ),
-
-                /// 🔥 ACTIONS (CLAVE)
-                Row(
-                  children: [
-                    if (headerAction != null) ...[
-                      headerAction!,
-                      const SizedBox(width: 8),
-                    ],
-
-                    IconButton(
-                      icon: Icon(Icons.close, color: c.iconPrimary),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            AppSpacing.spaceBetweenSections,
-
-            /// =========================
-            /// BODY
-            /// =========================
-            Flexible(child: SingleChildScrollView(child: body)),
-
-            AppSpacing.spaceBetweenSections,
-
-            /// =========================
-            /// FOOTER
-            /// =========================
-            if (viewActions)
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text(btnCancelTitle),
-                  ),
-
-                  const SizedBox(width: AppSpacing.s),
-
-                  ElevatedButton(
-                    onPressed: onSave,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: onSave == null
-                          ? c.disabled
-                          : c.secondary,
-                    ),
-                    child: Text(btnSaveTitle),
-                  ),
-                ],
-              ),
-          ],
-        ),
-      ),
-    );
   }
 }
 
 Future<void> showCustomerModal({
   required BuildContext context,
   required CustomerModalController controller,
-  required PosTabletLandscapeController controllerMain,
+  required PosMainController controllerMain,
 }) async {
   await showDialog(
     context: context,
@@ -245,7 +165,7 @@ Future<void> showCustomerModal({
 Widget _buildBody(
   BuildContext context,
   CustomerModalController controller,
-  PosTabletLandscapeController controllerMain,
+    PosMainController controllerMain,
 ) {
   /// 🔥 LOADING GLOBAL
   if (controller.isLoading) {
@@ -274,7 +194,7 @@ Widget _buildBody(
 
 Widget? _buildHeaderAction(
   CustomerModalController c,
-  PosTabletLandscapeController controllerMain,
+    PosMainController controllerMain,
     BuildContext context, // 👈 NECESARIO
 ) {
   if (c.view != CustomerViewType.detail) return null;

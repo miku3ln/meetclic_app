@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import '../../../../../shared/controllers/app_controller.dart';
 import '../../theme/pos_ticket_styles.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 import '../molecules/pos_ticket_header.dart';
 import '../organisms/pos_ticket_checkout.dart';
 import '../organisms/pos_ticket_list.dart';
 class PosRightPanel extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
 
   const PosRightPanel({super.key, required this.controller});
 
@@ -31,7 +31,7 @@ class PosRightPanel extends StatelessWidget {
           child: controller.shift. isShiftOpen
               ? Column(
             children: [
-              PosTicketHeader(title: 'Ticketsss', itemsCount: items.length,controllerMain:controller),
+              PosTicketHeader(title: 'Ticket', itemsCount: items.length,controllerMain:controller),
               const SizedBox(height: 50), // ✅ antes 50
               const Divider(height: 0),
               // ✅ Lista ocupa todo menos checkout

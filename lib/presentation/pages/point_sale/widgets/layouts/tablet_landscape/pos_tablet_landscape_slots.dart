@@ -4,13 +4,13 @@ import '../../organisms/pos_header_bar.dart';
 import '../../sections/pos_left_panel.dart';
 import '../../sections/pos_right_panel.dart';
 import '../../slots/pos_layout_slots.dart';
-import 'pos_tablet_landscape_controller.dart';
+import '../pos_main_controller.dart';
 
 
 
 class PosTabletLandscapeSlots {
   static PosLayoutSlots build({
-    required PosTabletLandscapeController controller,
+    required PosMainController controller,
   }) {
     return PosLayoutSlots(
       header: PosHeaderBar(

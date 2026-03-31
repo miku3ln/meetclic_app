@@ -3,11 +3,11 @@ import '../drawers/pos_app_drawer.dart';
 
 import '../templates/pos_split_template.dart';
 
-import 'tablet_landscape/pos_tablet_landscape_controller.dart';
+import 'pos_main_controller.dart';
 import 'tablet_landscape/pos_tablet_landscape_slots.dart';
 
 class PosTabletLandscapeLayout extends StatefulWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
   final scaffoldKey;
   const PosTabletLandscapeLayout({
     super.key,

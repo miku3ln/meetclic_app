@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../shared/utils.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart'; //oki
+import '../layouts/pos_main_controller.dart'; //oki
 
 class TypeServiceDropdown extends StatelessWidget {
   final List<TypeService> items;
@@ -71,7 +71,7 @@ class PosTicketHeader extends StatefulWidget {
   final String title;
   final int itemsCount;
 
-  final PosTabletLandscapeController controllerMain;
+  final PosMainController controllerMain;
 
   const PosTicketHeader({
     super.key,

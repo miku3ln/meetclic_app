@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../../../../shared/controllers/app_controller.dart';
 import '../../dialogs/pos_open_shift_dialog.dart';
 import '../../templates/pos_split_template.dart';
-import 'pos_tablet_landscape_controller.dart';
+import '../pos_main_controller.dart';
 import 'pos_tablet_landscape_fixtures.dart';
 import 'pos_tablet_landscape_slots.dart';
 
@@ -17,14 +17,14 @@ class PosTabletLandscapeLayout extends StatefulWidget {
 }
 
 class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
-  late final PosTabletLandscapeController controller;
+  late final PosMainController controller;
 
   @override
   void initState() {
     super.initState();
     final app = context.read<AppController>();
 
-    controller = PosTabletLandscapeController(app: app)
+    controller = PosMainController(app: app)
       ..addListener(_onControllerChanged);
 
     controller.shift.onRequestOpenShift = _showOpenShiftModal;

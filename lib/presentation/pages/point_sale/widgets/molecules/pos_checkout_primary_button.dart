@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import '../../state/pos_checkout_state.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 
 class PosCheckoutPrimaryButton extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
   final double height;
 
   const PosCheckoutPrimaryButton({

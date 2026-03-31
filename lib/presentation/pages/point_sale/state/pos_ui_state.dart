@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/state/product_modal_controller.dart';
 import '../shared/utils.dart';
 import '../widgets/dialogs/moda_managerl.dart';
-import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../widgets/layouts/pos_main_controller.dart';
 
 class PosUiState extends ChangeNotifier {
   final ValueNotifier<bool> isSummaryExpanded = ValueNotifier<bool>(false);
@@ -20,7 +20,7 @@ class PosUiState extends ChangeNotifier {
 
   void onMoreTap(      BuildContext context,
       dynamic data,
-      PosTabletLandscapeController controllerMain) {
+      PosMainController controllerMain) {
     final result = 'onMoreTap -> click..${controllerMain.hasCustomerSelected}';
     final hasCustomer = controllerMain.hasCustomerSelected;
     debugPrint(result);
@@ -59,7 +59,7 @@ class PosUiState extends ChangeNotifier {
   void onUserTap(
       BuildContext context,
       dynamic data,
-      PosTabletLandscapeController controllerMain,
+      PosMainController controllerMain,
       ) async {
 
     final service = CustomerService();

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../helpers/pos_responsive.dart';
 import '../layouts/pos_header_default.dart';
 import '../layouts/pos_header_mobile_portrait.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 import '../models/pos_product_item.dart';
 
 
@@ -22,7 +22,7 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
-  final PosTabletLandscapeController controllerMain;
+  final PosMainController controllerMain;
   const PosHeaderBar({
     super.key,
     required this.productCategories,

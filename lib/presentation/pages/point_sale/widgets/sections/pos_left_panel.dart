@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import '../../../../../shared/controllers/app_controller.dart';
 import '../atoms/pos_menu_carousel.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../molecules/pos_product_grid.dart';
 
 class PosLeftPanel extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
   final int columns;
 
   const PosLeftPanel({

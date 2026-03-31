@@ -1,14 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../../theme/pos_checkout_style.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 import '../molecules/pos_checkout_action_toggle.dart';
 import '../molecules/pos_checkout_primary_button.dart';
 import '../molecules/pos_payment_methods_bar.dart';
 import '../molecules/pos_totals_card.dart';
 
 class PosTicketCheckout extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
   final double totalsCardWidth;
 
   const PosTicketCheckout({

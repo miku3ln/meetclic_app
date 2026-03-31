@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
-import '../../../../../shared/controllers/app_controller.dart';
-import '../dialogs/pos_open_shift_dialog.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
+
 import '../organisms/pos_header_bar.dart';
-import '../models/pos_product_item.dart'; // PosCategoryItem
-import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
-import 'package:provider/provider.dart';
+
 class PosMobileLandscapeLayout extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
   final GlobalKey<ScaffoldState> scaffoldKey;
 
   const PosMobileLandscapeLayout({

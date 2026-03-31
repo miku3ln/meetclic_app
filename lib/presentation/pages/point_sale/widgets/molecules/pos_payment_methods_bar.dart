@@ -5,10 +5,10 @@ import '../../helpers/no_glow_scroll_behavior.dart';
 import '../../models/pos_payment_method.dart';
 import '../../theme/pos_checkout_style.dart';
 import '../atoms/pos_payment_chip.dart';
-import '../layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
+import '../layouts/pos_main_controller.dart';
 
 class PosPaymentMethodsBar extends StatelessWidget {
-  final PosTabletLandscapeController controller;
+  final PosMainController controller;
 
   const PosPaymentMethodsBar({super.key, required this.controller});
 

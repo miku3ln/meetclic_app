@@ -9,7 +9,6 @@ import '../models/product_draft.dart';
 import '../models/product_subcategory.dart';
 import '../services/product_catalog_service.dart';
 import '../widgets/dialogs/moda_managerl.dart';
-import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_controller.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 
 class ProductModalController extends ChangeNotifier {
