@@ -4,6 +4,7 @@ import '../../../../../shared/controllers/app_controller.dart';
 import '../../shared/utils.dart';
 import '../../state/pos_product_browser_state.dart';
 import '../dialogs/moda_managerl.dart';
+import '../dialogs/modal_pos_pay.dart';
 import '../models/pos_product_item.dart';
 import '../../state/pos_shift_state.dart';
 import '../../state/pos_ticket_state.dart';
@@ -81,18 +82,31 @@ class PosMainController extends ChangeNotifier {
     ticket.saveTicket();
   }
 
-  void onPay(   ) {
+  void onPay( BuildContext context  ) {//PROCESS-INIT
     if (!shift.isShiftOpen) {
       shift.onRequestOpenShift?.call();
       return;
     }
+    showDialog(
+      context: context,
+      builder: (_) {
+        return Dialog(
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
 
-    debugPrint('onPay -> cobrar');
+            /// 🔥 USAS TU CONFIG DIRECTO
+            child: buildPaymentModal(main: this),
+          ),
+        );
+      },
+    );
+
   }
 
-  void onPrimaryCheckoutTap() {
+  void onPrimaryCheckoutTap(BuildContext context) {
     if (checkout.checkoutAction == PosCheckoutAction.pay) {
-      onPay();
+      onPay(context);
     } else {
       onSave();
     }

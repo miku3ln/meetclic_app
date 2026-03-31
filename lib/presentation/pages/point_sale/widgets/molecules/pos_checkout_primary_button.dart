@@ -28,7 +28,9 @@ class PosCheckoutPrimaryButton extends StatelessWidget {
       width: double.infinity,
       height: height,
       child: ElevatedButton(
-        onPressed: enabled ? controller.onPrimaryCheckoutTap : null,
+        onPressed: enabled
+            ? () => controller.onPrimaryCheckoutTap(context)
+            : null,
         style: ElevatedButton.styleFrom(
           backgroundColor: bg,
           foregroundColor: fg,

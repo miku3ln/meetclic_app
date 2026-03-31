@@ -27,9 +27,7 @@ class PosTicketState extends ChangeNotifier {
 
   void addProduct(PosProductItem product) {
     _ensureTicket();
-
     final idx = _items.indexWhere((i) => i.productItem.id == product.id);
-
     if (idx == -1) {
       _items.add(
         PosTicketCalculator.buildNewItem(product: product),

@@ -60,7 +60,7 @@ class PosUiState extends ChangeNotifier {
       BuildContext context,
       dynamic data,
       PosMainController controllerMain,
-      ) async {
+      ) async {//PROCESS-INIT
 
     final service = CustomerService();
     final controller = CustomerModalController(service);

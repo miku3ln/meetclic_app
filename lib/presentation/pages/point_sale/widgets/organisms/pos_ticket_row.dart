@@ -6,7 +6,7 @@ import '../models/pos_product_item.dart';
 class PosTicketRow extends StatelessWidget {
   final PostTicketItem item;
   final PosTicketStyles styles;
-
+  final bool isEdit;
   final VoidCallback onMinus;
   final VoidCallback onPlus;
 
@@ -28,6 +28,7 @@ class PosTicketRow extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     this.debug = false,
+    required this.isEdit,
     this.ui = const PosTicketRowUi(),
   });
 
@@ -48,14 +49,17 @@ class PosTicketRow extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  flex: 7,
+                  //DETAILS
+                  flex: isEdit ? 7 : 10, // 🔥 ocupa todo si no es edit
                   child: _Dbg(
                     debug: debug,
                     color: ui.debugCol1Row1Bg,
                     child: Container(
                       height: ui.rowHeight,
                       alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.symmetric(horizontal: ui.titlePaddingX),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: ui.titlePaddingX,
+                      ),
                       decoration: BoxDecoration(
                         color: debug ? ui.debugTitleBoxBg : Colors.transparent,
                         borderRadius: BorderRadius.circular(ui.titleRadius),
@@ -69,33 +73,45 @@ class PosTicketRow extends StatelessWidget {
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 3,
-                  child: _Dbg(
-                    debug: debug,
-                    color: ui.debugCol2Row1Bg,
-                    child: Container(
-                      height: ui.rowHeight,
-                      padding: EdgeInsets.symmetric(horizontal: ui.actionsPaddingX),
-                      alignment: Alignment.centerRight,
-                      child: Align(
+                if (isEdit)
+                  Expanded(
+                    //ACTIONS
+                    flex: 3,
+                    child: _Dbg(
+                      debug: debug,
+                      color: ui.debugCol2Row1Bg,
+                      child: Container(
+                        height: ui.rowHeight,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: ui.actionsPaddingX,
+                        ),
                         alignment: Alignment.centerRight,
-                        child: FittedBox(
-                          fit: BoxFit.scaleDown,
+                        child: Align(
                           alignment: Alignment.centerRight,
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              _ActionIcon(ui: ui, onTap: onEdit, icon: ui.editIcon),
-                              SizedBox(width: ui.iconGap),
-                              _ActionIcon(ui: ui, onTap: onDelete, icon: ui.deleteIcon),
-                            ],
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            alignment: Alignment.centerRight,
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                _ActionIcon(
+                                  ui: ui,
+                                  onTap: onEdit,
+                                  icon: ui.editIcon,
+                                ),
+                                SizedBox(width: ui.iconGap),
+                                _ActionIcon(
+                                  ui: ui,
+                                  onTap: onDelete,
+                                  icon: ui.deleteIcon,
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -108,7 +124,7 @@ class PosTicketRow extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  flex: 7,
+                  flex: isEdit ? 7 : 10, // 🔥 ocupa todo si no es edit
                   child: Row(
                     children: [
                       // 40% imagen
@@ -120,7 +136,9 @@ class PosTicketRow extends StatelessWidget {
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(ui.imageRadius),
                             child: Container(
-                              color: debug ? ui.debugImageBoxBg : Colors.transparent,
+                              color: debug
+                                  ? ui.debugImageBoxBg
+                                  : Colors.transparent,
                               child: Image.network(
                                 p.imageUrl ?? '',
                                 fit: BoxFit.cover,
@@ -129,7 +147,8 @@ class PosTicketRow extends StatelessWidget {
 
                                   final expected = progress.expectedTotalBytes;
                                   final loaded = progress.cumulativeBytesLoaded;
-                                  final value = (expected != null && expected > 0)
+                                  final value =
+                                      (expected != null && expected > 0)
                                       ? loaded / expected
                                       : null;
 
@@ -178,22 +197,22 @@ class PosTicketRow extends StatelessWidget {
                     ],
                   ),
                 ),
-
-                // stepper qty
-                Expanded(
-                  flex: 3,
-                  child: _Dbg(
-                    debug: debug,
-                    color: ui.debugQtyBg,
-                    child: _QtyStepperPill(
-                      ui: ui,
-                      height: ui.qtyHeight,
-                      valueText: '${item.amount}',
-                      onMinus: onMinus,
-                      onPlus: onPlus,
+                if (isEdit)
+                  // stepper qty
+                  Expanded(
+                    flex: 3,
+                    child: _Dbg(
+                      debug: debug,
+                      color: ui.debugQtyBg,
+                      child: _QtyStepperPill(
+                        ui: ui,
+                        height: ui.qtyHeight,
+                        valueText: '${item.amount}',
+                        onMinus: onMinus,
+                        onPlus: onPlus,
+                      ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -407,7 +426,11 @@ class _ActionIcon extends StatelessWidget {
               color: ui.actionBg,
               borderRadius: BorderRadius.circular(ui.actionRadius),
             ),
-            child: Icon(icon, size: ui.actionIconSize, color: ui.actionIconColor),
+            child: Icon(
+              icon,
+              size: ui.actionIconSize,
+              color: ui.actionIconColor,
+            ),
           ),
         ),
       ),
@@ -486,11 +509,7 @@ class _QtyStepperPill extends StatelessWidget {
               SizedBox(
                 width: sideW,
                 height: double.infinity,
-                child: _PillSideButton(
-                  ui: ui,
-                  icon: Icons.add,
-                  onTap: onPlus,
-                ),
+                child: _PillSideButton(ui: ui, icon: Icons.add, onTap: onPlus),
               ),
             ],
           ),
@@ -558,21 +577,23 @@ class _PriceTotalBox extends StatelessWidget {
           height: h,
           padding: EdgeInsets.symmetric(horizontal: ui.pricePaddingX),
           decoration: BoxDecoration(
-            color: debug ? ui.priceBg : Colors.transparent, // ✅ solo pinta si debug
+            color: debug
+                ? ui.priceBg
+                : Colors.transparent, // ✅ solo pinta si debug
           ),
           alignment: Alignment.centerLeft,
           child: oneLine
               ? Text(money(totalShown), style: ui.totalTextStyle)
               : Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(money(unitShown), style: ui.unitTextStyle),
-              SizedBox(height: ui.priceLineGap),
-              Text(money(totalShown), style: ui.totalTextStyle),
-            ],
-          ),
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(money(unitShown), style: ui.unitTextStyle),
+                    SizedBox(height: ui.priceLineGap),
+                    Text(money(totalShown), style: ui.totalTextStyle),
+                  ],
+                ),
         );
       },
     );

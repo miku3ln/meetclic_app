@@ -6,7 +6,7 @@ import '../organisms/pos_ticket_row.dart';
 class PosTicketBody extends StatelessWidget {
   final List<PostTicketItem> items;
   final PosTicketStyles styles;
-
+  final bool isEdit;
   final void Function(PostTicketItem item) onMinus;
   final void Function(PostTicketItem item) onPlus;
 
@@ -21,6 +21,7 @@ class PosTicketBody extends StatelessWidget {
     required this.onPlus,
     required this.onEdit,
     required this.onDelete,
+    this.isEdit = true, // 🔥 default TRUE
   });
 
   @override
@@ -39,6 +40,7 @@ class PosTicketBody extends StatelessWidget {
           onPlus: () => onPlus(it),
           onEdit: () => onEdit(it),
           onDelete: () => onDelete(it),
+          isEdit: isEdit, // 🔥
         );
       },
     );
