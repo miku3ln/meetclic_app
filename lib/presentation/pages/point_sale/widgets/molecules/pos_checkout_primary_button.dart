@@ -22,7 +22,7 @@ class PosCheckoutPrimaryButton extends StatelessWidget {
     final Color bg = isPay ? colors.payActiveBg : colors.saveActiveBg;
     final Color fg = isPay ? colors.payActiveFg : colors.saveActiveFg;
 
-    final bool enabled = controller.shift.isShiftOpen && controller.ticket.items.isNotEmpty;
+    final bool enabled = controller.allowManagementPost();
 
     return SizedBox(
       width: double.infinity,

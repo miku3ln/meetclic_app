@@ -50,22 +50,24 @@ class PosTotalsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(s.radius),
         border: Border.all(color: s.border),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          PosTotalsRow(label: 'Subtotal', value: '\$${m(subtotal)}'),
-          const SizedBox(height: 10),
-          PosTotalsRow(label: 'Tax', value: '\$${m(tax)}'),
-          const SizedBox(height: 12),
-          Divider(height: 1, color: s.border),
-          const SizedBox(height: 12),
-          PosTotalsRow(
-            label: 'Total',
-            value: '\$${m(total)}',
-            labelStyle: s.totalLabelStyle,
-            valueStyle: s.totalValueStyle,
-          ),
-        ],
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            PosTotalsRow(label: 'Subtotal', value: '\$${m(subtotal)}'),
+            const SizedBox(height: 10),
+            PosTotalsRow(label: 'Tax', value: '\$${m(tax)}'),
+            const SizedBox(height: 12),
+            Divider(height: 1, color: s.border),
+            const SizedBox(height: 12),
+            PosTotalsRow(
+              label: 'Total',
+              value: '\$${m(total)}',
+              labelStyle: s.totalLabelStyle,
+              valueStyle: s.totalValueStyle,
+            ),
+          ],
+        ),
       ),
     );
   }

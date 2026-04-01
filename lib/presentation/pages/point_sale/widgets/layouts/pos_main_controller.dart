@@ -36,7 +36,6 @@ class PosMainController extends ChangeNotifier {
        payment = payment ?? PosPaymentState(),
        checkout = checkout ?? PosCheckoutState(),
        ui = ui ?? PosUiState() {
-
     typeService = typeServicesData.first; // 🔥 AQUÍ
     _bindStates();
   }
@@ -82,7 +81,8 @@ class PosMainController extends ChangeNotifier {
     ticket.saveTicket();
   }
 
-  void onPay( BuildContext context  ) {//PROCESS-INIT
+  void onPay(BuildContext context) {
+    //PROCESS-INIT
     if (!shift.isShiftOpen) {
       shift.onRequestOpenShift?.call();
       return;
@@ -92,6 +92,7 @@ class PosMainController extends ChangeNotifier {
 
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (_) {
         return AnimatedBuilder(
           animation: this, // 🔥 ESCUCHA CAMBIOS DEL MAIN
@@ -100,17 +101,13 @@ class PosMainController extends ChangeNotifier {
               child: SizedBox(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
-                child: buildPaymentModal(
-                  main: this,
-                  controller: controller,
-                ),
+                child: buildPaymentModal(main: this, controller: controller),
               ),
             );
           },
         );
       },
     );
-
   }
 
   void onPrimaryCheckoutTap(BuildContext context) {
@@ -137,34 +134,46 @@ class PosMainController extends ChangeNotifier {
 
   void setCustomerTicket(CustomerModelPosCurrent? selectedCustomerCurrent) {
     selectedCustomer = selectedCustomerCurrent;
-
     notifyListeners();
-
   }
+
   List<TypeService> typeServicesData = [
-  TypeService(label: 'Para servirse', icon: Icons.restaurant, value: 'servirse'),
-  TypeService(label: 'Para llevar', icon: Icons.shopping_bag, value: 'llevar'),
-  TypeService(label: 'A domicilio', icon: Icons.delivery_dining, value: 'domicilio'),
+    TypeService(
+      label: 'Para servirse',
+      icon: Icons.restaurant,
+      value: 'servirse',
+    ),
+    TypeService(
+      label: 'Para llevar',
+      icon: Icons.shopping_bag,
+      value: 'llevar',
+    ),
+    TypeService(
+      label: 'A domicilio',
+      icon: Icons.delivery_dining,
+      value: 'domicilio',
+    ),
   ];
+
   bool get hasCustomerSelected => selectedCustomer != null;
   late TypeService typeService;
+
   void setTypeService(TypeService typeSelected) {
     typeService = typeSelected;
     debugPrint('setTypeService: ${typeService.value}');
 
     notifyListeners();
-
   }
+
   // 🔥 CATEGORY
   String? selectedProductCategoryId;
 
   void setProductCategory(String id) {
-
     selectedProductCategoryId = id;
     notifyListeners();
   }
 
-// 🔥 SEARCH
+  // 🔥 SEARCH
   String query = '';
 
   void setQuery(String value) {
@@ -172,6 +181,18 @@ class PosMainController extends ChangeNotifier {
     notifyListeners();
   }
 
-  List<PosCategoryItem> get productCategories =>
-      browser.productCategories;
+  List<PosCategoryItem> get productCategories => browser.productCategories;
+
+  bool allowManagementPost() {
+    late bool result=selectedCustomer != null &&
+        shift.isShiftOpen &&
+        ticket.items.isNotEmpty;
+    if(checkout.isPaySelected){
+
+    }else{
+
+    }
+    return  result;
+  }
+  String get labelTitleWayPayment=>"Formas de Pago";
 }

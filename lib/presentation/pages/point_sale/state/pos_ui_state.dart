@@ -62,7 +62,7 @@ class PosUiState extends ChangeNotifier {
       PosMainController controllerMain,
       ) async {//PROCESS-INIT
 
-    final service = CustomerService();
+    final service = CustomerServiceModal();
     final controller = CustomerModalController(service);
 
     /// 🔥 DECIDES TODO AQUÍ (no en UI)

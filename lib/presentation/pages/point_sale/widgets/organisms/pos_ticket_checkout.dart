@@ -51,8 +51,8 @@ class PosTicketCheckout extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text(
-                            'Formas de Pago',
+                           Text(
+                           controller.labelTitleWayPayment,
                             style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 13,

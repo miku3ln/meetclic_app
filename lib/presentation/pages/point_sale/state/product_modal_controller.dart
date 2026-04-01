@@ -941,7 +941,7 @@ class CustomerModalController extends ChangeNotifier {
     notifyListeners();
   }
 
-  final CustomerService _service;
+  final CustomerServiceModal _service;
 
   CustomerModalController(this._service);
 

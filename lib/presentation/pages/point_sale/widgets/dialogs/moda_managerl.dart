@@ -534,7 +534,7 @@ class _CustomerTabs extends StatelessWidget {
   }
 }
 
-class CustomerService {
+class CustomerServiceModal {
   Future<List<CustomerModelPosCurrent>> fetchCustomers() async {
     /// Simula delay de API
     await Future.delayed(const Duration(seconds: 2));
