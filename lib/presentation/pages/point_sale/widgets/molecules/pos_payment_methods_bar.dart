@@ -10,7 +10,14 @@ import '../layouts/pos_main_controller.dart';
 class PosPaymentMethodsBar extends StatelessWidget {
   final PosMainController controller;
 
-  const PosPaymentMethodsBar({super.key, required this.controller});
+  // 👇 nuevo callback
+  final void Function(PosPaymentMethod method)? onPaymentTap;
+
+  const PosPaymentMethodsBar({
+    super.key,
+    required this.controller,
+    this.onPaymentTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -18,11 +25,11 @@ class PosPaymentMethodsBar extends StatelessWidget {
     final selected = controller.payment.paymentMethod;
 
     return Container(
-   //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
         color: s.barBg,
         borderRadius: BorderRadius.circular(s.radius),
-       // border: Border.all(color: s.border),
+        // border: Border.all(color: s.border),
       ),
       child: SizedBox(
         height: s.chipHeight,
@@ -37,21 +44,41 @@ class PosPaymentMethodsBar extends StatelessWidget {
                 label: 'Efectivo',
                 icon: Icons.payments_outlined,
                 selected: selected == PosPaymentMethod.cash,
-                onTap: () => controller.payment.setPaymentMethod(PosPaymentMethod.cash),
+                onTap: () {
+                  controller.payment.setPaymentMethod(PosPaymentMethod.cash);
+                  onPaymentTap?.call(PosPaymentMethod.cash);
+                },
+              ),
+              const SizedBox(width: 9),
+              PosPaymentChip(
+                label: 'Deposito',
+                icon: Icons.account_balance,
+                selected: selected == PosPaymentMethod.deposit,
+                onTap: () {
+                  controller.payment.setPaymentMethod(PosPaymentMethod.deposit);
+                  onPaymentTap?.call(PosPaymentMethod.deposit);
+                },
               ),
               const SizedBox(width: 9),
               PosPaymentChip(
                 label: 'Tarjetas ',
                 icon: Icons.credit_card_outlined,
                 selected: selected == PosPaymentMethod.card,
-                onTap: () => controller.payment.setPaymentMethod(PosPaymentMethod.card),
+                onTap: () {
+                  controller.payment.setPaymentMethod(PosPaymentMethod.card);
+                  onPaymentTap?.call(PosPaymentMethod.card);
+                },
               ),
+
               const SizedBox(width: 9),
               PosPaymentChip(
                 label: 'QR Code',
                 icon: Icons.qr_code_2_outlined,
                 selected: selected == PosPaymentMethod.qr,
-                onTap: () => controller.payment.setPaymentMethod(PosPaymentMethod.qr),
+                onTap: () {
+                  controller.payment.setPaymentMethod(PosPaymentMethod.qr);
+                  onPaymentTap?.call(PosPaymentMethod.qr);
+                },
               ),
             ],
           ),

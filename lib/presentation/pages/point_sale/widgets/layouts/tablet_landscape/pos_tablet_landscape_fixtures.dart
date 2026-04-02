@@ -354,4 +354,71 @@ class PosTabletLandscapeFixtures {
       ),
     ];
   }
+  static List<PosCoupon> getCouponsData() {
+    return [
+      /// 🍔 BURGERS
+      PosCoupon(id: 'cpn_001', code: 'BURGER10', name: '10% Burger', discount: 10, productId: 'prd_burger_clasica', expiresAt: DateTime.now().add(const Duration(days: 30))),
+      PosCoupon(id: 'cpn_002', code: 'BURGER20', name: '20% Burger', discount: 20, productId: 'prd_burger_doble', expiresAt: DateTime.now().add(const Duration(days: 15))),
+      PosCoupon(id: 'cpn_003', code: 'CHEESE5', name: '0.5 Queso', discount: 0.5, productId: 'prd_burger_queso'),
+      PosCoupon(id: 'cpn_004', code: 'POLLOBURGER', name: '15% Pollo Burger', discount: 15, productId: 'prd_burger_pollo'),
+
+      /// 🍗 POLLO
+      PosCoupon(id: 'cpn_005', code: 'POLLO10', name: '10% Pollo', discount: 10, productId: 'prd_pollo_crispy_2p'),
+      PosCoupon(id: 'cpn_006', code: 'POLLO3P', name: '1 OFF Pollo 3p', discount: 1, productId: 'prd_pollo_crispy_3p'),
+      PosCoupon(id: 'cpn_007', code: 'ALITAS20', name: '20% Alitas', discount: 20, productId: 'prd_alitas_6'),
+
+      /// 🍟 SNACKS
+      PosCoupon(id: 'cpn_008', code: 'PAPAS10', name: '10% Papas', discount: 10, productId: 'prd_papas_med'),
+      PosCoupon(id: 'cpn_009', code: 'PAPASGRAND', name: '1 Papas grandes', discount: 1, productId: 'prd_papas_gran'),
+      PosCoupon(id: 'cpn_010', code: 'NUGGETS5', name: '0.5 Nuggets', discount: 0.5, productId: 'prd_nuggets_6'),
+      PosCoupon(id: 'cpn_011', code: 'NUGGETS10', name: '10% Nuggets', discount: 10, productId: 'prd_nuggets_10'),
+
+      /// 🥤 BEBIDAS
+      PosCoupon(id: 'cpn_012', code: 'AGUAFREE', name: '1 Agua', discount: 1, productId: 'prd_agua'),
+      PosCoupon(id: 'cpn_013', code: 'COLA10', name: '10% Cola', discount: 10, productId: 'prd_cola_500'),
+      PosCoupon(id: 'cpn_014', code: 'JUGO1', name: '1 Jugo', discount: 1, productId: 'prd_jugo'),
+      PosCoupon(id: 'cpn_015', code: 'CAFE20', name: '20% Café', discount: 20, productId: 'prd_cafe'),
+
+      /// 🍰 POSTRES
+      PosCoupon(id: 'cpn_016', code: 'BROWNIE10', name: '10% Brownie', discount: 10, productId: 'prd_brownie'),
+      PosCoupon(id: 'cpn_017', code: 'HELADO2', name: '2 Helado', discount: 2, productId: 'prd_helado'),
+
+      /// 🍚 MENU
+      PosCoupon(id: 'cpn_018', code: 'ARROZ5', name: '5% Arroz carne', discount: 5, productId: 'prd_arroz_carne'),
+      PosCoupon(id: 'cpn_019', code: 'POLLOARROZ', name: '10% Arroz pollo', discount: 10, productId: 'prd_arroz_pollo'),
+      PosCoupon(id: 'cpn_020', code: 'HUEVOFREE', name: '1 Huevo', discount: 1, productId: 'prd_arroz_huevo'),
+      PosCoupon(id: 'cpn_021', code: 'SALCHICHA', name: '10% Salchicha', discount: 10, productId: 'prd_arroz_salchicha'),
+
+      /// 🧀 EXTRAS
+      PosCoupon(id: 'cpn_022', code: 'SALSAFREE', name: '0.5 Salsa', discount: 0.5, productId: 'prd_salsa_tomate'),
+      PosCoupon(id: 'cpn_023', code: 'MAYO10', name: '10% Mayonesa', discount: 10, productId: 'prd_mayonesa'),
+      PosCoupon(id: 'cpn_024', code: 'QUESO2', name: '2 Queso extra', discount: 2, productId: 'prd_queso_extra'),
+
+      /// 🍳 DESAYUNO
+      PosCoupon(id: 'cpn_025', code: 'DESAYUNO5', name: '5% Desayuno', discount: 5, productId: 'prd_desayuno_huevo_arroz'),
+      PosCoupon(id: 'cpn_026', code: 'DESAYUNO10', name: '10% Desayuno', discount: 10, productId: 'prd_desayuno_huevo_salchicha'),
+
+      /// 🍔 COMBOS
+      PosCoupon(id: 'cpn_027', code: 'COMBO10', name: '10% Combo Burger', discount: 10, productId: 'prd_combo_burger'),
+      PosCoupon(id: 'cpn_028', code: 'COMBO20', name: '20% Combo Pollo', discount: 20, productId: 'prd_combo_pollo'),
+
+      /// 🔥 GENERALES (repetidos distintos valores)
+      PosCoupon(id: 'cpn_029', code: 'BURGER5', name: '5% Burger', discount: 5, productId: 'prd_burger_clasica'),
+      PosCoupon(id: 'cpn_030', code: 'BURGER30', name: '30% Burger', discount: 30, productId: 'prd_burger_doble'),
+      PosCoupon(id: 'cpn_031', code: 'PAPAS5', name: '5% Papas', discount: 5, productId: 'prd_papas_med'),
+      PosCoupon(id: 'cpn_032', code: 'NUGGETS20', name: '20% Nuggets', discount: 20, productId: 'prd_nuggets_10'),
+
+      /// 🔥 MÁS VARIADOS
+      PosCoupon(id: 'cpn_033', code: 'COLA5', name: '5% Cola', discount: 5, productId: 'prd_cola_500'),
+      PosCoupon(id: 'cpn_034', code: 'CAFE5', name: '5% Café', discount: 5, productId: 'prd_cafe'),
+      PosCoupon(id: 'cpn_035', code: 'HELADO10', name: '10% Helado', discount: 10, productId: 'prd_helado'),
+      PosCoupon(id: 'cpn_036', code: 'BROWNIE5', name: '5% Brownie', discount: 5, productId: 'prd_brownie'),
+
+      /// ⚠️ EXPIRADOS
+      PosCoupon(id: 'cpn_037', code: 'OLD10', name: 'Expirado 10%', discount: 10, productId: 'prd_burger_clasica', expiresAt: DateTime.now().subtract(const Duration(days: 1))),
+      PosCoupon(id: 'cpn_038', code: 'OLD20', name: 'Expirado 20%', discount: 20, productId: 'prd_combo_burger', expiresAt: DateTime.now().subtract(const Duration(days: 2))),
+      PosCoupon(id: 'cpn_039', code: 'OLD5', name: 'Expirado 5%', discount: 5, productId: 'prd_papas_med', expiresAt: DateTime.now().subtract(const Duration(days: 3))),
+      PosCoupon(id: 'cpn_040', code: 'OLD50', name: 'Expirado 50%', discount: 50, productId: 'prd_burger_doble', expiresAt: DateTime.now().subtract(const Duration(days: 5))),
+    ];
+  }
 }

@@ -1,1 +1,1 @@
-enum PosPaymentMethod { cash, card, qr }
+enum PosPaymentMethod { cash, card, qr,deposit }

@@ -86,7 +86,8 @@ class PostTicketItem {
 
   final int amount;
   final double discount;
-
+  final String? couponId;
+  final double couponDiscount;
   const PostTicketItem({
     required this.productItem,
     required this.tax,
@@ -97,5 +98,29 @@ class PostTicketItem {
 
     this.description,
     this.discount = 0,
+    this.couponId,
+    this.couponDiscount = 0,
   });
+}
+class PosCoupon {
+  final String id;
+  final String code;
+  final String name;
+  final String? image;
+  final DateTime? expiresAt;
+  final double discount; // % o valor fijo
+  final String productId; // 🔥 a qué producto aplica
+
+  const PosCoupon({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.discount,
+    required this.productId,
+    this.image,
+    this.expiresAt,
+  });
+
+  bool get isExpired =>
+      expiresAt != null && DateTime.now().isAfter(expiresAt!);
 }

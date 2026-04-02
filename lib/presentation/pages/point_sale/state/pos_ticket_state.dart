@@ -112,4 +112,43 @@ class PosTicketState extends ChangeNotifier {
     _tax = result.tax;
     _total = result.total;
   }
+
+
+  bool applyCoupon(PosCoupon coupon) {
+    if (coupon.isExpired) return false;
+
+    /// 🔥 buscar item
+    final idx = _items.indexWhere(
+          (i) => i.productItem.id == coupon.productId,
+    );
+
+    if (idx == -1) return false;
+
+    final item = _items[idx];
+
+    /// 🔥 calcular descuento
+    final discountAmount = item.unitPrice * (coupon.discount / 100);
+
+    /// 🔥 CLONAR ITEM (NO mutar directo)
+    final newItem = PostTicketItem(
+      productItem: item.productItem,
+      amount: item.amount,
+      unitPrice: item.unitPrice,
+      subtotal: item.subtotal,
+      tax: item.tax,
+      total: (item.total - discountAmount).clamp(0, double.infinity),
+      discount: item.discount + discountAmount,
+
+      /// 🔥 NUEVO
+      couponId: coupon.id,
+      couponDiscount: discountAmount,
+    );
+
+    _items[idx] = newItem;
+
+    _recalculate();
+    notifyListeners();
+
+    return true;
+  }
 }

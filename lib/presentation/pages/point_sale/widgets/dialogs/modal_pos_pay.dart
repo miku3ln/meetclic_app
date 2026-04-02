@@ -6,6 +6,7 @@ import '../../shared/utils.dart';
 import '../../state/product_modal_controller.dart';
 import '../../theme/pos_ticket_styles.dart';
 import '../layouts/pos_main_controller.dart';
+import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../models/pos_product_item.dart';
 import '../molecules/pos_payment_methods_bar.dart';
 import '../molecules/pos_ticket_header.dart';
@@ -19,12 +20,10 @@ class PosPaymentLayoutController extends ChangeNotifier {
   bool get showActions => false;
 
   PosPaymentLayoutController({required this.main});
-
   /// =============================
   /// ITEMS
   /// =============================
   List<PostTicketItem> get items => main.ticket.items;
-
   bool get hasItems => items.isNotEmpty;
 
   /// =============================
@@ -342,8 +341,13 @@ Widget buildPaymentModal({
 
 class CashInput extends StatefulWidget {
   final PosPaymentLayoutController controller;
+  final PosMainController mainController;
 
-  const CashInput({super.key, required this.controller});
+  const CashInput({
+    super.key,
+    required this.controller,
+    required this.mainController,
+  });
 
   @override
   State<CashInput> createState() => _CashInputState();
@@ -410,7 +414,7 @@ class _CashInputState extends State<CashInput> {
       controller: _textController,
       focusNode: _focusNode,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
-
+      enabled: widget.mainController.payment.allowInputCashPointSale,
       decoration: const InputDecoration(
         labelText: 'Efectivo recibido',
         prefixIcon: Icon(Icons.attach_money),
@@ -434,6 +438,7 @@ Widget _buildPaymentForm(
   PosPaymentLayoutController controller,
   PosMainController mainController,
 ) {
+  final theme = Theme.of(context);
   return LayoutBuilder(
     builder: (context, constraints) {
       return SingleChildScrollView(
@@ -518,7 +523,12 @@ Widget _buildPaymentForm(
                 /// =========================
                 Row(
                   children: [
-                    Expanded(child: CashInput(controller: controller)),
+                    Expanded(
+                      child: CashInput(
+                        controller: controller,
+                        mainController: mainController,
+                      ),
+                    ),
                     const SizedBox(width: 16),
                     SizedBox(
                       height: 56,
@@ -526,9 +536,14 @@ Widget _buildPaymentForm(
                         onPressed: controller.hasItems
                             ? () {
                                 controller.completePayment();
+
                               }
                             : null,
-                        child: const Text('COBRAR'),
+                        child: Text(
+                          mainController
+                              .payment
+                              .getNameButtonManagementPointSale,
+                        ),
                       ),
                     ),
                   ],
@@ -539,33 +554,52 @@ Widget _buildPaymentForm(
                 /// =========================
                 /// BOTONES RÁPIDOS
                 /// =========================
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
-                  children: controller.suggestedAmounts.map((amount) {
-                    return SizedBox(
-                      width: 120,
-                      height: 48,
-                      child: OutlinedButton(
-                        onPressed: () {
-                          controller.setCash(amount);
-                          controller.completePayment();
-                        },
-                        child: Text('\$${amount.toStringAsFixed(2)}'),
-                      ),
-                    );
-                  }).toList(),
-                ),
-
+                if (mainController.payment.allowInputCashPointSale)
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 12,
+                    children: controller.suggestedAmounts.map((amount) {
+                      return SizedBox(
+                        width: 120,
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            controller.setCash(amount);
+                            controller.completePayment();
+                          },
+                          child: Text('\$${amount.toStringAsFixed(2)}'),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 const SizedBox(height: 24),
 
                 /// =========================
                 /// MÉTODOS DE PAGO
                 /// =========================
+                Text(
+                  'Formas de Pago.',
+                  style: TextStyle(
+                    fontSize: 18,
+                    color: theme.colorScheme.primary,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 10),
                 Expanded(
                   child: Align(
                     alignment: Alignment.topLeft,
-                    child: PosPaymentMethodsBar(controller: mainController),
+                    child: PosPaymentMethodsBar(
+                      controller: mainController,
+                      onPaymentTap: (method) {
+                        print("Seleccionado: $method");
+
+                        // aquí puedes:
+                        // - cerrar modal
+                        // - cambiar UI
+                        // - validar
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -835,6 +869,11 @@ class _Header extends StatelessWidget {
                   flex: 3,
                   alignment: HeaderItemAlignment.left, // 🔥
                   onTap: () {
+                    if(controller.isCompleted){
+                      controller.reset();
+                      controller.main.ticket.saveTicket();
+
+                    }
                     Navigator.pop(context);
                   },
                 ),
@@ -938,10 +977,7 @@ Widget _wrapItem(HeaderItemData item) {
   if (isIconOnly) {
     return Align(
       alignment: _mapAlignment(item.alignment),
-      child: IconButton(
-        icon: Icon(item.icon),
-        onPressed: item.onTap,
-      ),
+      child: IconButton(icon: Icon(item.icon), onPressed: item.onTap),
     );
   }
 
@@ -1101,5 +1137,73 @@ class _Actions extends StatelessWidget {
         ],
       ),
     );
+  }
+}
+class CouponInput extends StatefulWidget {
+  final PosMainController main;
+  const CouponInput({super.key, required this.main});
+
+  @override
+  State<CouponInput> createState() => _CouponInputState();
+}
+
+class _CouponInputState extends State<CouponInput> {
+  final controller = TextEditingController();
+
+  void _apply() {
+    final code = controller.text.trim();
+
+    /// 🔥 simular búsqueda
+    final coupon = fakeFindCoupon(code);
+    if (coupon == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Cupón no válido')),
+      );
+      return;
+    }
+
+    final success = widget.main.ticket.applyCoupon(coupon);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          success ? 'Cupón aplicado' : 'Producto no encontrado en ticket',
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Código de cupón',
+              border: OutlineInputBorder(),
+              prefixIcon: Icon(Icons.local_offer_outlined),
+            ),
+          ),
+        ),
+        const SizedBox(width: 8),
+        ElevatedButton(
+          onPressed: _apply,
+          child: const Text('Aplicar'),
+        ),
+      ],
+    );
+  }
+}
+PosCoupon? fakeFindCoupon(String code) {
+  final coupons = PosTabletLandscapeFixtures.getCouponsData();
+
+  try {
+    return coupons.firstWhere(
+          (c) => c.code.toLowerCase() == code.toLowerCase(),
+    );
+  } catch (_) {
+    return null;
   }
 }
