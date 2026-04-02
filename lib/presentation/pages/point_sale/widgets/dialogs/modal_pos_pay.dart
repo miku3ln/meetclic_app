@@ -5,6 +5,7 @@ import '../../../../../shared/controllers/app_controller.dart';
 import '../../shared/utils.dart';
 import '../../state/product_modal_controller.dart';
 import '../../theme/pos_ticket_styles.dart';
+import '../alert_information.dart';
 import '../layouts/pos_main_controller.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../models/pos_product_item.dart';
@@ -518,6 +519,9 @@ Widget _buildPaymentForm(
 
                 const SizedBox(height: 24),
 
+                CouponInput(main: mainController, controllerPos:  controller),
+
+                const SizedBox(height: 16),
                 /// =========================
                 /// INPUT + COBRAR
                 /// =========================
@@ -1141,7 +1145,8 @@ class _Actions extends StatelessWidget {
 }
 class CouponInput extends StatefulWidget {
   final PosMainController main;
-  const CouponInput({super.key, required this.main});
+  final PosPaymentLayoutController controllerPos;
+  const CouponInput({super.key, required this.main,required this.controllerPos});
 
   @override
   State<CouponInput> createState() => _CouponInputState();
@@ -1149,48 +1154,89 @@ class CouponInput extends StatefulWidget {
 
 class _CouponInputState extends State<CouponInput> {
   final controller = TextEditingController();
+  AlertType? _type;
+  String? _message;
+  String? _subtitle;
 
+  void _showAlert(AlertType type, String message, {String? subtitle}) {
+    setState(() {
+      _type = type;
+      _message = message;
+      _subtitle = subtitle;
+    });
+  }
+
+  void _clearAlert() {
+    setState(() {
+      _type = null;
+      _message = null;
+      _subtitle = null;
+    });
+  }
   void _apply() {
     final code = controller.text.trim();
 
-    /// 🔥 simular búsqueda
     final coupon = fakeFindCoupon(code);
+
     if (coupon == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Cupón no válido')),
-      );
+      _showAlert(AlertType.error, 'Cupón no válido');
+      return;
+    }
+
+    if (coupon.isExpired) {
+      _showAlert(AlertType.warning, 'Cupón expirado');
       return;
     }
 
     final success = widget.main.ticket.applyCoupon(coupon);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          success ? 'Cupón aplicado' : 'Producto no encontrado en ticket',
-        ),
-      ),
+    if (!success) {
+      _showAlert(AlertType.warning, 'Producto no está en el ticket');
+      return;
+    }
+
+    _showAlert(
+      AlertType.success,
+      'Cupón aplicado',
+      subtitle: coupon.name,
     );
   }
-
   @override
   Widget build(BuildContext context) {
-    return Row(
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Expanded(
-          child: TextField(
-            controller: controller,
-            decoration: const InputDecoration(
-              hintText: 'Código de cupón',
-              border: OutlineInputBorder(),
-              prefixIcon: Icon(Icons.local_offer_outlined),
-            ),
+        /// 🔥 ALERTA ARRIBA
+        if (_type != null && _message != null)
+          PosAlertMessage(
+            message: _message!,
+            subtitle: _subtitle,
+            type: _type!,
+            onClose: _clearAlert,
           ),
-        ),
-        const SizedBox(width: 8),
-        ElevatedButton(
-          onPressed: _apply,
-          child: const Text('Aplicar'),
+
+        /// INPUT + BOTÓN
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: controller,
+                decoration: const InputDecoration(
+                  hintText: 'Código de cupón',
+                  border: OutlineInputBorder(),
+                  prefixIcon: Icon(Icons.local_offer_outlined),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            SizedBox(
+              height: 56, // 🔥 iguala altura con TextField
+              child: ElevatedButton(
+                onPressed: _apply,
+                child: const Text('Aplicar'),
+              ),
+            ),
+          ],
         ),
       ],
     );
