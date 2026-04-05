@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
-
 import '../../../../../shared/controllers/app_controller.dart';
 import '../../shared/utils.dart';
 import '../../state/product_modal_controller.dart';
@@ -14,7 +13,18 @@ import '../molecules/pos_payment_methods_bar.dart';
 import '../molecules/pos_ticket_header.dart';
 import '../molecules/pos_totals_card.dart';
 import '../organisms/pos_ticket_list.dart';
+import '../sections/pos_layouts_utils.dart';
 import 'moda_managerl.dart';
+
+/// =============================
+/// USO EN MODAL
+/// =============================
+Widget buildPaymentModal({
+  required PosMainController main,
+  required PosPaymentLayoutController controller,
+}) {
+  return PosPaymentLayout(controller: controller, mainController: main);
+}
 
 class PosPaymentLayoutController extends ChangeNotifier {
   final PosMainController main;
@@ -167,15 +177,14 @@ class PosPaymentLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: controller,
-      builder: (_, __) {
-        return Column(
-          children: [
-            /// HEADER
-            _Header(controller: controller, mainController: mainController),
+    final theme = Theme.of(context);
 
-            /// BODY
+    return Stack(
+      children: [
+        /// 🔥 CONTENIDO PRINCIPAL
+        Column(
+          children: [
+            _Header(controller: controller, mainController: mainController),
             Expanded(
               child: _Body(
                 controller: controller,
@@ -183,11 +192,106 @@ class PosPaymentLayout extends StatelessWidget {
               ),
             ),
 
-            /// ACTIONS (opcional)
             if (controller.showActions) _Actions(controller: controller),
           ],
-        );
-      },
+        ),
+
+        /// 🔥 FLOATING ACTIONS (TU COMPONENTE)
+        Visibility(
+          visible: !controller.isCompleted,
+          child: PosFloatingActionsColumn(
+            position: PosFloatingPosition.bottomRight,
+            actions: [
+              PosActionButton(
+                width: 100,
+                icon: Icons.backspace,
+                backgroundColor: Colors.pink,
+                onTap: () {},
+              ),
+              PosActionButton(
+                width: 100,
+                icon: Icons.clear,
+                label: 'Cupones',
+                backgroundColor: Colors.orange,
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (_) => Dialog(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Container(
+                        width: 400,
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            /// HEADER
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Text(
+                                  'Cupones',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                IconButton(
+                                  icon: const Icon(Icons.close),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                              ],
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            //CUPON SET
+                            /// 🔥 BADGES DE CUPONES
+                            CouponInput(main: mainController, controllerPos: controller),
+                            if (mainController.ticket.items
+                                .where((e) => e.coupon != null)
+                                .toList()
+                                .isNotEmpty)
+                            //SET CUPONS ADD
+                              Text(
+                                'Cupones Aplicados.',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            PosCouponChips(
+                              items: mainController.ticket.items,
+                              onRemove: (item) {
+                                mainController.ticket.removeCoupon(item);
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              PosActionButton(
+                width: 100,
+
+               // onPressed: controller.hasItems
+              //      ? () => controller.completePayment()
+                icon: Icons.check,
+                label: mainController.payment.getNameButtonManagementPointSale,
+                backgroundColor: Colors.blue,
+                onTap: () {
+                  controller.completePayment();
+                },
+              ),
+            ],
+          ),
+        )
+      ],
     );
   }
 }
@@ -326,21 +430,12 @@ class PosPaymentPanel extends StatelessWidget {
           /// 🔥 SWITCH ENTRE FORM Y SUCCESS
           child: controller.isCompleted
               ? PosPaymentSuccess(controller: controller)
-              : _buildPaymentForm(context, controller, mainController),
+              // : _buildPaymentForm(context, controller, mainController),
+              : buildTestLayout(context, controller, mainController),
         );
       },
     );
   }
-}
-
-/// =============================
-/// USO EN MODAL
-/// =============================
-Widget buildPaymentModal({
-  required PosMainController main,
-  required PosPaymentLayoutController controller,
-}) {
-  return PosPaymentLayout(controller: controller, mainController: main);
 }
 
 class CashInput extends StatefulWidget {
@@ -437,207 +532,124 @@ class _CashInputState extends State<CashInput> {
   }
 }
 
-Widget _buildPaymentForm(
+Widget buildTestLayout(
   BuildContext context,
   PosPaymentLayoutController controller,
   PosMainController mainController,
 ) {
   final theme = Theme.of(context);
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      return SingleChildScrollView(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-        ),
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minHeight: constraints.maxHeight),
-          child: IntrinsicHeight(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                /// =========================
-                /// TOTAL
-                /// =========================
-                ///
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  child: Row(
-                    children: [
-                      /// =========================
-                      /// TOTAL
-                      /// =========================
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '\$${controller.total.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Importe total adeudado',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
+  return PosThreeSectionLayout(
+    /// 🔝 TOP
+    top: _buildTopSection(context, controller, mainController),
 
-                      /// DIVISOR
-                      Container(
-                        width: 1,
-                        height: 50,
-                        margin: const EdgeInsets.symmetric(horizontal: 12),
-                        color: Colors.grey.shade300,
-                      ),
-
-                      /// =========================
-                      /// CAMBIO
-                      /// =========================
-                      Expanded(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              '\$${controller.change.toStringAsFixed(2)}',
-                              style: const TextStyle(
-                                fontSize: 32,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              'Cambio',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                CouponInput(main: mainController, controllerPos: controller),
-
-                /// 🔥 BADGES DE CUPONES
-                ///
-                if (mainController.ticket.items
-                    .where((e) => e.coupon != null)
-                    .toList()
-                    .isNotEmpty)
-                //SET CUPONS ADD
-                  Text(
-                    'Cupones Aplicados.',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: theme.colorScheme.primary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  PosCouponChips(
-                    items: mainController.ticket.items,
-                    onRemove: (item) {
-                      mainController.ticket.removeCoupon(item);
+    /// 📜 BODY
+    body: Column(
+      children: [
+        if (mainController.payment.allowInputCashPointSale)
+          SizedBox(
+            height: 70,
+            child: PageView.builder(
+              controller: PageController(viewportFraction: 0.35),
+              itemCount: controller.suggestedAmounts.length,
+              itemBuilder: (context, index) {
+                final amount = controller.suggestedAmounts[index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: OutlinedButton(
+                    onPressed: () {
+                      controller.setCash(amount);
+                      controller.completePayment();
                     },
+                    child: Text('\$${amount.toStringAsFixed(2)}'),
                   ),
-
-                const SizedBox(height: 8),
-                const SizedBox(height: 16),
-
-                /// =========================
-                /// INPUT + COBRAR
-                /// =========================
-                Row(
-                  children: [
-                    Expanded(
-                      child: CashInput(
-                        controller: controller,
-                        mainController: mainController,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    SizedBox(
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: controller.hasItems
-                            ? () {
-                                controller.completePayment();
-                              }
-                            : null,
-                        child: Text(
-                          mainController
-                              .payment
-                              .getNameButtonManagementPointSale,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 16),
-
-                /// =========================
-                /// BOTONES RÁPIDOS
-                /// =========================
-                if (mainController.payment.allowInputCashPointSale)
-                  Wrap(
-                    spacing: 12,
-                    runSpacing: 12,
-                    children: controller.suggestedAmounts.map((amount) {
-                      return SizedBox(
-                        width: 120,
-                        height: 48,
-                        child: OutlinedButton(
-                          onPressed: () {
-                            controller.setCash(amount);
-                            controller.completePayment();
-                          },
-                          child: Text('\$${amount.toStringAsFixed(2)}'),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                const SizedBox(height: 24),
-
-                /// =========================
-                /// MÉTODOS DE PAGO
-                /// =========================
-                Text(
-                  'Formas de Pago.',
-                  style: TextStyle(
-                    fontSize: 18,
-                    color: theme.colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: PosPaymentMethodsBar(
-                      controller: mainController,
-                      onPaymentTap: (method) {
-                        print("Seleccionado: $method");
-
-                        // aquí puedes:
-                        // - cerrar modal
-                        // - cambiar UI
-                        // - validar
-                      },
-                    ),
-                  ),
-                ),
-              ],
+                );
+              },
             ),
           ),
+
+        const SizedBox(height: 12),
+
+        /// TOTAL / CAMBIO
+        Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          child: Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      '\$${controller.total.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text('Importe total adeudado'),
+                  ],
+                ),
+              ),
+              Container(width: 1, height: 50, color: Colors.grey),
+              Expanded(
+                child: Column(
+                  children: [
+                    Text(
+                      '\$${controller.change.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const Text('Cambio'),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      );
-    },
+
+      ],
+    ),
+
+    /// 🔻 FOOTER
+    footer: Row(
+      children: [
+        Expanded(
+          child: CashInput(
+            controller: controller,
+            mainController: mainController,
+          ),
+        ),
+
+      ],
+    ),
+  );
+}
+
+Widget _buildTopSection(
+  BuildContext context,
+  PosPaymentLayoutController controller,
+  PosMainController mainController,
+) {
+  final theme = Theme.of(context);
+
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.stretch,
+    children: [
+      Text(
+        'Formas de Pago.',
+        style: TextStyle(
+          fontSize: 18,
+          color: theme.colorScheme.primary,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      PosPaymentMethodsBar(
+        controller: mainController,
+        onPaymentTap: (method) {
+          print("Seleccionado: $method");
+        },
+      ),
+    ],
   );
 }
 
@@ -807,7 +819,6 @@ class HeaderItemData {
     this.icon,
     this.flex = 1,
     this.colorIcon = Colors.green,
-
     this.onTap,
     this.alignment = HeaderItemAlignment.center, // default
   }) : assert(label != null || icon != null, 'Debe tener label o icon');
@@ -1261,7 +1272,7 @@ class _CouponInputState extends State<CouponInput> {
                 decoration: const InputDecoration(
                   hintText: 'Código de cupón',
                   border: OutlineInputBorder(),
-                  prefixIcon: Icon(Icons.local_offer_outlined),
+                  prefixIcon: Icon(Icons.confirmation_number),
                 ),
               ),
             ),
@@ -1275,7 +1286,6 @@ class _CouponInputState extends State<CouponInput> {
             ),
           ],
         ),
-
       ],
     );
   }
@@ -1291,4 +1301,149 @@ PosCoupon? fakeFindCoupon(String code) {
   } catch (_) {
     return null;
   }
+}
+
+enum PosFloatingPosition { bottomRight, bottomLeft, topRight, topLeft }
+class PosActionButton {
+  final String? label;
+  final IconData? icon;
+  final VoidCallback onTap;
+  final Color? backgroundColor;
+
+  final double? width;   // 🔥 NUEVO
+  final double? height;  // 🔥 opcional ahora
+
+  const PosActionButton({
+    this.label,
+    this.icon,
+    required this.onTap,
+    this.backgroundColor,
+    this.width,
+    this.height,
+  }) : assert(
+  label != null || icon != null,
+  'Debe tener al menos label o icon',
+  );
+}
+
+class PosFloatingActionsColumn extends StatelessWidget {
+  final List<PosActionButton> actions;
+  final PosFloatingPosition position;
+  final double spacing;
+  final double width;
+  final EdgeInsets margin;
+
+  const PosFloatingActionsColumn({
+    super.key,
+    required this.actions,
+    this.position = PosFloatingPosition.bottomRight,
+    this.spacing = 12,
+    this.width = 80,
+    this.margin = const EdgeInsets.all(16),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final items = _isBottom ? actions.reversed.toList() : actions;
+    return Positioned(
+      top: _getTop(),
+      bottom: _getBottom(),
+      left: _getLeft(),
+      right: _getRight(),
+
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: _crossAxisAlignment, // 🔥 CLAVE
+        children: actions.map((action) {
+          return Padding(
+
+            padding: EdgeInsets.only(bottom: spacing),
+            child: SizedBox(
+
+              width: action.width ?? width,     // 🔥 prioridad botón → layout
+              height: action.height ?? 60,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: action.backgroundColor,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                onPressed: action.onTap,
+                child: _buildContent(action), // 👈 usa tu lógica nueva
+              ),
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  double? _getTop() {
+    return (position == PosFloatingPosition.topLeft ||
+            position == PosFloatingPosition.topRight)
+        ? margin.top
+        : null;
+  }
+
+  double? _getBottom() {
+    return (position == PosFloatingPosition.bottomLeft ||
+            position == PosFloatingPosition.bottomRight)
+        ? margin.bottom
+        : null;
+  }
+
+  double? _getLeft() {
+    return (position == PosFloatingPosition.topLeft ||
+            position == PosFloatingPosition.bottomLeft)
+        ? margin.left
+        : null;
+  }
+
+  double? _getRight() {
+    return (position == PosFloatingPosition.topRight ||
+            position == PosFloatingPosition.bottomRight)
+        ? margin.right
+        : null;
+  }
+
+  bool get _isRight {
+    return position == PosFloatingPosition.topRight ||
+        position == PosFloatingPosition.bottomRight;
+  }
+
+  bool get _isBottom {
+    return position == PosFloatingPosition.bottomLeft ||
+        position == PosFloatingPosition.bottomRight;
+  }
+
+  CrossAxisAlignment get _crossAxisAlignment {
+    return _isRight
+        ? CrossAxisAlignment.end   // 👉 derecha
+        : CrossAxisAlignment.start; // 👉 izquierda
+  }
+}
+
+Widget _buildContent(PosActionButton action) {
+
+  if (action.icon != null && action.label == null) {
+    return Icon(action.icon, size: 20); // 👈 más pequeño
+  }
+
+  if (action.label != null && action.icon == null) {
+    return Text(
+      action.label!,
+      style: const TextStyle(fontSize: 12), // 👈 más pequeño
+    );
+  }
+
+  return Column(
+    mainAxisAlignment: MainAxisAlignment.center,
+    mainAxisSize: MainAxisSize.min, // 🔥 CLAVE
+    children: [
+      Icon(action.icon, size: 20),
+      const SizedBox(height: 2), // 👈 reduce espacio
+      Text(action.label!, style: const TextStyle(fontSize: 11)),
+    ],
+  );
 }

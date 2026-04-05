@@ -9,16 +9,13 @@ import '../../../models/product_draft.dart';
 import '../../../models/sections_data.dart';
 import '../../../state/pos_items_controller.dart';
 import '../../../state/product_modal_controller.dart';
-import '../../molecules/inputs/ps_dropdown.dart';
 import '../../molecules/inputs/ps_field_row.dart';
 import '../../molecules/inputs/ps_input.dart';
 import '../../molecules/ps_image_picker.dart';
 import '../../organisms/dialogs/product_modal.dart';
 import '../../organisms/items/pos_items_content.dart';
-import '../../organisms/ps_toogle_group.dart';
 import '../../templates/row_grid.dart';
 import '../product/ps_section_card.dart';
-
 class PosCategoriesManagementSection extends StatefulWidget {
   const PosCategoriesManagementSection({super.key});
 

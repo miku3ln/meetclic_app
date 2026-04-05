@@ -9,7 +9,9 @@ import 'dart:async';
 
 import '../../../state/pos_loyalty_controller.dart';
 
-import '../../sections/loyalty/pos_cupon_management_section.dart';
+import '../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
+import '../../sections/loyalty/pos_cupons_management_section.dart';
+import '../../sections/loyalty/pos_dashboard_management_section.dart';
 
 class PosLoyaltyContent extends StatelessWidget {
   const PosLoyaltyContent({super.key});
@@ -26,9 +28,9 @@ class PosLoyaltyContent extends StatelessWidget {
   Widget _buildSection(PosLoyaltySection s) {
     switch (s) {
       case PosLoyaltySection.dashboard:
-        return const PosCuponManagementSection();
+        return const PosDashboardManagementSection();
       case PosLoyaltySection.cupon:
-        return const PosCategoriesManagementSection();
+        return const PosCuponsManagementSection();
       case PosLoyaltySection.gamification:
         return const PosModifiersManagementSection();
       case PosLoyaltySection.tracking:
@@ -38,16 +40,18 @@ class PosLoyaltyContent extends StatelessWidget {
   }
 }
 
-class FakeCategoriesApi {
+class FakeCuponsApi {
   final int total;
 
-  const FakeCategoriesApi({required this.total});
+  const FakeCuponsApi({required this.total});
 
   Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
     required int current,
     required int rowCount,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 800));
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    final coupons = PosTabletLandscapeFixtures.getCouponsData();
 
     final start = (current - 1) * rowCount;
     final end = (start + rowCount) > total ? total : (start + rowCount);
@@ -62,16 +66,21 @@ class FakeCategoriesApi {
     }
 
     final rows = List.generate(end - start, (index) {
-      final itemNumber = start + index + 1;
+      /// 🔥 aquí hacemos "loop" sobre los cupones reales
+      final coupon = coupons[(start + index) % coupons.length];
 
       return GenericListItem<Map<String, dynamic>>(
-        id: itemNumber,
-        title: 'Categoria $itemNumber',
-        subtitle: 'Estado: activa',
-        description: 'Descripcion de categoria #$itemNumber',
+        id: coupon.id, // evitar ids repetidos
+        title: '${coupon.name}(${coupon.code})' ,
+        subtitle: 'Código: ${coupon.code}',
+        description: 'Descuento: ${coupon.discount}',
         image: 'https://meetclic.com/public//uploads/business/gamification/default/tinkuy-encuentro-08.jpg',
         businessId: '1',
-        countData: 50 + (start + index),
+        countData: coupon.discount.toInt(),
+        data: {
+          'productId': coupon.productId,
+          'expiresAt': coupon.expiresAt?.toIso8601String(),
+        },
       );
     });
 

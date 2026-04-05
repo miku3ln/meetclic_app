@@ -9,31 +9,29 @@ import '../../../models/product_draft.dart';
 import '../../../models/sections_data.dart';
 import '../../../state/pos_items_controller.dart';
 import '../../../state/product_modal_controller.dart';
-import '../../molecules/inputs/ps_dropdown.dart';
 import '../../molecules/inputs/ps_field_row.dart';
 import '../../molecules/inputs/ps_input.dart';
 import '../../molecules/ps_image_picker.dart';
 import '../../organisms/dialogs/product_modal.dart';
 import '../../organisms/items/pos_items_content.dart';
-import '../../organisms/ps_toogle_group.dart';
+import '../../organisms/loyalty/pos_loyalty_content.dart';
 import '../../templates/row_grid.dart';
 import '../product/ps_section_card.dart';
-
-class PosCategoriesManagementSection extends StatefulWidget {
-  const PosCategoriesManagementSection({super.key});
+class PosCuponsManagementSection extends StatefulWidget {
+  const PosCuponsManagementSection({super.key});
 
   @override
-  State<PosCategoriesManagementSection> createState() =>
-      _PosCategoriesManagementSectionState();
+  State<PosCuponsManagementSection> createState() =>
+      _PosCuponsManagementSectionState();
 }
 
-class _PosCategoriesManagementSectionState extends State<PosCategoriesManagementSection> {
+class _PosCuponsManagementSectionState extends State<PosCuponsManagementSection> {
   final ScrollController _scrollController = ScrollController();
 
   /// aquí decides el total simulado
   int _simulatedTotal = 592;
 
-  late FakeCategoriesApi _api;
+  late FakeCuponsApi _api;
 
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
 
@@ -51,7 +49,7 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
   @override
   void initState() {
     super.initState();
-    _api = FakeCategoriesApi(total: _simulatedTotal);
+    _api = FakeCuponsApi(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
   }
@@ -106,7 +104,7 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
 
   Future<void> _refreshAll() async {
     if (_isLoading) return;
-    _api = FakeCategoriesApi(total: _simulatedTotal);
+    _api = FakeCuponsApi(total: _simulatedTotal);
 
     setState(() {
       _currentPage = 1;
@@ -140,7 +138,7 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
       btnCancelTitle: "Cancelar",
       barrierDismissible: false,
       controller: controller,
-      title: "Actualizar Categoria",
+      title: "Actualizar Cupon",
       type: CrudType.update,
     );
   }
@@ -163,7 +161,7 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
                   height: 600,
                   child: EmptyData(
                     icon:Sections.getIconItems(PosItemsSection.categories),
-                    title: 'Todavía no hay Categorias',
+                    title: 'Todavía no hay Cupones',
                     descriptionText: 'Aquí puedes verificar',
                     linkText: 'Más información',
                   ),
@@ -186,7 +184,7 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
                 controller: controller,
                 btnSaveTitle: "Guardar",
                 btnCancelTitle: "Cancelar",
-                title: "Crear Categoria",
+                title: "Crear Cupon",
                 type: CrudType.create,
               );
             },

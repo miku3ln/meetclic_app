@@ -4,35 +4,36 @@ import '../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../widgets/empty_data.dart';
+
 import '../../../models/product_draft.dart';
 import '../../../models/sections_data.dart';
-
-import '../../../state/pos_loyalty_controller.dart';
+import '../../../state/pos_items_controller.dart';
 import '../../../state/product_modal_controller.dart';
-import '../../molecules/inputs/ps_dropdown.dart';
+
 import '../../molecules/inputs/ps_field_row.dart';
 import '../../molecules/inputs/ps_input.dart';
 import '../../molecules/ps_image_picker.dart';
 import '../../organisms/dialogs/product_modal.dart';
 import '../../organisms/items/pos_items_content.dart';
-import '../../organisms/ps_toogle_group.dart';
+
+import '../../templates/row_grid.dart';
 import '../product/ps_section_card.dart';
 
-class PosCuponManagementSection extends StatefulWidget {
-  const PosCuponManagementSection({super.key});
+class PosDashboardManagementSection extends StatefulWidget {
+  const PosDashboardManagementSection({super.key});
 
   @override
-  State<PosCuponManagementSection> createState() =>
-      _PosCuponManagementSectionState();
+  State<PosDashboardManagementSection> createState() =>
+      _PosDashboardManagementSectionState();
 }
 
-class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
+class _PosDashboardManagementSectionState extends State<PosDashboardManagementSection> {
   final ScrollController _scrollController = ScrollController();
 
   /// aquí decides el total simulado
   int _simulatedTotal = 592;
 
-  late FakeItemsApi _api;
+  late FakeCategoriesApi _api;
 
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
 
@@ -50,7 +51,7 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
   @override
   void initState() {
     super.initState();
-    _api = FakeItemsApi(total: _simulatedTotal);
+    _api = FakeCategoriesApi(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
   }
@@ -105,7 +106,7 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
 
   Future<void> _refreshAll() async {
     if (_isLoading) return;
-    _api = FakeItemsApi(total: _simulatedTotal);
+    _api = FakeCategoriesApi(total: _simulatedTotal);
 
     setState(() {
       _currentPage = 1;
@@ -127,15 +128,11 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
     }
   }
 
-  void _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
-    if (item.data == null) {
-      /// puedes manejar error o simplemente salir
-      return;
-    }
+  void _onTapItem( GenericListItem<Map<String, dynamic>>item) async {
 
-    final controller = ProductModalController();
+    final controller = CategoriaModalController();
     await controller.init();
-    final draft = ProductMapper.fromMap(item.data!);
+    final draft = ProductCategoryMapper.fromMap(item );
     controller.loadAndValidate(draft);
     await showProductModal(
       context: context,
@@ -143,12 +140,12 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
       btnCancelTitle: "Cancelar",
       barrierDismissible: false,
       controller: controller,
-      title: "Actualizar Producto",
+      title: "Actualizar Categoria",
       type: CrudType.update,
     );
   }
 
-  final controller = ProductModalController();
+  final controller = CategoriaModalController();
 
   @override
   Widget build(BuildContext context) {
@@ -161,12 +158,12 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
             onRefresh: _refreshAll,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
+              children:  [
                 SizedBox(
                   height: 600,
                   child: EmptyData(
-                    icon: Icons.print_rounded,
-                    title: 'Todavía no hay productos',
+                    icon:Sections.getIconItems(PosItemsSection.categories),
+                    title: 'Todavía no hay Categorias',
                     descriptionText: 'Aquí puedes verificar',
                     linkText: 'Más información',
                   ),
@@ -181,7 +178,7 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
           bottom: 80,
           child: FloatingActionButton(
             onPressed: () async {
-              final controller = ProductModalController();
+              final controller = CategoriaModalController();
               await controller.init();
               showProductModal(
                 barrierDismissible: false,
@@ -189,7 +186,7 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
                 controller: controller,
                 btnSaveTitle: "Guardar",
                 btnCancelTitle: "Cancelar",
-                title: "Crear Producto",
+                title: "Crear Categoria",
                 type: CrudType.create,
               );
             },
@@ -218,52 +215,12 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
 
           final item = _items[index];
 
-          return InkWell(
+          return  PsHeaderWithBadge(
+            title: item.title,
+            badgeCount: item.countData,
+            badgeText: "Artículos",
+            imageUrl:item.image,
             onTap: () => _onTapItem(item),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      shape: BoxShape.circle,
-                    ),
-                    child: item.image == null
-                        ? Icon(
-                            SectionsLoyalty.getIconItems(PosLoyaltySection.dashboard),
-                            color: Colors.grey,
-                          )
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.subtitle,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
           );
         },
       ),
@@ -272,9 +229,10 @@ class _PosCuponManagementSectionState extends State<PosCuponManagementSection> {
 }
 
 
+
 Future<void> showProductModal({
   required BuildContext context,
-  required ProductModalController controller,
+  required CategoriaModalController controller,
   required String title,
   required String btnCancelTitle,
   required String btnSaveTitle,
@@ -294,12 +252,12 @@ Future<void> showProductModal({
           btnSaveTitle: btnSaveTitle,
           onSave: controller.canSubmit
               ? () {
-                  if (controller.validate().success) {
-                    final product = controller.save(type);
+            if (controller.validate().success) {
+              final product = controller.save(type);
 
-                    Navigator.pop(context);
-                  }
-                }
+              Navigator.pop(context);
+            }
+          }
               : null,
           body: _buildProductBody(context, controller, type, title),
         );
@@ -309,11 +267,11 @@ Future<void> showProductModal({
 }
 
 Widget _buildProductBody(
-  BuildContext context,
-  ProductModalController controller,
-  CrudType type,
-  String title,
-) {
+    BuildContext context,
+    CategoriaModalController controller,
+    CrudType type,
+    String title,
+    ) {
   return Column(
     children: [
       /// =========================
@@ -334,7 +292,7 @@ Widget _buildProductBody(
                   error: controller.nameError,
                   isTouched: controller.nameTouched,
                   isValid:
-                      controller.nameError == null &&
+                  controller.nameError == null &&
                       controller.name.isNotEmpty,
                 ),
                 Center(
@@ -364,96 +322,7 @@ Widget _buildProductBody(
 
             AppSpacing.spaceBetweenInputs,
 
-            PsFieldRow(
-              children: [
-                /// 🔥 CATEGORÍA
-                PsDropdown(
-                  label: "Categoría",
-                  items: controller.categories,
-                  value: controller.selectedCategory,
-                  getLabel: (e) => e.value,
-                  onChanged: controller.selectCategory,
-                  error: controller.categoryError,
-                  requiredField: true,
-                  isTouched: controller.categoryTouched,
-                  isValid: controller.selectedCategory != null,
-                ),
 
-                /// 🔥 SUBCATEGORÍA
-                PsDropdown(
-                  label: "Subcategoría",
-                  items: controller.subcategories,
-                  value: controller.selectedSubcategory,
-                  getLabel: (e) => e.value,
-                  onChanged: controller.selectSubcategory,
-                  error: controller.subcategoryError,
-                  requiredField: true,
-                  isTouched: controller.subcategoryTouched,
-                  isValid: controller.selectedSubcategory != null,
-                ),
-              ],
-            ),
-
-            AppSpacing.spaceBetweenInputs,
-            PsFieldRow(
-              children: [
-                PsInput(
-                  requiredField: true,
-                  label: "REF",
-                  value: controller.ref,
-                  keyboardType: TextInputType.text,
-                  onChanged: controller.setRef,
-                  error: controller.refError,
-                  isTouched: controller.refTouched,
-                  isValid: controller.refError == null,
-                ),
-                PsInput(
-                  requiredField: true,
-                  label: "Codigo de Barras",
-                  value: controller.codeBar,
-
-                  keyboardType: TextInputType.text,
-                  onChanged: controller.setCodeBar,
-                  error: controller.codeBarError,
-                  isTouched: controller.codeBarTouched,
-                  isValid: controller.codeBarError == null,
-                ),
-              ],
-            ),
-
-            /// 🔥 NUEVO COMPONENTE
-            PsSellTypeSelector(
-              value: controller.sellType,
-              onChanged: controller.setSellType,
-            ),
-            AppSpacing.spaceBetweenInputs,
-
-            /// 🔥 PRECIO + COSTE
-            PsFieldRow(
-              children: [
-                PsInput(
-                  value: controller.price.toString(),
-                  requiredField: true,
-                  label: "Precio",
-                  keyboardType: TextInputType.number,
-                  onChanged: controller.setPrice,
-                  error: controller.priceError,
-                  isTouched: controller.priceTouched,
-                  isValid: controller.priceError == null,
-                ),
-                PsInput(
-                  requiredField: true,
-                  value: controller.cost.toString(),
-
-                  label: "Coste",
-                  keyboardType: TextInputType.number,
-                  onChanged: controller.setCost,
-                  error: controller.costError,
-                  isTouched: controller.costTouched,
-                  isValid: controller.costError == null,
-                ),
-              ],
-            ),
           ],
         ),
       ),
@@ -462,40 +331,14 @@ Widget _buildProductBody(
       /// =========================
       /// 📦 INVENTARIO
       /// =========================
-      PsSectionCard(
+      type==CrudType.update? PsSectionCard(
         title: "Inventario",
         child: Column(
           children: [
-            PsFieldRow(
-              children: [
-                PsInput(
-                  requiredField: true,
-                  value: controller.stock.toString(),
 
-                  label: "Stock",
-                  keyboardType: TextInputType.number,
-                  onChanged: controller.setStock,
-                  isTouched: controller.stockTouched,
-                  error: controller.stockError,
-
-                  isValid: controller.stockError == null,
-                ),
-                PsInput(
-                  value: controller.lowStock.toString(),
-
-                  requiredField: true,
-                  label: "Stock mínimo",
-                  keyboardType: TextInputType.number,
-                  onChanged: controller.setLowStock,
-                  error: controller.lowStockError,
-                  isTouched: controller.lowStockTouched,
-                  isValid: controller.lowStockError == null,
-                ),
-              ],
-            ),
           ],
         ),
-      ),
+      ):AppSpacing.spaceBetweenSections,
     ],
   );
 }

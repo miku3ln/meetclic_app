@@ -153,7 +153,7 @@ class PostTicketItem {
   }
 }
 class PosCoupon {
-  final String id;
+  final int id;
   final String code;
   final String name;
   final String? image;
