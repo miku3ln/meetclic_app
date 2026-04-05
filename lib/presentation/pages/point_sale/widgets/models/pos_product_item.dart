@@ -74,7 +74,6 @@ class PostTicketHeader {
     required this.items,
   });
 }
-
 class PostTicketItem {
   final PosProductItem productItem;
   final double subtotal;
@@ -83,11 +82,15 @@ class PostTicketItem {
   final String? description;
   final double unitPrice;
 
-
   final int amount;
   final double discount;
-  final String? couponId;
+
+  /// 🔥 ahora guardamos el objeto completo
+  final PosCoupon? coupon;
+
+  /// puedes mantener esto si ya lo usas en cálculos
   final double couponDiscount;
+
   const PostTicketItem({
     required this.productItem,
     required this.tax,
@@ -95,12 +98,59 @@ class PostTicketItem {
     required this.amount,
     required this.subtotal,
     required this.unitPrice,
-
     this.description,
     this.discount = 0,
-    this.couponId,
+    this.coupon,
     this.couponDiscount = 0,
   });
+
+  /// 🔥 COPY WITH
+  PostTicketItem copyWith({
+    PosProductItem? productItem,
+    double? subtotal,
+    double? tax,
+    double? total,
+    String? description,
+    double? unitPrice,
+    int? amount,
+    double? discount,
+    PosCoupon? coupon,
+    double? couponDiscount,
+  }) {
+    return PostTicketItem(
+      productItem: productItem ?? this.productItem,
+      subtotal: subtotal ?? this.subtotal,
+      tax: tax ?? this.tax,
+      total: total ?? this.total,
+      unitPrice: unitPrice ?? this.unitPrice,
+      amount: amount ?? this.amount,
+      description: description ?? this.description,
+      discount: discount ?? this.discount,
+
+      /// 👇 clave
+      coupon: coupon,
+      couponDiscount: couponDiscount ?? this.couponDiscount,
+    );
+  }
+
+  /// 🔥 quitar cupón
+  PostTicketItem withoutCoupon() {
+    return copyWith(
+      coupon: null,
+      couponDiscount: 0,
+    );
+  }
+
+  /// 🔥 aplicar cupón
+  PostTicketItem withCoupon({
+    required PosCoupon coupon,
+    required double couponDiscount,
+  }) {
+    return copyWith(
+      coupon: coupon,
+      couponDiscount: couponDiscount,
+    );
+  }
 }
 class PosCoupon {
   final String id;

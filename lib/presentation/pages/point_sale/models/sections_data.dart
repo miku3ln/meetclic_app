@@ -3,7 +3,39 @@ import 'package:flutter/material.dart';
 import '../../../../shared/theme/configuration/app_text_styles.dart';
 import '../shared/styles.dart';
 import '../state/pos_items_controller.dart';
+import '../state/pos_loyalty_controller.dart';
+class SectionsLoyalty {
+  static String getTitleItems(PosLoyaltySection type) {
+    switch (type) {
+      case PosLoyaltySection.dashboard:
+        return 'Dashboard';
+      case PosLoyaltySection.cupon:
+        return 'Cupones';
+      case PosLoyaltySection.gamification:
+        return 'Gamificacion';
+      case PosLoyaltySection.tracking:
+        return 'Canales';
+      default:
+        return '';
+    }
+  }
 
+  static IconData getIconItems(PosLoyaltySection type) {
+    switch (type) {
+      case PosLoyaltySection.dashboard:
+        return  Icons.format_list_bulleted;
+      case PosLoyaltySection.cupon:
+        return Icons.copy_rounded;
+
+      case PosLoyaltySection.gamification:
+        return Icons.note_alt_outlined;
+      case PosLoyaltySection.tracking:
+        return Icons.local_offer_outlined;
+      default:
+        return Icons.menu;
+    }
+  }
+}
 class Sections {
   static String getTitleItems(PosItemsSection type) {
     switch (type) {

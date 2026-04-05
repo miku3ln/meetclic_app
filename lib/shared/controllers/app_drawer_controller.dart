@@ -70,9 +70,18 @@ class AppDrawerController extends ChangeNotifier {
       navigationMode: DrawerNavigationMode.push,
     ),
     AppDrawerItem(
+      id: AppRoutes.loyaltyKey,
+      title: 'Fidelización',
+      icon: Icons.favorite,
+      routeName: AppRoutes.loyalty,
+      requireLogin: true,
+      navigationMode: DrawerNavigationMode.push,
+    ),
+    AppDrawerItem(
       id: AppRoutes.settingsKey,
       title: 'Settings & account',
       icon: Icons.settings,
+      requireLogin: true,
       routeName: AppRoutes.settings,
       navigationMode: DrawerNavigationMode.push,
     ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/items/pos_items_layout.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/organisms/items/pos_items_content.dart';
 import '../../presentation/pages/home/home_page.dart';
+import '../../presentation/pages/point_sale/widgets/layouts/loyalty/pos_loyalty_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/receipts/pos_receipts_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/settings/pos_settings_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/shift/pos_shift_layout.dart';
@@ -22,6 +23,7 @@ class AppRoutes {
   static const receipts = '/receipts';
   static const items = '/items';
   static const sales = '/sales';
+  static const loyalty = '/loyalty';
 
   static const gateKey = 'gate';
   static const homeKey = 'home';
@@ -30,6 +32,8 @@ class AppRoutes {
   static const receiptsKey = 'receipts';
   static const itemsKey = 'items';
   static const salesKey = 'sales';
+  static const loyaltyKey = 'loyalty';
+
 }
 
 class AppRouter {
@@ -73,6 +77,11 @@ class AppRouter {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => PosItemsLayout(),
+        );
+      case AppRoutes.loyalty:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => PosLoyaltyLayout(),
         );
       default:
         return MaterialPageRoute(

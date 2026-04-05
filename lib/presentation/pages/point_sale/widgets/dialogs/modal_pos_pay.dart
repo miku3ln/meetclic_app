@@ -6,6 +6,7 @@ import '../../shared/utils.dart';
 import '../../state/product_modal_controller.dart';
 import '../../theme/pos_ticket_styles.dart';
 import '../alert_information.dart';
+import '../chips.dart';
 import '../layouts/pos_main_controller.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../models/pos_product_item.dart';
@@ -21,10 +22,12 @@ class PosPaymentLayoutController extends ChangeNotifier {
   bool get showActions => false;
 
   PosPaymentLayoutController({required this.main});
+
   /// =============================
   /// ITEMS
   /// =============================
   List<PostTicketItem> get items => main.ticket.items;
+
   bool get hasItems => items.isNotEmpty;
 
   /// =============================
@@ -519,9 +522,33 @@ Widget _buildPaymentForm(
 
                 const SizedBox(height: 24),
 
-                CouponInput(main: mainController, controllerPos:  controller),
+                CouponInput(main: mainController, controllerPos: controller),
 
+                /// 🔥 BADGES DE CUPONES
+                ///
+                if (mainController.ticket.items
+                    .where((e) => e.coupon != null)
+                    .toList()
+                    .isNotEmpty)
+                //SET CUPONS ADD
+                  Text(
+                    'Cupones Aplicados.',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  PosCouponChips(
+                    items: mainController.ticket.items,
+                    onRemove: (item) {
+                      mainController.ticket.removeCoupon(item);
+                    },
+                  ),
+
+                const SizedBox(height: 8),
                 const SizedBox(height: 16),
+
                 /// =========================
                 /// INPUT + COBRAR
                 /// =========================
@@ -540,7 +567,6 @@ Widget _buildPaymentForm(
                         onPressed: controller.hasItems
                             ? () {
                                 controller.completePayment();
-
                               }
                             : null,
                         child: Text(
@@ -873,10 +899,9 @@ class _Header extends StatelessWidget {
                   flex: 3,
                   alignment: HeaderItemAlignment.left, // 🔥
                   onTap: () {
-                    if(controller.isCompleted){
+                    if (controller.isCompleted) {
                       controller.reset();
                       controller.main.ticket.saveTicket();
-
                     }
                     Navigator.pop(context);
                   },
@@ -1143,10 +1168,16 @@ class _Actions extends StatelessWidget {
     );
   }
 }
+
 class CouponInput extends StatefulWidget {
   final PosMainController main;
   final PosPaymentLayoutController controllerPos;
-  const CouponInput({super.key, required this.main,required this.controllerPos});
+
+  const CouponInput({
+    super.key,
+    required this.main,
+    required this.controllerPos,
+  });
 
   @override
   State<CouponInput> createState() => _CouponInputState();
@@ -1173,18 +1204,21 @@ class _CouponInputState extends State<CouponInput> {
       _subtitle = null;
     });
   }
+
   void _apply() {
     final code = controller.text.trim();
-
     final coupon = fakeFindCoupon(code);
-
     if (coupon == null) {
       _showAlert(AlertType.error, 'Cupón no válido');
+      controller.clear();
+      FocusScope.of(context).unfocus();
       return;
     }
 
     if (coupon.isExpired) {
       _showAlert(AlertType.warning, 'Cupón expirado');
+      controller.clear();
+      FocusScope.of(context).unfocus();
       return;
     }
 
@@ -1192,17 +1226,20 @@ class _CouponInputState extends State<CouponInput> {
 
     if (!success) {
       _showAlert(AlertType.warning, 'Producto no está en el ticket');
+      controller.clear();
+      FocusScope.of(context).unfocus();
       return;
     }
 
-    _showAlert(
-      AlertType.success,
-      'Cupón aplicado',
-      subtitle: coupon.name,
-    );
+    _showAlert(AlertType.success, 'Cupón aplicado', subtitle: coupon.name);
+    controller.clear();
+    FocusScope.of(context).unfocus();
   }
+
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -1238,16 +1275,18 @@ class _CouponInputState extends State<CouponInput> {
             ),
           ],
         ),
+
       ],
     );
   }
 }
+
 PosCoupon? fakeFindCoupon(String code) {
   final coupons = PosTabletLandscapeFixtures.getCouponsData();
 
   try {
     return coupons.firstWhere(
-          (c) => c.code.toLowerCase() == code.toLowerCase(),
+      (c) => c.code.toLowerCase() == code.toLowerCase(),
     );
   } catch (_) {
     return null;

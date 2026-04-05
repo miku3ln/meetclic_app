@@ -35,9 +35,11 @@ class PosTicketRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = item.productItem;
-
+    final hasCoupon = item.coupon != null;
     return Container(
-      color: ui.rowBackground,
+      color: hasCoupon
+          ? ui.couponRowBackground
+          : ui.rowBackground,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -191,6 +193,7 @@ class PosTicketRow extends StatelessWidget {
                             unitPrice: item.unitPrice,
                             qty: item.amount,
                             taxPct: (p.taxPercentage ?? 0).toDouble(),
+                            hasCoupon: hasCoupon,
                           ),
                         ),
                       ),
@@ -228,6 +231,8 @@ class PosTicketRow extends StatelessWidget {
 class PosTicketRowUi {
   // general
   final Color rowBackground;
+  final Color couponRowBackground;
+
   final double rowHeight;
 
   // debug backgrounds (para diseñar)
@@ -295,6 +300,8 @@ class PosTicketRowUi {
   const PosTicketRowUi({
     // general
     this.rowBackground = Colors.transparent,
+    this.couponRowBackground = const Color(0x33FFCC00),
+
     this.rowHeight = 42,
 
     // debug section colors
@@ -551,6 +558,7 @@ class _PriceTotalBox extends StatelessWidget {
   final double unitPrice;
   final int qty;
   final double taxPct;
+  final bool hasCoupon;
 
   const _PriceTotalBox({
     required this.ui,
@@ -558,6 +566,7 @@ class _PriceTotalBox extends StatelessWidget {
     required this.unitPrice,
     required this.qty,
     required this.taxPct,
+    required this.hasCoupon,
   });
 
   @override
@@ -572,7 +581,6 @@ class _PriceTotalBox extends StatelessWidget {
       builder: (context, c) {
         final h = c.maxHeight.isFinite ? c.maxHeight : ui.rowHeight;
         final oneLine = h < 36;
-
         return Container(
           height: h,
           padding: EdgeInsets.symmetric(horizontal: ui.pricePaddingX),

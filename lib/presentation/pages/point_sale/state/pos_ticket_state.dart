@@ -117,7 +117,6 @@ class PosTicketState extends ChangeNotifier {
   bool applyCoupon(PosCoupon coupon) {
     if (coupon.isExpired) return false;
 
-    /// 🔥 buscar item
     final idx = _items.indexWhere(
           (i) => i.productItem.id == coupon.productId,
     );
@@ -126,22 +125,18 @@ class PosTicketState extends ChangeNotifier {
 
     final item = _items[idx];
 
-    /// 🔥 calcular descuento
-    final discountAmount = item.unitPrice * (coupon.discount / 100);
+    /// 🔥 calcular descuento dinámico
+    double discountAmount;
+    discountAmount = item.unitPrice * (coupon.discount / 100);
 
-    /// 🔥 CLONAR ITEM (NO mutar directo)
-    final newItem = PostTicketItem(
-      productItem: item.productItem,
-      amount: item.amount,
-      unitPrice: item.unitPrice,
-      subtotal: item.subtotal,
-      tax: item.tax,
-      total: (item.total - discountAmount).clamp(0, double.infinity),
+    /// 🔥 evitar negativos
+    double newTotal = (item.total - discountAmount).clamp(0, double.infinity);
+
+    /// 🔥 usar copyWith (NO crear manual)
+    final newItem = item.copyWith(
+      total: newTotal,
       discount: item.discount + discountAmount,
-
-      /// 🔥 NUEVO
-      couponId: coupon.id,
-      couponDiscount: discountAmount,
+      coupon: coupon, // 🔥 guardamos TODO el objeto
     );
 
     _items[idx] = newItem;
@@ -150,5 +145,22 @@ class PosTicketState extends ChangeNotifier {
     notifyListeners();
 
     return true;
+  }
+  void removeCoupon(PostTicketItem item) {
+    final index = _items.indexOf(item);
+    if (index == -1) return;
+
+    /// 🔥 restaurar total (IMPORTANTE)
+    final restoredTotal = item.total + item.couponDiscount;
+
+    _items[index] = item.copyWith(
+      total: restoredTotal,
+      discount: item.discount - item.couponDiscount,
+      coupon: null,
+      couponDiscount: 0,
+    );
+
+    _recalculate();
+    notifyListeners();
   }
 }
