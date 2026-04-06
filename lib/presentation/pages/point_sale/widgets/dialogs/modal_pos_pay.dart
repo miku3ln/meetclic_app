@@ -214,65 +214,10 @@ class PosPaymentLayout extends StatelessWidget {
                 label: 'Cupones',
                 backgroundColor: Colors.orange,
                 onTap: () {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (_) => Dialog(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Container(
-                        width: 400,
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            /// HEADER
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text(
-                                  'Cupones',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                IconButton(
-                                  icon: const Icon(Icons.close),
-                                  onPressed: () => Navigator.pop(context),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 12),
-
-                            //CUPON SET
-                            /// 🔥 BADGES DE CUPONES
-                            CouponInput(main: mainController, controllerPos: controller),
-                            if (mainController.ticket.items
-                                .where((e) => e.coupon != null)
-                                .toList()
-                                .isNotEmpty)
-                            //SET CUPONS ADD
-                              Text(
-                                'Cupones Aplicados.',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            PosCouponChips(
-                              items: mainController.ticket.items,
-                              onRemove: (item) {
-                                mainController.ticket.removeCoupon(item);
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  _openCouponsPanel(
+                     context,
+                     mainController,
+                     controller,
                   );
                 },
               ),
@@ -1302,7 +1247,123 @@ PosCoupon? fakeFindCoupon(String code) {
     return null;
   }
 }
+class _CouponsPanel extends StatelessWidget {
+  final PosMainController mainController;
+  final PosPaymentLayoutController controller;
 
+  const _CouponsPanel({
+    required this.mainController,
+    required this.controller,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Material(
+      color: Colors.white,
+      child: Container(
+        width: 400, // 👉 ancho tipo POS
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            /// 🔝 HEADER
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Cupones',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 12),
+
+            /// 🎟 INPUT
+            CouponInput(
+              main: mainController,
+              controllerPos: controller,
+            ),
+
+            const SizedBox(height: 12),
+
+            /// 📌 LISTA DE CUPONES APLICADOS
+            if (mainController.ticket.items
+                .where((e) => e.coupon != null)
+                .isNotEmpty)
+              Text(
+                'Cupones Aplicados',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: theme.colorScheme.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+
+            const SizedBox(height: 8),
+
+            /// 🔥 CHIPS
+            Expanded(
+              child: SingleChildScrollView(
+                child: PosCouponChips(
+                  items: mainController.ticket.items,
+                  onRemove: (item) {
+                    mainController.ticket.removeCoupon(item);
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+void _openCouponsPanel(
+    BuildContext context,
+    PosMainController mainController,
+    PosPaymentLayoutController controller,
+    ) {
+  showGeneralDialog(
+    context: context,
+    barrierDismissible: true,
+    barrierLabel: "Cupones",
+    barrierColor: Colors.black54,
+    transitionDuration: const Duration(milliseconds: 300),
+    pageBuilder: (_, __, ___) {
+      return Align(
+        alignment: Alignment.centerRight,
+        child: _CouponsPanel(
+          mainController: mainController,
+          controller: controller,
+        ),
+      );
+    },
+    transitionBuilder: (_, animation, __, child) {
+      final tween = Tween(
+        begin: const Offset(1, 0), // 👉 desde derecha
+        end: Offset.zero,
+      );
+
+      return SlideTransition(
+        position: tween.animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+        )),
+        child: child,
+      );
+    },
+  );
+}
 enum PosFloatingPosition { bottomRight, bottomLeft, topRight, topLeft }
 class PosActionButton {
   final String? label;

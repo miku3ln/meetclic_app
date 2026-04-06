@@ -87,27 +87,59 @@ class PosMainController extends ChangeNotifier {
       shift.onRequestOpenShift?.call();
       return;
     }
-
     final controller = PosPaymentLayoutController(main: this);
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) {
-        return AnimatedBuilder(
-          animation: this, // 🔥 ESCUCHA CAMBIOS DEL MAIN
-          builder: (_, __) {
-            return Dialog(
-              child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: buildPaymentModal(main: this, controller: controller),
+    if (true)//TYPE VIEW POS SALE
+      Navigator.push(
+        context,
+        PageRouteBuilder(
+          transitionDuration: const Duration(milliseconds: 300),
+          pageBuilder: (_, __, ___) {
+            return Scaffold(
+              body: AnimatedBuilder(
+                animation: Listenable.merge([this, controller]),
+                builder: (_, __) {
+                  return buildPaymentModal(
+                    main: this,
+                    controller: controller,
+                  );
+                },
               ),
             );
           },
-        );
-      },
-    );
+          transitionsBuilder: (_, animation, __, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(1, 0), // 👉 entra desde derecha
+                end: Offset.zero,
+              ).animate(CurvedAnimation(
+                parent: animation,
+                curve: Curves.easeInOut,
+              )),
+              child: child,
+            );
+          },
+        ),
+      );
+    if (false)
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) {
+          return AnimatedBuilder(
+            animation: Listenable.merge([this, controller]),
+            // animation: this, // 🔥 ESCUCHA CAMBIOS DEL MAIN
+            builder: (_, __) {
+              return Dialog(
+                child: SizedBox(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height,
+                  child: buildPaymentModal(main: this, controller: controller),
+                ),
+              );
+            },
+          );
+        },
+      );
   }
 
   void onPrimaryCheckoutTap(BuildContext context) {
@@ -184,15 +216,14 @@ class PosMainController extends ChangeNotifier {
   List<PosCategoryItem> get productCategories => browser.productCategories;
 
   bool allowManagementPost() {
-    late bool result=selectedCustomer != null &&
+    late bool result =
+        selectedCustomer != null &&
         shift.isShiftOpen &&
         ticket.items.isNotEmpty;
-    if(checkout.isPaySelected){
-
-    }else{
-
-    }
-    return  result;
+    if (checkout.isPaySelected) {
+    } else {}
+    return result;
   }
-  String get labelTitleWayPayment=>"Formas de Pago";
+
+  String get labelTitleWayPayment => "Formas de Pago";
 }
