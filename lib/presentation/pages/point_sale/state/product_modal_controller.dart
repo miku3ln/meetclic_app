@@ -7,6 +7,7 @@ import '../../../../shared/utils/validators/validators.dart';
 import '../models/product_category.dart';
 import '../models/product_draft.dart';
 import '../models/product_subcategory.dart';
+import '../repositories/config_repository.dart';
 import '../services/product_catalog_service.dart';
 import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
@@ -952,14 +953,9 @@ class CustomerModalController extends ChangeNotifier {
     try {
       isLoading = true;
       notifyListeners();
-
-      /// 👇 SIMULACIÓN REAL
       await Future.delayed(const Duration(seconds: 2));
-
       final data = await _service.fetchCustomers();
-
       customers = data;
-
     } catch (e) {
       errorMessage = "Error al cargar clientes";
     } finally {

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../../../../shared/controllers/app_controller.dart';
+import '../../repositories/config_repository.dart';
+import '../../services/config_api_service.dart';
 import '../dialogs/pos_open_shift_dialog.dart';
 import '../models/pos_product_item.dart';
 import '../organisms/pos_search_overlay.dart';
@@ -17,7 +19,7 @@ class PosHeaderDefaultLayout extends StatefulWidget
   // top actions
   final VoidCallback onMenuTap;
   final void Function(BuildContext context, dynamic data) onUserTap;
-  final void Function(BuildContext context, dynamic data)  onMoreTap;
+  final void Function(BuildContext context, dynamic data) onMoreTap;
 
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
@@ -69,10 +71,12 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
       widget.onSearchChanged?.call('');
     }
   }
+
   void _onChanged() {
     if (!mounted) return;
     setState(() {});
   }
+
   // ✅ Modal vive aquí
   Future<void> _showOpenShiftModal() async {
     final opened = await showDialog<bool>(
@@ -83,11 +87,16 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
 
     if (!mounted) return;
     if (opened != true) return;
-
   }
-  void initControllerMain(){
+
+  void initControllerMain() {
     final app = context.read<AppController>();
-    controller = PosMainController(app: app)..addListener(_onChanged);
+    controller = PosMainController(
+      app: app,
+      configRepository: ConfigRepository(
+        ConfigApiService(), // 👈 mock por ahora
+      ),
+    )..addListener(_onChanged);
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
@@ -109,6 +118,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
         ? productCategories.first.id
         : null;
   }
+
   @override
   void dispose() {
     PosSearchOverlay.hide();
@@ -138,7 +148,9 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
         ? true
         : false;
 
-    String fullName=!isAddCustomer?widget.controllerMain.selectedCustomer!.name:"";
+    String fullName = !isAddCustomer
+        ? widget.controllerMain.selectedCustomer!.name
+        : "";
     return AppBar(
       elevation: 0,
       centerTitle: true,
@@ -154,34 +166,29 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
             "type": isAddCustomer ? "create_user" : "update_user",
           }),
           icon: isAddCustomer
-              ? const Icon(
-            Icons.person_add_alt_1,
-            color: Colors.orange,
-          )
+              ? const Icon(Icons.person_add_alt_1, color: Colors.orange)
               : Row(
-            mainAxisSize: MainAxisSize.min,
-            children:  [
-              Text(
-                fullName,
-                style: TextStyle(
-                  color: Colors.green,
-                  fontWeight: FontWeight.w600,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      fullName,
+                      style: TextStyle(
+                        color: Colors.green,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    SizedBox(width: 6),
+                    Icon(
+                      Icons.quick_contacts_mail_outlined,
+                      color: Colors.green,
+                      size: 20,
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(width: 6),
-              Icon(
-                Icons.quick_contacts_mail_outlined,
-                color: Colors.green,
-                size: 20,
-              ),
-            ],
-          ),
         ),
         IconButton(
-          onPressed:()=> widget.onMoreTap(context, {
-          "source": "header",
-          "type":"",
-          }),
+          onPressed: () =>
+              widget.onMoreTap(context, {"source": "header", "type": ""}),
           icon: const Icon(Icons.more_vert),
         ),
       ],

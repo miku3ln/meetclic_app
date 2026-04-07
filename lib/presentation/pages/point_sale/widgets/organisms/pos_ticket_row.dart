@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pos_ticket_styles.dart';
 import '../models/pos_product_item.dart';
-
+enum PosTicketRowType {
+  manager,   // 🔥 completo (editar, eliminar, qty)
+  viewPayment,  // solo ver
+  compact,   // más pequeño (ej: resumen)
+}
 class PosTicketRow extends StatelessWidget {
   final PostTicketItem item;
   final PosTicketStyles styles;
-  final bool isEdit;
+  final PosTicketRowType type;
   final VoidCallback onMinus;
   final VoidCallback onPlus;
 
@@ -28,10 +32,353 @@ class PosTicketRow extends StatelessWidget {
     required this.onEdit,
     required this.onDelete,
     this.debug = false,
-    required this.isEdit,
+    this.type = PosTicketRowType.manager,
     this.ui = const PosTicketRowUi(),
   });
 
+  Widget _buildByType() {
+    switch (type) {
+      case PosTicketRowType.manager:
+        return _buildManager();
+
+      case PosTicketRowType.viewPayment:
+        return _buildViewPayment();
+
+      case PosTicketRowType.compact:
+        return Column();
+    }
+  }
+  Widget _buildImage(PosProductItem p) {
+    return _Dbg(
+      debug: debug,
+      color: ui.debugImageBg,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(ui.imageRadius),
+        child: Container(
+          color: debug ? ui.debugImageBoxBg : Colors.transparent,
+          child: Image.network(
+            p.imageUrl ?? '',
+            fit: BoxFit.cover,
+
+            /// 🔄 LOADING
+            loadingBuilder: (context, child, progress) {
+              if (progress == null) return child;
+
+              final expected = progress.expectedTotalBytes;
+              final loaded = progress.cumulativeBytesLoaded;
+
+              final value = (expected != null && expected > 0)
+                  ? loaded / expected
+                  : null;
+
+              return Center(
+                child: SizedBox(
+                  width: ui.loadingSize,
+                  height: ui.loadingSize,
+                  child: CircularProgressIndicator(
+                    strokeWidth: ui.loadingStroke,
+                    value: value,
+                    color: ui.loadingColor,
+                  ),
+                ),
+              );
+            },
+
+            /// ❌ ERROR
+            errorBuilder: (context, error, stackTrace) {
+              return Center(
+                child: Icon(
+                  ui.imageErrorIcon,
+                  size: ui.imageErrorIconSize,
+                  color: ui.imageErrorIconColor,
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+  Widget _buildViewPayment() {
+    final p = item.productItem;
+    final hasCoupon = item.coupon != null;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+
+        /// =========================
+        /// FILA 1 → NOMBRE
+        /// =========================
+        SizedBox(
+          height: ui.rowHeight,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 10,
+                child: _Dbg(
+                  debug: debug,
+                  color: ui.debugCol1Row1Bg,
+                  child: Container(
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ui.titlePaddingX,
+                    ),
+                    child: Text(
+                      p.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ui.titleTextStyle,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        /// =========================
+        /// FILA 2 → IMG + PRECIO | CANTIDAD
+        /// =========================
+        SizedBox(
+          height: ui.rowHeight,
+          child: Row(
+            children: [
+
+              /// 🔹 COL1: IMG + PRECIO
+
+              Expanded(
+                flex: 7,
+                child: Row(
+                  children: [
+                    /// imagen
+                    Expanded(
+                      flex: 4,
+                      child: _buildImage(p),
+                    ),
+
+                    /// precio / total
+                    Expanded(
+                      flex: 6,
+                      child: _PriceTotalBox(
+                        ui: ui,
+                        debug: debug,
+                        unitPrice: item.unitPrice,
+                        qty: item.amount,
+                        taxPct: (p.taxPercentage ?? 0).toDouble(),
+                        hasCoupon: hasCoupon,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              /// 🔹 COL2: CANTIDAD "X"
+              Expanded(
+                flex: 3,
+                child: Center(
+                  child: Text(
+                    '×${item.amount} ',
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.orange,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildManager() {
+    final p = item.productItem;
+
+    final hasCoupon = item.coupon != null;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // =========================
+        // FILA 1
+        // =========================
+        SizedBox(
+          height: ui.rowHeight,
+          child: Row(
+            children: [
+              Expanded(
+                //DETAILS
+                flex: 7, // 🔥 ocupa todo si no es edit
+                child: _Dbg(
+                  debug: debug,
+                  color: ui.debugCol1Row1Bg,
+                  child: Container(
+                    height: ui.rowHeight,
+                    alignment: Alignment.centerLeft,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ui.titlePaddingX,
+                    ),
+                    decoration: BoxDecoration(
+                      color: debug ? ui.debugTitleBoxBg : Colors.transparent,
+                      borderRadius: BorderRadius.circular(ui.titleRadius),
+                    ),
+                    child: Text(
+                      p.name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ui.titleTextStyle,
+                    ),
+                  ),
+                ),
+              ),
+
+              Expanded(
+                //ACTIONS
+                flex: 3,
+                child: _Dbg(
+                  debug: debug,
+                  color: ui.debugCol2Row1Bg,
+                  child: Container(
+                    height: ui.rowHeight,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: ui.actionsPaddingX,
+                    ),
+                    alignment: Alignment.centerRight,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerRight,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            _ActionIcon(
+                              ui: ui,
+                              onTap: onEdit,
+                              icon: ui.editIcon,
+                            ),
+                            SizedBox(width: ui.iconGap),
+                            _ActionIcon(
+                              ui: ui,
+                              onTap: onDelete,
+                              icon: ui.deleteIcon,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // =========================
+        // FILA 2
+        // =========================
+        SizedBox(
+          height: ui.rowHeight,
+          child: Row(
+            children: [
+              Expanded(
+                flex: 7 , // 🔥 ocupa todo si no es edit
+                child: Row(
+                  children: [
+                    // 40% imagen
+                    Expanded(
+                      flex: 4,
+                      child: _Dbg(
+                        debug: debug,
+                        color: ui.debugImageBg,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(ui.imageRadius),
+                          child: Container(
+                            color: debug
+                                ? ui.debugImageBoxBg
+                                : Colors.transparent,
+                            child: Image.network(
+                              p.imageUrl ?? '',
+                              fit: BoxFit.cover,
+                              loadingBuilder: (context, child, progress) {
+                                if (progress == null) return child;
+
+                                final expected = progress.expectedTotalBytes;
+                                final loaded = progress.cumulativeBytesLoaded;
+                                final value =
+                                (expected != null && expected > 0)
+                                    ? loaded / expected
+                                    : null;
+
+                                return Center(
+                                  child: SizedBox(
+                                    width: ui.loadingSize,
+                                    height: ui.loadingSize,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: ui.loadingStroke,
+                                      value: value,
+                                      color: ui.loadingColor,
+                                    ),
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Center(
+                                  child: Icon(
+                                    ui.imageErrorIcon,
+                                    size: ui.imageErrorIconSize,
+                                    color: ui.imageErrorIconColor,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
+                    // 60% precio / total
+                    Expanded(
+                      flex: 6,
+                      child: _Dbg(
+                        debug: debug,
+                        color: ui.debugPriceBg,
+                        child: _PriceTotalBox(
+                          ui: ui,
+                          debug: debug,
+                          unitPrice: item.unitPrice,
+                          qty: item.amount,
+                          taxPct: (p.taxPercentage ?? 0).toDouble(),
+                          hasCoupon: hasCoupon,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // stepper qty
+              Expanded(
+                flex: 3,
+                child: _Dbg(
+                  debug: debug,
+                  color: ui.debugQtyBg,
+                  child: _QtyStepperPill(
+                    ui: ui,
+                    height: ui.qtyHeight,
+                    valueText: '${item.amount}',
+                    onMinus: onMinus,
+                    onPlus: onPlus,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final p = item.productItem;
@@ -40,187 +387,7 @@ class PosTicketRow extends StatelessWidget {
       color: hasCoupon
           ? ui.couponRowBackground
           : ui.rowBackground,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // =========================
-          // FILA 1
-          // =========================
-          SizedBox(
-            height: ui.rowHeight,
-            child: Row(
-              children: [
-                Expanded(
-                  //DETAILS
-                  flex: isEdit ? 7 : 10, // 🔥 ocupa todo si no es edit
-                  child: _Dbg(
-                    debug: debug,
-                    color: ui.debugCol1Row1Bg,
-                    child: Container(
-                      height: ui.rowHeight,
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.symmetric(
-                        horizontal: ui.titlePaddingX,
-                      ),
-                      decoration: BoxDecoration(
-                        color: debug ? ui.debugTitleBoxBg : Colors.transparent,
-                        borderRadius: BorderRadius.circular(ui.titleRadius),
-                      ),
-                      child: Text(
-                        p.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: ui.titleTextStyle,
-                      ),
-                    ),
-                  ),
-                ),
-                if (isEdit)
-                  Expanded(
-                    //ACTIONS
-                    flex: 3,
-                    child: _Dbg(
-                      debug: debug,
-                      color: ui.debugCol2Row1Bg,
-                      child: Container(
-                        height: ui.rowHeight,
-                        padding: EdgeInsets.symmetric(
-                          horizontal: ui.actionsPaddingX,
-                        ),
-                        alignment: Alignment.centerRight,
-                        child: Align(
-                          alignment: Alignment.centerRight,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
-                            alignment: Alignment.centerRight,
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                _ActionIcon(
-                                  ui: ui,
-                                  onTap: onEdit,
-                                  icon: ui.editIcon,
-                                ),
-                                SizedBox(width: ui.iconGap),
-                                _ActionIcon(
-                                  ui: ui,
-                                  onTap: onDelete,
-                                  icon: ui.deleteIcon,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-
-          // =========================
-          // FILA 2
-          // =========================
-          SizedBox(
-            height: ui.rowHeight,
-            child: Row(
-              children: [
-                Expanded(
-                  flex: isEdit ? 7 : 10, // 🔥 ocupa todo si no es edit
-                  child: Row(
-                    children: [
-                      // 40% imagen
-                      Expanded(
-                        flex: 4,
-                        child: _Dbg(
-                          debug: debug,
-                          color: ui.debugImageBg,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(ui.imageRadius),
-                            child: Container(
-                              color: debug
-                                  ? ui.debugImageBoxBg
-                                  : Colors.transparent,
-                              child: Image.network(
-                                p.imageUrl ?? '',
-                                fit: BoxFit.cover,
-                                loadingBuilder: (context, child, progress) {
-                                  if (progress == null) return child;
-
-                                  final expected = progress.expectedTotalBytes;
-                                  final loaded = progress.cumulativeBytesLoaded;
-                                  final value =
-                                      (expected != null && expected > 0)
-                                      ? loaded / expected
-                                      : null;
-
-                                  return Center(
-                                    child: SizedBox(
-                                      width: ui.loadingSize,
-                                      height: ui.loadingSize,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: ui.loadingStroke,
-                                        value: value,
-                                        color: ui.loadingColor,
-                                      ),
-                                    ),
-                                  );
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Center(
-                                    child: Icon(
-                                      ui.imageErrorIcon,
-                                      size: ui.imageErrorIconSize,
-                                      color: ui.imageErrorIconColor,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-
-                      // 60% precio / total
-                      Expanded(
-                        flex: 6,
-                        child: _Dbg(
-                          debug: debug,
-                          color: ui.debugPriceBg,
-                          child: _PriceTotalBox(
-                            ui: ui,
-                            debug: debug,
-                            unitPrice: item.unitPrice,
-                            qty: item.amount,
-                            taxPct: (p.taxPercentage ?? 0).toDouble(),
-                            hasCoupon: hasCoupon,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                if (isEdit)
-                  // stepper qty
-                  Expanded(
-                    flex: 3,
-                    child: _Dbg(
-                      debug: debug,
-                      color: ui.debugQtyBg,
-                      child: _QtyStepperPill(
-                        ui: ui,
-                        height: ui.qtyHeight,
-                        valueText: '${item.amount}',
-                        onMinus: onMinus,
-                        onPlus: onPlus,
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
+      child: _buildByType(),
     );
   }
 }

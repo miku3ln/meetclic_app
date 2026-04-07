@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../shared/controllers/app_controller.dart';
+import '../../repositories/config_repository.dart';
 import '../../shared/utils.dart';
 import '../../state/pos_product_browser_state.dart';
 import '../dialogs/moda_managerl.dart';
@@ -20,9 +21,11 @@ class PosMainController extends ChangeNotifier {
   final PosPaymentState payment;
   final PosCheckoutState checkout;
   final PosUiState ui;
+  final ConfigRepository configRepository;
 
   PosMainController({
     required AppController app,
+    required this.configRepository, // 👈 NUEVO
     PosShiftState? shift,
     PosProductBrowserState? browser,
     PosTicketState? ticket,
@@ -37,7 +40,16 @@ class PosMainController extends ChangeNotifier {
        checkout = checkout ?? PosCheckoutState(),
        ui = ui ?? PosUiState() {
     typeService = typeServicesData.first; // 🔥 AQUÍ
+    initDataConfig();
     _bindStates();
+  }
+
+  void initDataConfig() async {
+    /// 🔥 CARGAR CONFIG
+    dataCustomerFinal = await configRepository.getFinalConsumer();
+    if (dataCustomerFinal != null) {
+      setCustomerTicket(dataCustomerFinal);
+    }
   }
 
   void _bindStates() {
@@ -88,7 +100,7 @@ class PosMainController extends ChangeNotifier {
       return;
     }
     final controller = PosPaymentLayoutController(main: this);
-    if (true)//TYPE VIEW POS SALE
+    if (true) //TYPE VIEW POS SALE
       Navigator.push(
         context,
         PageRouteBuilder(
@@ -98,23 +110,20 @@ class PosMainController extends ChangeNotifier {
               body: AnimatedBuilder(
                 animation: Listenable.merge([this, controller]),
                 builder: (_, __) {
-                  return buildPaymentModal(
-                    main: this,
-                    controller: controller,
-                  );
+                  return buildPaymentModal(main: this, controller: controller);
                 },
               ),
             );
           },
           transitionsBuilder: (_, animation, __, child) {
             return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1, 0), // 👉 entra desde derecha
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeInOut,
-              )),
+              position:
+                  Tween<Offset>(
+                    begin: const Offset(1, 0), // 👉 entra desde derecha
+                    end: Offset.zero,
+                  ).animate(
+                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                  ),
               child: child,
             );
           },
@@ -163,6 +172,7 @@ class PosMainController extends ChangeNotifier {
   }
 
   CustomerModelPosCurrent? selectedCustomer;
+  CustomerModelPosCurrent? dataCustomerFinal;
 
   void setCustomerTicket(CustomerModelPosCurrent? selectedCustomerCurrent) {
     selectedCustomer = selectedCustomerCurrent;
@@ -226,4 +236,11 @@ class PosMainController extends ChangeNotifier {
   }
 
   String get labelTitleWayPayment => "Formas de Pago";
+
+  CustomerModelPosCurrent get customerInUse {
+    return selectedCustomer ?? dataCustomerFinal!;
+  }
+  bool get canUseCoupons {
+    return ticket.items.isNotEmpty && shift.isShiftOpen;
+  }
 }

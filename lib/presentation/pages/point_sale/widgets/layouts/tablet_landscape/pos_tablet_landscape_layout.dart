@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../shared/controllers/app_controller.dart';
+import '../../../repositories/config_repository.dart';
+import '../../../services/config_api_service.dart';
 import '../../dialogs/pos_open_shift_dialog.dart';
 import '../../templates/pos_split_template.dart';
 import '../pos_main_controller.dart';
@@ -23,10 +25,10 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
   void initState() {
     super.initState();
     final app = context.read<AppController>();
-
-    controller = PosMainController(app: app)
+    controller = PosMainController(app: app,configRepository: ConfigRepository(
+        ConfigApiService(), // 👈 mock por ahora
+    ))
       ..addListener(_onControllerChanged);
-
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
 
     _initialize();

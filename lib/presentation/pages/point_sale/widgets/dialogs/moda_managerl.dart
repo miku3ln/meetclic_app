@@ -493,6 +493,28 @@ class CustomerModelPosCurrent {
     this.address,
     this.city,
   });
+
+  factory CustomerModelPosCurrent.fromJson(Map<String, dynamic> json) {
+    return CustomerModelPosCurrent(
+      id: json['id'].toString(),
+      name: json['name'] ?? '',
+      email: json['email'],
+      phone: json['phone'],
+      address: json['address'],
+      city: json['city'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'address': address,
+      'city': city,
+    };
+  }
 }
 
 class _CustomerTabs extends StatelessWidget {
@@ -534,34 +556,3 @@ class _CustomerTabs extends StatelessWidget {
   }
 }
 
-class CustomerServiceModal {
-  Future<List<CustomerModelPosCurrent>> fetchCustomers() async {
-    /// Simula delay de API
-    await Future.delayed(const Duration(seconds: 2));
-
-    /// Data mock (simulación backend)
-    return [
-      CustomerModelPosCurrent(
-        id: "1",
-        name: "Juan Pérez",
-        email: "juan@mail.com",
-        phone: "0999999999",
-        city: "Quito",
-      ),
-      CustomerModelPosCurrent(
-        id: "2",
-        name: "María López",
-        email: "maria@mail.com",
-        phone: "0888888888",
-        city: "Otavalo",
-      ),
-      CustomerModelPosCurrent(
-        id: "3",
-        name: "Carlos Andrade",
-        email: "carlos@mail.com",
-        phone: "0777777777",
-        city: "Ibarra",
-      ),
-    ];
-  }
-}

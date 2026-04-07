@@ -37,6 +37,7 @@ class PosRightPanel extends StatelessWidget {
               // ✅ Lista ocupa todo menos checkout
               Expanded(
                 child: PosTicketBody(
+
                   items: controller.ticket.items,
                   styles: styles,
                   onMinus: (it) => controller.ticket. decreaseItem(it),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/repositories/config_repository.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/services/config_api_service.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/dialogs/pos_open_shift_dialog.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
@@ -33,7 +35,10 @@ class _PointSalePageState extends State<PointSalePage> {
   }
   void initControllerMain(){
     final app = context.read<AppController>();
-    controller = PosMainController(app: app)..addListener(_onChanged);
+
+    controller = PosMainController(app: app,configRepository: ConfigRepository(
+        ConfigApiService(), // 👈 mock por ahora
+    ))..addListener(_onChanged);
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
     controller.shift.onRequestOpenShift = _showOpenShiftModal;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/state/product_modal_controller.dart';
+import '../repositories/config_repository.dart';
 import '../shared/utils.dart';
 import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/layouts/pos_main_controller.dart';

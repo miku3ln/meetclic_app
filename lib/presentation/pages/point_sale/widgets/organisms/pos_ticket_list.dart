@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import '../../theme/pos_ticket_styles.dart';
 import '../models/pos_product_item.dart';
 import '../organisms/pos_ticket_row.dart';
+
 class PosTicketBody extends StatelessWidget {
   final List<PostTicketItem> items;
   final PosTicketStyles styles;
-  final bool isEdit;
+
   final void Function(PostTicketItem item) onMinus;
   final void Function(PostTicketItem item) onPlus;
+  final PosTicketRowType type;
 
   final void Function(PostTicketItem item) onEdit;
   final void Function(PostTicketItem item) onDelete;
@@ -21,7 +23,7 @@ class PosTicketBody extends StatelessWidget {
     required this.onPlus,
     required this.onEdit,
     required this.onDelete,
-    this.isEdit = true, // 🔥 default TRUE
+    this.type = PosTicketRowType.manager, // 🔥 default TRUE
   });
 
   @override
@@ -40,7 +42,7 @@ class PosTicketBody extends StatelessWidget {
           onPlus: () => onPlus(it),
           onEdit: () => onEdit(it),
           onDelete: () => onDelete(it),
-          isEdit: isEdit, // 🔥
+          type:type,
         );
       },
     );
