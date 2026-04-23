@@ -89,7 +89,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     if (opened != true) return;
   }
 
-  void initControllerMain() {
+  Future<void> initControllerMain() async  {
     final app = context.read<AppController>();
     controller = PosMainController(
       app: app,
@@ -104,9 +104,11 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     controller.ui.onRequestOpenDrawer = () {
       _scaffoldKey.currentState?.openDrawer();
     };
+    // 🔥 AQUÍ está la clave
+    final products = await PosTabletLandscapeFixtures.getProductsData();
     // ✅ Carga data inicial (fixtures)
     controller.init(
-      initialProducts: PosTabletLandscapeFixtures.getProductsData(),
+      initialProducts: products,
       initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
       initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
       // opcional:

@@ -19,6 +19,9 @@ class PosProductItem {
   final double unitPrice;
   final double taxPercentage;
 
+  final double stock;
+  final String unit;
+
   const PosProductItem({
     required this.id,
     required this.name,
@@ -29,6 +32,9 @@ class PosProductItem {
     required this.menuCategoryId,
     required this.taxPercentage,
     required this.unitPrice,
+
+     this.stock=0,
+     this.unit='u',
   });
 }
 

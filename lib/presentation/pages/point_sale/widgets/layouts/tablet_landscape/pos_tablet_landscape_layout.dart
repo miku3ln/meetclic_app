@@ -36,9 +36,10 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
 
   Future<void> _initialize() async {
     await controller.shift.init();
+    final products = await PosTabletLandscapeFixtures.getProductsData();
 
     controller.init(
-      initialProducts: PosTabletLandscapeFixtures.getProductsData(),
+      initialProducts:products,
       initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
       initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
       initialSelectedProductCategoryId: "all",

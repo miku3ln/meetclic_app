@@ -1,4 +1,9 @@
+import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart' as http;
+
+import '../../../../../../infrastructure/config/server_config.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
 
@@ -8,13 +13,41 @@ class PosTabletLandscapeFixtures {
   // -------------------------
   static List<PosCategoryItem> getCategoriesData() {
     return const [
-      PosCategoryItem(id: 'all', value: 'Todos', description: 'Todos los productos'),
-      PosCategoryItem(id: 'mains', value: 'Platos fuertes', description: 'Hamburguesas, pollo, carne'),
-      PosCategoryItem(id: 'sides', value: 'Acompañamientos', description: 'Papas, arroz, ensaladas'),
-      PosCategoryItem(id: 'drinks', value: 'Bebidas', description: 'Gaseosas, jugos, agua'),
-      PosCategoryItem(id: 'desserts', value: 'Postres', description: 'Helados, brownie'),
-      PosCategoryItem(id: 'extras', value: 'Extras', description: 'Salsas, queso, adicional'),
-      PosCategoryItem(id: 'breakfast', value: 'Desayunos', description: 'Huevos, salchicha, combos desayuno'),
+      PosCategoryItem(
+        id: 'all',
+        value: 'Todos',
+        description: 'Todos los productos',
+      ),
+      PosCategoryItem(
+        id: 'mains',
+        value: 'Platos fuertes',
+        description: 'Hamburguesas, pollo, carne',
+      ),
+      PosCategoryItem(
+        id: 'sides',
+        value: 'Acompañamientos',
+        description: 'Papas, arroz, ensaladas',
+      ),
+      PosCategoryItem(
+        id: 'drinks',
+        value: 'Bebidas',
+        description: 'Gaseosas, jugos, agua',
+      ),
+      PosCategoryItem(
+        id: 'desserts',
+        value: 'Postres',
+        description: 'Helados, brownie',
+      ),
+      PosCategoryItem(
+        id: 'extras',
+        value: 'Extras',
+        description: 'Salsas, queso, adicional',
+      ),
+      PosCategoryItem(
+        id: 'breakfast',
+        value: 'Desayunos',
+        description: 'Huevos, salchicha, combos desayuno',
+      ),
     ];
   }
 
@@ -24,14 +57,42 @@ class PosTabletLandscapeFixtures {
   static List<PosCategoryItem> getMenuCategoriesData() {
     return const [
       PosCategoryItem(id: 'all', value: 'Todo', description: 'Todo el menú'),
-      PosCategoryItem(id: 'menu', value: 'Menú', description: 'Platos del día / principales'),
-      PosCategoryItem(id: 'burgers', value: 'Hamburguesas', description: 'Clásicas y dobles'),
-      PosCategoryItem(id: 'chicken', value: 'Pollo', description: 'Broaster / crispy'),
-      PosCategoryItem(id: 'combos', value: 'Combos', description: 'Combo con papas + bebida'),
-      PosCategoryItem(id: 'snacks', value: 'Snacks', description: 'Papas, alitas, nuggets'),
-      PosCategoryItem(id: 'drinks', value: 'Bebidas', description: 'Frías y calientes'),
+      PosCategoryItem(
+        id: 'menu',
+        value: 'Menú',
+        description: 'Platos del día / principales',
+      ),
+      PosCategoryItem(
+        id: 'burgers',
+        value: 'Hamburguesas',
+        description: 'Clásicas y dobles',
+      ),
+      PosCategoryItem(
+        id: 'chicken',
+        value: 'Pollo',
+        description: 'Broaster / crispy',
+      ),
+      PosCategoryItem(
+        id: 'combos',
+        value: 'Combos',
+        description: 'Combo con papas + bebida',
+      ),
+      PosCategoryItem(
+        id: 'snacks',
+        value: 'Snacks',
+        description: 'Papas, alitas, nuggets',
+      ),
+      PosCategoryItem(
+        id: 'drinks',
+        value: 'Bebidas',
+        description: 'Frías y calientes',
+      ),
       PosCategoryItem(id: 'desserts', value: 'Postres', description: 'Dulces'),
-      PosCategoryItem(id: 'breakfast', value: 'Desayunos', description: 'Huevos + arroz + salchicha'),
+      PosCategoryItem(
+        id: 'breakfast',
+        value: 'Desayunos',
+        description: 'Huevos + arroz + salchicha',
+      ),
       PosCategoryItem(id: 'grid', value: '▦', description: 'Cambiar vista'),
     ];
   }
@@ -46,22 +107,26 @@ class PosTabletLandscapeFixtures {
     final menuCats = getMenuCategoriesData();
 
     // Convertimos categorías en acciones (excepto "grid" si quieres mantenerlo)
-    return menuCats.map((c) {
-      return PosMenuActionItem(
-        id: c.id,
-        value: c.value,
-        description: c.description,
-        onTap: () => onTap(c.id),
-      );
-    }).toList(growable: false);
+    return menuCats
+        .map((c) {
+          return PosMenuActionItem(
+            id: c.id,
+            value: c.value,
+            description: c.description,
+            onTap: () => onTap(c.id),
+          );
+        })
+        .toList(growable: false);
   }
 
   // -------------------------
   // (3) PRODUCTS
   //  - Cada producto: productCategoryId + menuCategoryId
   // -------------------------
-  static List<PosProductItem> getProductsData() {
-    return const [
+  static Future<List<PosProductItem>> getProductsData() async {
+    return PosMockData.getProductsData();
+
+    /*return const [
       // ========= MENU (platos fuertes) =========
       PosProductItem(
         id: 'prd_arroz_carne',
@@ -70,7 +135,7 @@ class PosTabletLandscapeFixtures {
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
         taxPercentage: 0,
-        unitPrice: 2.50
+        unitPrice: 2.50,
 
       ),
       PosProductItem(
@@ -79,8 +144,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_pollo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_arroz_huevo',
@@ -88,8 +153,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_huevo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_arroz_salchicha',
@@ -97,8 +162,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz_salchicha/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'menu',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= BURGERS =========
@@ -108,8 +173,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_clasica/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_burger_doble',
@@ -117,8 +182,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_doble/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_burger_pollo',
@@ -126,8 +191,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_pollo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_burger_queso',
@@ -135,8 +200,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/burger_queso/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'burgers',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= CHICKEN =========
@@ -146,8 +211,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/pollo_2/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'chicken',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_pollo_crispy_3p',
@@ -155,8 +220,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/pollo_3/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'chicken',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_alitas_6',
@@ -164,8 +229,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/alitas_6/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'chicken',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= SNACKS =========
@@ -175,8 +240,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/papas_med/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'snacks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_papas_gran',
@@ -184,8 +249,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/papas_gran/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'snacks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_nuggets_6',
@@ -193,8 +258,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/nuggets_6/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'snacks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_nuggets_10',
@@ -202,8 +267,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/nuggets_10/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'snacks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= SIDES (acompañamientos) =========
@@ -213,8 +278,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/arroz/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'menu',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_ensalada',
@@ -222,8 +287,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/ensalada/600/600',
         productCategoryId: 'sides',
         menuCategoryId: 'menu',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= DRINKS =========
@@ -233,8 +298,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/agua/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_cola_500',
@@ -242,8 +307,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/cola_500/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_jugo',
@@ -251,8 +316,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/jugo/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_cafe',
@@ -260,8 +325,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/cafe/600/600',
         productCategoryId: 'drinks',
         menuCategoryId: 'drinks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= DESSERTS =========
@@ -271,8 +336,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/brownie/600/600',
         productCategoryId: 'desserts',
         menuCategoryId: 'desserts',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_helado',
@@ -280,8 +345,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/helado/600/600',
         productCategoryId: 'desserts',
         menuCategoryId: 'desserts',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= EXTRAS =========
@@ -291,8 +356,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/salsa_tomate/600/600',
         productCategoryId: 'extras',
         menuCategoryId: 'snacks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_mayonesa',
@@ -300,8 +365,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/mayo/600/600',
         productCategoryId: 'extras',
         menuCategoryId: 'snacks',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_queso_extra',
@@ -309,8 +374,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/queso_extra/600/600',
         productCategoryId: 'extras',
         menuCategoryId: 'burgers',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= BREAKFAST =========
@@ -320,8 +385,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/desayuno_huevo/600/600',
         productCategoryId: 'breakfast',
         menuCategoryId: 'breakfast',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_desayuno_huevo_salchicha',
@@ -329,8 +394,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/desayuno_salchicha/600/600',
         productCategoryId: 'breakfast',
         menuCategoryId: 'breakfast',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
 
       // ========= COMBOS =========
@@ -340,8 +405,8 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/combo_burger/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'combos',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
       PosProductItem(
         id: 'prd_combo_pollo',
@@ -349,76 +414,458 @@ class PosTabletLandscapeFixtures {
         imageUrl: 'https://picsum.photos/seed/combo_pollo/600/600',
         productCategoryId: 'mains',
         menuCategoryId: 'combos',
-          taxPercentage: 16,
-          unitPrice: 2.50
+        taxPercentage: 16,
+        unitPrice: 2.50,
       ),
-    ];
+    ];*/
   }
+
   static List<PosCoupon> getCouponsData() {
     return [
       /// 🍔 BURGERS
-      PosCoupon(id: 1, code: 'BURGER10', name: '10% Burger', discount: 10, productId: 'prd_burger_clasica', expiresAt: DateTime.now().add(const Duration(days: 30))),
-      PosCoupon(id: 2, code: 'BURGER20', name: '20% Burger', discount: 20, productId: 'prd_burger_doble', expiresAt: DateTime.now().add(const Duration(days: 15))),
-      PosCoupon(id: 3, code: 'CHEESE5', name: '0.5 Queso', discount: 0.5, productId: 'prd_burger_queso'),
-      PosCoupon(id: 4, code: 'POLLOBURGER', name: '15% Pollo Burger', discount: 15, productId: 'prd_burger_pollo'),
+      PosCoupon(
+        id: 1,
+        code: 'BURGER10',
+        name: '10% Burger',
+        discount: 10,
+        productId: 'prd_burger_clasica',
+        expiresAt: DateTime.now().add(const Duration(days: 30)),
+      ),
+      PosCoupon(
+        id: 2,
+        code: 'BURGER20',
+        name: '20% Burger',
+        discount: 20,
+        productId: 'prd_burger_doble',
+        expiresAt: DateTime.now().add(const Duration(days: 15)),
+      ),
+      PosCoupon(
+        id: 3,
+        code: 'CHEESE5',
+        name: '0.5 Queso',
+        discount: 0.5,
+        productId: 'prd_burger_queso',
+      ),
+      PosCoupon(
+        id: 4,
+        code: 'POLLOBURGER',
+        name: '15% Pollo Burger',
+        discount: 15,
+        productId: 'prd_burger_pollo',
+      ),
 
       /// 🍗 POLLO
-      PosCoupon(id: 5, code: 'POLLO10', name: '10% Pollo', discount: 10, productId: 'prd_pollo_crispy_2p'),
-      PosCoupon(id: 6, code: 'POLLO3P', name: '1 OFF Pollo 3p', discount: 1, productId: 'prd_pollo_crispy_3p'),
-      PosCoupon(id:7, code: 'ALITAS20', name: '20% Alitas', discount: 20, productId: 'prd_alitas_6'),
+      PosCoupon(
+        id: 5,
+        code: 'POLLO10',
+        name: '10% Pollo',
+        discount: 10,
+        productId: 'prd_pollo_crispy_2p',
+      ),
+      PosCoupon(
+        id: 6,
+        code: 'POLLO3P',
+        name: '1 OFF Pollo 3p',
+        discount: 1,
+        productId: 'prd_pollo_crispy_3p',
+      ),
+      PosCoupon(
+        id: 7,
+        code: 'ALITAS20',
+        name: '20% Alitas',
+        discount: 20,
+        productId: 'prd_alitas_6',
+      ),
 
       /// 🍟 SNACKS
-      PosCoupon(id:8, code: 'PAPAS10', name: '10% Papas', discount: 10, productId: 'prd_papas_med'),
-      PosCoupon(id:9, code: 'PAPASGRAND', name: '1 Papas grandes', discount: 1, productId: 'prd_papas_gran'),
-      PosCoupon(id: 10, code: 'NUGGETS5', name: '0.5 Nuggets', discount: 0.5, productId: 'prd_nuggets_6'),
-      PosCoupon(id:11, code: 'NUGGETS10', name: '10% Nuggets', discount: 10, productId: 'prd_nuggets_10'),
+      PosCoupon(
+        id: 8,
+        code: 'PAPAS10',
+        name: '10% Papas',
+        discount: 10,
+        productId: 'prd_papas_med',
+      ),
+      PosCoupon(
+        id: 9,
+        code: 'PAPASGRAND',
+        name: '1 Papas grandes',
+        discount: 1,
+        productId: 'prd_papas_gran',
+      ),
+      PosCoupon(
+        id: 10,
+        code: 'NUGGETS5',
+        name: '0.5 Nuggets',
+        discount: 0.5,
+        productId: 'prd_nuggets_6',
+      ),
+      PosCoupon(
+        id: 11,
+        code: 'NUGGETS10',
+        name: '10% Nuggets',
+        discount: 10,
+        productId: 'prd_nuggets_10',
+      ),
 
       /// 🥤 BEBIDAS
-      PosCoupon(id: 12, code: 'AGUAFREE', name: '1 Agua', discount: 1, productId: 'prd_agua'),
-      PosCoupon(id:13, code: 'COLA10', name: '10% Cola', discount: 10, productId: 'prd_cola_500'),
-      PosCoupon(id: 14, code: 'JUGO1', name: '1 Jugo', discount: 1, productId: 'prd_jugo'),
-      PosCoupon(id: 15, code: 'CAFE20', name: '20% Café', discount: 20, productId: 'prd_cafe'),
+      PosCoupon(
+        id: 12,
+        code: 'AGUAFREE',
+        name: '1 Agua',
+        discount: 1,
+        productId: 'prd_agua',
+      ),
+      PosCoupon(
+        id: 13,
+        code: 'COLA10',
+        name: '10% Cola',
+        discount: 10,
+        productId: 'prd_cola_500',
+      ),
+      PosCoupon(
+        id: 14,
+        code: 'JUGO1',
+        name: '1 Jugo',
+        discount: 1,
+        productId: 'prd_jugo',
+      ),
+      PosCoupon(
+        id: 15,
+        code: 'CAFE20',
+        name: '20% Café',
+        discount: 20,
+        productId: 'prd_cafe',
+      ),
 
       /// 🍰 POSTRES
-      PosCoupon(id: 16, code: 'BROWNIE10', name: '10% Brownie', discount: 10, productId: 'prd_brownie'),
-      PosCoupon(id: 17, code: 'HELADO2', name: '2 Helado', discount: 2, productId: 'prd_helado'),
+      PosCoupon(
+        id: 16,
+        code: 'BROWNIE10',
+        name: '10% Brownie',
+        discount: 10,
+        productId: 'prd_brownie',
+      ),
+      PosCoupon(
+        id: 17,
+        code: 'HELADO2',
+        name: '2 Helado',
+        discount: 2,
+        productId: 'prd_helado',
+      ),
 
       /// 🍚 MENU
-      PosCoupon(id:18, code: 'ARROZ5', name: '5% Arroz carne', discount: 5, productId: 'prd_arroz_carne'),
-      PosCoupon(id: 19, code: 'POLLOARROZ', name: '10% Arroz pollo', discount: 10, productId: 'prd_arroz_pollo'),
-      PosCoupon(id:20, code: 'HUEVOFREE', name: '1 Huevo', discount: 1, productId: 'prd_arroz_huevo'),
-      PosCoupon(id:21, code: 'SALCHICHA', name: '10% Salchicha', discount: 10, productId: 'prd_arroz_salchicha'),
+      PosCoupon(
+        id: 18,
+        code: 'ARROZ5',
+        name: '5% Arroz carne',
+        discount: 5,
+        productId: 'prd_arroz_carne',
+      ),
+      PosCoupon(
+        id: 19,
+        code: 'POLLOARROZ',
+        name: '10% Arroz pollo',
+        discount: 10,
+        productId: 'prd_arroz_pollo',
+      ),
+      PosCoupon(
+        id: 20,
+        code: 'HUEVOFREE',
+        name: '1 Huevo',
+        discount: 1,
+        productId: 'prd_arroz_huevo',
+      ),
+      PosCoupon(
+        id: 21,
+        code: 'SALCHICHA',
+        name: '10% Salchicha',
+        discount: 10,
+        productId: 'prd_arroz_salchicha',
+      ),
 
       /// 🧀 EXTRAS
-      PosCoupon(id: 22, code: 'SALSAFREE', name: '0.5 Salsa', discount: 0.5, productId: 'prd_salsa_tomate'),
-      PosCoupon(id:23, code: 'MAYO10', name: '10% Mayonesa', discount: 10, productId: 'prd_mayonesa'),
-      PosCoupon(id:24, code: 'QUESO2', name: '2 Queso extra', discount: 2, productId: 'prd_queso_extra'),
+      PosCoupon(
+        id: 22,
+        code: 'SALSAFREE',
+        name: '0.5 Salsa',
+        discount: 0.5,
+        productId: 'prd_salsa_tomate',
+      ),
+      PosCoupon(
+        id: 23,
+        code: 'MAYO10',
+        name: '10% Mayonesa',
+        discount: 10,
+        productId: 'prd_mayonesa',
+      ),
+      PosCoupon(
+        id: 24,
+        code: 'QUESO2',
+        name: '2 Queso extra',
+        discount: 2,
+        productId: 'prd_queso_extra',
+      ),
 
       /// 🍳 DESAYUNO
-      PosCoupon(id:25, code: 'DESAYUNO5', name: '5% Desayuno', discount: 5, productId: 'prd_desayuno_huevo_arroz'),
-      PosCoupon(id:26, code: 'DESAYUNO10', name: '10% Desayuno', discount: 10, productId: 'prd_desayuno_huevo_salchicha'),
+      PosCoupon(
+        id: 25,
+        code: 'DESAYUNO5',
+        name: '5% Desayuno',
+        discount: 5,
+        productId: 'prd_desayuno_huevo_arroz',
+      ),
+      PosCoupon(
+        id: 26,
+        code: 'DESAYUNO10',
+        name: '10% Desayuno',
+        discount: 10,
+        productId: 'prd_desayuno_huevo_salchicha',
+      ),
 
       /// 🍔 COMBOS
-      PosCoupon(id:27, code: 'COMBO10', name: '10% Combo Burger', discount: 10, productId: 'prd_combo_burger'),
-      PosCoupon(id:28, code: 'COMBO20', name: '20% Combo Pollo', discount: 20, productId: 'prd_combo_pollo'),
+      PosCoupon(
+        id: 27,
+        code: 'COMBO10',
+        name: '10% Combo Burger',
+        discount: 10,
+        productId: 'prd_combo_burger',
+      ),
+      PosCoupon(
+        id: 28,
+        code: 'COMBO20',
+        name: '20% Combo Pollo',
+        discount: 20,
+        productId: 'prd_combo_pollo',
+      ),
 
       /// 🔥 GENERALES (repetidos distintos valores)
-      PosCoupon(id:29, code: 'BURGER5', name: '5% Burger', discount: 5, productId: 'prd_burger_clasica'),
-      PosCoupon(id: 30, code: 'BURGER30', name: '30% Burger', discount: 30, productId: 'prd_burger_doble'),
-      PosCoupon(id: 31, code: 'PAPAS5', name: '5% Papas', discount: 5, productId: 'prd_papas_med'),
-      PosCoupon(id:32, code: 'NUGGETS20', name: '20% Nuggets', discount: 20, productId: 'prd_nuggets_10'),
+      PosCoupon(
+        id: 29,
+        code: 'BURGER5',
+        name: '5% Burger',
+        discount: 5,
+        productId: 'prd_burger_clasica',
+      ),
+      PosCoupon(
+        id: 30,
+        code: 'BURGER30',
+        name: '30% Burger',
+        discount: 30,
+        productId: 'prd_burger_doble',
+      ),
+      PosCoupon(
+        id: 31,
+        code: 'PAPAS5',
+        name: '5% Papas',
+        discount: 5,
+        productId: 'prd_papas_med',
+      ),
+      PosCoupon(
+        id: 32,
+        code: 'NUGGETS20',
+        name: '20% Nuggets',
+        discount: 20,
+        productId: 'prd_nuggets_10',
+      ),
 
       /// 🔥 MÁS VARIADOS
-      PosCoupon(id: 33, code: 'COLA5', name: '5% Cola', discount: 5, productId: 'prd_cola_500'),
-      PosCoupon(id: 34, code: 'CAFE5', name: '5% Café', discount: 5, productId: 'prd_cafe'),
-      PosCoupon(id: 35, code: 'HELADO10', name: '10% Helado', discount: 10, productId: 'prd_helado'),
-      PosCoupon(id: 36, code: 'BROWNIE5', name: '5% Brownie', discount: 5, productId: 'prd_brownie'),
+      PosCoupon(
+        id: 33,
+        code: 'COLA5',
+        name: '5% Cola',
+        discount: 5,
+        productId: 'prd_cola_500',
+      ),
+      PosCoupon(
+        id: 34,
+        code: 'CAFE5',
+        name: '5% Café',
+        discount: 5,
+        productId: 'prd_cafe',
+      ),
+      PosCoupon(
+        id: 35,
+        code: 'HELADO10',
+        name: '10% Helado',
+        discount: 10,
+        productId: 'prd_helado',
+      ),
+      PosCoupon(
+        id: 36,
+        code: 'BROWNIE5',
+        name: '5% Brownie',
+        discount: 5,
+        productId: 'prd_brownie',
+      ),
 
       /// ⚠️ EXPIRADOS
-      PosCoupon(id: 37, code: 'OLD10', name: 'Expirado 10%', discount: 10, productId: 'prd_burger_clasica', expiresAt: DateTime.now().subtract(const Duration(days: 1))),
-      PosCoupon(id:38, code: 'OLD20', name: 'Expirado 20%', discount: 20, productId: 'prd_combo_burger', expiresAt: DateTime.now().subtract(const Duration(days: 2))),
-      PosCoupon(id:39, code: 'OLD5', name: 'Expirado 5%', discount: 5, productId: 'prd_papas_med', expiresAt: DateTime.now().subtract(const Duration(days: 3))),
-      PosCoupon(id: 40, code: 'OLD50', name: 'Expirado 50%', discount: 50, productId: 'prd_burger_doble', expiresAt: DateTime.now().subtract(const Duration(days: 5))),
+      PosCoupon(
+        id: 37,
+        code: 'OLD10',
+        name: 'Expirado 10%',
+        discount: 10,
+        productId: 'prd_burger_clasica',
+        expiresAt: DateTime.now().subtract(const Duration(days: 1)),
+      ),
+      PosCoupon(
+        id: 38,
+        code: 'OLD20',
+        name: 'Expirado 20%',
+        discount: 20,
+        productId: 'prd_combo_burger',
+        expiresAt: DateTime.now().subtract(const Duration(days: 2)),
+      ),
+      PosCoupon(
+        id: 39,
+        code: 'OLD5',
+        name: 'Expirado 5%',
+        discount: 5,
+        productId: 'prd_papas_med',
+        expiresAt: DateTime.now().subtract(const Duration(days: 3)),
+      ),
+      PosCoupon(
+        id: 40,
+        code: 'OLD50',
+        name: 'Expirado 50%',
+        discount: 50,
+        productId: 'prd_burger_doble',
+        expiresAt: DateTime.now().subtract(const Duration(days: 5)),
+      ),
     ];
+  }
+}
+
+abstract class ProductRepository {
+  Future<List<PosProductItem>> getProducts();
+}
+
+class ProductRemoteDataSource {
+  Future<Map<String, dynamic>> getProducts() async {
+    final response = await http.get(
+      Uri.parse('${ServerConfig.baseUrl}/products-sales'),
+      headers: {
+        'Authorization': 'Bearer TU_TOKEN',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception('Error API');
+    }
+
+    return jsonDecode(response.body);
+  }
+}
+
+class ProductMapper {
+  static PosProductItem fromJson(Map<String, dynamic> json) {
+    return PosProductItem(
+      id: json['id'].toString(),
+      name: json['name'],
+      imageUrl: json['source'],
+      productCategoryId: json['product_category_id'].toString(),
+      menuCategoryId: json['product_subcategory_id'].toString(),
+      stock: (json['stock']['quantity'] ?? 0).toDouble(),
+      unit: json['stock']['unit'] ?? 'u',
+      unitPrice: 55,
+      taxPercentage: 0,
+    );
+  }
+}
+
+class ProductRepositoryImpl implements ProductRepository {
+  final ProductRemoteDataSource remote;
+
+  ProductRepositoryImpl(this.remote);
+
+  @override
+  Future<List<PosProductItem>> getProducts() async {
+    final data = await remote.getProducts();
+
+    final List rows = data['data']['rows'];
+
+    return rows.map((e) => ProductMapper.fromJson(e)).toList();
+  }
+}
+
+class GetProductsUseCase {
+  final ProductRepository repository;
+
+  GetProductsUseCase(this.repository);
+
+  Future<List<PosProductItem>> call() {
+    return repository.getProducts();
+  }
+}
+
+class ProductController extends ChangeNotifier {
+  final GetProductsUseCase getProductsUseCase;
+
+  List<PosProductItem> products = [];
+  bool loading = false;
+
+  ProductController(this.getProductsUseCase);
+
+  Future<void> loadProducts() async {
+    loading = true;
+    notifyListeners();
+
+    try {
+      products = await getProductsUseCase();
+    } catch (e) {
+      print(e);
+    }
+
+    loading = false;
+    notifyListeners();
+  }
+}
+
+class PosMockData {
+  static Future<List<PosProductItem>> getProductsData() async {
+    final uri = Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales')
+        .replace(
+          queryParameters: {
+            'current': '1',
+            'rowCount': '-1',
+            'searchPhrase': '',
+            'business_id': '1',
+            'grid_id': '#grid-registers-grid',
+          },
+        );
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer 6cab9b53-a8ca-420d-a3e0-da862e467296',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode != 200) {
+
+      List<PosProductItem> result = [];
+      return result;
+    }
+    final data = jsonDecode(response.body);
+    final List rows = data['rows'];
+    // 🔥 aquí haces el mapper DIRECTO
+    return rows.map<PosProductItem>((json) {
+      final stock = json['stock'] ?? {};
+      final taxData = json['tax'] ?? {};
+      final priceData = json['price'] ?? {};
+
+      return PosProductItem(
+        id: json['id'].toString(),
+        name: json['name'],
+        imageUrl: json['source'],
+        productCategoryId: json['product_category_id'].toString(),
+        menuCategoryId: json['product_subcategory_id'].toString(),
+
+        taxPercentage: double.tryParse(taxData['value_percentage'] ?.toString() ?? '0') ?? 0,
+        unitPrice: double.tryParse(priceData['pv']?.toString() ?? '0') ?? 0,
+        // 👉 si agregas estos campos al modelo
+        stock: (stock['quantity'] ?? 0).toDouble(),
+        unit: stock['unit'] ?? 'u',
+      );
+    }).toList();
   }
 }

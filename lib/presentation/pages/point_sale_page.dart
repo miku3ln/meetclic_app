@@ -33,7 +33,7 @@ class _PointSalePageState extends State<PointSalePage> {
     super.initState();
     initControllerMain();
   }
-  void initControllerMain(){
+  Future<void> initControllerMain() async{
     final app = context.read<AppController>();
 
     controller = PosMainController(app: app,configRepository: ConfigRepository(
@@ -46,9 +46,11 @@ class _PointSalePageState extends State<PointSalePage> {
     controller.ui.onRequestOpenDrawer = () {
       _scaffoldKey.currentState?.openDrawer();
     };
+    final products = await PosTabletLandscapeFixtures.getProductsData();
+
     // ✅ Carga data inicial (fixtures)
     controller.init(
-      initialProducts: PosTabletLandscapeFixtures.getProductsData(),
+      initialProducts:products,
       initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
       initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
       // opcional:
