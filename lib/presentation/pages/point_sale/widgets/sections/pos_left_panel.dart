@@ -25,6 +25,7 @@ class PosLeftPanel extends StatelessWidget {
     final double paddingAll=isLoginMode?45:12;
     final menuDataActions = PosTabletLandscapeFixtures.getMenuDataActions(
       onTap: controller.browser.onMenuCategoryTap,
+        controller:controller
     );
     final showMenu = controller.shift.isShiftOpen;
     return Padding(

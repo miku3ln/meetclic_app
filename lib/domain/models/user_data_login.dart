@@ -91,10 +91,11 @@ class UserDataLogin {
     final Map<String, dynamic> jsonDataSummary = jsonDecode(
       movementSummaryJson,
     );
+
     var userData = json;
-    return UserDataLogin(
+    final result=UserDataLogin(
       userId: userData['user_id'] ?? 0,
-      accessToken: userData['access_token'] ?? '',
+      accessToken: userData['access_token'] ?? ( userData['accessToken'] ??""),
       userName: userData['user_name'] ?? '',
       email: userData['email'] ?? '',
       userStatus: userData['user_status'] ?? '',
@@ -123,6 +124,7 @@ class UserDataLogin {
           ? MovementSummaryModel.fromJson(userData['summary'])
           : MovementSummaryModel.fromJson(jsonDataSummary),
     );
+    return  result;
   }
 
   Map<String, dynamic> toJson() {

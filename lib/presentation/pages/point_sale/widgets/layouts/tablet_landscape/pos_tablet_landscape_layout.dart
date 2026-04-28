@@ -37,11 +37,11 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
   Future<void> _initialize() async {
     await controller.shift.init();
     final products = await PosTabletLandscapeFixtures.getProductsData();
-
+    controller.browser.allProducts=products;
     controller.init(
       initialProducts:products,
-      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
-      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(products),
+      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(products),
       initialSelectedProductCategoryId: "all",
       initialSelectedMenuCategoryId: "all",
     );

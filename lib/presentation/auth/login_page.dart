@@ -5,7 +5,6 @@ import 'package:meetclic_app/presentation/auth/register_stepper_page.dart';
 import 'package:meetclic_app/infrastructure/assets/app_images.dart';
 import 'package:meetclic_app/shared/localization/app_localizations.dart';
 
-
 import 'package:meetclic_app/presentation/widgets/atoms/input_text_atom.dart';
 import 'package:meetclic_app/presentation/widgets/atoms/intro_logo.dart';
 
@@ -66,7 +65,9 @@ class _LoginPageState extends State<LoginPage> {
 
     if (email.isEmpty || pass.isEmpty) {
       _showAlert(
-        message: appLocalizations.translate('loginManagerTitle.fieldEmailInput'),
+        message: appLocalizations.translate(
+          'loginManagerTitle.fieldEmailInput',
+        ),
         icon: Icons.warning_amber_rounded,
       );
       return;
@@ -75,27 +76,27 @@ class _LoginPageState extends State<LoginPage> {
     setState(() => isLoading = true);
 
     try {
-      final userData = await FakeAuthService().login(
+      final userDataLogin = await AuthManagerService().login(
         email: email,
         password: pass,
       );
 
-      await context.read<SessionService>().saveSession(userData);
 
       _showAlert(
-        message: "Login OK (${userData.roleName})",
+        message: userDataLogin.message,
         icon: Icons.check_circle_outline,
       );
-      // ✅ manda al Splash para que él decida el destino configurado
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const SplashScreen()),
-            (route) => false,
-      );
+      if (userDataLogin.success) {
+        final userData = userDataLogin.data!;
+        await context.read<SessionService>().saveSession(userData);
+        // ✅ manda al Splash para que él decida el destino configurado
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const SplashScreen()),
+              (route) => false,
+        );
+      }
     } catch (e) {
-      _showAlert(
-        message: e.toString(),
-        icon: Icons.error_outline,
-      );
+      _showAlert(message: e.toString(), icon: Icons.error_outline);
     } finally {
       if (mounted) setState(() => isLoading = false);
     }
@@ -119,9 +120,13 @@ class _LoginPageState extends State<LoginPage> {
               if (_alertMessage != null) ...[
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 10,
+                  ),
                   decoration: BoxDecoration(
-                    color: _alertBackgroundColor ??
+                    color:
+                        _alertBackgroundColor ??
                         theme.colorScheme.surfaceVariant.withOpacity(0.5),
                     borderRadius: BorderRadius.circular(12),
                   ),
@@ -138,7 +143,8 @@ class _LoginPageState extends State<LoginPage> {
                         child: Text(
                           _alertMessage!,
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: _alertTextColor ?? theme.colorScheme.onSurface,
+                            color:
+                                _alertTextColor ?? theme.colorScheme.onSurface,
                           ),
                         ),
                       ),
@@ -151,14 +157,18 @@ class _LoginPageState extends State<LoginPage> {
               AppSpacing.spaceBetweenInputs,
 
               InputTextAtom(
-                label: appLocalizations.translate('loginManagerTitle.fieldEmail'),
+                label: appLocalizations.translate(
+                  'loginManagerTitle.fieldEmail',
+                ),
                 controller: emailController,
               ),
 
               AppSpacing.spaceBetweenInputs,
 
               InputTextAtom(
-                label: appLocalizations.translate('loginManagerTitle.fieldPassword'),
+                label: appLocalizations.translate(
+                  'loginManagerTitle.fieldPassword',
+                ),
                 controller: passwordController,
                 obscureText: true,
               ),
@@ -181,12 +191,14 @@ class _LoginPageState extends State<LoginPage> {
                   child: isLoading
                       ? const CircularProgressIndicator()
                       : Text(
-                    appLocalizations.translate('loginManagerTitle.singInButton'),
-                    style: TextStyle(
-                      color: theme.colorScheme.onPrimary,
-                      fontSize: 18,
-                    ),
-                  ),
+                          appLocalizations.translate(
+                            'loginManagerTitle.singInButton',
+                          ),
+                          style: TextStyle(
+                            color: theme.colorScheme.onPrimary,
+                            fontSize: 18,
+                          ),
+                        ),
                 ),
               ),
 
@@ -195,11 +207,15 @@ class _LoginPageState extends State<LoginPage> {
               TextButton(
                 onPressed: () {
                   Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const RegisterStepperPage()),
+                    MaterialPageRoute(
+                      builder: (_) => const RegisterStepperPage(),
+                    ),
                   );
                 },
                 child: Text(
-                  appLocalizations.translate('loginManagerTitle.register.buttonRegister'),
+                  appLocalizations.translate(
+                    'loginManagerTitle.register.buttonRegister',
+                  ),
                 ),
               ),
             ],

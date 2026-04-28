@@ -32,7 +32,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   /// aquí decides el total simulado
   int _simulatedTotal = 592;
 
-  late FakeItemsApi _api;
+  late PosItemsManagementApi _api;
 
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
 
@@ -50,7 +50,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   @override
   void initState() {
     super.initState();
-    _api = FakeItemsApi(total: _simulatedTotal);
+    _api = PosItemsManagementApi(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
   }
@@ -105,7 +105,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   Future<void> _refreshAll() async {
     if (_isLoading) return;
-    _api = FakeItemsApi(total: _simulatedTotal);
+    _api = PosItemsManagementApi(total: _simulatedTotal);
 
     setState(() {
       _currentPage = 1;
@@ -231,12 +231,43 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                       color: Colors.grey.shade300,
                       shape: BoxShape.circle,
                     ),
+                    clipBehavior: Clip.antiAlias, // 👈 importante para que la imagen respete el círculo
                     child: item.image == null
                         ? Icon(
-                            Sections.getIconItems(PosItemsSection.items),
-                            color: Colors.grey,
-                          )
-                        : null,
+                      Sections.getIconItems(PosItemsSection.items),
+                      color: Colors.grey,
+                    )
+                        : Image.network(
+                      item.image!,
+                      fit: BoxFit.cover,
+
+                      // 🔄 Mientras carga
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+
+                        return Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              value: loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  loadingProgress.expectedTotalBytes!
+                                  : null,
+                            ),
+                          ),
+                        );
+                      },
+
+                      // ❌ Si falla
+                      errorBuilder: (context, error, stackTrace) {
+                        return Icon(
+                          Sections.getIconItems(PosItemsSection.items),
+                          color: Colors.grey,
+                        );
+                      },
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(

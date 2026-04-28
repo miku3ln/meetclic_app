@@ -215,7 +215,7 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
           return  PsHeaderWithBadge(
             title: item.title,
             badgeCount: item.countData,
-            badgeText: "Artículos",
+            badgeText: "Artículos Prueba",
             imageUrl:item.image,
             onTap: () => _onTapItem(item),
           );

@@ -39,6 +39,7 @@ class _PointSalePageState extends State<PointSalePage> {
     controller = PosMainController(app: app,configRepository: ConfigRepository(
         ConfigApiService(), // 👈 mock por ahora
     ))..addListener(_onChanged);
+
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
@@ -47,17 +48,18 @@ class _PointSalePageState extends State<PointSalePage> {
       _scaffoldKey.currentState?.openDrawer();
     };
     final products = await PosTabletLandscapeFixtures.getProductsData();
+    controller.browser.allProducts=products;
 
     // ✅ Carga data inicial (fixtures)
     controller.init(
       initialProducts:products,
-      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
-      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(products),
+      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(products),
       // opcional:
       initialSelectedProductCategoryId: 'all',
       initialSelectedMenuCategoryId: 'all',
     );
-    productCategories = PosTabletLandscapeFixtures.getCategoriesData();
+    productCategories = PosTabletLandscapeFixtures.getCategoriesData(products);
     selectedProductCategoryId = productCategories.isNotEmpty
         ? productCategories.first.id
         : null;

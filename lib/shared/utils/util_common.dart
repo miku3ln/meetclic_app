@@ -1,6 +1,12 @@
 // lib/shared/utils/util_common.dart
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
+
+import '../../domain/services/session_service.dart';
+import '../pagination_response.dart';
 
 class UtilCommon {
   static Future<void> handleTap({
@@ -68,5 +74,56 @@ class UtilCommon {
   static bool isValidCedulaEcuatoriana(String cedula) {
     if (cedula.length != 10) return false;
     return _ecuadorianCedulaRegex.hasMatch(cedula);
+  }
+}
+class PaginatedApiService {
+  final String baseUrl;
+
+  const PaginatedApiService({required this.baseUrl});
+
+  Future<PaginatedResponse<GenericListItem<T>>> fetchPage<T>({
+    required String endpoint,
+    required Map<String, String> queryParams,
+    required String totalKey,
+    required String rowsKey,
+    required GenericListItem<T> Function(Map<String, dynamic>) mapper,
+  }) async {
+    final token = SessionService().apiToken;
+
+    final uri = Uri.parse('$baseUrl/$endpoint')
+        .replace(queryParameters: queryParams);
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer ${token!}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      return PaginatedResponse(
+        current: int.tryParse(queryParams['current'] ?? '1') ?? 1,
+        rowCount: int.tryParse(queryParams['rowCount'] ?? '0') ?? 0,
+        rows: [],
+        total: 0,
+      );
+    }
+
+    final data = jsonDecode(response.body);
+
+    final int total = data[totalKey] ?? 0;
+    final List rows = data[rowsKey] ?? [];
+
+    final mapped = rows
+        .map<GenericListItem<T>>((json) => mapper(json))
+        .toList();
+
+    return PaginatedResponse(
+      current: int.tryParse(queryParams['current'] ?? '1') ?? 1,
+      rowCount: int.tryParse(queryParams['rowCount'] ?? '0') ?? 0,
+      rows: mapped,
+      total: total,
+    );
   }
 }

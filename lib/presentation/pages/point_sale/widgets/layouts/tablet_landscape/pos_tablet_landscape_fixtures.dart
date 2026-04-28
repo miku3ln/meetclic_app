@@ -3,98 +3,60 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
+import '../../../../../../domain/services/session_service.dart';
 import '../../../../../../infrastructure/config/server_config.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
+import '../pos_main_controller.dart';
 
 class PosTabletLandscapeFixtures {
   // -------------------------
   // (1) PRODUCT CATEGORIES (Dropdown)
   // -------------------------
-  static List<PosCategoryItem> getCategoriesData() {
-    return const [
-      PosCategoryItem(
+  static List<PosCategoryItem> getCategoriesData(List<PosProductItem> products) {
+    final Map<String, PosCategoryItem> map = {};
+
+    for (final p in products) {
+      map[p.productCategoryId] = PosCategoryItem(
+        id: p.productCategoryId,
+        value: p.productCategory ?? 'Sin categoría',
+        description: p.productCategory ?? '',
+      );
+    }
+
+    return [
+      const PosCategoryItem(
         id: 'all',
         value: 'Todos',
         description: 'Todos los productos',
       ),
-      PosCategoryItem(
-        id: 'mains',
-        value: 'Platos fuertes',
-        description: 'Hamburguesas, pollo, carne',
-      ),
-      PosCategoryItem(
-        id: 'sides',
-        value: 'Acompañamientos',
-        description: 'Papas, arroz, ensaladas',
-      ),
-      PosCategoryItem(
-        id: 'drinks',
-        value: 'Bebidas',
-        description: 'Gaseosas, jugos, agua',
-      ),
-      PosCategoryItem(
-        id: 'desserts',
-        value: 'Postres',
-        description: 'Helados, brownie',
-      ),
-      PosCategoryItem(
-        id: 'extras',
-        value: 'Extras',
-        description: 'Salsas, queso, adicional',
-      ),
-      PosCategoryItem(
-        id: 'breakfast',
-        value: 'Desayunos',
-        description: 'Huevos, salchicha, combos desayuno',
-      ),
+      ...map.values,
     ];
   }
 
   // -------------------------
   // (2) MENU CATEGORIES (Bottom buttons)
   // -------------------------
-  static List<PosCategoryItem> getMenuCategoriesData() {
-    return const [
-      PosCategoryItem(id: 'all', value: 'Todo', description: 'Todo el menú'),
-      PosCategoryItem(
-        id: 'menu',
-        value: 'Menú',
-        description: 'Platos del día / principales',
+  static List<PosCategoryItem> getMenuCategoriesData(List<PosProductItem> products) {
+    final Map<String, PosCategoryItem> map = {};
+    for (final p in products) {
+      map[p.menuCategoryId] = PosCategoryItem(
+        id: p.menuCategoryId,
+        value: p.menuCategory ?? 'Sin Subcategoria',
+        description: p.menuCategoryId ?? '',
+      );
+    }
+
+    return [
+      const PosCategoryItem(
+        id: 'all',
+        value: 'Todos',
+        description: 'Todos los productos',
       ),
-      PosCategoryItem(
-        id: 'burgers',
-        value: 'Hamburguesas',
-        description: 'Clásicas y dobles',
-      ),
-      PosCategoryItem(
-        id: 'chicken',
-        value: 'Pollo',
-        description: 'Broaster / crispy',
-      ),
-      PosCategoryItem(
-        id: 'combos',
-        value: 'Combos',
-        description: 'Combo con papas + bebida',
-      ),
-      PosCategoryItem(
-        id: 'snacks',
-        value: 'Snacks',
-        description: 'Papas, alitas, nuggets',
-      ),
-      PosCategoryItem(
-        id: 'drinks',
-        value: 'Bebidas',
-        description: 'Frías y calientes',
-      ),
-      PosCategoryItem(id: 'desserts', value: 'Postres', description: 'Dulces'),
-      PosCategoryItem(
-        id: 'breakfast',
-        value: 'Desayunos',
-        description: 'Huevos + arroz + salchicha',
-      ),
-      PosCategoryItem(id: 'grid', value: '▦', description: 'Cambiar vista'),
+      ...map.values,
     ];
+
+
   }
 
   // -------------------------
@@ -103,8 +65,11 @@ class PosTabletLandscapeFixtures {
   // -------------------------
   static List<PosMenuActionItem> getMenuDataActions({
     required void Function(String id) onTap,
+    required PosMainController controller
   }) {
-    final menuCats = getMenuCategoriesData();
+
+
+    final menuCats = getMenuCategoriesData(controller.browser.allProducts);
 
     // Convertimos categorías en acciones (excepto "grid" si quieres mantenerlo)
     return menuCats
@@ -823,6 +788,8 @@ class ProductController extends ChangeNotifier {
 
 class PosMockData {
   static Future<List<PosProductItem>> getProductsData() async {
+    final token = SessionService().apiToken;
+
     final uri = Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales')
         .replace(
           queryParameters: {
@@ -836,7 +803,7 @@ class PosMockData {
     final response = await http.get(
       uri,
       headers: {
-        'Authorization': 'Bearer 6cab9b53-a8ca-420d-a3e0-da862e467296',
+        'Authorization': 'Bearer ${token!}',
         'Content-Type': 'application/json',
       },
     );
@@ -859,6 +826,8 @@ class PosMockData {
         imageUrl: json['source'],
         productCategoryId: json['product_category_id'].toString(),
         menuCategoryId: json['product_subcategory_id'].toString(),
+        menuCategory: json['subcategory'].toString(),
+        productCategory: json['category'].toString(),
 
         taxPercentage: double.tryParse(taxData['value_percentage'] ?.toString() ?? '0') ?? 0,
         unitPrice: double.tryParse(priceData['pv']?.toString() ?? '0') ?? 0,

@@ -21,7 +21,8 @@ class PosProductItem {
 
   final double stock;
   final String unit;
-
+  final String? productCategory; // (1) dropdown arriba
+  final String? menuCategory; // (2) barra abajo
   const PosProductItem({
     required this.id,
     required this.name,
@@ -35,6 +36,8 @@ class PosProductItem {
 
      this.stock=0,
      this.unit='u',
+    this.productCategory="",
+    this.menuCategory='',
   });
 }
 

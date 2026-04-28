@@ -89,7 +89,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     if (opened != true) return;
   }
 
-  Future<void> initControllerMain() async  {
+  Future<void> initControllerMain() async {
     final app = context.read<AppController>();
     controller = PosMainController(
       app: app,
@@ -106,16 +106,21 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     };
     // 🔥 AQUÍ está la clave
     final products = await PosTabletLandscapeFixtures.getProductsData();
+    controller.browser.allProducts = products;
     // ✅ Carga data inicial (fixtures)
     controller.init(
       initialProducts: products,
-      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(),
-      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(),
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(
+        products,
+      ),
+      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(
+        products,
+      ),
       // opcional:
       initialSelectedProductCategoryId: 'all',
       initialSelectedMenuCategoryId: 'all',
     );
-    productCategories = PosTabletLandscapeFixtures.getCategoriesData();
+    productCategories = PosTabletLandscapeFixtures.getCategoriesData(products);
     selectedProductCategoryId = productCategories.isNotEmpty
         ? productCategories.first.id
         : null;
