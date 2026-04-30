@@ -728,6 +728,9 @@ class ProductMapper {
       id: json['id'].toString(),
       name: json['name'],
       imageUrl: json['source'],
+      code: json['code'] ,
+      type: json['type'] ,
+
       productCategoryId: json['product_category_id'].toString(),
       menuCategoryId: json['product_subcategory_id'].toString(),
       stock: (json['stock']['quantity'] ?? 0).toDouble(),
@@ -828,7 +831,8 @@ class PosMockData {
         menuCategoryId: json['product_subcategory_id'].toString(),
         menuCategory: json['subcategory'].toString(),
         productCategory: json['category'].toString(),
-
+        type: json['type'].toString(),
+        code: json['code'].toString(),
         taxPercentage: double.tryParse(taxData['value_percentage'] ?.toString() ?? '0') ?? 0,
         unitPrice: double.tryParse(priceData['pv']?.toString() ?? '0') ?? 0,
         // 👉 si agregas estos campos al modelo

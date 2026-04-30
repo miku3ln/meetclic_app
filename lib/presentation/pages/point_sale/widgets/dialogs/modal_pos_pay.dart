@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:meetclic_app/shared/providers_session.dart';
+import '../../../../../infrastructure/config/server_config.dart';
 import '../../../../../shared/controllers/app_controller.dart';
 import '../../repositories/config_repository.dart';
 import '../../shared/utils.dart';
+import '../../state/pos_checkout_state.dart';
 import '../../state/product_modal_controller.dart';
 import '../../theme/pos_ticket_styles.dart';
 import '../alert_information.dart';
@@ -152,8 +157,96 @@ class PosPaymentLayoutController extends ChangeNotifier {
 
   bool get isCompleted => _isCompleted;
 
-  void completePayment() {
-    _isCompleted = true;
+  Future<void> completePayment() async {
+    try {
+      final customer = main.selectedCustomer;
+      final customerId = customer?.id;
+      final businessId=1;
+      final currentSession = SessionService().currentSession;
+      final userId = currentSession?.userId;
+      final paymentMethod = main.payment.paymentMethodCode;
+      final typeSave = main.checkout.checkoutAction == PosCheckoutAction.pay
+          ? "SAVE"
+          : "NOT-SAVE";
+      final TypeService typeService = main.typeService;
+
+      List<PostTicketItemSave> itemsBody = items.map((item) {
+        return PostTicketItemSave(
+          id: item.productItem.id,
+          code: item.productItem.code,
+          name: item.productItem.name,
+          description: item.description ?? '',
+          type: item.productItem.type,
+          amount: item.amount.toDouble(),
+          hasTax: item.tax > 0 ? 'SI' : 'NO',
+          valuePercentageTax: item.tax,
+          pvPrice: item.unitPrice,
+          total: item.total,
+          subtotal: item.subtotal,
+          valuePercentageDiscount: item.discount + item.couponDiscount,
+        );
+      }).toList();
+
+      final body = {
+        "body": itemsBody
+            .map(
+              (e) => {
+                "id": e.id,
+                "code": e.code,
+                "name": e.name,
+                "description": e.description,
+                "type": e.type,
+                "amount": e.amount,
+                "hasTax": e.hasTax,
+                "valuePercentageTax": e.valuePercentageTax,
+                "pvPrice": e.pvPrice,
+                "subtotal": e.subtotal,
+                "total": e.total,
+                "valuePercentageDiscount": e.valuePercentageDiscount,
+              },
+            )
+            .toList(),
+        "header": {
+          "paymentMethod": paymentMethod,
+          "customer_id": customerId,
+          "userId": userId,
+          "business_id":businessId,
+          "typeSave": typeSave,
+          "typeService": typeService.value,
+        },
+      };
+      final token = SessionService().apiToken;
+      final uri = Uri.parse(
+        '${ServerConfig.baseUrl}/pointsales/generate-ticket',
+      );
+      final response = await http.post(
+        uri,
+        headers: {
+          'Authorization': 'Bearer ${token!}',
+          'Content-Type': 'text/plain',
+        },
+        body: jsonEncode(body),
+      );
+      // 🔥 VALIDACIÓN REAL
+      if (response.statusCode == 200) {
+        final decoded = jsonDecode(response.body);
+
+        /// 👇 depende de tu backend
+        final success = decoded["success"] ?? true;
+
+        if (success) {
+          // ✅ TODO OK
+          _isCompleted = true;
+        } else {}
+      } else {
+        // ❌ error HTTP
+      }
+
+    } catch (e) {
+      print(e);
+
+    }
+
     notifyListeners();
   }
 

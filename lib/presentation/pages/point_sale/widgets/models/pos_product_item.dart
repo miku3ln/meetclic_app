@@ -18,6 +18,9 @@ class PosProductItem {
   final String menuCategoryId; // (2) barra abajo
   final double unitPrice;
   final double taxPercentage;
+  final String code;
+  final String type;
+
 
   final double stock;
   final String unit;
@@ -26,6 +29,10 @@ class PosProductItem {
   const PosProductItem({
     required this.id,
     required this.name,
+    required this.code,
+    required this.type,
+
+
     this.imageUrl,
     this.placeholderColor,
     this.titleColor,
@@ -83,6 +90,41 @@ class PostTicketHeader {
     required this.items,
   });
 }
+
+class PostTicketItemSave {
+
+  final String id;
+  final String code;
+  final String name;
+  final String description;
+  final String type;
+  final double amount;
+  final String hasTax;
+  final double valuePercentageTax;
+  final double pvPrice;
+  final double valuePercentageDiscount;
+  final double total;
+  final double subtotal;
+
+
+
+  const PostTicketItemSave({
+    required this.id,
+    required this.code,
+    required this.name,
+    required this.description,
+    required this.type,
+    required this.amount,
+    required this.hasTax,
+    required this.valuePercentageTax,
+    required  this.pvPrice,
+     this.valuePercentageDiscount=0,
+    required  this.total,
+    required  this.subtotal,
+
+  });
+
+}
 class PostTicketItem {
   final PosProductItem productItem;
   final double subtotal;
@@ -90,6 +132,8 @@ class PostTicketItem {
   final double total;
   final String? description;
   final double unitPrice;
+  final String? code;
+  final String? type;
 
   final int amount;
   final double discount;
@@ -108,6 +152,8 @@ class PostTicketItem {
     required this.subtotal,
     required this.unitPrice,
     this.description,
+    this.code,
+    this.type,
     this.discount = 0,
     this.coupon,
     this.couponDiscount = 0,

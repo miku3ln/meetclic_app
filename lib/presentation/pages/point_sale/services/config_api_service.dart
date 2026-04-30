@@ -6,7 +6,7 @@ class ConfigApiService {
   Future<CustomerModelPosCurrent> fetchFinalConsumer() async {
  //   final response = await api.get('/consumer-final');
     final mockData = {
-      "id": "9999999999",
+      "id": "1",
       "name": "CONSUMIDOR FINAL",
       "email": 'consumidorfinal@trece.com',
       "phone": '099999999',
