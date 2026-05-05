@@ -31,7 +31,7 @@ class ServerConfig {
       case Environment.test:
         return 'http://192.168.137.1/meetclickmanager/api';
       case Environment.local:
-        return 'http://192.168.100.74:4949/meetclic-manager/api'; //PC WORK RED
+        return 'http://192.168.100.79:4949/meetclic-manager/api'; //PC WORK RED
       // return 'http://192.168.0.102/meetclickmanager/api';
     }
   }

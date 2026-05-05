@@ -157,7 +157,7 @@ class PosPaymentLayoutController extends ChangeNotifier {
 
   bool get isCompleted => _isCompleted;
 
-  Future<void> completePayment() async {
+  Future<Map<String, dynamic>>  completePayment() async {
     try {
       final customer = main.selectedCustomer;
       final customerId = customer?.id;
@@ -231,23 +231,42 @@ class PosPaymentLayoutController extends ChangeNotifier {
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
 
-        /// 👇 depende de tu backend
-        final success = decoded["success"] ?? true;
 
-        if (success) {
-          // ✅ TODO OK
+        final success = decoded["success"] ?? false;
+        final message = decoded["msj"] ?? "Sin mensaje";
+
+        if (response.statusCode == 200 && success) {
           _isCompleted = true;
-        } else {}
+        }
+        notifyListeners();
+
+        return {
+          "success": success,
+          "message": message,
+          "data": decoded["data"],
+          "errors": decoded["errors"] ?? [],
+        };
+
       } else {
-        // ❌ error HTTP
+        return {
+          "success": false,
+          "message": "Error Servidor.!",
+          "data": [],
+          "errors":  [],
+        };
       }
 
     } catch (e) {
-      print(e);
+
+      return {
+        "success": false,
+        "message": e.toString(),
+        "data": null,
+        "errors": [],
+      };
 
     }
 
-    notifyListeners();
   }
 
   void reset() {
@@ -316,8 +335,25 @@ class PosPaymentLayout extends StatelessWidget {
                 icon: Icons.check,
                 label: mainController.payment.getNameButtonManagementPointSale,
                 backgroundColor: Colors.blue,
-                onPressed: () {
-                  controller.completePayment();
+                onPressed: () async{//SAVE DATA
+                  final result = await controller.completePayment();
+                  final success = result["success"];
+                  final message = result["message"];
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(message),
+                        backgroundColor:
+                        success ? Colors.green : Colors.red,
+                        behavior: SnackBarBehavior.floating,
+                        margin: const EdgeInsets.only(
+                          top: 20,
+                          left: 20,
+                          right: 20,
+                          bottom: 0,
+                        ),
+                        duration: const Duration(seconds: 3),
+                      ),
+                  );
                 },
               ),
             ],
@@ -589,9 +625,26 @@ Widget posPaymentManagement(
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: OutlinedButton(
-                    onPressed: () {
+                    onPressed: () async {
                       controller.setCash(amount);
-                      controller.completePayment();
+                      final result = await controller.completePayment();
+                      final success = result["success"];
+                      final message = result["message"];
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(message),
+                          backgroundColor:
+                          success ? Colors.green : Colors.red,
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.only(
+                            top: 20,
+                            left: 20,
+                            right: 20,
+                            bottom: 0,
+                          ),
+                          duration: const Duration(seconds: 3),
+                        ),
+                      );
                     },
                     child: Text('\$${amount.toStringAsFixed(2)}'),
                   ),

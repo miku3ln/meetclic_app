@@ -59,20 +59,20 @@ class _ReceiptDetailCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final data = receipt.data ?? {};
 
-    final total = data['total'] as double? ?? 0;
+    final total = data['total'];
     final receiptNumber = data['receiptNumber']?.toString() ?? '';
     final employee = data['employee']?.toString() ?? '';
     final tpv = data['tpv']?.toString() ?? '';
     final orderType = data['orderType']?.toString() ?? '';
     final productName = data['productName']?.toString() ?? '';
-    final quantity = data['quantity'] as int? ?? 1;
-    final unitPrice = data['unitPrice'] as double? ?? 0;
-    final lineTotal = data['lineTotal'] as double? ?? 0;
-    final paymentMethod = data['paymentMethod']?.toString() ?? '';
-    final paymentAmount = data['paymentAmount'] as double? ?? 0;
-    final date = data['date'] as DateTime?;
-    final hour = data['hour']?.toString() ?? '';
-    final code = data['code']?.toString() ?? '';
+    final quantity = data['quantity'] ;
+    final unitPrice = data['unitPrice'];
+    final lineTotal = data['lineTotal'] ;
+    final paymentMethod = data['paymentMethod'];
+    final paymentAmount = data['paymentAmount'] ;
+    final date = data['date'];
+    final hour = data['hour'];
+    final code = data['code'];
 
     return Card(
       elevation: 3,

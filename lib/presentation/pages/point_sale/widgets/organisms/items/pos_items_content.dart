@@ -12,6 +12,7 @@ import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/utils/util_common.dart';
 import '../../../state/pos_items_controller.dart';
 import 'dart:async';
+import 'package:intl/intl.dart';
 
 import '../../sections/items/pos_items_management_section.dart';
 
@@ -20,9 +21,7 @@ class PosItemsContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final section = context
-        .watch<PosItemsController>()
-        .section;
+    final section = context.watch<PosItemsController>().section;
     return Container(
       color: Colors.white,
       child: Column(children: [Expanded(child: _buildSection(section))]),
@@ -75,7 +74,7 @@ class FakeCategoriesApi {
         subtitle: 'Estado: activa',
         description: 'Descripcion de categoria #$itemNumber',
         image:
-        'https://meetclic.com/public//uploads/business/gamification/default/tinkuy-encuentro-08.jpg',
+            'https://meetclic.com/public//uploads/business/gamification/default/tinkuy-encuentro-08.jpg',
         businessId: '1',
         countData: 50 + (start + index),
       );
@@ -123,6 +122,73 @@ class PosItemsManagementApi {
           description: json['category'] ?? '',
           image: json['source'],
           data: json,
+        );
+      },
+    );
+  }
+}
+
+class PosTicketManagementApi {
+  final int total;
+
+  final api = PaginatedApiService(baseUrl: ServerConfig.baseUrl);
+
+  PosTicketManagementApi({required this.total});
+
+  Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
+    required int current,
+    required int rowCount,
+    String? searchCode,
+    DateTime? date,
+  }) {
+    return api.fetchPage<Map<String, dynamic>>(
+      endpoint: 'pointsales/tickets-sales',
+      queryParams: {
+        'current': '$current',
+        'rowCount': '$rowCount',
+        'searchPhrase': '',
+        'business_id': '1',
+      },
+      totalKey: 'total',
+      rowsKey: 'rows',
+      // 🔥 AQUÍ está toda tu lógica real ahora
+      mapper: (json) {
+        final payments=json['payments'];
+        final payment=payments[0];
+        final header = json['header'];
+        final meta = json['meta'];
+        final amount =  double.parse(payment['amount']);
+        final lineTotal=amount;
+        final code = '#${header['id']}';
+        final hour = '22:15';
+
+        final paymentMethod=payment['payment_method'];
+        final dateInvoice=DateTime.parse(header['invoice_date']);
+
+        final dateInvoiceString='Fecha: ${DateFormat('dd/MM/yyyy HH:mm a').format(dateInvoice)}';
+        return GenericListItem<Map<String, dynamic>>(
+          id: header['id'],
+          title:lineTotal.toString(),
+          subtitle: dateInvoiceString,
+          description: paymentMethod,
+          image: null,
+          data: {
+            'receiptNumber': '${ header['id']}',
+            'employee': 'Trece',
+            'tpv': 'TPV 1',
+            'orderType': 'Para Servirse',
+            'productName': 'Mixto ${header['id']}',
+            'quantity': 1,
+            'unitPrice': (amount),
+            'lineTotal': (lineTotal),
+            'total': (amount),
+            'paymentMethod': paymentMethod,
+            'paymentAmount': (amount),
+            'code': code,
+            'hour': hour,
+            'date':dateInvoice,
+            'all': json,
+          },
         );
       },
     );

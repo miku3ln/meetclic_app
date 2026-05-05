@@ -10,6 +10,7 @@ import '../../../shared/styles.dart';
 import '../../../state/pos_receipts_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 
+import '../../organisms/items/pos_items_content.dart';
 import '../../organisms/pos_settings_app_bar.dart';
 import '../../organisms/receipts/pos_receipts_register_view.dart';
 
@@ -90,7 +91,7 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
 
-  late FakeReceiptsApi _api;
+  late PosTicketManagementApi _api;
 
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
 
@@ -106,11 +107,12 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
 
   bool get _hasData => _items.isNotEmpty;
   bool get _hasMore => _items.length < _total;
+  int _simulatedTotal = 592;
 
   @override
   void initState() {
     super.initState();
-    _api = FakeReceiptsApi();
+    _api = PosTicketManagementApi(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
   }
@@ -177,8 +179,7 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
 
   Future<void> _refreshAll() async {
     if (_isLoading) return;
-
-    _api = FakeReceiptsApi();
+    _api = PosTicketManagementApi(total: _simulatedTotal);
 
     setState(() {
       _currentPage = 1;
