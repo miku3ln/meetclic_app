@@ -40,6 +40,7 @@ class SessionService extends ChangeNotifier {
   UserDataLogin? get currentSession => _usuarioLogin;
 
   String? get apiToken => _usuarioLogin?.accessToken;
+  String? get businessId => '42';
 
   bool get isLoggedIn => _usuarioLogin != null;
 

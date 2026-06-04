@@ -161,7 +161,7 @@ class PosPaymentLayoutController extends ChangeNotifier {
     try {
       final customer = main.selectedCustomer;
       final customerId = customer?.id;
-      final businessId=1;
+      final businessId=SessionService().businessId;
       final currentSession = SessionService().currentSession;
       final userId = currentSession?.userId;
       final paymentMethod = main.payment.paymentMethodCode;
@@ -217,7 +217,7 @@ class PosPaymentLayoutController extends ChangeNotifier {
       };
       final token = SessionService().apiToken;
       final uri = Uri.parse(
-        '${ServerConfig.baseUrl}/pointsales/generate-ticket',
+        '${ServerConfig.baseUrl}/pointsales/generate-ticket',//POS-PRODUCTS-SALES -INIT-TWO
       );
       final response = await http.post(
         uri,

@@ -14,7 +14,7 @@ class ProductDraft {
   final ProductCategory category;
   final ProductSubcategory subcategory;
 
-  final SellType sellType;
+  final MeasureType sellType;
 
   final double stock;
   final double lowStock;
@@ -75,7 +75,7 @@ class ProductMapper {
           ? m['subcategory']
           : ProductSubcategory.empty(),
 
-      sellType: SellType.unit,
+      sellType: MeasureType.unit,
 
       image: null,
     );

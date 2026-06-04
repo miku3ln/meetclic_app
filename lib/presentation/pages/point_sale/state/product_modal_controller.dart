@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/models/product_management_measure.dart';
 
 
 
@@ -38,6 +39,7 @@ class ProductModalController extends ChangeNotifier {
   bool imageTouched = false;
   bool categoryTouched = false;
   bool subcategoryTouched = false;
+  bool measureCategoryTouched = false;
 
   /// =========================
   /// ⚠️ ERRORS
@@ -51,6 +53,8 @@ class ProductModalController extends ChangeNotifier {
   String? codeBarError;
   String? categoryError;
   String? subcategoryError;
+  String? measureCategoryError;
+
   String? imageError;
 
   /// =========================
@@ -63,6 +67,7 @@ class ProductModalController extends ChangeNotifier {
 
   ProductCategory? selectedCategory;
   ProductSubcategory? selectedSubcategory;
+  MeasureCategoryModel? selectedMeasureCategory;
 
   /// =========================
   /// 🖼 IMAGE
@@ -203,7 +208,17 @@ class ProductModalController extends ChangeNotifier {
 
     notifyListeners();
   }
+  UnitMeasureModel? selectedUnitMeasure;
+  void selectUnitsByMeasure(UnitMeasureModel? unit) {
+    measureCategoryTouched = true;
 
+    selectedUnitMeasure = unit;
+
+    measureCategoryError =
+    unit == null ? "Selecciona una unidad de medida" : null;
+
+    notifyListeners();
+  }
   /// =========================
   /// 🖼 IMAGE
   /// =========================
@@ -356,13 +371,18 @@ class ProductModalController extends ChangeNotifier {
     ].every((e) => e == null);
   }
 
-  SellType sellType = SellType.unit;
+  MeasureType sellType = MeasureType.unit;
+  TypeDesgloce sellTypeDesgloce = TypeDesgloce.menuRecipe;
 
-  void setSellType(SellType type) {
+  void setSellType(MeasureType type) {
     sellType = type;
+    selectedUnitMeasure = null;
     notifyListeners();
   }
-
+  void setDesgloce(TypeDesgloce type) {
+    sellTypeDesgloce = type;
+    notifyListeners();
+  }
   void loadAndValidate(ProductDraft draft) {
     load(draft);
   }

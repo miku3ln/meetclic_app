@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../../../../../../domain/services/session_service.dart';
 import '../../../../../../infrastructure/config/server_config.dart';
+import '../../../models/product_management_measure.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
 import '../pos_main_controller.dart';
@@ -722,7 +723,7 @@ class ProductRemoteDataSource {
   }
 }
 
-class ProductMapper {
+class ProductMapperOther {
   static PosProductItem fromJson(Map<String, dynamic> json) {
     return PosProductItem(
       id: json['id'].toString(),
@@ -752,7 +753,7 @@ class ProductRepositoryImpl implements ProductRepository {
 
     final List rows = data['data']['rows'];
 
-    return rows.map((e) => ProductMapper.fromJson(e)).toList();
+    return rows.map((e) => ProductMapperOther.fromJson(e)).toList();
   }
 }
 
@@ -792,14 +793,14 @@ class ProductController extends ChangeNotifier {
 class PosMockData {
   static Future<List<PosProductItem>> getProductsData() async {
     final token = SessionService().apiToken;
-
-    final uri = Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales')
+final businessId=SessionService().businessId;
+    final uri = Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales')//POS-PRODUCTS -INIT-ONE
         .replace(
           queryParameters: {
             'current': '1',
             'rowCount': '-1',
             'searchPhrase': '',
-            'business_id': '1',
+            'business_id': businessId,
             'grid_id': '#grid-registers-grid',
           },
         );
@@ -840,6 +841,35 @@ class PosMockData {
         unit: stock['unit'] ?? 'u',
       );
     }).toList();
+  }
+  static Future<List<MeasureCategoryModel>> getCatalogMeasureData() async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    final uri = Uri.parse(
+      '${ServerConfig.baseUrl}/pointsales/catalog-measure',
+    ).replace(
+      queryParameters: {
+        'business_id': businessId,
+      },
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      return [];
+    }
+
+    final List<dynamic> data = jsonDecode(response.body);
+    return data
+        .map((e) => MeasureCategoryModel.fromJson(e))
+        .toList();
   }
 }
 

@@ -6,9 +6,11 @@ import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../widgets/empty_data.dart';
 
 import '../../../models/product_draft.dart';
+import '../../../models/product_management_measure.dart';
 import '../../../models/sections_data.dart';
 import '../../../state/pos_items_controller.dart';
 import '../../../state/product_modal_controller.dart';
+import '../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../molecules/inputs/ps_dropdown.dart';
 import '../../molecules/inputs/ps_field_row.dart';
 import '../../molecules/inputs/ps_input.dart';
@@ -137,6 +139,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     await controller.init();
     final draft = ProductMapper.fromMap(item.data!);
     controller.loadAndValidate(draft);
+
+    final catalogMeasureData = await PosMockData.getCatalogMeasureData();
     await showProductModal(
       context: context,
       btnSaveTitle: "Actualizar",
@@ -145,6 +149,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       controller: controller,
       title: "Actualizar Producto",
       type: CrudType.update,
+      listMeasureCategory: catalogMeasureData,
     );
   }
 
@@ -176,6 +181,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           )
         else
           _buildList(),
+
         Positioned(
           right: 32,
           bottom: 80,
@@ -183,6 +189,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
             onPressed: () async {
               final controller = ProductModalController();
               await controller.init();
+              final catalogMeasureData =
+                  await PosMockData.getCatalogMeasureData();
               showProductModal(
                 barrierDismissible: false,
                 context: context,
@@ -191,6 +199,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                 btnCancelTitle: "Cancelar",
                 title: "Crear Producto",
                 type: CrudType.create,
+                listMeasureCategory: catalogMeasureData,
               );
             },
             child: const Icon(Icons.add),
@@ -231,43 +240,48 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                       color: Colors.grey.shade300,
                       shape: BoxShape.circle,
                     ),
-                    clipBehavior: Clip.antiAlias, // 👈 importante para que la imagen respete el círculo
+                    clipBehavior: Clip.antiAlias,
+                    // 👈 importante para que la imagen respete el círculo
                     child: item.image == null
                         ? Icon(
-                      Sections.getIconItems(PosItemsSection.items),
-                      color: Colors.grey,
-                    )
+                            Sections.getIconItems(PosItemsSection.items),
+                            color: Colors.grey,
+                          )
                         : Image.network(
-                      item.image!,
-                      fit: BoxFit.cover,
+                            item.image!,
+                            fit: BoxFit.cover,
 
-                      // 🔄 Mientras carga
-                      loadingBuilder: (context, child, loadingProgress) {
-                        if (loadingProgress == null) return child;
+                            // 🔄 Mientras carga
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
 
-                        return Center(
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              value: loadingProgress.expectedTotalBytes != null
-                                  ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                                  : null,
-                            ),
+                              return Center(
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                  .cumulativeBytesLoaded /
+                                              loadingProgress
+                                                  .expectedTotalBytes!
+                                        : null,
+                                  ),
+                                ),
+                              );
+                            },
+
+                            // ❌ Si falla
+                            errorBuilder: (context, error, stackTrace) {
+                              return Icon(
+                                Sections.getIconItems(PosItemsSection.items),
+                                color: Colors.grey,
+                              );
+                            },
                           ),
-                        );
-                      },
-
-                      // ❌ Si falla
-                      errorBuilder: (context, error, stackTrace) {
-                        return Icon(
-                          Sections.getIconItems(PosItemsSection.items),
-                          color: Colors.grey,
-                        );
-                      },
-                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -302,16 +316,15 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 }
 
-
 Future<void> showProductModal({
   required BuildContext context,
   required ProductModalController controller,
   required String title,
   required String btnCancelTitle,
   required String btnSaveTitle,
-
+  required List<MeasureCategoryModel> listMeasureCategory,
   CrudType type = CrudType.update,
-  required bool barrierDismissible
+  required bool barrierDismissible,
 }) async {
   await showDialog(
     barrierDismissible: barrierDismissible,
@@ -332,7 +345,13 @@ Future<void> showProductModal({
                   }
                 }
               : null,
-          body: _buildProductBody(context, controller, type, title),
+          body: _buildProductBody(
+            context,
+            controller,
+            type,
+            title,
+            listMeasureCategory,
+          ),
         );
       },
     ),
@@ -344,6 +363,7 @@ Widget _buildProductBody(
   ProductModalController controller,
   CrudType type,
   String title,
+  List<MeasureCategoryModel> listMeasureCategory,
 ) {
   return Column(
     children: [
@@ -351,7 +371,7 @@ Widget _buildProductBody(
       /// 📦 INFORMACIÓN
       /// =========================
       PsSectionCard(
-        title: "Información",
+        title: "Información General",
         child: Column(
           children: [
             PsFieldRow(
@@ -451,12 +471,6 @@ Widget _buildProductBody(
                 ),
               ],
             ),
-
-            /// 🔥 NUEVO COMPONENTE
-            PsSellTypeSelector(
-              value: controller.sellType,
-              onChanged: controller.setSellType,
-            ),
             AppSpacing.spaceBetweenInputs,
 
             /// 🔥 PRECIO + COSTE
@@ -494,26 +508,33 @@ Widget _buildProductBody(
       /// 📦 INVENTARIO
       /// =========================
       PsSectionCard(
-        title: "Inventario",
+        title: "Inventario Inicial",
         child: Column(
           children: [
+            PsFieldRow(
+              children: [
+                PsSellTypeSelector(
+                  value: controller.sellType,
+                  onChanged: controller.setSellType,
+                ),
+                _buildMeasureWidget(controller.sellType, listMeasureCategory,controller),
+              ],
+            ),
+
             PsFieldRow(
               children: [
                 PsInput(
                   requiredField: true,
                   value: controller.stock.toString(),
-
                   label: "Stock",
                   keyboardType: TextInputType.number,
                   onChanged: controller.setStock,
                   isTouched: controller.stockTouched,
                   error: controller.stockError,
-
                   isValid: controller.stockError == null,
                 ),
                 PsInput(
                   value: controller.lowStock.toString(),
-
                   requiredField: true,
                   label: "Stock mínimo",
                   keyboardType: TextInputType.number,
@@ -528,5 +549,34 @@ Widget _buildProductBody(
         ),
       ),
     ],
+  );
+}
+Widget _buildMeasureWidget(
+    MeasureType type,
+    List<MeasureCategoryModel> listMeasureCategory,
+    ProductModalController controller,
+    ) {
+  if (type == MeasureType.unit) {
+    return const SizedBox.shrink();
+  }
+
+  final resultSet = listMeasureCategory.firstWhere(
+        (e) => e.id.toString() == type.id,
+  );
+
+  final unitsWithConversions = resultSet.units
+      .where((unit) => unit.conversions.isNotEmpty)
+      .toList();
+
+  return PsDropdown<UnitMeasureModel>(
+    label: "Medida",
+    items: unitsWithConversions,
+    value: controller.selectedUnitMeasure,
+    getLabel: (e) => '${e.name} (${e.symbol})',
+    onChanged: controller.selectUnitsByMeasure,
+    error: controller.measureCategoryError,
+    requiredField: true,
+    isTouched: controller.measureCategoryTouched,
+    isValid: controller.selectedUnitMeasure != null,
   );
 }
