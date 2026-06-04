@@ -40,6 +40,7 @@ class ProductModalController extends ChangeNotifier {
   bool categoryTouched = false;
   bool subcategoryTouched = false;
   bool measureCategoryTouched = false;
+  bool taxTouched = false;
 
   /// =========================
   /// ⚠️ ERRORS
@@ -54,6 +55,7 @@ class ProductModalController extends ChangeNotifier {
   String? categoryError;
   String? subcategoryError;
   String? measureCategoryError;
+  String? taxCategoryError;
 
   String? imageError;
 
@@ -64,10 +66,12 @@ class ProductModalController extends ChangeNotifier {
 
   List<ProductCategory> categories = [];
   List<ProductSubcategory> subcategories = [];
+  List<TaxCategoryModel> taxs = [];
 
   ProductCategory? selectedCategory;
   ProductSubcategory? selectedSubcategory;
   MeasureCategoryModel? selectedMeasureCategory;
+  TaxCategoryModel? selectedTaxCategory;
 
   /// =========================
   /// 🖼 IMAGE
@@ -184,11 +188,9 @@ class ProductModalController extends ChangeNotifier {
 
   Future<void> selectCategory(ProductCategory? category) async {
     categoryTouched = true;
-
     selectedCategory = category;
     selectedSubcategory = null;
     subcategories = [];
-
     categoryError = category == null ? "Selecciona una categoría" : null;
     subcategoryError = "Selecciona una subcategoría";
 
@@ -201,11 +203,8 @@ class ProductModalController extends ChangeNotifier {
 
   void selectSubcategory(ProductSubcategory? sub) {
     subcategoryTouched = true;
-
     selectedSubcategory = sub;
-
     subcategoryError = sub == null ? "Selecciona una subcategoría" : null;
-
     notifyListeners();
   }
   UnitMeasureModel? selectedUnitMeasure;
@@ -216,6 +215,15 @@ class ProductModalController extends ChangeNotifier {
 
     measureCategoryError =
     unit == null ? "Selecciona una unidad de medida" : null;
+
+    notifyListeners();
+  }
+  TaxCategoryModel? selectedTax;
+  void selectTax(TaxCategoryModel? selectData) {
+    taxTouched = true;
+    selectedTax = selectData;
+    taxCategoryError =
+    selectData == null ? "Selecciona Iva" : null;
 
     notifyListeners();
   }

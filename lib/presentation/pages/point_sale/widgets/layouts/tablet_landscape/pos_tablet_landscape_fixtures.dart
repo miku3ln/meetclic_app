@@ -871,6 +871,35 @@ final businessId=SessionService().businessId;
         .map((e) => MeasureCategoryModel.fromJson(e))
         .toList();
   }
+  static Future<List<TaxCategoryModel>> getCatalogTaxData() async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    final uri = Uri.parse(
+      '${ServerConfig.baseUrl}/pointsales/catalog-tax',
+    ).replace(
+      queryParameters: {
+        'business_id': businessId,
+      },
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      return [];
+    }
+
+    final List<dynamic> data = jsonDecode(response.body);
+    return data
+        .map((e) => TaxCategoryModel.fromJson(e))
+        .toList();
+  }
 }
 
 

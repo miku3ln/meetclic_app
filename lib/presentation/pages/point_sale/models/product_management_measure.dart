@@ -114,3 +114,29 @@ class MeasureCategoryModel {
     );
   }
 }
+
+class TaxCategoryModel {
+  final int id;
+  final String name;
+  final String description;
+  final int priority;
+
+
+  TaxCategoryModel({
+    required this.id,
+    required this.name,
+    required this.description,
+    required this.priority,
+
+  });
+
+  factory TaxCategoryModel.fromJson(Map<String, dynamic> json) {
+    return TaxCategoryModel(
+      id: json['tax_id'],
+      name: json['tax_percentage'].toString(),
+      description: json['tax_name'],
+      priority: (json['tax_priority']),
+
+    );
+  }
+}

@@ -141,7 +141,9 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     controller.loadAndValidate(draft);
 
     final catalogMeasureData = await PosMockData.getCatalogMeasureData();
-    await showProductModal(
+    final catalogTaxData = await PosMockData.getCatalogTaxData();
+
+    await showManagerProduct(
       context: context,
       btnSaveTitle: "Actualizar",
       btnCancelTitle: "Cancelar",
@@ -150,6 +152,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       title: "Actualizar Producto",
       type: CrudType.update,
       listMeasureCategory: catalogMeasureData,
+      listTaxCategory: catalogTaxData,
     );
   }
 
@@ -191,7 +194,9 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
               await controller.init();
               final catalogMeasureData =
                   await PosMockData.getCatalogMeasureData();
-              showProductModal(
+              final catalogTaxData = await PosMockData.getCatalogTaxData();
+
+              showManagerProduct(
                 barrierDismissible: false,
                 context: context,
                 controller: controller,
@@ -200,6 +205,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                 title: "Crear Producto",
                 type: CrudType.create,
                 listMeasureCategory: catalogMeasureData,
+                listTaxCategory: catalogTaxData,
               );
             },
             child: const Icon(Icons.add),
@@ -316,54 +322,92 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 }
 
-Future<void> showProductModal({
+enum ProductViewMode {
+  dialog,
+  page,
+}
+Future<void> showManagerProduct({
   required BuildContext context,
   required ProductModalController controller,
   required String title,
   required String btnCancelTitle,
   required String btnSaveTitle,
   required List<MeasureCategoryModel> listMeasureCategory,
+  required List<TaxCategoryModel> listTaxCategory,
   CrudType type = CrudType.update,
   required bool barrierDismissible,
+  ProductViewMode viewMode = ProductViewMode.page,
 }) async {
-  await showDialog(
-    barrierDismissible: barrierDismissible,
-    context: context,
-    builder: (_) => AnimatedBuilder(
-      animation: controller,
-      builder: (_, __) {
-        return PsModalLayout(
-          title: title,
-          btnCancelTitle: btnCancelTitle,
-          btnSaveTitle: btnSaveTitle,
-          onSave: controller.canSubmit
-              ? () {
-                  if (controller.validate().success) {
-                    final product = controller.save(type);
+final allowModal=viewMode == ProductViewMode.dialog;
+  final content = AnimatedBuilder(
+    animation: controller,
+    builder: (_, __) {
+      return PsModalLayout(
+        useDialog:allowModal,
+        title: title,
+        btnCancelTitle: btnCancelTitle,
+        btnSaveTitle: btnSaveTitle,
+        onSave: controller.canSubmit
+            ? () {
+          if (controller.validate().success) {
+            controller.save(type);
+            Navigator.pop(context);
+          }
+        }
+            : null,
+        body: _buildProductBody(
+          context,
+          controller,
+          type,
+          title,
+          listMeasureCategory,
+          listTaxCategory,
+        ),
+      );
+    },
+  );
 
-                    Navigator.pop(context);
-                  }
-                }
-              : null,
-          body: _buildProductBody(
-            context,
-            controller,
-            type,
-            title,
-            listMeasureCategory,
+  if (viewMode == ProductViewMode.dialog) {
+    await showDialog(
+      context: context,
+      barrierDismissible: barrierDismissible,
+      builder: (_) => content,
+    );
+    return;
+  }
+
+  await Navigator.push(
+    context,
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (_, __, ___) {
+
+        return content;
+      },
+      transitionsBuilder: (_, animation, __, child) {
+        return SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(1, 0),
+            end: Offset.zero,
+          ).animate(
+            CurvedAnimation(
+              parent: animation,
+              curve: Curves.easeInOut,
+            ),
           ),
+          child: child,
         );
       },
     ),
   );
 }
-
 Widget _buildProductBody(
   BuildContext context,
   ProductModalController controller,
   CrudType type,
   String title,
   List<MeasureCategoryModel> listMeasureCategory,
+  List<TaxCategoryModel> listTaxCategory,
 ) {
   return Column(
     children: [
@@ -462,7 +506,6 @@ Widget _buildProductBody(
                   requiredField: true,
                   label: "Codigo de Barras",
                   value: controller.codeBar,
-
                   keyboardType: TextInputType.text,
                   onChanged: controller.setCodeBar,
                   error: controller.codeBarError,
@@ -472,10 +515,30 @@ Widget _buildProductBody(
               ],
             ),
             AppSpacing.spaceBetweenInputs,
+          ],
+        ),
+      ),
+      AppSpacing.spaceBetweenSections,
 
+      PsSectionCard(
+        title: "Costos y Precios",
+        child: Column(
+          children: [
             /// 🔥 PRECIO + COSTE
             PsFieldRow(
               children: [
+                PsDropdown<TaxCategoryModel>(
+                  label: "Impuesto",
+                  items: listTaxCategory,
+                  value: controller.selectedTax,
+                  getLabel: (e) => '${e.name} (${e.description})',
+                  onChanged: controller.selectTax,
+                  error: controller.taxCategoryError,
+                  requiredField: true,
+                  isTouched: controller.taxTouched,
+                  isValid: controller.selectedTax != null,
+                ),
+
                 PsInput(
                   value: controller.price.toString(),
                   requiredField: true,
@@ -502,7 +565,6 @@ Widget _buildProductBody(
           ],
         ),
       ),
-      AppSpacing.spaceBetweenSections,
 
       /// =========================
       /// 📦 INVENTARIO
@@ -517,7 +579,11 @@ Widget _buildProductBody(
                   value: controller.sellType,
                   onChanged: controller.setSellType,
                 ),
-                _buildMeasureWidget(controller.sellType, listMeasureCategory,controller),
+                _buildMeasureWidget(
+                  controller.sellType,
+                  listMeasureCategory,
+                  controller,
+                ),
               ],
             ),
 
@@ -551,17 +617,18 @@ Widget _buildProductBody(
     ],
   );
 }
+
 Widget _buildMeasureWidget(
-    MeasureType type,
-    List<MeasureCategoryModel> listMeasureCategory,
-    ProductModalController controller,
-    ) {
+  MeasureType type,
+  List<MeasureCategoryModel> listMeasureCategory,
+  ProductModalController controller,
+) {
   if (type == MeasureType.unit) {
     return const SizedBox.shrink();
   }
 
   final resultSet = listMeasureCategory.firstWhere(
-        (e) => e.id.toString() == type.id,
+    (e) => e.id.toString() == type.id,
   );
 
   final unitsWithConversions = resultSet.units
