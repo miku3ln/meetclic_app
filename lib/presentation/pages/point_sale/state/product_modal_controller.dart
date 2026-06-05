@@ -2,8 +2,6 @@ import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/models/product_management_measure.dart';
 
-
-
 import '../../../../shared/utils/validators/validators.dart';
 import '../models/product_category.dart';
 import '../models/product_draft.dart';
@@ -207,26 +205,30 @@ class ProductModalController extends ChangeNotifier {
     subcategoryError = sub == null ? "Selecciona una subcategoría" : null;
     notifyListeners();
   }
+
   UnitMeasureModel? selectedUnitMeasure;
+
   void selectUnitsByMeasure(UnitMeasureModel? unit) {
     measureCategoryTouched = true;
-
     selectedUnitMeasure = unit;
-
-    measureCategoryError =
-    unit == null ? "Selecciona una unidad de medida" : null;
-
+    measureCategoryError = unit == null
+        ? "Selecciona una unidad de medida"
+        : null;
     notifyListeners();
   }
+
+
+
   TaxCategoryModel? selectedTax;
+
   void selectTax(TaxCategoryModel? selectData) {
     taxTouched = true;
     selectedTax = selectData;
-    taxCategoryError =
-    selectData == null ? "Selecciona Iva" : null;
+    taxCategoryError = selectData == null ? "Selecciona Iva" : null;
 
     notifyListeners();
   }
+
   /// =========================
   /// 🖼 IMAGE
   /// =========================
@@ -326,7 +328,6 @@ class ProductModalController extends ChangeNotifier {
     subcategoryError = errors['subcategory'];
     imageError = errors['image'];
 
-
     /// =========================
     /// ✅ RESULTADO FINAL
     /// =========================
@@ -381,22 +382,30 @@ class ProductModalController extends ChangeNotifier {
 
   MeasureType sellType = MeasureType.unit;
   TypeDesgloce sellTypeDesgloce = TypeDesgloce.menuRecipe;
-
-  void setSellType(MeasureType type) {
+  void setMeasureType(MeasureType type) {
     sellType = type;
     selectedUnitMeasure = null;
+    notifyListeners();
+  }
+
+  InventoryType inventoryType = InventoryType.raw;
+
+  void setInventoryType(InventoryType type) {
+    inventoryType = type;
     notifyListeners();
   }
   void setDesgloce(TypeDesgloce type) {
     sellTypeDesgloce = type;
     notifyListeners();
   }
+
   void loadAndValidate(ProductDraft draft) {
     load(draft);
   }
 
   void load(ProductDraft draft) async {
     mode = CrudType.update;
+
     /// =========================
     /// 🧾 DATA
     /// =========================
@@ -508,13 +517,12 @@ class ProductModalController extends ChangeNotifier {
     imageError = null;
   }
 }
+
 class CategoriaModalController extends ChangeNotifier {
   /// =========================
   /// 🧾 DATA
   /// =========================
   String name = "";
-
-
 
   /// =========================
   /// 👆 TOUCHED
@@ -529,8 +537,6 @@ class CategoriaModalController extends ChangeNotifier {
   String? nameError;
   String? imageError;
 
-
-
   /// =========================
   /// 🖼 IMAGE
   /// =========================
@@ -540,7 +546,6 @@ class CategoriaModalController extends ChangeNotifier {
   /// 🧠 INIT
   /// =========================
   Future<void> init() async {
-
     notifyListeners();
   }
 
@@ -604,7 +609,6 @@ class CategoriaModalController extends ChangeNotifier {
     nameError = errors['name'];
     imageError = errors['image'];
 
-
     /// =========================
     /// ✅ RESULTADO FINAL
     /// =========================
@@ -629,16 +633,11 @@ class CategoriaModalController extends ChangeNotifier {
       return validate().success;
     }
 
-    return isFormValid &&
-        nameTouched &&
-        imageTouched ;
+    return isFormValid && nameTouched && imageTouched;
   }
 
   bool get isFormValid {
-    return [
-      nameError,
-      imageError,
-    ].every((e) => e == null);
+    return [nameError, imageError].every((e) => e == null);
   }
 
   void loadAndValidate(ProductCategoryDraft draft) {
@@ -647,6 +646,7 @@ class CategoriaModalController extends ChangeNotifier {
 
   void load(ProductCategoryDraft draft) async {
     mode = CrudType.update;
+
     /// =========================
     /// 🧾 DATA
     /// =========================
@@ -654,14 +654,12 @@ class CategoriaModalController extends ChangeNotifier {
 
     image = draft.image as File?;
 
-
     /// =========================
     /// ⚠️ RESET TOUCH
     /// =========================
     nameTouched = false;
 
     imageTouched = false;
-
 
     /// =========================
     /// ❌ RESET ERRORES
@@ -683,17 +681,13 @@ class CategoriaModalController extends ChangeNotifier {
       throw Exception("Formulario inválido");
     }
 
-    return ProductCategoryDraft(
-      name: name,
-      image: ""
-    );
+    return ProductCategoryDraft(name: name, image: "");
   }
 
   void _resetTouched() {
     nameTouched = false;
 
     imageTouched = false;
-
   }
 
   void _resetErrors() {
@@ -702,20 +696,12 @@ class CategoriaModalController extends ChangeNotifier {
     imageError = null;
   }
 }
-enum CustomerDetailTab {
-  profile,
-  redeem,
-  purchases,
-}
-enum CustomerViewType {
-  list,
-  create,
-  update,
-  detail,
-}
+
+enum CustomerDetailTab { profile, redeem, purchases }
+
+enum CustomerViewType { list, create, update, detail }
 
 class CustomerModalController extends ChangeNotifier {
-
   /// =========================
   /// VIEW STATE
   /// =========================
@@ -736,19 +722,22 @@ class CustomerModalController extends ChangeNotifier {
     search = val;
     notifyListeners();
   }
+
   void setTypeView(CustomerViewType val) {
     view = val;
     notifyListeners();
   }
+
   List<CustomerModelPosCurrent> get filteredCustomers {
     if (search.isEmpty) return customers;
 
     return customers
-        .where((c) =>
-        c.name.toLowerCase().contains(search.toLowerCase()))
+        .where((c) => c.name.toLowerCase().contains(search.toLowerCase()))
         .toList();
   }
+
   bool initialized = false;
+
   /// =========================
   /// FORM DATA
   /// =========================
@@ -859,13 +848,14 @@ class CustomerModalController extends ChangeNotifier {
 
     /// NORMAL FLOW
     if (view == CustomerViewType.detail ||
-        view == CustomerViewType.create||
+        view == CustomerViewType.create ||
         view == CustomerViewType.update) {
       view = CustomerViewType.list;
     }
 
     notifyListeners();
   }
+
   /// =========================
   /// SAVE
   /// =========================
@@ -886,6 +876,7 @@ class CustomerModalController extends ChangeNotifier {
 
     return customer;
   }
+
   void reset() {
     view = CustomerViewType.list;
     selectedCustomer = null;
@@ -893,6 +884,7 @@ class CustomerModalController extends ChangeNotifier {
     detailTab = CustomerDetailTab.profile;
     initialized = false;
   }
+
   void _resetForm() {
     name = "";
     email = "";
@@ -902,11 +894,14 @@ class CustomerModalController extends ChangeNotifier {
     nameTouched = false;
     nameError = null;
   }
+
   bool isSelectedInTicket = false;
   CustomerModelPosCurrent? customerInTicket;
+
   bool isCustomerSelected(CustomerModelPosCurrent c) {
     return customerInTicket?.id == c.id;
   }
+
   void toggleCustomerInTicket() {
     if (selectedCustomer == null) return;
 
@@ -920,12 +915,15 @@ class CustomerModalController extends ChangeNotifier {
 
     notifyListeners();
   }
-  void setCustomerInitTicket(CustomerModelPosCurrent c){
+
+  void setCustomerInitTicket(CustomerModelPosCurrent c) {
     customerInTicket = c;
-    selectedCustomer=c;
+    selectedCustomer = c;
     notifyListeners();
   }
+
   bool openedWithCustomer = false;
+
   void initWithCustomer(CustomerModelPosCurrent customer) {
     selectedCustomer = customer;
     customerInTicket = customer;
@@ -933,20 +931,24 @@ class CustomerModalController extends ChangeNotifier {
     openedWithCustomer = true; // 🔥 CLAVE
     view = CustomerViewType.detail;
 
-    notifyListeners();  selectedCustomer = customer;
+    notifyListeners();
+    selectedCustomer = customer;
     customerInTicket = customer;
 
     view = CustomerViewType.detail;
 
     notifyListeners();
   }
+
   CustomerDetailTab detailTab = CustomerDetailTab.profile;
 
   void setDetailTab(CustomerDetailTab tab) {
     detailTab = tab;
     notifyListeners();
   }
+
   CrudType mode = CrudType.create;
+
   void goToEdit() {
     final c = selectedCustomer;
     if (c == null) return;

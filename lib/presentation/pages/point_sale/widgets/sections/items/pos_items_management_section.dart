@@ -322,10 +322,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 }
 
-enum ProductViewMode {
-  dialog,
-  page,
-}
+enum ProductViewMode { dialog, page }
+
 Future<void> showManagerProduct({
   required BuildContext context,
   required ProductModalController controller,
@@ -338,22 +336,22 @@ Future<void> showManagerProduct({
   required bool barrierDismissible,
   ProductViewMode viewMode = ProductViewMode.page,
 }) async {
-final allowModal=viewMode == ProductViewMode.dialog;
+  final allowModal = viewMode == ProductViewMode.dialog;
   final content = AnimatedBuilder(
     animation: controller,
     builder: (_, __) {
       return PsModalLayout(
-        useDialog:allowModal,
+        useDialog: allowModal,
         title: title,
         btnCancelTitle: btnCancelTitle,
         btnSaveTitle: btnSaveTitle,
         onSave: controller.canSubmit
             ? () {
-          if (controller.validate().success) {
-            controller.save(type);
-            Navigator.pop(context);
-          }
-        }
+                if (controller.validate().success) {
+                  controller.save(type);
+                  Navigator.pop(context);
+                }
+              }
             : null,
         body: _buildProductBody(
           context,
@@ -381,26 +379,21 @@ final allowModal=viewMode == ProductViewMode.dialog;
     PageRouteBuilder(
       transitionDuration: const Duration(milliseconds: 300),
       pageBuilder: (_, __, ___) {
-
         return content;
       },
       transitionsBuilder: (_, animation, __, child) {
         return SlideTransition(
-          position: Tween<Offset>(
-            begin: const Offset(1, 0),
-            end: Offset.zero,
-          ).animate(
-            CurvedAnimation(
-              parent: animation,
-              curve: Curves.easeInOut,
-            ),
-          ),
+          position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+              .animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+              ),
           child: child,
         );
       },
     ),
   );
 }
+
 Widget _buildProductBody(
   BuildContext context,
   ProductModalController controller,
@@ -418,6 +411,37 @@ Widget _buildProductBody(
         title: "Información General",
         child: Column(
           children: [
+            PsFieldRow(
+              children: [
+                PsToggleSelector<InventoryType>(
+                  title: "Tipo de  Producto",
+                  value: controller.inventoryType,
+                  items: InventoryType.values,
+                  onChanged: controller.setInventoryType,
+                ),
+                PsInput(
+                  requiredField: true,
+                  label: "Codigo",
+                  value: controller.codeBar,
+                  keyboardType: TextInputType.text,
+                  onChanged: controller.setCodeBar,
+                  error: controller.codeBarError,
+                  isTouched: controller.codeBarTouched,
+                  isValid: controller.codeBarError == null,
+                ),
+                PsInput(
+                  requiredField: true,
+                  label: "REF",
+                  value: controller.ref,
+                  keyboardType: TextInputType.text,
+                  onChanged: controller.setRef,
+                  error: controller.refError,
+                  isTouched: controller.refTouched,
+                  isValid: controller.refError == null,
+                ),
+
+              ],
+            ),
             PsFieldRow(
               children: [
                 /// 🔥 NOMBRE
@@ -490,31 +514,7 @@ Widget _buildProductBody(
             ),
 
             AppSpacing.spaceBetweenInputs,
-            PsFieldRow(
-              children: [
-                PsInput(
-                  requiredField: true,
-                  label: "REF",
-                  value: controller.ref,
-                  keyboardType: TextInputType.text,
-                  onChanged: controller.setRef,
-                  error: controller.refError,
-                  isTouched: controller.refTouched,
-                  isValid: controller.refError == null,
-                ),
-                PsInput(
-                  requiredField: true,
-                  label: "Codigo de Barras",
-                  value: controller.codeBar,
-                  keyboardType: TextInputType.text,
-                  onChanged: controller.setCodeBar,
-                  error: controller.codeBarError,
-                  isTouched: controller.codeBarTouched,
-                  isValid: controller.codeBarError == null,
-                ),
-              ],
-            ),
-            AppSpacing.spaceBetweenInputs,
+
           ],
         ),
       ),
@@ -552,7 +552,6 @@ Widget _buildProductBody(
                 PsInput(
                   requiredField: true,
                   value: controller.cost.toString(),
-
                   label: "Coste",
                   keyboardType: TextInputType.number,
                   onChanged: controller.setCost,
@@ -565,6 +564,7 @@ Widget _buildProductBody(
           ],
         ),
       ),
+      AppSpacing.spaceBetweenSections,
 
       /// =========================
       /// 📦 INVENTARIO
@@ -575,9 +575,11 @@ Widget _buildProductBody(
           children: [
             PsFieldRow(
               children: [
-                PsSellTypeSelector(
+                PsToggleSelector<MeasureType>(
+                  title: "Tipo de Medida",
                   value: controller.sellType,
-                  onChanged: controller.setSellType,
+                  items: MeasureType.values,
+                  onChanged: controller.setMeasureType,
                 ),
                 _buildMeasureWidget(
                   controller.sellType,
