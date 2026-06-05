@@ -47,11 +47,7 @@ class PsModalLayout extends StatelessWidget {
         AppSpacing.spaceBetweenSections,
 
         Expanded(
-          child: SingleChildScrollView(
-            keyboardDismissBehavior:
-            ScrollViewKeyboardDismissBehavior.onDrag,
             child: body,
-          ),
         ),
 
         AppSpacing.spaceBetweenSections,

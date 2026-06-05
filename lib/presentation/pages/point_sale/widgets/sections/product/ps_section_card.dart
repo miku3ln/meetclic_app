@@ -5,7 +5,43 @@ import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/theme/configuration/app_text_styles.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 
+class PsSectionSplit extends StatelessWidget {
+  final Widget left;
+  final Widget right;
 
+  final int leftFlex;
+  final int rightFlex;
+
+  const PsSectionSplit({
+    super.key,
+    required this.left,
+    required this.right,
+    this.leftFlex = 1,
+    this.rightFlex = 1,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          flex: leftFlex,
+          child: left,
+        ),
+
+        const SizedBox(
+          width: AppSpacing.m,
+        ),
+
+        Expanded(
+          flex: rightFlex,
+          child: right,
+        ),
+      ],
+    );
+  }
+}
 class PsSectionCard extends StatelessWidget {
   final String title;
   final Widget child;

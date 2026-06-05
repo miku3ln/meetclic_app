@@ -99,6 +99,45 @@ class ProductModalController extends ChangeNotifier {
 
     notifyListeners();
   }
+  void updateIngredientQuantity(
+      RecipeIngredientItem item,
+      String value,
+      ) {
+    item.quantity =
+        double.tryParse(value) ?? 0;
+
+    notifyListeners();
+  }
+  void updateIngredientUnit(
+      RecipeIngredientItem item,
+      UnitMeasureModel? unit,
+      ) {
+    item.selectedUnit = unit;
+
+    notifyListeners();
+  }
+  final List<RecipeIngredientItem> ingredients = [
+    RecipeIngredientItem(
+      name: 'Arroz',
+      measureType: MeasureType.mass,
+      quantity: 350,
+    ),
+    RecipeIngredientItem(
+      name: 'Papa',
+      measureType: MeasureType.mass,
+      quantity: 75,
+    ),
+    RecipeIngredientItem(
+      name: 'Pollo',
+      measureType: MeasureType.unit,
+      quantity: 1,
+    ),
+    RecipeIngredientItem(
+      name: 'Chorizo',
+      measureType: MeasureType.unit,
+      quantity: 1,
+    ),
+  ];
 
   void setPrice(String value) {
     priceTouched = true;

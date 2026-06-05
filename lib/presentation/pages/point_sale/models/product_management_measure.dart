@@ -1,3 +1,6 @@
+
+import '../widgets/organisms/ps_toogle_group.dart';
+
 class ConversionModel {
   final int id;
   final double factor;
@@ -151,4 +154,21 @@ class TaxCategoryModel {
 
     );
   }
+}
+
+
+class RecipeIngredientItem {
+  final String name;
+  final MeasureType measureType;
+
+  double quantity;
+
+  UnitMeasureModel? selectedUnit;
+
+  RecipeIngredientItem({
+    required this.name,
+    required this.measureType,
+    required this.quantity,
+    this.selectedUnit,
+  });
 }
