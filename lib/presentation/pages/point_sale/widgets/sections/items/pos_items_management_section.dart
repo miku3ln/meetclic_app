@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section/pos_items_controller.dart';
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
@@ -24,33 +25,26 @@ import '../product/ps_section_card.dart';
 
 class PosItemsManagementSection extends StatefulWidget {
   const PosItemsManagementSection({super.key});
-
   @override
   State<PosItemsManagementSection> createState() =>
       _PosItemsManagementSectionState();
 }
-
 class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   final ScrollController _scrollController = ScrollController();
-
-  /// aquí decides el total simulado
-  int _simulatedTotal = 592;
-
+  bool _isOpeningProduct = false;
+  final TextEditingController _searchController = TextEditingController();
   late PosItemsManagementApi _api;
-
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
-
   int _currentPage = 1;
   final int _rowCount = 10;
   int _total = 0;
-
   bool _isLoading = false;
   bool _hasInitialLoadFinished = false;
-
+  String _searchCode = '';
   bool get _hasData => _items.isNotEmpty;
-
   bool get _hasMore => _items.length < _total;
-
+  /// aquí decides el total simulado
+  int _simulatedTotal = 592;
   @override
   void initState() {
     super.initState();
@@ -58,16 +52,15 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     _loadInitial();
     _scrollController.addListener(_onScroll);
   }
-
   @override
   void dispose() {
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
   Future<void> _loadInitial() async {
     if (_isLoading) return;
-
     setState(() {
       _isLoading = true;
     });
@@ -75,6 +68,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     final response = await _api.fetchPage(
       current: _currentPage,
       rowCount: _rowCount,
+      searchPhrase: _searchCode
     );
 
     if (!mounted) return;
@@ -95,6 +89,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     _currentPage++;
     final response = await _api.fetchPage(
       current: _currentPage,
+      searchPhrase: _searchCode,
       rowCount: _rowCount,
     );
 
@@ -131,88 +126,141 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     }
   }
 
-  void _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
-    if (item.data == null) {
-      /// puedes manejar error o simplemente salir
-      return;
+  Future<void> _onTapItem(
+      GenericListItem<Map<String, dynamic>> item,
+      ) async {
+    if (item.data == null) return;
+
+    setState(() {
+      _isOpeningProduct = true;
+    });
+
+    try {
+      final controller = ProductModalController();
+
+      await controller.init();
+
+      final draft = ProductMapper.fromMap(item.data!);
+
+      controller.loadAndValidate(draft);
+
+      final catalogMeasureData =
+      await PosMockData.getCatalogMeasureData();
+
+      final catalogTaxData =
+      await PosMockData.getCatalogTaxData();
+
+      if (!mounted) return;
+
+      await showManagerProduct(
+        context: context,
+        btnSaveTitle: "Actualizar",
+        btnCancelTitle: "Cancelar",
+        barrierDismissible: false,
+        controller: controller,
+        title: "Actualizar Producto",
+        type: CrudType.update,
+        listMeasureCategory: catalogMeasureData,
+        listTaxCategory: catalogTaxData,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isOpeningProduct = false;
+        });
+      }
     }
-
-    final controller = ProductModalController();
-    await controller.init();
-    final draft = ProductMapper.fromMap(item.data!);
-    controller.loadAndValidate(draft);
-
-    final catalogMeasureData = await PosMockData.getCatalogMeasureData();
-    final catalogTaxData = await PosMockData.getCatalogTaxData();
-
-    await showManagerProduct(
-      context: context,
-      btnSaveTitle: "Actualizar",
-      btnCancelTitle: "Cancelar",
-      barrierDismissible: false,
-      controller: controller,
-      title: "Actualizar Producto",
-      type: CrudType.update,
-      listMeasureCategory: catalogMeasureData,
-      listTaxCategory: catalogTaxData,
-    );
   }
-
   final controller = ProductModalController();
-
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        if (!_hasInitialLoadFinished && _isLoading)
-          const Center(child: CircularProgressIndicator())
-        else if (!_hasData)
-          RefreshIndicator(
-            onRefresh: _refreshAll,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
-                SizedBox(
-                  height: 600,
-                  child: EmptyData(
-                    icon: Icons.print_rounded,
-                    title: 'Todavía no hay productos',
-                    descriptionText: 'Aquí puedes verificar',
-                    linkText: 'Más información',
+        IgnorePointer(
+          ignoring: _isOpeningProduct,
+          child: Stack(
+            children: [
+              if (!_hasInitialLoadFinished && _isLoading)
+                const Center(
+                  child: CircularProgressIndicator(),
+                )
+              else if (!_hasData)
+                RefreshIndicator(
+                  onRefresh: _refreshAll,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(
+                        height: 600,
+                        child: EmptyData(
+                          icon: Icons.print_rounded,
+                          title: 'Todavía no hay productos',
+                          descriptionText: 'Aquí puedes verificar',
+                          linkText: 'Más información',
+                        ),
+                      ),
+                    ],
                   ),
+                )
+              else
+                _buildList(),
+              Positioned(
+                right: 32,
+                bottom: 80,
+                child: FloatingActionButton(
+                  onPressed: () async {
+                    setState(() {
+                      _isOpeningProduct = true;
+                    });
+
+                    try {
+                      final controller = ProductModalController();
+
+                      await controller.init();
+
+                      final catalogMeasureData =
+                      await PosMockData.getCatalogMeasureData();
+
+                      final catalogTaxData =
+                      await PosMockData.getCatalogTaxData();
+
+                      if (!mounted) return;
+
+                      await showManagerProduct(
+                        barrierDismissible: false,
+                        context: context,
+                        controller: controller,
+                        btnSaveTitle: "Guardar",
+                        btnCancelTitle: "Cancelar",
+                        title: "Crear Producto",
+                        type: CrudType.create,
+                        listMeasureCategory: catalogMeasureData,
+                        listTaxCategory: catalogTaxData,
+                      );
+                    } finally {
+                      if (mounted) {
+                        setState(() {
+                          _isOpeningProduct = false;
+                        });
+                      }
+                    }
+                  },
+                  child: const Icon(Icons.add),
                 ),
-              ],
-            ),
-          )
-        else
-          _buildList(),
-
-        Positioned(
-          right: 32,
-          bottom: 80,
-          child: FloatingActionButton(
-            onPressed: () async {
-              final controller = ProductModalController();
-              await controller.init();
-              final catalogMeasureData =
-                  await PosMockData.getCatalogMeasureData();
-              final catalogTaxData = await PosMockData.getCatalogTaxData();
-
-              showManagerProduct(
-                barrierDismissible: false,
-                context: context,
-                controller: controller,
-                btnSaveTitle: "Guardar",
-                btnCancelTitle: "Cancelar",
-                title: "Crear Producto",
-                type: CrudType.create,
-                listMeasureCategory: catalogMeasureData,
-                listTaxCategory: catalogTaxData,
-              );
-            },
-            child: const Icon(Icons.add),
+              ),
+            ],
           ),
         ),
+
+        if (_isOpeningProduct)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.25),
+              child: const Center(
+                child: CircularProgressIndicator(),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -220,103 +268,25 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   Widget _buildList() {
     return RefreshIndicator(
       onRefresh: _refreshAll,
-      child: ListView.separated(
+      child: ListView.builder(
         controller: _scrollController,
         physics: const AlwaysScrollableScrollPhysics(),
         itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
-        separatorBuilder: (_, __) => const Divider(height: 1),
         itemBuilder: (context, index) {
           if (index >= _items.length) {
             return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: CircularProgressIndicator()),
+              padding: EdgeInsets.zero,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
 
           final item = _items[index];
 
-          return InkWell(
+          return ProductListCard(
+            item: item,
             onTap: () => _onTapItem(item),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      shape: BoxShape.circle,
-                    ),
-                    clipBehavior: Clip.antiAlias,
-                    // 👈 importante para que la imagen respete el círculo
-                    child: item.image == null
-                        ? Icon(
-                            Sections.getIconItems(PosItemsSection.items),
-                            color: Colors.grey,
-                          )
-                        : Image.network(
-                            item.image!,
-                            fit: BoxFit.cover,
-
-                            // 🔄 Mientras carga
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-
-                              return Center(
-                                child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    value:
-                                        loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                  .cumulativeBytesLoaded /
-                                              loadingProgress
-                                                  .expectedTotalBytes!
-                                        : null,
-                                  ),
-                                ),
-                              );
-                            },
-
-                            // ❌ Si falla
-                            errorBuilder: (context, error, stackTrace) {
-                              return Icon(
-                                Sections.getIconItems(PosItemsSection.items),
-                                color: Colors.grey,
-                              );
-                            },
-                          ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.subtitle,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
           );
         },
       ),
@@ -395,359 +365,6 @@ Future<void> showManagerProduct({
     ),
   );
 }
-
-Widget _buildProductBody2(
-  BuildContext context,
-  ProductModalController controller,
-  CrudType type,
-  String title,
-  List<MeasureCategoryModel> listMeasureCategory,
-  List<TaxCategoryModel> listTaxCategory,
-) {
-  return Column(
-    children: [
-      /// =========================
-      /// 📦 INFORMACIÓN
-      /// =========================
-      PsSectionSplit(
-        leftFlex: 7,
-        rightFlex: 3,
-        left: PsSectionCard(
-          title: "Información General",
-          child: Column(
-            children: [
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsToggleSelector<InventoryType>(
-                      title: "Tipo de  Producto",
-                      value: controller.inventoryType,
-                      items: InventoryType.values,
-                      onChanged: controller.setInventoryType,
-                    ),
-                  ),
-                  PsFieldItem(
-                    child: PsInput(
-                      requiredField: true,
-                      label: "Codigo",
-                      value: controller.codeBar,
-                      keyboardType: TextInputType.text,
-                      onChanged: controller.setCodeBar,
-                      error: controller.codeBarError,
-                      isTouched: controller.codeBarTouched,
-                      isValid: controller.codeBarError == null,
-                    ),
-                  ),
-                  PsFieldItem(
-                    child: PsInput(
-                      requiredField: true,
-                      label: "REF",
-                      value: controller.ref,
-                      keyboardType: TextInputType.text,
-                      onChanged: controller.setRef,
-                      error: controller.refError,
-                      isTouched: controller.refTouched,
-                      isValid: controller.refError == null,
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
-
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    flex: 2,
-                    child: PsInput(
-                      label: "Nombre",
-                      requiredField: true,
-                      value: controller.name,
-                      onChanged: controller.setName,
-                      error: controller.nameError,
-                      isTouched: controller.nameTouched,
-                      isValid:
-                          controller.nameError == null &&
-                          controller.name.isNotEmpty,
-                    ),
-                  ),
-
-                  PsFieldItem(
-                    flex: 2,
-                    child: Center(
-                      child: PsImagePicker(
-                        image: controller.image,
-                        error: controller.imageError,
-                        onPick: () async {
-                          final mediaService = MediaPickerService();
-                          final file = await showImageSourceSelector(
-                            context,
-                            mediaService.pickFromCamera,
-                            mediaService.pickFromGallery,
-                          );
-
-                          if (file != null) {
-                            controller.setImage(file);
-                          }
-                        },
-                        onRemove: controller.removeImage,
-                        requiredField: true,
-                        isTouched: controller.imageTouched,
-                        isValid: controller.image != null,
-                      ),
-                    ),
-                  ),
-
-                  /// 🔥 NOMBRE
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
-              PsFieldRow(
-                children: [
-                  /// 🔥 CATEGORÍA
-                  PsFieldItem(
-                    child: PsDropdown(
-                      label: "Categoría",
-                      items: controller.categories,
-                      value: controller.selectedCategory,
-                      getLabel: (e) => e.value,
-                      onChanged: controller.selectCategory,
-                      error: controller.categoryError,
-                      requiredField: true,
-                      isTouched: controller.categoryTouched,
-                      isValid: controller.selectedCategory != null,
-                    ),
-                  ),
-                  PsFieldItem(
-                    child:
-                        /// 🔥 SUBCATEGORÍA
-                        PsDropdown(
-                          label: "Subcategoría",
-                          items: controller.subcategories,
-                          value: controller.selectedSubcategory,
-                          getLabel: (e) => e.value,
-                          onChanged: controller.selectSubcategory,
-                          error: controller.subcategoryError,
-                          requiredField: true,
-                          isTouched: controller.subcategoryTouched,
-                          isValid: controller.selectedSubcategory != null,
-                        ),
-                  ),
-                ],
-              ),
-
-              AppSpacing.spaceBetweenInputs,
-            ],
-          ),
-        ),
-        right: PsSectionCard(
-          title: "Costos y Precios",
-          child: Column(
-            children: [
-              /// 🔥 PRECIO + COSTE
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    flex: 1,
-                    child: PsDropdown<TaxCategoryModel>(
-                      label: "Impuesto",
-                      items: listTaxCategory,
-                      value: controller.selectedTax,
-                      getLabel: (e) => '${e.name} (${e.description})',
-                      onChanged: controller.selectTax,
-                      error: controller.taxCategoryError,
-                      requiredField: true,
-                      isTouched: controller.taxTouched,
-                      isValid: controller.selectedTax != null,
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
-
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsInput(
-                      value: controller.price.toString(),
-                      requiredField: true,
-                      label: "Precio",
-                      keyboardType: TextInputType.number,
-                      onChanged: controller.setPrice,
-                      error: controller.priceError,
-                      isTouched: controller.priceTouched,
-                      isValid: controller.priceError == null,
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
-
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsInput(
-                      requiredField: true,
-                      value: controller.cost.toString(),
-                      label: "Coste",
-                      keyboardType: TextInputType.number,
-                      onChanged: controller.setCost,
-                      error: controller.costError,
-                      isTouched: controller.costTouched,
-                      isValid: controller.costError == null,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
-      AppSpacing.spaceBetweenSections,
-
-      PsSectionCard(
-        title: "Inventario Inicial",
-        child: Column(
-          children: [
-            PsFieldRow(
-              children: [
-                PsFieldItem(
-                  child: PsToggleSelector<MeasureType>(
-                    title: "Tipo de Medida",
-                    value: controller.sellType,
-                    items: MeasureType.values,
-                    onChanged: controller.setMeasureType,
-                  ),
-                ),
-                PsFieldItem(
-                  child: _buildMeasureWidget(
-                    controller.sellType,
-                    listMeasureCategory,
-                    controller,
-                  ),
-                ),
-              ],
-            ),
-
-            PsFieldRow(
-              children: [
-                PsFieldItem(
-                  child: PsInput(
-                    requiredField: true,
-                    value: controller.stock.toString(),
-                    label: "Stock",
-                    keyboardType: TextInputType.number,
-                    onChanged: controller.setStock,
-                    isTouched: controller.stockTouched,
-                    error: controller.stockError,
-                    isValid: controller.stockError == null,
-                  ),
-                ),
-                PsFieldItem(
-                  child: PsInput(
-                    value: controller.lowStock.toString(),
-                    requiredField: true,
-                    label: "Stock mínimo",
-                    keyboardType: TextInputType.number,
-                    onChanged: controller.setLowStock,
-                    error: controller.lowStockError,
-                    isTouched: controller.lowStockTouched,
-                    isValid: controller.lowStockError == null,
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-      AppSpacing.spaceBetweenSections,
-      /// =========================
-      /// 📦 INVENTARIO
-      /// =========================
-      controller.inventoryType == InventoryType.forSale ||
-              controller.inventoryType == InventoryType.processed
-          ? PsSectionCard(
-              title: switch (controller.inventoryType) {
-                InventoryType.raw => 'Receta ',
-                InventoryType.processed => 'Receta',
-                InventoryType.forSale => 'Receta',
-              },
-              child: Column(
-                children: [
-                  PsFieldRow(
-                    children: [
-                      /// 🔥 CATEGORÍA
-                      PsFieldItem(
-                        child: PsDropdown(
-                          label: switch (controller.inventoryType) {
-                            InventoryType.raw =>
-                              'Receta - Ingrese Productos Materia Prima',
-                            InventoryType.processed => 'Materia Prima',
-                            InventoryType.forSale => ' Productos procesados',
-                          },
-                          items: controller.categories,
-                          value: controller.selectedCategory,
-                          getLabel: (e) => e.value,
-                          onChanged: controller.selectCategory,
-                          error: controller.categoryError,
-                          requiredField: true,
-                          isTouched: controller.categoryTouched,
-                          isValid: controller.selectedCategory != null,
-                        ),
-                      ),
-                    ],
-                  ),
-                  AppSpacing.spaceBetweenSections,
-
-                  PsFieldRow(
-                    children: [
-                      PsFieldItem(
-                        child: PsToggleSelector<MeasureType>(
-                          title: "Total de Tipos de Productos Agregados",
-                          value: controller.sellType,
-                          items: MeasureType.values,
-                          onChanged: controller.setMeasureType,
-                        ),
-                      ),
-                      PsFieldItem(
-                        child: _buildMeasureWidget(
-                          controller.sellType,
-                          listMeasureCategory,
-                          controller,
-                        ),
-                      ),
-                    ],
-                  ),
-                  AppSpacing.spaceBetweenSections,
-                  SizedBox(
-                    height: 400, // ajusta a tu necesidad
-                    child: ListView.separated(
-                      itemCount: controller.ingredients.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 12),
-                      itemBuilder: (_, index) {
-                        final e = controller.ingredients[index];
-                        return PsIngredientCard(
-                          item: e,
-                          measureCategories: listMeasureCategory,
-                          onQuantityChanged: (value) {
-                            controller.updateIngredientQuantity(e, value);
-                          },
-                          onUnitChanged: (unit) {
-                            controller.updateIngredientUnit(e, unit);
-                          },
-                          onEdit: () {},
-                          onDelete: () {},
-                        );
-                      },
-                    ),
-                  ),
-                ],
-              ),
-            )
-          : SizedBox.shrink(),
-    ],
-  );
-}
-
 Widget _buildProductBody(
     BuildContext context,
     ProductModalController controller,
@@ -1321,7 +938,6 @@ Widget _buildBaseInfo(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text('Equiv. Base'),
-
         const SizedBox(height: 8),
 
         Text(
@@ -1425,3 +1041,5 @@ class _ProductTabsViewState extends State<ProductTabsView>
     );
   }
 }
+
+

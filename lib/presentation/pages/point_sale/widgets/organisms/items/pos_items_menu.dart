@@ -8,7 +8,7 @@ import '../../../models/sections_data.dart';
 import '../../../shared/styles.dart';
 import '../../../state/pos_items_controller.dart';
 
-class PosItemsMenu extends StatelessWidget {
+class PosItemsMenu extends StatelessWidget {//MENU MANAGEMENT PRODUCTS
   const PosItemsMenu({super.key});
 
   @override
@@ -26,13 +26,6 @@ class PosItemsMenu extends StatelessWidget {
               children: [
                 menuItem(
                   context,
-                  icon: Sections.getIconItems(PosItemsSection.items),
-                  title: Sections.getTitleItems(PosItemsSection.items),
-                  selected: settings.section == PosItemsSection.items,
-                  onTap: () => settings.setSection(PosItemsSection.items),
-                ),
-                menuItem(
-                  context,
                   icon: Sections.getIconItems(PosItemsSection.categories),
                   title:Sections.getTitleItems(PosItemsSection.categories),
                   selected:
@@ -47,6 +40,14 @@ class PosItemsMenu extends StatelessWidget {
                   selected: settings.section == PosItemsSection.modifiers,
                   onTap: () => settings.setSection(PosItemsSection.modifiers),
                 ),*/
+
+                menuItem(
+                  context,
+                  icon: Sections.getIconItems(PosItemsSection.items),
+                  title: Sections.getTitleItems(PosItemsSection.items),
+                  selected: settings.section == PosItemsSection.items,
+                  onTap: () => settings.setSection(PosItemsSection.items),
+                ),
                 menuItem(
                   context,
                   icon: Sections.getIconItems(PosItemsSection.discounts),

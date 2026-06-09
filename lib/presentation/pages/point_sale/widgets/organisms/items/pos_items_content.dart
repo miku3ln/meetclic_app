@@ -98,33 +98,62 @@ class PosItemsManagementApi {
 
   Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
     required int current,
-    required int rowCount,
-  }) {
-    return api.fetchPage<Map<String, dynamic>>(
-      endpoint: 'pointsales/products-sales',
-      queryParams: {
-        'current': '$current',
-        'rowCount': '$rowCount',
-        'searchPhrase': '',
-        'business_id': '1',
-      },
-      totalKey: 'total',
-      rowsKey: 'rows',
-      // 🔥 AQUÍ está toda tu lógica real ahora
-      mapper: (json) {
-        final stock = json['stock'] ?? {};
-        final price = json['price'] ?? {};
+    required String searchPhrase,
 
-        return GenericListItem<Map<String, dynamic>>(
-          id: json['id'],
-          title: json['name'] ?? '',
-          subtitle: 'Stock: ${stock['quantity']} ${stock['unit']}',
-          description: json['category'] ?? '',
-          image: json['source'],
-          data: json,
-        );
+    required int rowCount,
+  }) async {
+
+
+    final token = SessionService().apiToken;
+    final businessId=SessionService().businessId;
+    final uri = Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales')//POS-PRODUCTS -INIT-ONE
+        .replace(
+      queryParameters: {
+        'current': current.toString(),
+        'rowCount': rowCount.toString(),
+        'searchPhrase': searchPhrase,
+        'business_id': businessId.toString(),
+        'grid_id': '#grid-registers-grid',
       },
     );
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer ${token!}',
+        'Content-Type': 'application/json',
+      },
+    );
+    if (response.statusCode != 200) {
+      return const PaginatedResponse<
+          GenericListItem<Map<String, dynamic>>>(
+        current: 1,
+        rowCount: 0,
+        rows: [],
+        total: 0,
+      );
+    }
+    final data = jsonDecode(response.body);
+
+    final rows = (data['rows'] as List).map((json) {
+      final stock = json['stock'] ?? {};
+
+      return GenericListItem<Map<String, dynamic>>(
+        id: json['id'],
+        title: json['name'] ?? '',
+        subtitle: 'Stock: ${stock['quantity']} ${stock['unit']}',
+        description: json['category'] ?? '',
+        image: json['source'],
+        data: json,
+      );
+    }).toList();
+
+    return PaginatedResponse<GenericListItem<Map<String, dynamic>>>(
+      current: data['current'] ?? current,
+      rowCount: data['rowCount'] ?? rowCount,
+      rows: rows,
+      total: data['total'] ?? 0,
+    );
+
   }
 }
 

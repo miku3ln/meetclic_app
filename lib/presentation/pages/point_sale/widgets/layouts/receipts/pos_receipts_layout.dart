@@ -13,16 +13,12 @@ import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/items/pos_items_content.dart';
 import '../../organisms/pos_settings_app_bar.dart';
 import '../../organisms/receipts/pos_receipts_register_view.dart';
-
-
 class PosReceiptsLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
-
   const PosReceiptsLayout({
     super.key,
     this.onMenuTap,
   });
-
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -31,10 +27,8 @@ class PosReceiptsLayout extends StatelessWidget {
     );
   }
 }
-
 class _PosReceiptsView extends StatelessWidget {
   const _PosReceiptsView();
-
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
@@ -90,25 +84,18 @@ class PosReceiptsRegisters extends StatefulWidget {
 class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
-
   late PosTicketManagementApi _api;
-
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
-
   int _currentPage = 1;
   final int _rowCount = 10;
   int _total = 0;
-
   bool _isLoading = false;
   bool _hasInitialLoadFinished = false;
-
   String _searchCode = '';
   DateTime? _selectedDate;
-
   bool get _hasData => _items.isNotEmpty;
   bool get _hasMore => _items.length < _total;
   int _simulatedTotal = 592;
-
   @override
   void initState() {
     super.initState();
