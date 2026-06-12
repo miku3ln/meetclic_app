@@ -1,7 +1,10 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/models/product_management_measure.dart';
 
+import '../../../../domain/services/session_service.dart';
+import '../../../../shared/models/api_response.dart';
 import '../../../../shared/utils/validators/validators.dart';
 import '../models/product_category.dart';
 import '../models/product_draft.dart';
@@ -9,6 +12,7 @@ import '../models/product_subcategory.dart';
 import '../repositories/config_repository.dart';
 import '../services/product_catalog_service.dart';
 import '../widgets/dialogs/moda_managerl.dart';
+import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 
 class ProductModalController extends ChangeNotifier {
@@ -99,23 +103,19 @@ class ProductModalController extends ChangeNotifier {
 
     notifyListeners();
   }
-  void updateIngredientQuantity(
-      RecipeIngredientItem item,
-      String value,
-      ) {
-    item.quantity =
-        double.tryParse(value) ?? 0;
+
+  void updateIngredientQuantity(RecipeIngredientItem item, String value) {
+    item.quantity = double.tryParse(value) ?? 0;
 
     notifyListeners();
   }
-  void updateIngredientUnit(
-      RecipeIngredientItem item,
-      UnitMeasureModel? unit,
-      ) {
+
+  void updateIngredientUnit(RecipeIngredientItem item, UnitMeasureModel? unit) {
     item.selectedUnit = unit;
 
     notifyListeners();
   }
+
   final List<RecipeIngredientItem> ingredients = [
     RecipeIngredientItem(
       name: 'Arroz',
@@ -141,48 +141,59 @@ class ProductModalController extends ChangeNotifier {
 
   void setPrice(String value) {
     priceTouched = true;
-    price == null ? "" : double.tryParse(value);
+    price = 0;
     priceError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Precio"),
       ValidatorsUtil.number(),
       ValidatorsUtil.positive(),
     ]);
 
+    if (value == '') {
+      price = null;
+    } else {
+      price = double.tryParse(value);
+    }
     notifyListeners();
   }
 
   void setCost(String value) {
     costTouched = true;
-    cost == null ? "" : double.tryParse(value);
-
     costError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Coste"),
       ValidatorsUtil.number(),
       ValidatorsUtil.nonNegative(),
     ]);
-
+    if (value == '') {
+      cost = null;
+    } else {
+      cost = double.tryParse(value);
+    }
     notifyListeners();
   }
 
   void setStock(String value) {
     stockTouched = true;
 
-    stock == null ? "" : double.tryParse(value);
-
     stockError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Stock"),
       ValidatorsUtil.number(),
       ValidatorsUtil.nonNegative(),
     ]);
-
+    if (value == '') {
+      stock = null;
+    } else {
+      stock = double.tryParse(value);
+    }
     notifyListeners();
   }
 
   void setLowStock(String value) {
     lowStockTouched = true;
-
-    lowStock == null ? "" : double.tryParse(value);
-
+    if (value == '') {
+      lowStock = null;
+    } else {
+      lowStock = double.tryParse(value);
+    }
     lowStockError = ValidatorsUtil.validate(value, [
       ValidatorsUtil.required("Stock mínimo"),
       ValidatorsUtil.number(),
@@ -255,8 +266,6 @@ class ProductModalController extends ChangeNotifier {
         : null;
     notifyListeners();
   }
-
-
 
   TaxCategoryModel? selectedTax;
 
@@ -421,6 +430,7 @@ class ProductModalController extends ChangeNotifier {
 
   MeasureType sellType = MeasureType.unit;
   TypeDesgloce sellTypeDesgloce = TypeDesgloce.menuRecipe;
+
   void setMeasureType(MeasureType type) {
     sellType = type;
     selectedUnitMeasure = null;
@@ -433,6 +443,7 @@ class ProductModalController extends ChangeNotifier {
     inventoryType = type;
     notifyListeners();
   }
+
   void setDesgloce(TypeDesgloce type) {
     sellTypeDesgloce = type;
     notifyListeners();
@@ -510,24 +521,13 @@ class ProductModalController extends ChangeNotifier {
   /// 💾 SAVE
   /// =========================
 
-  ProductDraft save(CrudType type) {
+  Future<ApiResponse<Map<String, dynamic>>> save(CrudType type) async {
     if (!validate().success) {
       throw Exception("Formulario inválido");
     }
-
-    return ProductDraft(
-      name: name,
-      price: price!,
-      cost: cost!,
-      category: selectedCategory!,
-      subcategory: selectedSubcategory!,
-      stock: stock!,
-      lowStock: lowStock!,
-      code: "",
-      barcode: codeBar!,
-      image: image!,
-      sellType: sellType,
-    );
+    var payload = buildPayload();
+    final response = await ProductDataUtil.createProduct(payload);
+    return response;
   }
 
   void _resetTouched() {
@@ -555,6 +555,185 @@ class ProductModalController extends ChangeNotifier {
     subcategoryError = null;
     imageError = null;
   }
+
+  Map<String, dynamic> buildPayload() {
+    switch (inventoryType) {
+      case InventoryType.raw:
+        return _buildRawPayload();
+      case InventoryType.processed:
+        return _buildProcessedPayload();
+
+      case InventoryType.forSale:
+        return _buildForSalePayload();
+    }
+  }
+
+  List<MeasureCategoryModel> listMeasureCategoryData = [];
+
+  Map<String, dynamic> buildInitialInventoryMeasure({
+    required MeasureType measureType,
+    required double stock,
+    required List<MeasureCategoryModel> listMeasureCategory,
+    UnitMeasureModel? selectedUnitMeasure,
+  }) {
+    final category = listMeasureCategory.firstWhere(
+      (e) => e.id.toString() == measureType.id,
+    );
+
+    final baseUnit = category.baseUnit;
+
+    double quantity = stock;
+    int? unitMeasureId = selectedUnitMeasure?.id;
+    double conversionFactor = 1;
+    int? unit_input_id = 1;
+
+    switch (measureType) {
+      case MeasureType.unit:
+        quantity = stock;
+        unitMeasureId = baseUnit.id;
+        unit_input_id = unitMeasureId;
+
+        conversionFactor = 1;
+        break;
+
+      case MeasureType.mass:
+      case MeasureType.volume:
+      case MeasureType.length:
+      case MeasureType.area:
+        conversionFactor = selectedUnitMeasure?.factorToBase ?? 1;
+        quantity = stock * conversionFactor;
+        unitMeasureId = baseUnit.id;
+        unit_input_id = selectedUnitMeasure?.id;
+        break;
+    }
+
+    return {
+      'quantity': quantity,
+      'unit_measure_id': unitMeasureId,
+      'quantity_input': stock,
+      'unit_input_id': unit_input_id,
+      'conversion_factor': conversionFactor,
+      'reference_type': 'INVENTARIO_INICIAL',
+      'reference_id': null,
+      'description': 'Carga inicial',
+    };
+  }
+
+  void setListMeasureCategory(List<MeasureCategoryModel> list) {
+    listMeasureCategoryData = list;
+    notifyListeners();
+  }
+
+  Map<String, dynamic> _buildRawPayload() {
+    final businessId = SessionService().businessId;
+    final currentSession = SessionService().currentSession;
+    final user_id = currentSession?.userId;
+    final hasTax = selectedTax!.taxPercentage > 0.0;
+
+    final measureData = buildInitialInventoryMeasure(
+      measureType: sellType,
+      stock: stock!,
+      selectedUnitMeasure: selectedUnitMeasure,
+      listMeasureCategory: listMeasureCategoryData,
+    );
+    final product_measure_type_id = sellType.id;
+    return {
+      'product': {
+        'code': codeBar,
+        'name': name,
+        'product_type': 'MEASURABLE',
+        'inventory_type': 'RAW',
+        'state': 'ACTIVE',
+        'product_trademark_id': 1,
+        'product_category_id': selectedCategory?.id,
+        'product_subcategory_id': selectedSubcategory?.id,
+        'source': '',
+        'description': ref,
+        'code_provider': codeBar,
+        'code_product': codeBar,
+        'has_tax': hasTax?1:0,
+        'is_service': 0,
+        'user_id': user_id,
+        'product_measure_type_id': product_measure_type_id,
+        'view_online': 1,
+      },
+      'business_by_products': {'business_id': businessId},
+      'product_inventory': {
+        'business_id': businessId,
+        'avarage_kardex_value': cost,
+        'tax': hasTax ? 'SI' : 'NO',
+        'quantity_units': stock,
+        'sale_price': price,
+        'total_price': ((price ?? 0) * (stock ?? 0)),
+        'tax_id': selectedTax?.id,
+        'profit': 30,
+        'profit_type': 1,
+        'note': 'descrip',
+        'sale_price2': price,
+        'sale_price3': price,
+        'sale_price4': price,
+      },
+
+      'product_sell_config': {
+        'allow_pos': 1,
+        'allow_shop': 1,
+        'allow_delivery': 0,
+        'visible': 1,
+      },
+
+      'inventory_movement': {
+        //MANAGEMENT MEASURE CONFIG
+        'quantity': measureData["quantity"],
+        'unit_measure_id': measureData["unit_measure_id"],
+        'quantity_input': measureData["quantity_input"],
+        'unit_input_id': measureData["unit_input_id"],
+        'conversion_factor': measureData["conversion_factor"],
+        'reference_type': measureData["reference_type"],
+        'reference_id': measureData["reference_id"],
+        'description': measureData["description"],
+      },
+    };
+  }
+
+  Map<String, dynamic> _buildProcessedPayload() {
+    return {
+      ..._buildRawPayload(),
+
+      'recipe': {'name': name, 'yield_quantity': stock},
+
+      'recipe_detail': ingredients
+          .map(
+            (e) => {
+              'product_id': e.name, //ID TODO PRODUCT
+              'quantity': e.quantity,
+              'unit_measure_id': e.selectedUnit?.id,
+            },
+          )
+          .toList(),
+    };
+  }
+
+  Map<String, dynamic> _buildForSalePayload() {
+    return {
+      ..._buildRawPayload(),
+
+      'recipe': {'name': name, 'yield_quantity': stock},
+
+      'recipe_detail': ingredients
+          .map(
+            (e) => {
+              'product_id': e.name, //ID TODO PRODUCT
+              'quantity': e.quantity,
+              'unit_measure_id': e.selectedUnit?.id,
+            },
+          )
+          .toList(),
+    };
+  }
+}
+
+extension on Double {
+  operator >(int other) {}
 }
 
 class CategoriaModalController extends ChangeNotifier {

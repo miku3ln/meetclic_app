@@ -10,11 +10,36 @@ class ApiResponse<T> {
     this.data,
   });
 
-  factory ApiResponse.fromJson(Map<String, dynamic> json, T Function(dynamic) fromJsonT) {
+  factory ApiResponse.success({
+    String message = '',
+    T? data,
+  }) {
+    return ApiResponse(
+      success: true,
+      message: message,
+      data: data,
+    );
+  }
+
+  factory ApiResponse.error(
+      String message,
+      ) {
+    return ApiResponse(
+      success: false,
+      message: message,
+    );
+  }
+
+  factory ApiResponse.fromJson(
+      Map<String, dynamic> json,
+      T Function(dynamic) fromJsonT,
+      ) {
     return ApiResponse(
       success: json['success'] ?? false,
       message: json['message'] ?? '',
-      data: json['data'] != null ? fromJsonT(json['data']) : null,
+      data: json['data'] != null
+          ? fromJsonT(json['data'])
+          : null,
     );
   }
 }

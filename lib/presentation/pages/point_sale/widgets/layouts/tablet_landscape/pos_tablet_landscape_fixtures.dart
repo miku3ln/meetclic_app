@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../../../../../../domain/services/session_service.dart';
 import '../../../../../../infrastructure/config/server_config.dart';
+import '../../../../../../shared/models/api_response.dart';
 import '../../../models/product_management_measure.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
@@ -902,4 +903,125 @@ final businessId=SessionService().businessId;
   }
 }
 
+class ProductCreateRequest {
+  final Map<String, dynamic> product;
+  final Map<String, dynamic> businessByProducts;
+  final Map<String, dynamic> productInventory;
+  final Map<String, dynamic> productSellConfig;
+  final Map<String, dynamic> inventoryMovement;
 
+  const ProductCreateRequest({
+    required this.product,
+    required this.businessByProducts,
+    required this.productInventory,
+    required this.productSellConfig,
+    required this.inventoryMovement,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'product': product,
+      'business_by_products': businessByProducts,
+      'product_inventory': productInventory,
+      'product_sell_config': productSellConfig,
+      'inventory_movement': inventoryMovement,
+    };
+  }
+}
+class ProductApiError {
+  final String? table;
+  final Map<String, List<String>> errors;
+
+  ProductApiError({
+    this.table,
+    required this.errors,
+  });
+
+  factory ProductApiError.fromJson(
+      Map<String, dynamic> json,
+      ) {
+    return ProductApiError(
+      table: json['table'],
+      errors: (json['errors'] as Map<String, dynamic>? ?? {})
+          .map(
+            (k, v) => MapEntry(
+          k,
+          List<String>.from(v),
+        ),
+      ),
+    );
+  }
+
+  String get firstError {
+    if (errors.isEmpty) return '';
+
+    final firstField = errors.values.first;
+
+    if (firstField.isEmpty) return '';
+
+    return firstField.first;
+  }
+}
+class ProductDataUtil {
+  static Future<ApiResponse<Map<String, dynamic>>> createProduct(
+      Map<String, dynamic> payload,
+      ) async {
+    try {
+      final token = SessionService().apiToken;
+
+      final response = await http.post(
+        Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/product-type-save',
+        ),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(payload),
+      );
+
+      final body = jsonDecode(response.body);
+      if (body['success'] == true) {
+        return ApiResponse.success(
+          message: body['message'] ?? 'Operación realizada correctamente',
+          data: body,
+        );
+      }
+
+      String message = 'Error desconocido';
+
+      try {
+        final errorRaw = body['error']?['message'];
+
+        if (errorRaw != null) {
+          final errorJson =
+          jsonDecode(errorRaw) as Map<String, dynamic>;
+
+          final table = errorJson['table'];
+
+          final errors =
+              errorJson['errors'] as Map<String, dynamic>? ?? {};
+
+          if (errors.isNotEmpty) {
+            final field = errors.keys.first;
+            final fieldErrors =
+            List<String>.from(errors[field]);
+
+            message =
+            '[$table] ${fieldErrors.first}';
+          }
+        }
+      } catch (_) {
+        message = body['error']?['message'] ??
+            body['message'] ??
+            'Error desconocido';
+      }
+
+      return ApiResponse.error(message);
+    } catch (e) {
+      return ApiResponse.error(
+        e.toString(),
+      );
+    }
+  }
+}

@@ -1,4 +1,6 @@
 
+import 'dart:ffi';
+
 import '../widgets/organisms/ps_toogle_group.dart';
 
 class ConversionModel {
@@ -133,6 +135,8 @@ class MeasureCategoryModel {
 class TaxCategoryModel {
   final int id;
   final String name;
+  final double taxPercentage;
+
   final String description;
   final int priority;
 
@@ -142,6 +146,7 @@ class TaxCategoryModel {
     required this.name,
     required this.description,
     required this.priority,
+    required this.taxPercentage,
 
   });
 
@@ -149,6 +154,8 @@ class TaxCategoryModel {
     return TaxCategoryModel(
       id: json['tax_id'],
       name: json['tax_percentage'].toString(),
+      taxPercentage:  double.parse(json['tax_percentage'].toString()),
+
       description: json['tax_name'],
       priority: (json['tax_priority']),
 

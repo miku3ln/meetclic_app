@@ -172,37 +172,6 @@ class ProductListCard extends StatelessWidget {
 
             const SizedBox(height: 18),
 
-            /// 2 FILAS - 3 COLUMNAS
-            Row(
-              children: [
-                Expanded(
-                  child: _InfoColumn(
-                    icon: Icons.widgets_outlined,
-                    title: "Tipo",
-                    value: _getInventoryLabel(inventoryType),
-                  ),
-                ),
-
-                Expanded(
-                  child: _InfoColumn(
-                    icon: Icons.inventory_2_outlined,
-                    title: "Cantidad",
-                    value: "$quantity $unit",
-                  ),
-                ),
-
-                Expanded(
-                  child: _InfoColumn(
-                    icon: Icons.scale_outlined,
-                    title: "Medida",
-                    value: measureType,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
             Row(
               children: [
                 Expanded(
@@ -230,6 +199,38 @@ class ProductListCard extends StatelessWidget {
                 ),
               ],
             ),
+
+            const SizedBox(height: 16),
+            /// 2 FILAS - 3 COLUMNAS
+            Row(
+              children: [
+                Expanded(
+                  child: _InfoColumn(
+                    icon: Icons.scale_outlined,
+                    title: "Tipo de Medida",
+                    value: measureType,
+                  ),
+                ),
+                Expanded(
+                  child: _InfoColumn(
+                    icon: Icons.widgets_outlined,
+                    title: "Tipo",
+                    value: _getInventoryLabel(inventoryType),
+                  ),
+                ),
+
+                Expanded(
+                  child: _InfoColumn(
+                    icon: Icons.inventory_2_outlined,
+                    title: "Cantidad",
+                    value: "$quantity $unit",
+                  ),
+                ),
+
+
+              ],
+            ),
+
           ],
         ),
       ),
