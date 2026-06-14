@@ -1,4 +1,3 @@
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -19,8 +18,6 @@ import '../../../../organisms/ps_toogle_group.dart';
 import '../../../product/ps_section_card.dart';
 import '../../pos_items_management_section.dart';
 
-
-
 Future<void> showManagerProduct({
   required BuildContext context,
   required ProductModalController controller,
@@ -29,7 +26,7 @@ Future<void> showManagerProduct({
   required String btnSaveTitle,
   required List<MeasureCategoryModel> listMeasureCategory,
   required List<TaxCategoryModel> listTaxCategory,
-  CrudType type = CrudType.update,
+  CrudType typeManagement = CrudType.update,
   required bool barrierDismissible,
   ProductViewMode viewMode = ProductViewMode.page,
 }) async {
@@ -44,36 +41,33 @@ Future<void> showManagerProduct({
         btnSaveTitle: btnSaveTitle,
         onSave: controller.canSubmit
             ? () async {
-          if (!controller.validate().success) {
-            return;
-          }
+                if (!controller.validate().success) {
+                  return;
+                }
 
-          final resultSave = await controller.save(type);
+                final resultSave = await controller.save(typeManagement);
 
-          if (!context.mounted) return;
+                if (!context.mounted) return;
 
-          if (resultSave.success) {
-            AlertService.success(
-              context,
-              message: resultSave.message,
-            );
-
-            Navigator.pop(
-              context,
-              resultSave,
-            );
-          } else {
-            AlertService.error(
-              context,
-              message: resultSave.message,
-            );
-          }
-        }
+                if (resultSave.success) {
+                  bool allowClose = true;
+                  if (controller.inventoryType == InventoryType.forSale ||
+                      controller.inventoryType == InventoryType.processed) {
+                    allowClose = false;
+                  }
+                  AlertService.success(context, message: resultSave.message);
+                  if (allowClose) {
+                    Navigator.pop(context, resultSave);
+                  }
+                } else {
+                  AlertService.error(context, message: resultSave.message);
+                }
+              }
             : null,
         body: _buildProductBody(
           context,
           controller,
-          type,
+          typeManagement,
           title,
           listMeasureCategory,
           listTaxCategory,
@@ -102,8 +96,8 @@ Future<void> showManagerProduct({
         return SlideTransition(
           position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
               .animate(
-            CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-          ),
+                CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+              ),
           child: child,
         );
       },
@@ -112,16 +106,16 @@ Future<void> showManagerProduct({
 }
 
 Widget _buildProductBody(
-    BuildContext context,
-    ProductModalController controller,
-    CrudType type,
-    String title,
-    List<MeasureCategoryModel> listMeasureCategory,
-    List<TaxCategoryModel> listTaxCategory,
-    ) {
+  BuildContext context,
+  ProductModalController controller,
+  CrudType typeManagement,
+  String title,
+  List<MeasureCategoryModel> listMeasureCategory,
+  List<TaxCategoryModel> listTaxCategory,
+) {
   final recipeEnabled =
       controller.inventoryType == InventoryType.processed ||
-          controller.inventoryType == InventoryType.forSale;
+      controller.inventoryType == InventoryType.forSale;
 
   controller.setListMeasureCategory(listMeasureCategory);
   return ProductTabsView(
@@ -130,15 +124,18 @@ Widget _buildProductBody(
     listTaxCategory: listTaxCategory,
   );
 }
+
 Widget _buildTabProduct(
-    BuildContext context,
-    ProductModalController controller,
-    List<MeasureCategoryModel> listMeasureCategory,
-    List<TaxCategoryModel> listTaxCategory,
-    ) {
+  BuildContext context,
+  ProductModalController controller,
+  List<MeasureCategoryModel> listMeasureCategory,
+  List<TaxCategoryModel> listTaxCategory,
+) {
   return SingleChildScrollView(
     child: Column(
       children: [
+        AppSpacing.spaceBetweenSections,
+
         /// =========================
         /// 📦 INFORMACIÓN
         /// =========================
@@ -199,7 +196,7 @@ Widget _buildTabProduct(
                         error: controller.nameError,
                         isTouched: controller.nameTouched,
                         isValid:
-                        controller.nameError == null &&
+                            controller.nameError == null &&
                             controller.name.isNotEmpty,
                       ),
                     ),
@@ -252,18 +249,18 @@ Widget _buildTabProduct(
                     ),
                     PsFieldItem(
                       child:
-                      /// 🔥 SUBCATEGORÍA
-                      PsDropdown(
-                        label: "Subcategoría",
-                        items: controller.subcategories,
-                        value: controller.selectedSubcategory,
-                        getLabel: (e) => e.value,
-                        onChanged: controller.selectSubcategory,
-                        error: controller.subcategoryError,
-                        requiredField: true,
-                        isTouched: controller.subcategoryTouched,
-                        isValid: controller.selectedSubcategory != null,
-                      ),
+                          /// 🔥 SUBCATEGORÍA
+                          PsDropdown(
+                            label: "Subcategoría",
+                            items: controller.subcategories,
+                            value: controller.selectedSubcategory,
+                            getLabel: (e) => e.value,
+                            onChanged: controller.selectSubcategory,
+                            error: controller.subcategoryError,
+                            requiredField: true,
+                            isTouched: controller.subcategoryTouched,
+                            isValid: controller.selectedSubcategory != null,
+                          ),
                     ),
                   ],
                 ),
@@ -393,6 +390,7 @@ Widget _buildTabProduct(
           ),
         ),
         AppSpacing.spaceBetweenSections,
+
         /// =========================
         /// 📦 INVENTARIO
         /// =========================
@@ -400,14 +398,15 @@ Widget _buildTabProduct(
     ),
   );
 }
+
 Widget _buildTabRecipe(
-    BuildContext context,
-    ProductModalController controller,
-    List<MeasureCategoryModel> listMeasureCategory,
-    ) {
+  BuildContext context,
+  ProductModalController controller,
+  List<MeasureCategoryModel> listMeasureCategory,
+) {
   final recipeEnabled =
       controller.inventoryType == InventoryType.processed ||
-          controller.inventoryType == InventoryType.forSale;
+      controller.inventoryType == InventoryType.forSale;
   return SingleChildScrollView(
     child: PsSectionCard(
       title: switch (controller.inventoryType) {
@@ -418,102 +417,105 @@ Widget _buildTabRecipe(
 
       child: Column(
         children: [
-
-          recipeEnabled?PsSectionCard(
-            title: switch (controller.inventoryType) {
-              InventoryType.raw => 'Receta ',
-              InventoryType.processed => 'Receta',
-              InventoryType.forSale => 'Receta',
-            },
-            child: Column(
-              children: [
-                PsFieldRow(
-                  children: [
-                    /// 🔥 CATEGORÍA
-                    PsFieldItem(
-                      child: PsDropdown(
-                        label: switch (controller.inventoryType) {
-                          InventoryType.raw =>
-                          'Receta - Ingrese Productos Materia Prima',
-                          InventoryType.processed => 'Materia Prima',
-                          InventoryType.forSale => ' Productos procesados',
-                        },
-                        items: controller.categories,
-                        value: controller.selectedCategory,
-                        getLabel: (e) => e.value,
-                        onChanged: controller.selectCategory,
-                        error: controller.categoryError,
-                        requiredField: true,
-                        isTouched: controller.categoryTouched,
-                        isValid: controller.selectedCategory != null,
+          recipeEnabled
+              ? PsSectionCard(
+                  title: switch (controller.inventoryType) {
+                    InventoryType.raw => 'Receta ',
+                    InventoryType.processed => 'Receta',
+                    InventoryType.forSale => 'Receta',
+                  },
+                  child: Column(
+                    children: [
+                      AppSpacing.spaceBetweenSections,
+                      PsFieldRow(
+                        children: [
+                          /// 🔥 CATEGORÍA
+                          PsFieldItem(
+                            child: PsDropdown(
+                              label: switch (controller.inventoryType) {
+                                InventoryType.raw =>
+                                  'Receta - Ingrese Productos Materia Prima',
+                                InventoryType.processed => 'Materia Prima',
+                                InventoryType.forSale =>
+                                  ' Productos procesados',
+                              },
+                              items: controller.categories,
+                              value: controller.selectedCategory,
+                              getLabel: (e) => e.value,
+                              onChanged: controller.selectCategory,
+                              error: controller.categoryError,
+                              requiredField: true,
+                              isTouched: controller.categoryTouched,
+                              isValid: controller.selectedCategory != null,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenSections,
-
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsToggleSelector<MeasureType>(
-                        title: "Total de Tipos de Productos Agregados",
-                        value: controller.sellType,
-                        items: MeasureType.values,
-                        onChanged: controller.setMeasureType,
+                      AppSpacing.spaceBetweenSections,
+                      PsFieldRow(
+                        children: [
+                          PsFieldItem(
+                            child: PsToggleSelector<MeasureType>(
+                              title: "Total de Tipos de Productos Agregados",
+                              value: controller.sellType,
+                              items: MeasureType.values,
+                              onChanged: controller.setMeasureType,
+                            ),
+                          ),
+                          PsFieldItem(
+                            child: _buildMeasureWidget(
+                              controller.sellType,
+                              listMeasureCategory,
+                              controller,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    PsFieldItem(
-                      child: _buildMeasureWidget(
-                        controller.sellType,
-                        listMeasureCategory,
-                        controller,
+                      AppSpacing.spaceBetweenSections,
+                      SizedBox(
+                        height: 400, // ajusta a tu necesidad
+                        child: ListView.separated(
+                          itemCount: controller.ingredients.length,
+                          separatorBuilder: (_, __) =>
+                              const SizedBox(height: 12),
+                          itemBuilder: (_, index) {
+                            final e = controller.ingredients[index];
+                            return PsIngredientCard(
+                              item: e,
+                              measureCategories: listMeasureCategory,
+                              onQuantityChanged: (value) {
+                                controller.updateIngredientQuantity(e, value);
+                              },
+                              onUnitChanged: (unit) {
+                                controller.updateIngredientUnit(e, unit);
+                              },
+                              onEdit: () {},
+                              onDelete: () {},
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenSections,
-                SizedBox(
-                  height: 400, // ajusta a tu necesidad
-                  child: ListView.separated(
-                    itemCount: controller.ingredients.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 12),
-                    itemBuilder: (_, index) {
-                      final e = controller.ingredients[index];
-                      return PsIngredientCard(
-                        item: e,
-                        measureCategories: listMeasureCategory,
-                        onQuantityChanged: (value) {
-                          controller.updateIngredientQuantity(e, value);
-                        },
-                        onUnitChanged: (unit) {
-                          controller.updateIngredientUnit(e, unit);
-                        },
-                        onEdit: () {},
-                        onDelete: () {},
-                      );
-                    },
+                    ],
                   ),
-                ),
-              ],
-            ),
-          ):SizedBox.shrink()
-
+                )
+              : SizedBox.shrink(),
         ],
       ),
     ),
   );
 }
+
 Widget _buildMeasureWidget(
-    MeasureType type,
-    List<MeasureCategoryModel> listMeasureCategory,
-    ProductModalController controller,
-    ) {
+  MeasureType type,
+  List<MeasureCategoryModel> listMeasureCategory,
+  ProductModalController controller,
+) {
   if (type == MeasureType.unit) {
     return const SizedBox.shrink();
   }
 
   final resultSet = listMeasureCategory.firstWhere(
-        (e) => e.id.toString() == type.id,
+    (e) => e.id.toString() == type.id,
   );
 
   final unitsWithConversions = resultSet.units
@@ -558,7 +560,7 @@ class PsIngredientCard extends StatelessWidget {
 
   List<UnitMeasureModel> getUnits() {
     final category = measureCategories.firstWhere(
-          (e) => e.id.toString() == item.measureType.id,
+      (e) => e.id.toString() == item.measureType.id,
     );
 
     return category.units;
@@ -662,15 +664,15 @@ class PsBadge extends StatelessWidget {
 }
 
 Widget _buildBaseInfo(
-    RecipeIngredientItem item,
-    List<MeasureCategoryModel> measureCategories,
-    ) {
+  RecipeIngredientItem item,
+  List<MeasureCategoryModel> measureCategories,
+) {
   if (item.selectedUnit == null) {
     return const SizedBox.shrink();
   }
 
   final category = measureCategories.firstWhere(
-        (e) => e.id.toString() == item.measureType.id,
+    (e) => e.id.toString() == item.measureType.id,
   );
 
   final baseValue = item.quantity * item.selectedUnit!.factorToBase;
@@ -695,6 +697,7 @@ Widget _buildBaseInfo(
     ),
   );
 }
+
 class ProductTabsView extends StatefulWidget {
   final ProductModalController controller;
   final List<MeasureCategoryModel> listMeasureCategory;
@@ -713,17 +716,13 @@ class ProductTabsView extends StatefulWidget {
 
 class _ProductTabsViewState extends State<ProductTabsView>
     with SingleTickerProviderStateMixin {
-
   late TabController tabController;
 
   @override
   void initState() {
     super.initState();
 
-    tabController = TabController(
-      length: 2,
-      vsync: this,
-    );
+    tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -736,24 +735,18 @@ class _ProductTabsViewState extends State<ProductTabsView>
   Widget build(BuildContext context) {
     final recipeEnabled =
         widget.controller.inventoryType == InventoryType.processed ||
-            widget.controller.inventoryType == InventoryType.forSale;
+        widget.controller.inventoryType == InventoryType.forSale;
 
     return Column(
       children: [
-
         TabBar(
           controller: tabController,
           tabs: [
-            const Tab(
-              text: 'Producto',
-              icon: Icon(Icons.inventory_2_outlined),
-            ),
+            const Tab(text: 'Producto', icon: Icon(Icons.inventory_2_outlined)),
             Tab(
               text: recipeEnabled ? 'Receta' : '',
               icon: Icon(
-                recipeEnabled
-                    ? Icons.restaurant_menu
-                    : Icons.lock_outline,
+                recipeEnabled ? Icons.restaurant_menu : Icons.lock_outline,
               ),
             ),
           ],
@@ -772,15 +765,15 @@ class _ProductTabsViewState extends State<ProductTabsView>
 
               recipeEnabled
                   ? _buildTabRecipe(
-                context,
-                widget.controller,
-                widget.listMeasureCategory,
-              )
+                      context,
+                      widget.controller,
+                      widget.listMeasureCategory,
+                    )
                   : const Center(
-                child: Text(
-                  'Disponible únicamente para productos procesados',
-                ),
-              ),
+                      child: Text(
+                        'Disponible únicamente para productos procesados',
+                      ),
+                    ),
             ],
           ),
         ),

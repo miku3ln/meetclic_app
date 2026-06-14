@@ -996,17 +996,70 @@ class ProductDataUtil {
         if (errorRaw != null) {
           final errorJson =
           jsonDecode(errorRaw) as Map<String, dynamic>;
-
           final table = errorJson['table'];
-
           final errors =
               errorJson['errors'] as Map<String, dynamic>? ?? {};
-
           if (errors.isNotEmpty) {
             final field = errors.keys.first;
             final fieldErrors =
             List<String>.from(errors[field]);
+            message =
+            '[$table] ${fieldErrors.first}';
+          }
+        }
+      } catch (_) {
+        message = body['error']?['message'] ??
+            body['message'] ??
+            'Error desconocido';
+      }
 
+      return ApiResponse.error(message);
+    } catch (e) {
+      return ApiResponse.error(
+        e.toString(),
+      );
+    }
+  }
+  static Future<ApiResponse<Map<String, dynamic>>> updateProduct(
+      Map<String, dynamic> payload,
+      ) async {
+    try {
+      final token = SessionService().apiToken;
+
+      final response = await http.post(
+        Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/product-type-save',
+        ),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(payload),
+      );
+
+      final body = jsonDecode(response.body);
+      if (body['success'] == true) {
+        return ApiResponse.success(
+          message: body['message'] ?? 'Operación realizada correctamente',
+          data: body,
+        );
+      }
+
+      String message = 'Error desconocido';
+
+      try {
+        final errorRaw = body['error']?['message'];
+
+        if (errorRaw != null) {
+          final errorJson =
+          jsonDecode(errorRaw) as Map<String, dynamic>;
+          final table = errorJson['table'];
+          final errors =
+              errorJson['errors'] as Map<String, dynamic>? ?? {};
+          if (errors.isNotEmpty) {
+            final field = errors.keys.first;
+            final fieldErrors =
+            List<String>.from(errors[field]);
             message =
             '[$table] ${fieldErrors.first}';
           }

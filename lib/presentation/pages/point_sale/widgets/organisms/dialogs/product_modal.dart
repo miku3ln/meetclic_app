@@ -44,7 +44,7 @@ class PsModalLayout extends StatelessWidget {
           ],
         ),
 
-        AppSpacing.spaceBetweenSections,
+
 
         Expanded(
             child: body,

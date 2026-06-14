@@ -439,6 +439,7 @@ class ProductModalController extends ChangeNotifier {
 
   InventoryType inventoryType = InventoryType.raw;
 
+
   void setInventoryType(InventoryType type) {
     inventoryType = type;
     notifyListeners();
@@ -526,7 +527,11 @@ class ProductModalController extends ChangeNotifier {
       throw Exception("Formulario inválido");
     }
     var payload = buildPayload();
-    final response = await ProductDataUtil.createProduct(payload);
+    if(type==CrudType.create){
+      final response = await ProductDataUtil.createProduct(payload);
+      return response;
+    }
+    final response = await ProductDataUtil.updateProduct(payload);
     return response;
   }
 

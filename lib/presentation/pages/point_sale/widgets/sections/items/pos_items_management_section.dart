@@ -144,7 +144,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
         barrierDismissible: false,
         controller: controller,
         title: "Actualizar Producto",
-        type: CrudType.update,
+        typeManagement: CrudType.update,
         listMeasureCategory: catalogMeasureData,
         listTaxCategory: catalogTaxData,
       );
@@ -218,7 +218,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                         btnSaveTitle: "Guardar",
                         btnCancelTitle: "Cancelar",
                         title: "Crear Producto",
-                        type: CrudType.create,
+                        typeManagement: CrudType.create,
                         listMeasureCategory: catalogMeasureData,
                         listTaxCategory: catalogTaxData,
                       );
