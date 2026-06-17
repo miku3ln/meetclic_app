@@ -7,6 +7,7 @@ import '../../../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../../../shared/theme/configuration/app_text_styles.dart';
 import '../../../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../../../../../../shared/utils/validators/validators.dart';
+import '../../../../../../../shared/responsive/device_gesture_observer.dart';
 import '../../../../../models/product_management_measure.dart';
 import '../../../../../state/product_modal_controller.dart';
 import '../../../../molecules/inputs/ps_dropdown.dart';
@@ -29,35 +30,35 @@ Future<void> showManagerProduct({
   CrudType typeManagement = CrudType.update,
   required bool barrierDismissible,
   ProductViewMode viewMode = ProductViewMode.page,
+  int productId = -1,
 }) async {
   final allowModal = viewMode == ProductViewMode.dialog;
+  controller.setManagerInitProduct(typeManagement, productId);
+
   final content = AnimatedBuilder(
     animation: controller,
     builder: (_, __) {
       return PsModalLayout(
         useDialog: allowModal,
-        title: title,
+        title: controller.titleManagement,
         btnCancelTitle: btnCancelTitle,
         btnSaveTitle: btnSaveTitle,
         onSave: controller.canSubmit
             ? () async {
-                if (!controller.validate().success) {
+                if (!controller.validateForm().success) {
                   return;
                 }
-
-                final resultSave = await controller.save(typeManagement);
-
+                final resultSave = await controller.saveProduct(typeManagement);
                 if (!context.mounted) return;
-
                 if (resultSave.success) {
-                  bool allowClose = true;
-                  if (controller.inventoryType == InventoryType.forSale ||
-                      controller.inventoryType == InventoryType.processed) {
-                    allowClose = false;
-                  }
+                  bool allowClose = controller.allowCloseModalBySave();
                   AlertService.success(context, message: resultSave.message);
                   if (allowClose) {
                     Navigator.pop(context, resultSave);
+                  } else {
+                    final product = resultSave.data?['saved']['product'];
+                    final productIdCurrent=product["id"];
+                    controller.setManagerInitProduct(CrudType.update, productIdCurrent);
                   }
                 } else {
                   AlertService.error(context, message: resultSave.message);
@@ -105,34 +106,67 @@ Future<void> showManagerProduct({
   );
 }
 
-Widget _buildProductBody(
-  BuildContext context,
-  ProductModalController controller,
-  CrudType typeManagement,
-  String title,
-  List<MeasureCategoryModel> listMeasureCategory,
-  List<TaxCategoryModel> listTaxCategory,
-) {
-  final recipeEnabled =
-      controller.inventoryType == InventoryType.processed ||
-      controller.inventoryType == InventoryType.forSale;
+class ProductManagerFormWidget extends StatelessWidget {
+  final ProductModalController controller;
+  final List<MeasureCategoryModel> listMeasureCategory;
+  final List<TaxCategoryModel> listTaxCategory;
+  final BuildContext buildContextParent;
 
-  controller.setListMeasureCategory(listMeasureCategory);
-  return ProductTabsView(
-    controller: controller,
-    listMeasureCategory: listMeasureCategory,
-    listTaxCategory: listTaxCategory,
-  );
+  const ProductManagerFormWidget({
+    super.key,
+    required this.controller,
+    required this.listMeasureCategory,
+    required this.listTaxCategory,
+    required this.buildContextParent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final device = DeviceGestureObserver.snapshotOf(context);
+
+    switch (device.layoutType) {
+      case LayoutType.mobilePortrait:
+        return Text('mobilePortrait');
+
+      case LayoutType.mobileLandscape:
+        return Text('mobileLandscape');
+
+      case LayoutType.tabletPortrait:
+        return PortraitProductWidget(
+          controller: controller,
+          listMeasureCategory: listMeasureCategory,
+          listTaxCategory: listTaxCategory,
+          buildContextParent: buildContextParent,
+        );
+
+      case LayoutType.tabletLandscape:
+        return LandProductWidget(
+          controller: controller,
+          listMeasureCategory: listMeasureCategory,
+          listTaxCategory: listTaxCategory,
+          buildContextParent: buildContextParent,
+        );
+    }
+  }
 }
 
-Widget _buildTabProduct(
-  BuildContext context,
-  ProductModalController controller,
-  List<MeasureCategoryModel> listMeasureCategory,
-  List<TaxCategoryModel> listTaxCategory,
-) {
-  return SingleChildScrollView(
-    child: Column(
+class LandProductWidget extends StatelessWidget {
+  final ProductModalController controller;
+  final List<MeasureCategoryModel> listMeasureCategory;
+  final List<TaxCategoryModel> listTaxCategory;
+  final BuildContext buildContextParent;
+
+  const LandProductWidget({
+    super.key,
+    required this.controller,
+    required this.listMeasureCategory,
+    required this.listTaxCategory,
+    required this.buildContextParent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
       children: [
         AppSpacing.spaceBetweenSections,
 
@@ -143,23 +177,28 @@ Widget _buildTabProduct(
           leftFlex: 7,
           rightFlex: 3,
           left: PsSectionCard(
-            title: "Información General",
+            title: labelCardInformationProduct(controller),
             child: Column(
               children: [
                 PsFieldRow(
                   children: [
                     PsFieldItem(
                       child: PsToggleSelector<InventoryType>(
-                        title: "Tipo de  Producto",
+                        title: controller.inventoryTypeLabel,
                         value: controller.inventoryType,
                         items: InventoryType.values,
                         onChanged: controller.setInventoryType,
                       ),
                     ),
+                  ],
+                ),
+                AppSpacing.spaceBetweenInputs,
+                PsFieldRow(
+                  children: [
                     PsFieldItem(
                       child: PsInput(
                         requiredField: true,
-                        label: "Codigo",
+                        label: controller.codeBarLabel,
                         value: controller.codeBar,
                         keyboardType: TextInputType.text,
                         onChanged: controller.setCodeBar,
@@ -171,25 +210,24 @@ Widget _buildTabProduct(
                     PsFieldItem(
                       child: PsInput(
                         requiredField: true,
-                        label: "REF",
-                        value: controller.ref,
+                        label: controller.descriptionLabel,
+                        value: controller.description,
                         keyboardType: TextInputType.text,
-                        onChanged: controller.setRef,
-                        error: controller.refError,
-                        isTouched: controller.refTouched,
-                        isValid: controller.refError == null,
+                        onChanged: controller.setDescription,
+                        error: controller.descriptionError,
+                        isTouched: controller.descriptionTouched,
+                        isValid: controller.descriptionError == null,
                       ),
                     ),
                   ],
                 ),
                 AppSpacing.spaceBetweenInputs,
-
                 PsFieldRow(
                   children: [
                     PsFieldItem(
                       flex: 2,
                       child: PsInput(
-                        label: "Nombre",
+                        label: controller.nameLabel,
                         requiredField: true,
                         value: controller.name,
                         onChanged: controller.setName,
@@ -236,7 +274,7 @@ Widget _buildTabProduct(
                     /// 🔥 CATEGORÍA
                     PsFieldItem(
                       child: PsDropdown(
-                        label: "Categoría",
+                        label: controller.categoriesLabel,
                         items: controller.categories,
                         value: controller.selectedCategory,
                         getLabel: (e) => e.value,
@@ -251,7 +289,7 @@ Widget _buildTabProduct(
                       child:
                           /// 🔥 SUBCATEGORÍA
                           PsDropdown(
-                            label: "Subcategoría",
+                            label: controller.subcategoriesLabel,
                             items: controller.subcategories,
                             value: controller.selectedSubcategory,
                             getLabel: (e) => e.value,
@@ -270,7 +308,7 @@ Widget _buildTabProduct(
             ),
           ),
           right: PsSectionCard(
-            title: "Costos y Precios",
+            title: controller.titleCardCostPricesProduct,
             child: Column(
               children: [
                 /// 🔥 PRECIO + COSTE
@@ -279,7 +317,7 @@ Widget _buildTabProduct(
                     PsFieldItem(
                       flex: 1,
                       child: PsDropdown<TaxCategoryModel>(
-                        label: "Impuesto",
+                        label: controller.taxsLabel,
                         items: listTaxCategory,
                         value: controller.selectedTax,
                         getLabel: (e) => '${e.name} (${e.description})',
@@ -300,7 +338,7 @@ Widget _buildTabProduct(
                       child: PsInput(
                         value: controller.price.toString(),
                         requiredField: true,
-                        label: "Precio",
+                        label: controller.priceLabel,
                         keyboardType: TextInputType.number,
                         onChanged: controller.setPrice,
                         error: controller.priceError,
@@ -318,7 +356,7 @@ Widget _buildTabProduct(
                       child: PsInput(
                         requiredField: true,
                         value: controller.cost.toString(),
-                        label: "Coste",
+                        label: controller.getLabelPriceName(),
                         keyboardType: TextInputType.number,
                         onChanged: controller.setCost,
                         error: controller.costError,
@@ -335,17 +373,35 @@ Widget _buildTabProduct(
         AppSpacing.spaceBetweenSections,
 
         PsSectionCard(
-          title: "Inventario Inicial",
+          //TODO
+          title: controller.titleCardInventoryInitProduct,
           child: Column(
             children: [
               PsFieldRow(
                 children: [
                   PsFieldItem(
                     child: PsToggleSelector<MeasureType>(
-                      title: "Tipo de Medida",
+                      title: controller.sellTypeLabel,
                       value: controller.sellType,
                       items: MeasureType.values,
                       onChanged: controller.setMeasureType,
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      requiredField: true,
+                      value: controller.stock.toString(),
+                      label: controller.stockLabel,
+                      keyboardType: TextInputType.number,
+                      onChanged: controller.setStock,
+                      isTouched: controller.stockTouched,
+                      error: controller.stockError,
+                      isValid: controller.stockError == null,
                     ),
                   ),
                   PsFieldItem(
@@ -357,26 +413,14 @@ Widget _buildTabProduct(
                   ),
                 ],
               ),
-
+              AppSpacing.spaceBetweenInputs,
               PsFieldRow(
                 children: [
                   PsFieldItem(
                     child: PsInput(
-                      requiredField: true,
-                      value: controller.stock.toString(),
-                      label: "Stock",
-                      keyboardType: TextInputType.number,
-                      onChanged: controller.setStock,
-                      isTouched: controller.stockTouched,
-                      error: controller.stockError,
-                      isValid: controller.stockError == null,
-                    ),
-                  ),
-                  PsFieldItem(
-                    child: PsInput(
                       value: controller.lowStock.toString(),
                       requiredField: true,
-                      label: "Stock mínimo",
+                      label: controller.lowStockLabel,
                       keyboardType: TextInputType.number,
                       onChanged: controller.setLowStock,
                       error: controller.lowStockError,
@@ -395,6 +439,338 @@ Widget _buildTabProduct(
         /// 📦 INVENTARIO
         /// =========================
       ],
+    );
+  }
+}
+
+String labelCardInformationProduct(ProductModalController controller) {
+  return controller.titleCardInformationProduct;
+}
+
+class PortraitProductWidget extends StatelessWidget {
+  final ProductModalController controller;
+  final List<MeasureCategoryModel> listMeasureCategory;
+  final List<TaxCategoryModel> listTaxCategory;
+  final BuildContext buildContextParent;
+
+  const PortraitProductWidget({
+    super.key,
+    required this.controller,
+    required this.listMeasureCategory,
+    required this.listTaxCategory,
+    required this.buildContextParent,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        AppSpacing.spaceBetweenSections,
+
+        /// =========================
+        /// 📦 INFORMACIÓN
+        /// =========================
+        PsSectionSplit(
+          leftFlex: 7,
+          rightFlex: 3,
+          left: PsSectionCard(
+            title: labelCardInformationProduct(controller),
+            child: Column(
+              children: [
+                PsFieldRow(
+                  children: [
+                    PsFieldItem(
+                      child: PsToggleSelector<InventoryType>(
+                        title: controller.inventoryTypeLabel,
+                        value: controller.inventoryType,
+                        items: InventoryType.values,
+                        onChanged: controller.setInventoryType,
+                      ),
+                    ),
+                  ],
+                ),
+                AppSpacing.spaceBetweenInputs,
+                PsFieldRow(
+                  children: [
+                    PsFieldItem(
+                      child: PsInput(
+                        requiredField: true,
+                        label: controller.codeBarLabel,
+                        value: controller.codeBar,
+                        keyboardType: TextInputType.text,
+                        onChanged: controller.setCodeBar,
+                        error: controller.codeBarError,
+                        isTouched: controller.codeBarTouched,
+                        isValid: controller.codeBarError == null,
+                      ),
+                    ),
+                    PsFieldItem(
+                      child: PsInput(
+                        requiredField: true,
+                        label: controller.descriptionLabel,
+                        value: controller.description,
+                        keyboardType: TextInputType.text,
+                        onChanged: controller.setDescription,
+                        error: controller.descriptionError,
+                        isTouched: controller.descriptionTouched,
+                        isValid: controller.descriptionError == null,
+                      ),
+                    ),
+                  ],
+                ),
+                AppSpacing.spaceBetweenInputs,
+                PsFieldRow(
+                  children: [
+                    PsFieldItem(
+                      flex: 2,
+                      child: PsInput(
+                        label: controller.nameLabel,
+                        requiredField: true,
+                        value: controller.name,
+                        onChanged: controller.setName,
+                        error: controller.nameError,
+                        isTouched: controller.nameTouched,
+                        isValid:
+                            controller.nameError == null &&
+                            controller.name.isNotEmpty,
+                      ),
+                    ),
+
+                    PsFieldItem(
+                      flex: 2,
+                      child: Center(
+                        child: PsImagePicker(
+                          image: controller.image,
+                          error: controller.imageError,
+                          onPick: () async {
+                            final mediaService = MediaPickerService();
+                            final file = await showImageSourceSelector(
+                              context,
+                              mediaService.pickFromCamera,
+                              mediaService.pickFromGallery,
+                            );
+
+                            if (file != null) {
+                              controller.setImage(file);
+                            }
+                          },
+                          onRemove: controller.removeImage,
+                          requiredField: true,
+                          isTouched: controller.imageTouched,
+                          isValid: controller.image != null,
+                        ),
+                      ),
+                    ),
+
+                    /// 🔥 NOMBRE
+                  ],
+                ),
+                AppSpacing.spaceBetweenInputs,
+                PsFieldRow(
+                  children: [
+                    /// 🔥 CATEGORÍA
+                    PsFieldItem(
+                      child: PsDropdown(
+                        label: controller.categoriesLabel,
+                        items: controller.categories,
+                        value: controller.selectedCategory,
+                        getLabel: (e) => e.value,
+                        onChanged: controller.selectCategory,
+                        error: controller.categoryError,
+                        requiredField: true,
+                        isTouched: controller.categoryTouched,
+                        isValid: controller.selectedCategory != null,
+                      ),
+                    ),
+                    PsFieldItem(
+                      child:
+                          /// 🔥 SUBCATEGORÍA
+                          PsDropdown(
+                            label: controller.subcategoriesLabel,
+                            items: controller.subcategories,
+                            value: controller.selectedSubcategory,
+                            getLabel: (e) => e.value,
+                            onChanged: controller.selectSubcategory,
+                            error: controller.subcategoryError,
+                            requiredField: true,
+                            isTouched: controller.subcategoryTouched,
+                            isValid: controller.selectedSubcategory != null,
+                          ),
+                    ),
+                  ],
+                ),
+
+                AppSpacing.spaceBetweenInputs,
+              ],
+            ),
+          ),
+          right: PsSectionCard(
+            title: controller.titleCardCostPricesProduct,
+            child: Column(
+              children: [
+                /// 🔥 PRECIO + COSTE
+                PsFieldRow(
+                  children: [
+                    PsFieldItem(
+                      flex: 1,
+                      child: PsDropdown<TaxCategoryModel>(
+                        label: controller.taxsLabel,
+                        items: listTaxCategory,
+                        value: controller.selectedTax,
+                        getLabel: (e) => '${e.name} (${e.description})',
+                        onChanged: controller.selectTax,
+                        error: controller.taxCategoryError,
+                        requiredField: true,
+                        isTouched: controller.taxTouched,
+                        isValid: controller.selectedTax != null,
+                      ),
+                    ),
+                  ],
+                ),
+                AppSpacing.spaceBetweenInputs,
+
+                PsFieldRow(
+                  children: [
+                    PsFieldItem(
+                      child: PsInput(
+                        value: controller.price.toString(),
+                        requiredField: true,
+                        label: controller.priceLabel,
+                        keyboardType: TextInputType.number,
+                        onChanged: controller.setPrice,
+                        error: controller.priceError,
+                        isTouched: controller.priceTouched,
+                        isValid: controller.priceError == null,
+                      ),
+                    ),
+                  ],
+                ),
+                AppSpacing.spaceBetweenInputs,
+
+                PsFieldRow(
+                  children: [
+                    PsFieldItem(
+                      child: PsInput(
+                        requiredField: true,
+                        value: controller.cost.toString(),
+                        label: controller.getLabelPriceName(),
+                        keyboardType: TextInputType.number,
+                        onChanged: controller.setCost,
+                        error: controller.costError,
+                        isTouched: controller.costTouched,
+                        isValid: controller.costError == null,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ),
+        AppSpacing.spaceBetweenSections,
+
+        PsSectionCard(
+          title: controller.titleCardInventoryInitProduct,
+          child: Column(
+            children: [
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsToggleSelector<MeasureType>(
+                      title: controller.sellTypeLabel,
+                      value: controller.sellType,
+                      items: MeasureType.values,
+                      onChanged: controller.setMeasureType,
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      requiredField: true,
+                      value: controller.stock.toString(),
+                      label: controller.stockLabel,
+                      keyboardType: TextInputType.number,
+                      onChanged: controller.setStock,
+                      isTouched: controller.stockTouched,
+                      error: controller.stockError,
+                      isValid: controller.stockError == null,
+                    ),
+                  ),
+                  PsFieldItem(
+                    child: _buildMeasureWidget(
+                      controller.sellType,
+                      listMeasureCategory,
+                      controller,
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      value: controller.lowStock.toString(),
+                      requiredField: true,
+                      label: controller.lowStockLabel,
+                      keyboardType: TextInputType.number,
+                      onChanged: controller.setLowStock,
+                      error: controller.lowStockError,
+                      isTouched: controller.lowStockTouched,
+                      isValid: controller.lowStockError == null,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        AppSpacing.spaceBetweenSections,
+
+        /// =========================
+        /// 📦 INVENTARIO
+        /// =========================
+      ],
+    );
+  }
+}
+
+Widget _buildProductBody(
+  BuildContext context,
+  ProductModalController controller,
+  CrudType typeManagement,
+  String title,
+  List<MeasureCategoryModel> listMeasureCategory,
+  List<TaxCategoryModel> listTaxCategory,
+) {
+  final recipeEnabled =
+      controller.inventoryType == InventoryType.processed ||
+      controller.inventoryType == InventoryType.forSale;
+
+  controller.setListMeasureCategory(listMeasureCategory);
+  return ProductTabsView(
+    controller: controller,
+    listMeasureCategory: listMeasureCategory,
+    listTaxCategory: listTaxCategory,
+  );
+}
+
+Widget _buildTabProduct(
+  BuildContext context,
+  ProductModalController controller,
+  List<MeasureCategoryModel> listMeasureCategory,
+  List<TaxCategoryModel> listTaxCategory,
+) {
+  return SingleChildScrollView(
+    child: ProductManagerFormWidget(
+      controller: controller,
+      listMeasureCategory: listMeasureCategory,
+      listTaxCategory: listTaxCategory,
+      buildContextParent: context,
     ),
   );
 }
@@ -405,103 +781,108 @@ Widget _buildTabRecipe(
   List<MeasureCategoryModel> listMeasureCategory,
 ) {
   final recipeEnabled =
-      controller.inventoryType == InventoryType.processed ||
-      controller.inventoryType == InventoryType.forSale;
-  return SingleChildScrollView(
-    child: PsSectionCard(
-      title: switch (controller.inventoryType) {
-        InventoryType.raw => 'Receta',
-        InventoryType.processed => 'Receta - Materias Primas',
-        InventoryType.forSale => 'Receta - Productos Procesados',
-      },
+      (controller.inventoryType == InventoryType.processed ||
+          controller.inventoryType == InventoryType.forSale) &&
+      controller.idManagementProduct > 0;
 
-      child: Column(
-        children: [
-          recipeEnabled
-              ? PsSectionCard(
-                  title: switch (controller.inventoryType) {
-                    InventoryType.raw => 'Receta ',
-                    InventoryType.processed => 'Receta',
-                    InventoryType.forSale => 'Receta',
-                  },
-                  child: Column(
-                    children: [
-                      AppSpacing.spaceBetweenSections,
-                      PsFieldRow(
-                        children: [
-                          /// 🔥 CATEGORÍA
-                          PsFieldItem(
-                            child: PsDropdown(
-                              label: switch (controller.inventoryType) {
-                                InventoryType.raw =>
-                                  'Receta - Ingrese Productos Materia Prima',
-                                InventoryType.processed => 'Materia Prima',
-                                InventoryType.forSale =>
-                                  ' Productos procesados',
-                              },
-                              items: controller.categories,
-                              value: controller.selectedCategory,
-                              getLabel: (e) => e.value,
-                              onChanged: controller.selectCategory,
-                              error: controller.categoryError,
-                              requiredField: true,
-                              isTouched: controller.categoryTouched,
-                              isValid: controller.selectedCategory != null,
+  return SingleChildScrollView(
+    child: controller.idManagementProduct > 0
+        ? PsSectionCard(
+            title: labelCardInformationProduct(controller),
+            child: Column(
+              children: [
+                recipeEnabled
+                    ? PsSectionCard(
+                        title: switch (controller.inventoryType) {
+                          InventoryType.raw => 'Receta ',
+                          InventoryType.processed => 'Receta',
+                          InventoryType.forSale => 'Receta',
+                        },
+                        child: Column(
+                          children: [
+                            AppSpacing.spaceBetweenSections,
+                            PsFieldRow(
+                              children: [
+                                /// 🔥 CATEGORÍA
+                                PsFieldItem(
+                                  child: PsDropdown(
+                                    label: switch (controller.inventoryType) {
+                                      InventoryType.raw => '',
+                                      InventoryType.processed =>
+                                        controller
+                                            .titleLabelProductProcessedRecipe,
+                                      InventoryType.forSale =>
+                                        controller
+                                            .titleLabelProductForSaleRecipe,
+                                    },
+                                    items: controller.categories,
+                                    value: controller.selectedCategory,
+                                    getLabel: (e) => e.value,
+                                    onChanged: controller.selectCategory,
+                                    error: controller.categoryError,
+                                    requiredField: true,
+                                    isTouched: controller.categoryTouched,
+                                    isValid:
+                                        controller.selectedCategory != null,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
-                      AppSpacing.spaceBetweenSections,
-                      PsFieldRow(
-                        children: [
-                          PsFieldItem(
-                            child: PsToggleSelector<MeasureType>(
-                              title: "Total de Tipos de Productos Agregados",
-                              value: controller.sellType,
-                              items: MeasureType.values,
-                              onChanged: controller.setMeasureType,
+                            AppSpacing.spaceBetweenSections,
+                            PsFieldRow(
+                              children: [
+                                PsFieldItem(
+                                  child: PsToggleSelector<MeasureType>(
+                                    title: controller.titleLabelTotalRecipe,
+                                    value: controller.sellType,
+                                    items: MeasureType.values,
+                                    onChanged: controller.setMeasureType,
+                                  ),
+                                ),
+                                PsFieldItem(
+                                  child: _buildMeasureWidget(
+                                    controller.sellType,
+                                    listMeasureCategory,
+                                    controller,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          PsFieldItem(
-                            child: _buildMeasureWidget(
-                              controller.sellType,
-                              listMeasureCategory,
-                              controller,
+                            AppSpacing.spaceBetweenSections,
+                            SizedBox(
+                              height: 400, // ajusta a tu necesidad
+                              child: ListView.separated(
+                                itemCount: controller.ingredients.length,
+                                separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 12),
+                                itemBuilder: (_, index) {
+                                  final e = controller.ingredients[index];
+                                  return PsIngredientCard(
+                                    item: e,
+                                    measureCategories: listMeasureCategory,
+                                    onQuantityChanged: (value) {
+                                      controller.updateIngredientQuantity(
+                                        e,
+                                        value,
+                                      );
+                                    },
+                                    onUnitChanged: (unit) {
+                                      controller.updateIngredientUnit(e, unit);
+                                    },
+                                    onEdit: () {},
+                                    onDelete: () {},
+                                  );
+                                },
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                      AppSpacing.spaceBetweenSections,
-                      SizedBox(
-                        height: 400, // ajusta a tu necesidad
-                        child: ListView.separated(
-                          itemCount: controller.ingredients.length,
-                          separatorBuilder: (_, __) =>
-                              const SizedBox(height: 12),
-                          itemBuilder: (_, index) {
-                            final e = controller.ingredients[index];
-                            return PsIngredientCard(
-                              item: e,
-                              measureCategories: listMeasureCategory,
-                              onQuantityChanged: (value) {
-                                controller.updateIngredientQuantity(e, value);
-                              },
-                              onUnitChanged: (unit) {
-                                controller.updateIngredientUnit(e, unit);
-                              },
-                              onEdit: () {},
-                              onDelete: () {},
-                            );
-                          },
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
-                )
-              : SizedBox.shrink(),
-        ],
-      ),
-    ),
+                      )
+                    : SizedBox.shrink(),
+              ],
+            ),
+          )
+        : Text(controller.inventoryType == InventoryType.processed?'No ha registrado el Producto Procesado':(controller.inventoryType == InventoryType.forSale?'No ha registrado el Menu':'') ),
   );
 }
 

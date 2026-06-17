@@ -43,15 +43,10 @@ class PsModalLayout extends StatelessWidget {
             ),
           ],
         ),
-
-
-
         Expanded(
             child: body,
         ),
-
         AppSpacing.spaceBetweenSections,
-
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [

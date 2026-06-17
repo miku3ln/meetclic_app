@@ -8,12 +8,15 @@ import '../../../models/product_draft.dart';
 import '../../../state/product_modal_controller.dart';
 import '../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../organisms/items/pos_items_content.dart';
+
 class PosItemsManagementSection extends StatefulWidget {
   const PosItemsManagementSection({super.key});
+
   @override
   State<PosItemsManagementSection> createState() =>
       _PosItemsManagementSectionState();
 }
+
 class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   final ScrollController _scrollController = ScrollController();
   bool _isOpeningProduct = false;
@@ -26,10 +29,14 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   bool _isLoading = false;
   bool _hasInitialLoadFinished = false;
   String _searchCode = '';
+
   bool get _hasData => _items.isNotEmpty;
+
   bool get _hasMore => _items.length < _total;
+
   /// aquí decides el total simulado
   int _simulatedTotal = 592;
+
   @override
   void initState() {
     super.initState();
@@ -37,6 +44,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     _loadInitial();
     _scrollController.addListener(_onScroll);
   }
+
   @override
   void dispose() {
     _scrollController.dispose();
@@ -53,7 +61,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     final response = await _api.fetchPage(
       current: _currentPage,
       rowCount: _rowCount,
-      searchPhrase: _searchCode
+      searchPhrase: _searchCode,
     );
 
     if (!mounted) return;
@@ -111,9 +119,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     }
   }
 
-  Future<void> _onTapItem(
-      GenericListItem<Map<String, dynamic>> item,
-      ) async {
+  Future<void> _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
     if (item.data == null) return;
 
     setState(() {
@@ -122,21 +128,12 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
     try {
       final controller = ProductModalController();
-
       await controller.init();
-
       final draft = ProductMapper.fromMap(item.data!);
-
       controller.loadAndValidate(draft);
-
-      final catalogMeasureData =
-      await PosMockData.getCatalogMeasureData();
-
-      final catalogTaxData =
-      await PosMockData.getCatalogTaxData();
-
+      final catalogMeasureData = await PosMockData.getCatalogMeasureData();
+      final catalogTaxData = await PosMockData.getCatalogTaxData();
       if (!mounted) return;
-
       await showManagerProduct(
         context: context,
         btnSaveTitle: "Actualizar",
@@ -147,6 +144,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
         typeManagement: CrudType.update,
         listMeasureCategory: catalogMeasureData,
         listTaxCategory: catalogTaxData,
+        productId: 8,
       );
     } finally {
       if (mounted) {
@@ -156,7 +154,9 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       }
     }
   }
+
   final controller = ProductModalController();
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -166,9 +166,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           child: Stack(
             children: [
               if (!_hasInitialLoadFinished && _isLoading)
-                const Center(
-                  child: CircularProgressIndicator(),
-                )
+                const Center(child: CircularProgressIndicator())
               else if (!_hasData)
                 RefreshIndicator(
                   onRefresh: _refreshAll,
@@ -204,13 +202,12 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                       await controller.init();
 
                       final catalogMeasureData =
-                      await PosMockData.getCatalogMeasureData();
+                          await PosMockData.getCatalogMeasureData();
 
                       final catalogTaxData =
-                      await PosMockData.getCatalogTaxData();
+                          await PosMockData.getCatalogTaxData();
 
                       if (!mounted) return;
-
                       await showManagerProduct(
                         barrierDismissible: false,
                         context: context,
@@ -241,9 +238,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           Positioned.fill(
             child: Container(
               color: Colors.black.withOpacity(0.25),
-              child: const Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: const Center(child: CircularProgressIndicator()),
             ),
           ),
       ],
@@ -261,18 +256,13 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           if (index >= _items.length) {
             return const Padding(
               padding: EdgeInsets.zero,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             );
           }
 
           final item = _items[index];
 
-          return ProductListCard(
-            item: item,
-            onTap: () => _onTapItem(item),
-          );
+          return ProductListCard(item: item, onTap: () => _onTapItem(item));
         },
       ),
     );
@@ -280,6 +270,3 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 }
 
 enum ProductViewMode { dialog, page }
-
-
-

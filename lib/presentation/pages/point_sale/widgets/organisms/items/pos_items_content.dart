@@ -170,13 +170,15 @@ class PosTicketManagementApi {
     String? searchCode,
     DateTime? date,
   }) {
+    final businessId = SessionService().businessId;
+
     return api.fetchPage<Map<String, dynamic>>(
       endpoint: 'pointsales/tickets-sales',
       queryParams: {
         'current': '$current',
         'rowCount': '$rowCount',
         'searchPhrase': '',
-        'business_id': '1',
+        'business_id':businessId!,
       },
       totalKey: 'total',
       rowsKey: 'rows',

@@ -41,7 +41,7 @@ enum MeasureType  implements ToggleOptionItem{
 
 enum InventoryType implements ToggleOptionItem{
   raw('Materia prima', Icons.inventory_outlined,'RAW'),
-  processed('Producto elaborado', Icons.restaurant_outlined,'PROCESSED'),
+  processed('Elaborado', Icons.restaurant_outlined,'PROCESSED'),
   forSale('Menu', Icons.point_of_sale_outlined,'FOR_SALE');
   const InventoryType(this.value, this.icon,this.id);
 

@@ -15,29 +15,212 @@ import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 
-class ProductModalController extends ChangeNotifier {
+class FieldState<T> {
+  T? value;
+  bool touched;
+  String? error;
+  final String label;
+
+  FieldState({
+    required this.label,
+    this.value,
+    this.touched = false,
+    this.error,
+  });
+
+  bool get isValid => error == null;
+}
+
+class FormFieldController<T> extends ChangeNotifier {
+  T? value;
+  bool touched = false;
+  String? error;
+
+  final String label;
+  final List<Validator<T?>> validators;
+
+  FormFieldController({
+    required this.label,
+    this.value,
+    this.validators = const [],
+  });
+
+  void setValue(T? newValue) {
+    value = newValue;
+    touched = true;
+    validate();
+    notifyListeners();
+  }
+
+  bool validate() {
+    error = ValidatorsUtil.validate<T?>(value, validators);
+
+    return error == null;
+  }
+
+  bool get isValid => error == null;
+}
+
+abstract class BaseFormController extends ChangeNotifier {
+  final Map<String, dynamic> fields = {};
+
+  bool validate() {
+    bool valid = true;
+
+    for (final field in fields.values) {
+      if (field is FormFieldController) {
+        valid = field.validate() && valid;
+      }
+    }
+
+    notifyListeners();
+
+    return valid;
+  }
+
+  bool get isValid {
+    return fields.values.every(
+      (field) => field is FormFieldController ? field.error == null : true,
+    );
+  }
+
+  T field<T>(String key) {
+    return fields[key] as T;
+  }
+}
+
+class ProductModalController extends BaseFormController {
+  ProductModalController() {
+    fields.addAll({
+      'name': FormFieldController<String>(
+        label: 'Nombre',
+        validators: [
+          ValidatorsUtil.required("Nombre"),
+          ValidatorsUtil.minLength(3),
+        ],
+      ),
+
+      'description': FormFieldController<String>(
+        label: 'Descripcion',
+        validators: [
+          ValidatorsUtil.required("Descripcion"),
+          ValidatorsUtil.minLength(3),
+        ],
+      ),
+
+      'codeBar': FormFieldController<String>(
+        label: 'Codigo',
+        validators: [
+          ValidatorsUtil.required("Código"),
+          ValidatorsUtil.alphanumeric(),
+        ],
+      ),
+
+      'price': FormFieldController<double>(
+        label: 'Precio Venta',
+        validators: [ValidatorsUtil.positiveDouble("Precio")],
+      ),
+
+      'cost': FormFieldController<double>(
+        label: 'Costo',
+        validators: [ValidatorsUtil.nonNegativeDouble("Costo")],
+      ),
+
+      'stock': FormFieldController<double>(
+        label: 'Stock',
+        validators: [ValidatorsUtil.nonNegativeDouble("Stock")],
+      ),
+
+      'lowStock': FormFieldController<double>(
+        label: 'Stock Minimo',
+        validators: [ValidatorsUtil.nonNegativeDouble("Stock mínimo")],
+      ),
+    });
+  }
+
+  FormFieldController<String> get nameField =>
+      field<FormFieldController<String>>('name');
+
+  FormFieldController<String> get descriptionField =>
+      field<FormFieldController<String>>('description');
+
+  FormFieldController<String> get codeBarField =>
+      field<FormFieldController<String>>('codeBar');
+
+  FormFieldController<double> get priceField =>
+      field<FormFieldController<double>>('price');
+
+  FormFieldController<double> get costField =>
+      field<FormFieldController<double>>('cost');
+
+  FormFieldController<double> get stockField =>
+      field<FormFieldController<double>>('stock');
+
+  FormFieldController<double> get lowStockField =>
+      field<FormFieldController<double>>('lowStock');
+
+  String get name => nameField.value ?? '';
+
+  String? get description => descriptionField.value;
+
+  String? get codeBar => codeBarField.value;
+
+  double? get price => priceField.value;
+
+  double? get cost => costField.value;
+
+  double? get stock => stockField.value;
+
+  double? get lowStock => lowStockField.value;
+
+  String? get nameError => nameField.error;
+
+  String? get descriptionError => descriptionField.error;
+
+  String? get codeBarError => codeBarField.error;
+
+  String? get priceError => priceField.error;
+
+  String? get costError => costField.error;
+
+  String? get stockError => stockField.error;
+
+  String? get lowStockError => lowStockField.error;
+
+  bool get nameTouched => nameField.touched;
+
+  bool get descriptionTouched => descriptionField.touched;
+
+  bool get codeBarTouched => codeBarField.touched;
+
+  bool get priceTouched => priceField.touched;
+
+  bool get costTouched => costField.touched;
+
+  bool get stockTouched => stockField.touched;
+
+  bool get lowStockTouched => lowStockField.touched;
+
   /// =========================
   /// 🧾 DATA
   /// =========================
-  String name = "";
-  double? price = 0;
-  double? cost = 0;
-  double? stock = 0;
-  double? lowStock = 0;
 
-  String? ref;
-  String? codeBar;
+  String priceLabel = 'Precio Venta';
+  String costLabel = 'Precio Compra';
+  String costProductionLabel = 'Precio Costo';
+  String stockLabel = 'Stock';
+  String lowStockLabel = 'Stock Minimo';
+  String descriptionLabel = 'Descripcion';
+  String codeBarLabel = 'Codigo';
+  String categoriesLabel = 'Categoria';
+  String subcategoriesLabel = 'Subcategoria';
+  String taxsLabel = 'Impuesto';
+  String imageLabel = 'Imagen';
+  String sellTypeLabel = 'Tipos de Medida';
 
   /// =========================
   /// 👆 TOUCHED
   /// =========================
-  bool nameTouched = false;
-  bool priceTouched = false;
-  bool costTouched = false;
-  bool stockTouched = false;
-  bool lowStockTouched = false;
-  bool refTouched = false;
-  bool codeBarTouched = false;
   bool imageTouched = false;
   bool categoryTouched = false;
   bool subcategoryTouched = false;
@@ -47,18 +230,11 @@ class ProductModalController extends ChangeNotifier {
   /// =========================
   /// ⚠️ ERRORS
   /// =========================
-  String? nameError;
-  String? priceError;
-  String? costError;
-  String? stockError;
-  String? lowStockError;
-  String? refError;
-  String? codeBarError;
+
   String? categoryError;
   String? subcategoryError;
   String? measureCategoryError;
   String? taxCategoryError;
-
   String? imageError;
 
   /// =========================
@@ -93,14 +269,7 @@ class ProductModalController extends ChangeNotifier {
   /// =========================
 
   void setName(String value) {
-    name = value;
-    nameTouched = true;
-
-    nameError = ValidatorsUtil.validate(value, [
-      ValidatorsUtil.required("Nombre"),
-      ValidatorsUtil.minLength(3),
-    ]);
-
+    nameField.setValue(value);
     notifyListeners();
   }
 
@@ -140,93 +309,35 @@ class ProductModalController extends ChangeNotifier {
   ];
 
   void setPrice(String value) {
-    priceTouched = true;
-    price = 0;
-    priceError = ValidatorsUtil.validate(value, [
-      ValidatorsUtil.required("Precio"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.positive(),
-    ]);
-
-    if (value == '') {
-      price = null;
-    } else {
-      price = double.tryParse(value);
-    }
+    priceField.setValue(value.isEmpty ? null : double.tryParse(value));
     notifyListeners();
   }
 
   void setCost(String value) {
-    costTouched = true;
-    costError = ValidatorsUtil.validate(value, [
-      ValidatorsUtil.required("Coste"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.nonNegative(),
-    ]);
-    if (value == '') {
-      cost = null;
-    } else {
-      cost = double.tryParse(value);
-    }
+    costField.setValue(value.isEmpty ? null : double.tryParse(value));
+
     notifyListeners();
   }
 
   void setStock(String value) {
-    stockTouched = true;
+    stockField.setValue(value.isEmpty ? null : double.tryParse(value));
 
-    stockError = ValidatorsUtil.validate(value, [
-      ValidatorsUtil.required("Stock"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.nonNegative(),
-    ]);
-    if (value == '') {
-      stock = null;
-    } else {
-      stock = double.tryParse(value);
-    }
     notifyListeners();
   }
 
   void setLowStock(String value) {
-    lowStockTouched = true;
-    if (value == '') {
-      lowStock = null;
-    } else {
-      lowStock = double.tryParse(value);
-    }
-    lowStockError = ValidatorsUtil.validate(value, [
-      ValidatorsUtil.required("Stock mínimo"),
-      ValidatorsUtil.number(),
-      ValidatorsUtil.nonNegative(),
-    ]);
+    lowStockField.setValue(value.isEmpty ? null : double.tryParse(value));
 
     notifyListeners();
   }
 
-  void setRef(String value) {
-    refTouched = true;
-
-    refError = ValidatorsUtil.validate(value, [
-      ValidatorsUtil.required("REF"),
-      ValidatorsUtil.alphanumeric(),
-      ValidatorsUtil.minLength(3),
-    ]);
-
-    ref = refError == null ? value : null;
-
+  void setDescription(String value) {
+    descriptionField.setValue(value);
     notifyListeners();
   }
 
   void setCodeBar(String value) {
-    codeBarTouched = true;
-
-    codeBarError = ValidatorsUtil.validate(value, [
-      ValidatorsUtil.required("Código"),
-      ValidatorsUtil.alphanumeric(),
-    ]);
-
-    codeBar = codeBarError == null ? value : null;
-
+    codeBarField.setValue(value);
     notifyListeners();
   }
 
@@ -300,113 +411,53 @@ class ProductModalController extends ChangeNotifier {
   /// =========================
   bool submitted = false;
 
-  ValidationResult validate() {
+  ValidationResult validateForm() {
     submitted = true;
+    super.validate();
+    categoryError = selectedCategory == null
+        ? "Selecciona una categoría"
+        : null;
 
-    /// =========================
-    /// 🧠 NORMALIZADOR (FIX NULL)
-    /// =========================
-    String normalize(num? value) => value == null ? "" : value.toString();
+    subcategoryError = selectedSubcategory == null
+        ? "Selecciona una subcategoría"
+        : null;
 
-    /// =========================
-    /// 📦 MAP DE ERRORES
-    /// =========================
-    final errors = <String, String?>{
-      /// TEXTOS
-      'name': ValidatorsUtil.validate(name, [
-        ValidatorsUtil.required("Nombre"),
-      ]),
-
-      'ref': ValidatorsUtil.validate(ref, [
-        ValidatorsUtil.required("REF"),
-        ValidatorsUtil.alphanumeric(),
-      ]),
-
-      'codeBar': ValidatorsUtil.validate(codeBar, [
-        ValidatorsUtil.required("Código"),
-        ValidatorsUtil.alphanumeric(),
-      ]),
-
-      /// NUMÉRICOS
-      'price': ValidatorsUtil.validate(normalize(price), [
-        ValidatorsUtil.required("Precio"),
-        ValidatorsUtil.number(),
-        ValidatorsUtil.positive(),
-      ]),
-
-      'cost': ValidatorsUtil.validate(normalize(cost), [
-        ValidatorsUtil.required("Coste"),
-        ValidatorsUtil.number(),
-        ValidatorsUtil.nonNegative(),
-      ]),
-
-      'stock': ValidatorsUtil.validate(normalize(stock), [
-        ValidatorsUtil.required("Stock"),
-        ValidatorsUtil.number(),
-        ValidatorsUtil.nonNegative(),
-      ]),
-
-      'lowStock': ValidatorsUtil.validate(normalize(lowStock), [
-        ValidatorsUtil.required("Stock mínimo"),
-        ValidatorsUtil.number(),
-        ValidatorsUtil.nonNegative(),
-      ]),
-
-      /// RELACIONES
-      'category': selectedCategory == null ? "Selecciona una categoría" : null,
-
-      'subcategory': selectedSubcategory == null
-          ? "Selecciona una subcategoría"
-          : null,
-
-      'image': image == null ? "Imagen requerida" : null,
+    imageError = image == null ? "Imagen requerida" : null;
+    final errors = {
+      'name': nameError,
+      'price': priceError,
+      'cost': costError,
+      'stock': stockError,
+      'lowStock': lowStockError,
+      'description': descriptionError,
+      'codeBar': codeBarError,
+      'category': categoryError,
+      'subcategory': subcategoryError,
+      'image': imageError,
     };
-
-    /// =========================
-    /// 🔥 ASIGNAR A VARIABLES (CLAVE)
-    /// =========================
-    nameError = errors['name'];
-    priceError = errors['price'];
-    costError = errors['cost'];
-    stockError = errors['stock'];
-    lowStockError = errors['lowStock'];
-    refError = errors['ref'];
-    codeBarError = errors['codeBar'];
-    categoryError = errors['category'];
-    subcategoryError = errors['subcategory'];
-    imageError = errors['image'];
-
-    /// =========================
-    /// ✅ RESULTADO FINAL
-    /// =========================
     final hasErrors = errors.values.any((e) => e != null);
     notifyListeners();
     return ValidationResult(
       success: !hasErrors,
       errors: errors,
-      message: hasErrors
-          ? "Formulario inválido, revisa los campos"
-          : "Formulario válido",
+      message: hasErrors ? "Formulario inválido" : "Formulario válido",
     );
   }
-
   CrudType mode = CrudType.create;
-
   /// =========================
   /// 🧠 FORM STATE
   /// =========================
   bool get canSubmit {
     if (mode == CrudType.update) {
-      return validate().success;
+      return validateForm().success;
     }
-
     return isFormValid &&
         nameTouched &&
         priceTouched &&
         costTouched &&
         stockTouched &&
         lowStockTouched &&
-        refTouched &&
+        descriptionTouched &&
         codeBarTouched &&
         imageTouched &&
         categoryTouched &&
@@ -420,12 +471,122 @@ class ProductModalController extends ChangeNotifier {
       costError,
       stockError,
       lowStockError,
-      refError,
+      descriptionError,
       codeBarError,
       categoryError,
       subcategoryError,
       imageError,
     ].every((e) => e == null);
+  }
+  Future<void> loadProduct({
+    required ProductDraft draft,
+    int? productId,
+  }) async {
+    mode = productId == null
+        ? CrudType.create
+        : CrudType.update;
+
+    idManagementProduct = productId ?? -1;
+
+    /// =========================
+    /// FORM FIELDS
+    /// =========================
+
+    nameField.value = draft.name;
+    descriptionField.value = draft.description;
+    codeBarField.value = draft.barcode;
+
+    priceField.value = draft.price;
+    costField.value = draft.cost;
+    stockField.value = draft.stock;
+    lowStockField.value = draft.lowStock;
+
+    /// =========================
+    /// CATEGORY
+    /// =========================
+
+    if (draft.category.id > 0) {
+      selectedCategory = categories.firstWhere(
+            (e) => e.id == draft.category.id,
+        orElse: ProductCategory.empty,
+      );
+
+      subcategories = await _service.getSubcategories(
+        selectedCategory!.id,
+      );
+
+      if (draft.subcategory.id > 0) {
+        selectedSubcategory = subcategories.firstWhere(
+              (e) => e.id == draft.subcategory.id,
+          orElse: ProductSubcategory.empty,
+        );
+      }
+    }
+
+    /// =========================
+    /// IMAGE
+    /// =========================
+
+    image = draft.image;
+
+    /// =========================
+    /// CONFIG
+    /// =========================
+
+    sellType = draft.sellType;
+
+    if (draft.selectedUnitMeasure != null) {
+      selectedUnitMeasure = draft.selectedUnitMeasure;
+    }
+
+    if (draft.tax != null) {
+      selectedTax = draft.tax;
+    }
+
+    if (draft.inventoryType != null) {
+      inventoryType = draft.inventoryType!;
+    }
+
+    /// =========================
+    /// RESET STATE
+    /// =========================
+
+    _resetTouched();
+    _resetErrors();
+
+    notifyListeners();
+  }
+  CrudType typeManagementProduct = CrudType.create;
+  int idManagementProduct = -1;
+  String titleManagement = "";
+
+  void setManagerInitProduct(CrudType typeManagement, int productId) {
+    typeManagementProduct = typeManagement;
+    idManagementProduct = productId;
+    if (typeManagement == CrudType.create) {
+      titleManagement = "Crear Producto";
+    } else {
+      titleManagement = "Actualizar Producto";
+    }
+    notifyListeners();
+  }
+
+  String getLabelPriceName() {
+    if (InventoryType.raw == inventoryType) {
+      return costLabel;
+    } else if (InventoryType.processed == inventoryType) {
+      return costProductionLabel;
+    }
+    return costProductionLabel + "d";
+  }
+
+  bool allowCloseModalBySave() {
+    if (InventoryType.raw == inventoryType) {
+      return true;
+    } else if (InventoryType.processed == inventoryType) {
+      return false;
+    }
+    return false;
   }
 
   MeasureType sellType = MeasureType.unit;
@@ -438,7 +599,17 @@ class ProductModalController extends ChangeNotifier {
   }
 
   InventoryType inventoryType = InventoryType.raw;
+  String inventoryTypeLabel = 'Tipo de Producto';
+  String nameLabel = 'Nombre';
 
+  String titleCardInformationProduct = 'Informacion General';
+  String titleCardCostPricesProduct = 'Costos y Precios';
+  String titleCardInventoryInitProduct = 'Inventario Inicial';
+  String titleCardProcessedProductRecipe = 'Receta - Materias Primas';
+  String titleCardForSaleProductRecipe = 'Receta - Productos Procesados';
+  String titleLabelProductProcessedRecipe = 'Materia Prima';
+  String titleLabelProductForSaleRecipe = 'Productos Procesados';
+  String titleLabelTotalRecipe = 'Total de Tipos de Productos Agregados';
 
   void setInventoryType(InventoryType type) {
     inventoryType = type;
@@ -460,15 +631,14 @@ class ProductModalController extends ChangeNotifier {
     /// =========================
     /// 🧾 DATA
     /// =========================
-    name = draft.name;
-    price = draft.price;
-    cost = draft.cost;
-    stock = draft.stock;
-    lowStock = draft.lowStock;
-
-    ref = draft.code;
-    codeBar = draft.barcode;
-
+    nameField.value = draft.name;
+    priceField.value = draft.price;
+    costField.value = draft.cost;
+    stockField.value = draft.stock;
+    lowStockField.value = draft.lowStock;
+    descriptionField.value = draft.description;
+    codeBarField.value = draft.barcode;
+    inventoryType=draft.inventoryType;
     if (draft.category.id > 0) {
       selectedCategory = categories.firstWhere(
         (c) => c.id == draft.category.id,
@@ -489,13 +659,7 @@ class ProductModalController extends ChangeNotifier {
     /// =========================
     /// ⚠️ RESET TOUCH
     /// =========================
-    nameTouched = false;
-    priceTouched = false;
-    costTouched = false;
-    stockTouched = false;
-    lowStockTouched = false;
-    refTouched = false;
-    codeBarTouched = false;
+
     imageTouched = false;
     categoryTouched = false;
     subcategoryTouched = false;
@@ -503,13 +667,7 @@ class ProductModalController extends ChangeNotifier {
     /// =========================
     /// ❌ RESET ERRORES
     /// =========================
-    nameError = null;
-    priceError = null;
-    costError = null;
-    stockError = null;
-    lowStockError = null;
-    refError = null;
-    codeBarError = null;
+
     categoryError = null;
     subcategoryError = null;
     imageError = null;
@@ -522,12 +680,12 @@ class ProductModalController extends ChangeNotifier {
   /// 💾 SAVE
   /// =========================
 
-  Future<ApiResponse<Map<String, dynamic>>> save(CrudType type) async {
-    if (!validate().success) {
+  Future<ApiResponse<Map<String, dynamic>>> saveProduct(CrudType type) async {
+    if (!validateForm().success) {
       throw Exception("Formulario inválido");
     }
     var payload = buildPayload();
-    if(type==CrudType.create){
+    if (type == CrudType.create) {
       final response = await ProductDataUtil.createProduct(payload);
       return response;
     }
@@ -536,26 +694,26 @@ class ProductModalController extends ChangeNotifier {
   }
 
   void _resetTouched() {
-    nameTouched = false;
-    priceTouched = false;
-    costTouched = false;
-    stockTouched = false;
-    lowStockTouched = false;
-    refTouched = false;
-    codeBarTouched = false;
+    nameField.touched = false;
+    priceField.touched = false;
+    costField.touched = false;
+    stockField.touched = false;
+    lowStockField.touched = false;
+    descriptionField.touched = false;
+    codeBarField.touched = false;
     imageTouched = false;
     categoryTouched = false;
     subcategoryTouched = false;
   }
 
   void _resetErrors() {
-    nameError = null;
-    priceError = null;
-    costError = null;
-    stockError = null;
-    lowStockError = null;
-    refError = null;
-    codeBarError = null;
+    nameField.error = null;
+    priceField.error = null;
+    costField.error = null;
+    stockField.error = null;
+    lowStockField.error = null;
+    descriptionField.error = null;
+    codeBarField.error = null;
     categoryError = null;
     subcategoryError = null;
     imageError = null;
@@ -564,12 +722,12 @@ class ProductModalController extends ChangeNotifier {
   Map<String, dynamic> buildPayload() {
     switch (inventoryType) {
       case InventoryType.raw:
-        return _buildRawPayload();
+        return _buildBasePayload();
       case InventoryType.processed:
-        return _buildProcessedPayload();
+        return _buildBasePayload();
 
       case InventoryType.forSale:
-        return _buildForSalePayload();
+        return _buildBasePayload();
     }
   }
 
@@ -618,8 +776,8 @@ class ProductModalController extends ChangeNotifier {
       'quantity_input': stock,
       'unit_input_id': unit_input_id,
       'conversion_factor': conversionFactor,
-      'reference_type': 'INVENTARIO_INICIAL',
-      'reference_id': null,
+      'descriptionerence_type': 'INVENTARIO_INICIAL',
+      'descriptionerence_id': null,
       'description': 'Carga inicial',
     };
   }
@@ -629,12 +787,11 @@ class ProductModalController extends ChangeNotifier {
     notifyListeners();
   }
 
-  Map<String, dynamic> _buildRawPayload() {
+  Map<String, dynamic> _buildBasePayload() {
     final businessId = SessionService().businessId;
     final currentSession = SessionService().currentSession;
     final user_id = currentSession?.userId;
     final hasTax = selectedTax!.taxPercentage > 0.0;
-
     final measureData = buildInitialInventoryMeasure(
       measureType: sellType,
       stock: stock!,
@@ -647,16 +804,16 @@ class ProductModalController extends ChangeNotifier {
         'code': codeBar,
         'name': name,
         'product_type': 'MEASURABLE',
-        'inventory_type': 'RAW',
+        'inventory_type': inventoryType.id,
         'state': 'ACTIVE',
         'product_trademark_id': 1,
         'product_category_id': selectedCategory?.id,
         'product_subcategory_id': selectedSubcategory?.id,
         'source': '',
-        'description': ref,
+        'description': description,
         'code_provider': codeBar,
         'code_product': codeBar,
-        'has_tax': hasTax?1:0,
+        'has_tax': hasTax ? 1 : 0,
         'is_service': 0,
         'user_id': user_id,
         'product_measure_type_id': product_measure_type_id,
@@ -678,14 +835,12 @@ class ProductModalController extends ChangeNotifier {
         'sale_price3': price,
         'sale_price4': price,
       },
-
       'product_sell_config': {
         'allow_pos': 1,
         'allow_shop': 1,
         'allow_delivery': 0,
         'visible': 1,
       },
-
       'inventory_movement': {
         //MANAGEMENT MEASURE CONFIG
         'quantity': measureData["quantity"],
@@ -693,46 +848,10 @@ class ProductModalController extends ChangeNotifier {
         'quantity_input': measureData["quantity_input"],
         'unit_input_id': measureData["unit_input_id"],
         'conversion_factor': measureData["conversion_factor"],
-        'reference_type': measureData["reference_type"],
-        'reference_id': measureData["reference_id"],
+        'descriptionerence_type': measureData["descriptionerence_type"],
+        'descriptionerence_id': measureData["descriptionerence_id"],
         'description': measureData["description"],
       },
-    };
-  }
-
-  Map<String, dynamic> _buildProcessedPayload() {
-    return {
-      ..._buildRawPayload(),
-
-      'recipe': {'name': name, 'yield_quantity': stock},
-
-      'recipe_detail': ingredients
-          .map(
-            (e) => {
-              'product_id': e.name, //ID TODO PRODUCT
-              'quantity': e.quantity,
-              'unit_measure_id': e.selectedUnit?.id,
-            },
-          )
-          .toList(),
-    };
-  }
-
-  Map<String, dynamic> _buildForSalePayload() {
-    return {
-      ..._buildRawPayload(),
-
-      'recipe': {'name': name, 'yield_quantity': stock},
-
-      'recipe_detail': ingredients
-          .map(
-            (e) => {
-              'product_id': e.name, //ID TODO PRODUCT
-              'quantity': e.quantity,
-              'unit_measure_id': e.selectedUnit?.id,
-            },
-          )
-          .toList(),
     };
   }
 }

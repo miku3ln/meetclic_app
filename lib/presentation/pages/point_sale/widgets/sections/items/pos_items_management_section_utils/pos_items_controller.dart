@@ -155,7 +155,7 @@ class ProductListCard extends StatelessWidget {
                       const SizedBox(height: 4),
 
                       Text(
-                        "ID-${item.id}",
+                        "${data['code']}",
                         style: TextStyle(
                           fontSize: 13,
                           color: colors.textSecondary,
