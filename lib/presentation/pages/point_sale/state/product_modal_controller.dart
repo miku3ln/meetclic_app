@@ -2,7 +2,6 @@ import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/models/product_management_measure.dart';
-
 import '../../../../domain/services/session_service.dart';
 import '../../../../shared/models/api_response.dart';
 import '../../../../shared/utils/validators/validators.dart';
@@ -14,80 +13,7 @@ import '../services/product_catalog_service.dart';
 import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
-
-class FieldState<T> {
-  T? value;
-  bool touched;
-  String? error;
-  final String label;
-
-  FieldState({
-    required this.label,
-    this.value,
-    this.touched = false,
-    this.error,
-  });
-
-  bool get isValid => error == null;
-}
-
-class FormFieldController<T> extends ChangeNotifier {
-  T? value;
-  bool touched = false;
-  String? error;
-
-  final String label;
-  final List<Validator<T?>> validators;
-
-  FormFieldController({
-    required this.label,
-    this.value,
-    this.validators = const [],
-  });
-
-  void setValue(T? newValue) {
-    value = newValue;
-    touched = true;
-    validate();
-    notifyListeners();
-  }
-
-  bool validate() {
-    error = ValidatorsUtil.validate<T?>(value, validators);
-
-    return error == null;
-  }
-
-  bool get isValid => error == null;
-}
-
-abstract class BaseFormController extends ChangeNotifier {
-  final Map<String, dynamic> fields = {};
-
-  bool validate() {
-    bool valid = true;
-
-    for (final field in fields.values) {
-      if (field is FormFieldController) {
-        valid = field.validate() && valid;
-      }
-    }
-
-    notifyListeners();
-
-    return valid;
-  }
-
-  bool get isValid {
-    return fields.values.every(
-      (field) => field is FormFieldController ? field.error == null : true,
-    );
-  }
-
-  T field<T>(String key) {
-    return fields[key] as T;
-  }
-}
+import 'dart:convert';
 
 class ProductModalController extends BaseFormController {
   ProductModalController() {
@@ -99,7 +25,6 @@ class ProductModalController extends BaseFormController {
           ValidatorsUtil.minLength(3),
         ],
       ),
-
       'description': FormFieldController<String>(
         label: 'Descripcion',
         validators: [
@@ -274,40 +199,28 @@ class ProductModalController extends BaseFormController {
   }
 
   void updateIngredientQuantity(RecipeIngredientItem item, String value) {
-    item.quantity = double.tryParse(value) ?? 0;
-
+    item.quantityInput = double.tryParse(value) ?? 0;
     notifyListeners();
   }
 
-  void updateIngredientUnit(RecipeIngredientItem item, UnitMeasureModel? unit) {
-    item.selectedUnit = unit;
+  void updateIngredientUnit(
+      RecipeIngredientItem item,
+      UnitMeasureModel? unit,
+      ) {
+
+    if (unit == null) return;
+
+    item.inputUnit = unit;
+
+    item.unitInputId = unit.id;
+
+    item.conversionFactor = unit.factorToBase;
+
+    item.quantityBase =
+        item.quantityInput * unit.factorToBase;
 
     notifyListeners();
   }
-
-  final List<RecipeIngredientItem> ingredients = [
-    RecipeIngredientItem(
-      name: 'Arroz',
-      measureType: MeasureType.mass,
-      quantity: 350,
-    ),
-    RecipeIngredientItem(
-      name: 'Papa',
-      measureType: MeasureType.mass,
-      quantity: 75,
-    ),
-    RecipeIngredientItem(
-      name: 'Pollo',
-      measureType: MeasureType.unit,
-      quantity: 1,
-    ),
-    RecipeIngredientItem(
-      name: 'Chorizo',
-      measureType: MeasureType.unit,
-      quantity: 1,
-    ),
-  ];
-
   void setPrice(String value) {
     priceField.setValue(value.isEmpty ? null : double.tryParse(value));
     notifyListeners();
@@ -315,19 +228,16 @@ class ProductModalController extends BaseFormController {
 
   void setCost(String value) {
     costField.setValue(value.isEmpty ? null : double.tryParse(value));
-
     notifyListeners();
   }
 
   void setStock(String value) {
     stockField.setValue(value.isEmpty ? null : double.tryParse(value));
-
     notifyListeners();
   }
 
   void setLowStock(String value) {
     lowStockField.setValue(value.isEmpty ? null : double.tryParse(value));
-
     notifyListeners();
   }
 
@@ -384,14 +294,12 @@ class ProductModalController extends BaseFormController {
     taxTouched = true;
     selectedTax = selectData;
     taxCategoryError = selectData == null ? "Selecciona Iva" : null;
-
     notifyListeners();
   }
 
   /// =========================
   /// 🖼 IMAGE
   /// =========================
-
   void setImage(File file) {
     image = file;
     imageTouched = true;
@@ -443,7 +351,9 @@ class ProductModalController extends BaseFormController {
       message: hasErrors ? "Formulario inválido" : "Formulario válido",
     );
   }
+
   CrudType mode = CrudType.create;
+
   /// =========================
   /// 🧠 FORM STATE
   /// =========================
@@ -478,88 +388,194 @@ class ProductModalController extends BaseFormController {
       imageError,
     ].every((e) => e == null);
   }
-  Future<void> loadProduct({
-    required ProductDraft draft,
-    int? productId,
-  }) async {
-    mode = productId == null
-        ? CrudType.create
-        : CrudType.update;
 
-    idManagementProduct = productId ?? -1;
-
-    /// =========================
-    /// FORM FIELDS
-    /// =========================
-
-    nameField.value = draft.name;
-    descriptionField.value = draft.description;
-    codeBarField.value = draft.barcode;
-
-    priceField.value = draft.price;
-    costField.value = draft.cost;
-    stockField.value = draft.stock;
-    lowStockField.value = draft.lowStock;
-
-    /// =========================
-    /// CATEGORY
-    /// =========================
-
-    if (draft.category.id > 0) {
-      selectedCategory = categories.firstWhere(
-            (e) => e.id == draft.category.id,
-        orElse: ProductCategory.empty,
-      );
-
-      subcategories = await _service.getSubcategories(
-        selectedCategory!.id,
-      );
-
-      if (draft.subcategory.id > 0) {
-        selectedSubcategory = subcategories.firstWhere(
-              (e) => e.id == draft.subcategory.id,
-          orElse: ProductSubcategory.empty,
-        );
-      }
-    }
-
-    /// =========================
-    /// IMAGE
-    /// =========================
-
-    image = draft.image;
-
-    /// =========================
-    /// CONFIG
-    /// =========================
-
-    sellType = draft.sellType;
-
-    if (draft.selectedUnitMeasure != null) {
-      selectedUnitMeasure = draft.selectedUnitMeasure;
-    }
-
-    if (draft.tax != null) {
-      selectedTax = draft.tax;
-    }
-
-    if (draft.inventoryType != null) {
-      inventoryType = draft.inventoryType!;
-    }
-
-    /// =========================
-    /// RESET STATE
-    /// =========================
-
-    _resetTouched();
-    _resetErrors();
-
-    notifyListeners();
-  }
   CrudType typeManagementProduct = CrudType.create;
   int idManagementProduct = -1;
   String titleManagement = "";
+  Future<void> loadRecipe() async {
 
+    final ingredientsData = await PosMockData.getProductsRecipeData(idManagementProduct,listMeasureCategoryData);
+    print("Cargando receta...");
+
+    // consumir api
+    // llenar lista
+    // notifyListeners();
+
+    ingredients=ingredientsData;
+  final  ingredients2 = [
+      RecipeIngredientItem(
+        recipeId: 1,
+        productId: 1,
+
+        name: 'Carne de Res',
+        code: 'A-01-MEASURABLE',
+
+        inventoryType: 'RAW',
+        productType: 'MEASURABLE',
+
+        quantityInput: 0.5,
+        quantityBase: 500,
+        conversionFactor: 1000,
+
+        unitInputId: 1,
+        baseUnitMeasureId: 5,
+
+        inputUnit: UnitMeasureModel(
+          id: 1,
+          name: 'Kilogramo',
+          symbol: 'kg',
+          factorToBase: 1000,
+          isBase: false,
+          isDefault: false,
+          decimalPrecision: 2,
+          conversions: const [],
+        ),
+
+        baseUnit: UnitMeasureModel(
+          id: 5,
+          name: 'Gramo',
+          symbol: 'g',
+          factorToBase: 1,
+          isBase: true,
+          isDefault: false,
+          decimalPrecision: 2,
+          conversions: const [],
+        ),
+      ),
+
+      RecipeIngredientItem(
+        recipeId: 2,
+        productId: 2,
+
+        name: 'Arroz',
+        code: 'A-02-MEASURABLE',
+
+        inventoryType: 'RAW',
+        productType: 'MEASURABLE',
+
+        quantityInput: 0.35,
+        quantityBase: 350,
+        conversionFactor: 1000,
+
+        unitInputId: 1,
+        baseUnitMeasureId: 5,
+
+        inputUnit: UnitMeasureModel(
+          id: 1,
+          name: 'Kilogramo',
+          symbol: 'kg',
+          factorToBase: 1000,
+          isBase: false,
+          isDefault: false,
+          decimalPrecision: 2,
+          conversions: const [],
+        ),
+
+        baseUnit: UnitMeasureModel(
+          id: 5,
+          name: 'Gramo',
+          symbol: 'g',
+          factorToBase: 1,
+          isBase: true,
+          isDefault: false,
+          decimalPrecision: 2,
+          conversions: const [],
+        ),
+      ),
+
+      RecipeIngredientItem(
+        recipeId: 3,
+        productId: 3,
+
+        name: 'Papa',
+        code: 'A-03-MEASURABLE',
+
+        inventoryType: 'RAW',
+        productType: 'MEASURABLE',
+
+        quantityInput: 0.075,
+        quantityBase: 75,
+        conversionFactor: 1000,
+
+        unitInputId: 1,
+        baseUnitMeasureId: 5,
+
+        inputUnit: UnitMeasureModel(
+          id: 1,
+          name: 'Kilogramo',
+          symbol: 'kg',
+          factorToBase: 1000,
+          isBase: false,
+          isDefault: false,
+          decimalPrecision: 2,
+          conversions: const [],
+        ),
+
+        baseUnit: UnitMeasureModel(
+          id: 5,
+          name: 'Gramo',
+          symbol: 'g',
+          factorToBase: 1,
+          isBase: true,
+          isDefault: false,
+          decimalPrecision: 2,
+          conversions: const [],
+        ),
+      ),
+
+      RecipeIngredientItem(
+        recipeId: 4,
+        productId: 4,
+
+        name: 'Chorizo',
+        code: 'A-04-UNIT',
+
+        inventoryType: 'RAW',
+        productType: 'UNIT',
+
+        quantityInput: 1,
+        quantityBase: 1,
+        conversionFactor: 1,
+
+        unitInputId: 35,
+        baseUnitMeasureId: 35,
+
+        inputUnit: UnitMeasureModel(
+          id: 35,
+          name: 'Unidad',
+          symbol: 'und',
+          factorToBase: 1,
+          isBase: true,
+          isDefault: true,
+          decimalPrecision: 0,
+          conversions: const [],
+        ),
+
+        baseUnit: UnitMeasureModel(
+          id: 35,
+          name: 'Unidad',
+          symbol: 'und',
+          factorToBase: 1,
+          isBase: true,
+          isDefault: true,
+          decimalPrecision: 0,
+          conversions: const [],
+        ),
+      ),
+    ];
+    notifyListeners();
+
+  }
+  late List<RecipeIngredientItem> ingredients = [];
+  List<MeasureCategoryModel> listMeasureCategoryManagement=[];
+  List<TaxCategoryModel> listTaxCategoryManagement=[];
+
+  void setManagerDataManagementProduct(List<MeasureCategoryModel> listMeasureCategory,List<TaxCategoryModel> listTaxCategory) {
+    listMeasureCategoryManagement=listMeasureCategory;
+    listTaxCategoryManagement=listTaxCategory;
+
+    notifyListeners();
+  }
   void setManagerInitProduct(CrudType typeManagement, int productId) {
     typeManagementProduct = typeManagement;
     idManagementProduct = productId;
@@ -622,10 +638,10 @@ class ProductModalController extends BaseFormController {
   }
 
   void loadAndValidate(ProductDraft draft) {
-    load(draft);
+    loadDataModel(draft);
   }
 
-  void load(ProductDraft draft) async {
+  void loadDataModel(ProductDraft draft) async {
     mode = CrudType.update;
 
     /// =========================
@@ -636,9 +652,55 @@ class ProductModalController extends BaseFormController {
     costField.value = draft.cost;
     stockField.value = draft.stock;
     lowStockField.value = draft.lowStock;
-    descriptionField.value = draft.description;
-    codeBarField.value = draft.barcode;
-    inventoryType=draft.inventoryType;
+
+    codeBarField.value = draft.code;
+    inventoryType = draft.inventoryType;
+    if (draft.detailsAll?.isNotEmpty == true) {
+      final details = jsonDecode(draft.detailsAll!);
+      final productCurrent = details['product'];
+      descriptionField.value = productCurrent['description'];
+
+      /// UNIT MEASURE
+      final unitMeasureId = details['default_unit_measure']?['id'];
+      final taxData = details['tax'];
+      final taxId=taxData['id'];
+
+
+      selectedTax = listTaxCategoryManagement.firstWhere(
+            (e) => e.id == taxId,
+      );
+
+      if (false) {
+        selectedTax = TaxCategoryModel(
+          id: taxData['id'],
+          name: taxData['value'],
+          description: '',
+          priority: 0,
+          taxPercentage: taxData['percentage'],
+        );
+        if (unitMeasureId != null) {
+          for (final category in listMeasureCategoryData) {
+            try {
+              selectedUnitMeasure = category.units.firstWhere(
+                (e) => e.id == unitMeasureId,
+              );
+              break;
+            } catch (_) {}
+          }
+        }
+
+        /// MEASURE TYPE
+        final measureTypeId = details['product_measure_type']?['id'];
+
+        if (measureTypeId != null) {
+          sellType = MeasureType.values.firstWhere(
+            (e) => e.id == measureTypeId.toString(),
+            orElse: () => MeasureType.unit,
+          );
+        }
+      }
+    }
+
     if (draft.category.id > 0) {
       selectedCategory = categories.firstWhere(
         (c) => c.id == draft.category.id,

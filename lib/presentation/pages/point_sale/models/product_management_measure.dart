@@ -155,27 +155,50 @@ class TaxCategoryModel {
       id: json['tax_id'],
       name: json['tax_percentage'].toString(),
       taxPercentage:  double.parse(json['tax_percentage'].toString()),
-
       description: json['tax_name'],
       priority: (json['tax_priority']),
 
     );
   }
+  factory TaxCategoryModel.empty() {
+    return TaxCategoryModel(
+      id: 0,
+      name: '',
+      taxPercentage:  0,
+      description:'',
+      priority: 0,
+    );
+  }
 }
 
-
 class RecipeIngredientItem {
+
+  final int recipeId;
+  final int productId;
   final String name;
-  final MeasureType measureType;
-
-  double quantity;
-
-  UnitMeasureModel? selectedUnit;
-
+  final String code;
+  final String inventoryType;
+  final String productType;
+  double quantityInput;
+  double quantityBase;
+  double conversionFactor;
+  int unitInputId;
+  int baseUnitMeasureId;
+  UnitMeasureModel? inputUnit;
+  UnitMeasureModel? baseUnit;
   RecipeIngredientItem({
+    required this.recipeId,
+    required this.productId,
     required this.name,
-    required this.measureType,
-    required this.quantity,
-    this.selectedUnit,
+    required this.code,
+    required this.inventoryType,
+    required this.productType,
+    required this.quantityInput,
+    required this.quantityBase,
+    required this.conversionFactor,
+    required this.unitInputId,
+    required this.baseUnitMeasureId,
+    this.inputUnit,
+    this.baseUnit,
   });
 }

@@ -1,3 +1,5 @@
+
+import 'package:flutter/cupertino.dart';
 typedef Validator<T> = String? Function(T value);
 enum CrudType { create, update }
 class ValidationResult {
@@ -176,4 +178,97 @@ class ValidatorsUtil {
       ) {
     return compose(validators)(value);
   }
+}
+
+
+class FieldState<T> {
+  T? value;
+  bool touched;
+  String? error;
+  final String label;
+
+  FieldState({
+    required this.label,
+    this.value,
+    this.touched = false,
+    this.error,
+  });
+
+  bool get isValid => error == null;
+
+
+  String text = '';
+}
+
+class FormFieldController<T> extends ChangeNotifier {
+  T? value;
+  bool touched = false;
+  String? error;
+
+  final String label;
+  final List<Validator<T?>> validators;
+
+  FormFieldController({
+    required this.label,
+    this.value,
+    this.validators = const [],
+  });
+
+  void setValue(T? newValue) {
+    value = newValue;
+    touched = true;
+    validate();
+  notifyListeners();
+  }
+
+  bool validate() {
+    error = ValidatorsUtil.validate<T?>(value, validators);
+
+    return error == null;
+  }
+
+  bool get isValid => error == null;
+}
+
+abstract class BaseFormController extends ChangeNotifier {
+  final Map<String, dynamic> fields = {};
+  bool validate() {
+    bool valid = true;
+    for (final field in fields.values) {
+      if (field is FormFieldController) {
+        valid = field.validate() && valid;
+      }
+    }
+    notifyListeners();
+    return valid;
+  }
+
+  bool get isValid {
+    return fields.values.every(
+          (field) => field is FormFieldController ? field.error == null : true,
+    );
+  }
+  T field<T>(String key) {
+    return fields[key] as T;
+  }
+}
+void _setTextField(
+    FormFieldController<String> field,
+    String value,
+    ) {
+  field.setValue(value);
+}
+double _parseDouble(String value, {
+  double defaultValue = 0,
+}) {
+  return double.tryParse(value) ?? defaultValue;
+}
+String formatInput(num? value) {
+  if (value == null) return '';
+
+  if (value == value.toInt()) {
+    return value.toInt().toString();
+  }
+
+  return value.toString();
 }

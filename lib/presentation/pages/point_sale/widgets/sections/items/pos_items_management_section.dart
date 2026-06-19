@@ -130,9 +130,10 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       final controller = ProductModalController();
       await controller.init();
       final draft = ProductMapper.fromMap(item.data!);
-      controller.loadAndValidate(draft);
       final catalogMeasureData = await PosMockData.getCatalogMeasureData();
       final catalogTaxData = await PosMockData.getCatalogTaxData();
+      controller.setManagerDataManagementProduct(catalogMeasureData, catalogTaxData);
+      controller.loadAndValidate(draft);
       if (!mounted) return;
       await showManagerProduct(
         context: context,
@@ -203,10 +204,9 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
                       final catalogMeasureData =
                           await PosMockData.getCatalogMeasureData();
-
                       final catalogTaxData =
                           await PosMockData.getCatalogTaxData();
-
+                      controller.setManagerDataManagementProduct(catalogMeasureData, catalogTaxData);
                       if (!mounted) return;
                       await showManagerProduct(
                         barrierDismissible: false,

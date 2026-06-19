@@ -34,7 +34,7 @@ Future<void> showManagerProduct({
 }) async {
   final allowModal = viewMode == ProductViewMode.dialog;
   controller.setManagerInitProduct(typeManagement, productId);
-
+  controller.setListMeasureCategory(listMeasureCategory);
   final content = AnimatedBuilder(
     animation: controller,
     builder: (_, __) {
@@ -57,8 +57,11 @@ Future<void> showManagerProduct({
                     Navigator.pop(context, resultSave);
                   } else {
                     final product = resultSave.data?['saved']['product'];
-                    final productIdCurrent=product["id"];
-                    controller.setManagerInitProduct(CrudType.update, productIdCurrent);
+                    final productIdCurrent = product["id"];
+                    controller.setManagerInitProduct(
+                      CrudType.update,
+                      productIdCurrent,
+                    );
                   }
                 } else {
                   AlertService.error(context, message: resultSave.message);
@@ -336,7 +339,7 @@ class LandProductWidget extends StatelessWidget {
                   children: [
                     PsFieldItem(
                       child: PsInput(
-                        value: controller.price.toString(),
+                        value: controller.price?.toString() ?? '',
                         requiredField: true,
                         label: controller.priceLabel,
                         keyboardType: TextInputType.number,
@@ -355,7 +358,7 @@ class LandProductWidget extends StatelessWidget {
                     PsFieldItem(
                       child: PsInput(
                         requiredField: true,
-                        value: controller.cost.toString(),
+                        value: controller.cost?.toString() ?? '',
                         label: controller.getLabelPriceName(),
                         keyboardType: TextInputType.number,
                         onChanged: controller.setCost,
@@ -395,7 +398,7 @@ class LandProductWidget extends StatelessWidget {
                   PsFieldItem(
                     child: PsInput(
                       requiredField: true,
-                      value: controller.stock.toString(),
+                      value: controller.stock?.toString() ?? '',
                       label: controller.stockLabel,
                       keyboardType: TextInputType.number,
                       onChanged: controller.setStock,
@@ -418,7 +421,7 @@ class LandProductWidget extends StatelessWidget {
                 children: [
                   PsFieldItem(
                     child: PsInput(
-                      value: controller.lowStock.toString(),
+                      value: controller.lowStock?.toString() ?? '',
                       requiredField: true,
                       label: controller.lowStockLabel,
                       keyboardType: TextInputType.number,
@@ -633,7 +636,7 @@ class PortraitProductWidget extends StatelessWidget {
                   children: [
                     PsFieldItem(
                       child: PsInput(
-                        value: controller.price.toString(),
+                        value: controller.price?.toString() ?? '',
                         requiredField: true,
                         label: controller.priceLabel,
                         keyboardType: TextInputType.number,
@@ -652,7 +655,7 @@ class PortraitProductWidget extends StatelessWidget {
                     PsFieldItem(
                       child: PsInput(
                         requiredField: true,
-                        value: controller.cost.toString(),
+                        value: controller.cost?.toString() ?? '',
                         label: controller.getLabelPriceName(),
                         keyboardType: TextInputType.number,
                         onChanged: controller.setCost,
@@ -691,7 +694,7 @@ class PortraitProductWidget extends StatelessWidget {
                   PsFieldItem(
                     child: PsInput(
                       requiredField: true,
-                      value: controller.stock.toString(),
+                      value: controller.stock?.toString() ?? '',
                       label: controller.stockLabel,
                       keyboardType: TextInputType.number,
                       onChanged: controller.setStock,
@@ -714,7 +717,7 @@ class PortraitProductWidget extends StatelessWidget {
                 children: [
                   PsFieldItem(
                     child: PsInput(
-                      value: controller.lowStock.toString(),
+                      value: controller.lowStock?.toString() ?? '',
                       requiredField: true,
                       label: controller.lowStockLabel,
                       keyboardType: TextInputType.number,
@@ -751,7 +754,6 @@ Widget _buildProductBody(
       controller.inventoryType == InventoryType.processed ||
       controller.inventoryType == InventoryType.forSale;
 
-  controller.setListMeasureCategory(listMeasureCategory);
   return ProductTabsView(
     controller: controller,
     listMeasureCategory: listMeasureCategory,
@@ -882,7 +884,13 @@ Widget _buildTabRecipe(
               ],
             ),
           )
-        : Text(controller.inventoryType == InventoryType.processed?'No ha registrado el Producto Procesado':(controller.inventoryType == InventoryType.forSale?'No ha registrado el Menu':'') ),
+        : Text(
+            controller.inventoryType == InventoryType.processed
+                ? 'No ha registrado el Producto Procesado'
+                : (controller.inventoryType == InventoryType.forSale
+                      ? 'No ha registrado el Menu'
+                      : ''),
+          ),
   );
 }
 
@@ -939,10 +947,17 @@ class PsIngredientCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  List<UnitMeasureModel> getUnits() {
-    final category = measureCategories.firstWhere(
-      (e) => e.id.toString() == item.measureType.id,
+  List<UnitMeasureModel> getUnits(
+      RecipeIngredientItem item,
+      ) {
+    final category3 =
+    measureCategories.firstWhere(
+          (e) => e.baseUnit.id == item.baseUnit?.id,
     );
+    final category = measureCategories.firstWhere(
+          (e) => e.id.toString() == item.baseUnitMeasureId.toString(),
+    );
+
 
     return category.units;
   }
@@ -960,8 +975,8 @@ class PsIngredientCard extends StatelessWidget {
               child: Wrap(
                 spacing: 4,
                 children: [
-                  Text(item.measureType.value),
-                  PsBadge(label: item.measureType.value),
+                  Text(item.inventoryType),
+                  PsBadge(label: item.inventoryType),
                 ],
               ),
             ),
@@ -989,19 +1004,20 @@ class PsIngredientCard extends StatelessWidget {
             children: [
               PsFieldItem(
                 flex: 2,
-                child: PsInput(
-                  label: 'Cantidad',
-                  value: item.quantity.toString(),
-                  keyboardType: TextInputType.number,
-                  onChanged: onQuantityChanged,
+                child: PsDropdown<UnitMeasureModel>(
+                  label: item.inputUnit?.name ?? 'Unidad',
+                  items: getUnits(item),
+                  value: item.inputUnit,
+                  getLabel: (e) => '${e.name} (${e.symbol})',
+                  onChanged: onUnitChanged,
                 ),
               ),
               PsFieldItem(
                 flex: 2,
                 child: PsDropdown<UnitMeasureModel>(
-                  label: item.measureType.value,
-                  items: getUnits(),
-                  value: item.selectedUnit,
+                  label: item.inputUnit?.name ?? 'Unidad',
+                  items: getUnits(item),
+                  value: item.inputUnit,
                   getLabel: (e) => '${e.name} (${e.symbol})',
                   onChanged: onUnitChanged,
                 ),
@@ -1043,20 +1059,16 @@ class PsBadge extends StatelessWidget {
     );
   }
 }
-
 Widget _buildBaseInfo(
-  RecipeIngredientItem item,
-  List<MeasureCategoryModel> measureCategories,
-) {
-  if (item.selectedUnit == null) {
+    RecipeIngredientItem item,
+    List<MeasureCategoryModel> measureCategories,
+    ) {
+  if (item.inputUnit == null || item.baseUnit == null) {
     return const SizedBox.shrink();
   }
 
-  final category = measureCategories.firstWhere(
-    (e) => e.id.toString() == item.measureType.id,
-  );
-
-  final baseValue = item.quantity * item.selectedUnit!.factorToBase;
+  final baseValue =
+      item.quantityInput * item.conversionFactor;
 
   return Container(
     padding: const EdgeInsets.all(12),
@@ -1069,10 +1081,11 @@ Widget _buildBaseInfo(
       children: [
         const Text('Equiv. Base'),
         const SizedBox(height: 8),
-
         Text(
-          '${baseValue.toStringAsFixed(2)} ${category.baseUnit.symbol}',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          '${baseValue.toStringAsFixed(2)} ${item.baseUnit!.symbol}',
+          style: const TextStyle(
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ],
     ),
@@ -1098,12 +1111,26 @@ class ProductTabsView extends StatefulWidget {
 class _ProductTabsViewState extends State<ProductTabsView>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
+  bool recipeLoaded = false;
 
   @override
   void initState() {
     super.initState();
-
     tabController = TabController(length: 2, vsync: this);
+    tabController.addListener(() {
+      if (tabController.index == 1 && !recipeLoaded) {
+        final recipeEnabled =
+            widget.controller.inventoryType == InventoryType.processed ||
+            widget.controller.inventoryType == InventoryType.forSale;
+
+        if (recipeEnabled && widget.controller.idManagementProduct > 0) {
+          recipeLoaded = true;
+          widget.controller.loadRecipe();
+        }
+      } else {
+        recipeLoaded = false;
+      }
+    });
   }
 
   @override

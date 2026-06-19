@@ -58,11 +58,12 @@ class _PsInputState extends State<PsInput> {
 
   @override
   void didUpdateWidget(covariant PsInput oldWidget) {
-    if (oldWidget.value != widget.value) {
+    super.didUpdateWidget(oldWidget);
+
+    if (!_focusNode.hasFocus &&
+        oldWidget.value != widget.value) {
       _controller.text = widget.value ?? "";
     }
-
-    super.didUpdateWidget(oldWidget);
   }
   @override
   void dispose() {

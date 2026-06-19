@@ -9,6 +9,7 @@ import '../../../../../../shared/models/api_response.dart';
 import '../../../models/product_management_measure.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
+import '../../organisms/ps_toogle_group.dart';
 import '../pos_main_controller.dart';
 
 class PosTabletLandscapeFixtures {
@@ -802,7 +803,6 @@ final businessId=SessionService().businessId;
             'rowCount': '-1',
             'searchPhrase': '',
             'business_id': businessId,
-            'grid_id': '#grid-registers-grid',
           },
         );
     final response = await http.get(
@@ -840,6 +840,112 @@ final businessId=SessionService().businessId;
         // 👉 si agregas estos campos al modelo
         stock: (stock['quantity'] ?? 0).toDouble(),
         unit: stock['unit'] ?? 'u',
+      );
+    }).toList();
+  }
+  static UnitMeasureModel?  findUnit(
+      int unitId,
+      List<MeasureCategoryModel> categories,
+      ) {
+    for (final category in categories) {
+
+      if (category.baseUnit.id == unitId) {
+        return category.baseUnit;
+      }
+
+      for (final unit in category.units) {
+        if (unit.id == unitId) {
+          return unit;
+        }
+      }
+    }
+
+    return null;
+  }
+  static Future<List<RecipeIngredientItem>> getProductsRecipeData(
+      int componentProductId,
+      List<MeasureCategoryModel> categories,
+      ) async {
+
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    final uri =
+    Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales-recipe')
+        .replace(
+      queryParameters: {
+        'current': '1',
+        'rowCount': '-1',
+        'searchPhrase': '',
+        'business_id': '$businessId',
+        'component_product_id': '$componentProductId',
+      },
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      return [];
+    }
+
+    final data = jsonDecode(response.body);
+
+    final rows = data['rows'] as List? ?? [];
+
+    return rows.map<RecipeIngredientItem>((row) {
+
+      final details = jsonDecode(row['details_all']);
+
+      final recipe = details['recipe'];
+      final product = details['product'];
+
+      final inputUnitId =
+      int.parse(recipe['unit_input_id'].toString());
+
+      final baseUnitId =
+      int.parse(recipe['base_unit_measure_id'].toString());
+
+      return RecipeIngredientItem(
+        recipeId: recipe['id'],
+
+        productId: product['id'],
+
+        name: product['name'],
+
+        code: product['code'],
+
+        inventoryType: product['inventory_type'],
+
+        productType: product['product_type'],
+
+        quantityInput:
+        double.parse(recipe['quantity_input'].toString()),
+
+        quantityBase:
+        double.parse(recipe['quantity_base'].toString()),
+
+        conversionFactor:
+        double.parse(recipe['conversion_factor'].toString()),
+
+        unitInputId: inputUnitId,
+
+        baseUnitMeasureId: baseUnitId,
+
+        inputUnit: findUnit(
+          inputUnitId,
+          categories,
+        ),
+
+        baseUnit: findUnit(
+          baseUnitId,
+          categories,
+        ),
       );
     }).toList();
   }

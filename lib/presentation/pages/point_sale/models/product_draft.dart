@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:meetclic_app/presentation/pages/point_sale/models/product_management_measure.dart';
-
+import 'dart:convert';
 import '../../../../shared/pagination_response.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 import 'product_category.dart';
@@ -30,6 +30,7 @@ class ProductDraft {
 
   final TaxCategoryModel? tax;
   UnitMeasureModel? selectedUnitMeasure;
+  final String? detailsAll;
 
   ProductDraft({
     this.id,
@@ -48,6 +49,7 @@ class ProductDraft {
     required this.inventoryType,
     this.tax,
     this.selectedUnitMeasure,
+    this.detailsAll,
   });
 }
 
@@ -58,50 +60,53 @@ class ProductMapper {
     final m = map ?? {};
     final String currentTypeMeasureId = m['measure_type_management'][0]
         .toString();
-    MeasureType sellType =MeasureType.unit;
+    MeasureType sellType = MeasureType.unit;
 
     if (MeasureType.unit.id == currentTypeMeasureId) {
-      sellType =MeasureType.unit;
-    }else   if (MeasureType.volume.id == currentTypeMeasureId) {
-      sellType =MeasureType.volume;
-    }else  if (MeasureType.length.id == currentTypeMeasureId) {
-      sellType =MeasureType.length;
-    }else  if (MeasureType.mass.id == currentTypeMeasureId) {
-      sellType =MeasureType.mass;
-    }else  if (MeasureType.area.id == currentTypeMeasureId) {
-      sellType =MeasureType.area;
+      sellType = MeasureType.unit;
+    } else if (MeasureType.volume.id == currentTypeMeasureId) {
+      sellType = MeasureType.volume;
+    } else if (MeasureType.length.id == currentTypeMeasureId) {
+      sellType = MeasureType.length;
+    } else if (MeasureType.mass.id == currentTypeMeasureId) {
+      sellType = MeasureType.mass;
+    } else if (MeasureType.area.id == currentTypeMeasureId) {
+      sellType = MeasureType.area;
     }
-final classification=m["classification"];
-    final inventory_type=classification['inventory_type'];
+    final classification = m["classification"];
+    final inventory_type = classification['inventory_type'];
 
-    InventoryType inventoryType=InventoryType.raw;
+    InventoryType inventoryType = InventoryType.raw;
 
     if (InventoryType.raw.id == inventory_type) {
-      inventoryType =InventoryType.raw;
-    }else   if (InventoryType.processed.id == inventory_type) {
-      inventoryType =InventoryType.processed;
-    }else    if (InventoryType.forSale.id == inventory_type) {
-      inventoryType =InventoryType.forSale;
+      inventoryType = InventoryType.raw;
+    } else if (InventoryType.processed.id == inventory_type) {
+      inventoryType = InventoryType.processed;
+    } else if (InventoryType.forSale.id == inventory_type) {
+      inventoryType = InventoryType.forSale;
     }
+    final taxCurrent = TaxCategoryModel(
+      taxPercentage: 0,
+      description: '',
+      id: -1,
+      name: '',
+      priority: 0,
+    );
     return ProductDraft(
       id: m['id'],
       name: m['name']?.toString() ?? '',
-
+      detailsAll: m['details_all']?.toString() ?? '',
       price: (m['price'] is num) ? (m['price'] as num).toDouble() : 0.0,
-
       cost: (m['cost'] is num) ? (m['cost'] as num).toDouble() : 0.0,
-
       stock: (m['stock']['quantity'] is num)
           ? (m['stock']['quantity'] as num).toDouble()
           : 0.0,
-
       lowStock: (m['lowStock'] is num)
           ? (m['lowStock'] as num).toDouble()
           : 0.0,
-
       code: m['code']?.toString() ?? '',
       barcode: m['barcode']?.toString() ?? '',
-      description: m['code']?.toString() ?? '',
+      description: m['description']?.toString() ?? '',
 
       /// ⚠️ AQUÍ ESTÁ LO CRÍTICO
       category: ProductCategory(
@@ -110,7 +115,6 @@ final classification=m["classification"];
         description: "noe",
         source: '',
       ),
-
       // 👈 debes crear esto
       subcategory: ProductSubcategory(
         id: m['product_subcategory_id'],
@@ -119,18 +123,10 @@ final classification=m["classification"];
         source: "",
         productCategoryId: m['product_category_id'],
       ),
-
       sellType: sellType,
-
       selectedUnitMeasure: m['selectedUnitMeasure'] as UnitMeasureModel?,
-      inventoryType:inventoryType,
-      tax: TaxCategoryModel(
-        taxPercentage: 0,
-        description: '',
-        id: -1,
-        name: '',
-        priority: 0,
-      ),
+      inventoryType: inventoryType,
+      tax: taxCurrent,
       image: null,
     );
   }
