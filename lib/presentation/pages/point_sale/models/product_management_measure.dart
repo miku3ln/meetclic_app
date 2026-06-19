@@ -186,6 +186,8 @@ class RecipeIngredientItem {
   int baseUnitMeasureId;
   UnitMeasureModel? inputUnit;
   UnitMeasureModel? baseUnit;
+  String? allData;
+
   RecipeIngredientItem({
     required this.recipeId,
     required this.productId,
@@ -200,5 +202,7 @@ class RecipeIngredientItem {
     required this.baseUnitMeasureId,
     this.inputUnit,
     this.baseUnit,
+    this.allData,
+
   });
 }

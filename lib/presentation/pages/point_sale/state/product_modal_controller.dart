@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/models/product_management_measure.dart';
 import '../../../../domain/services/session_service.dart';
 import '../../../../shared/models/api_response.dart';
+import '../../../../shared/pagination_response.dart';
 import '../../../../shared/utils/validators/validators.dart';
 import '../models/product_category.dart';
 import '../models/product_draft.dart';
@@ -198,16 +199,62 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
   }
 
+  void addIngredient(GenericListItem<Map<String, dynamic>> item) {
+    final data = item.data!;
+    final details = jsonDecode(data['details_all']);
+    final product = details['product'];
+    final defaultUnit = details['default_unit_measure'];
+    final itemAdd = RecipeIngredientItem(
+      recipeId: 0,
+      // nuevo, aún no existe en BD
+      productId: product['id'],
+      name: product['name'],
+      code: product['code_product'] ?? '',
+
+      inventoryType: product['inventory_type'],
+      productType: product['product_type'],
+      /// inicialmente vacío
+      quantityInput: 0,
+      quantityBase: 0,
+      conversionFactor: double.parse(defaultUnit['factor_to_base'].toString()),
+      unitInputId: defaultUnit['id'],
+      baseUnitMeasureId: product['product_measure_type_id'],
+      inputUnit: UnitMeasureModel(
+        id:defaultUnit['id'],
+        name: defaultUnit['name'],
+        symbol: defaultUnit['symbol'],
+        factorToBase: double.parse(defaultUnit['factor_to_base'].toString()),
+        isBase: defaultUnit['is_base'] == 1,
+        isDefault: true,
+        decimalPrecision: defaultUnit['decimal_precision'],
+        conversions: const [],
+      ),
+
+      baseUnit: UnitMeasureModel(
+        id: defaultUnit['id'],
+        name: defaultUnit['name'],
+        symbol: defaultUnit['symbol'],
+        factorToBase: double.parse(defaultUnit['factor_to_base'].toString()),
+        isBase: true,
+        isDefault: true,
+        decimalPrecision: defaultUnit['decimal_precision'],
+        conversions: const [],
+      ),
+        allData:data['details_all']
+    );
+
+    late int information = 1;
+    ingredients.add(itemAdd);
+    notifyListeners();
+
+  }
+
   void updateIngredientQuantity(RecipeIngredientItem item, String value) {
     item.quantityInput = double.tryParse(value) ?? 0;
     notifyListeners();
   }
 
-  void updateIngredientUnit(
-      RecipeIngredientItem item,
-      UnitMeasureModel? unit,
-      ) {
-
+  void updateIngredientUnit(RecipeIngredientItem item, UnitMeasureModel? unit) {
     if (unit == null) return;
 
     item.inputUnit = unit;
@@ -216,11 +263,11 @@ class ProductModalController extends BaseFormController {
 
     item.conversionFactor = unit.factorToBase;
 
-    item.quantityBase =
-        item.quantityInput * unit.factorToBase;
+    item.quantityBase = item.quantityInput * unit.factorToBase;
 
     notifyListeners();
   }
+
   void setPrice(String value) {
     priceField.setValue(value.isEmpty ? null : double.tryParse(value));
     notifyListeners();
@@ -392,17 +439,20 @@ class ProductModalController extends BaseFormController {
   CrudType typeManagementProduct = CrudType.create;
   int idManagementProduct = -1;
   String titleManagement = "";
-  Future<void> loadRecipe() async {
 
-    final ingredientsData = await PosMockData.getProductsRecipeData(idManagementProduct,listMeasureCategoryData);
+  Future<void> loadRecipe() async {
+    final ingredientsData = await PosMockData.getProductsRecipeData(
+      idManagementProduct,
+      listMeasureCategoryData,
+    );
     print("Cargando receta...");
 
     // consumir api
     // llenar lista
     // notifyListeners();
 
-    ingredients=ingredientsData;
-  final  ingredients2 = [
+    ingredients = ingredientsData;
+    final ingredients2 = [
       RecipeIngredientItem(
         recipeId: 1,
         productId: 1,
@@ -564,18 +614,22 @@ class ProductModalController extends BaseFormController {
       ),
     ];
     notifyListeners();
-
   }
-  late List<RecipeIngredientItem> ingredients = [];
-  List<MeasureCategoryModel> listMeasureCategoryManagement=[];
-  List<TaxCategoryModel> listTaxCategoryManagement=[];
 
-  void setManagerDataManagementProduct(List<MeasureCategoryModel> listMeasureCategory,List<TaxCategoryModel> listTaxCategory) {
-    listMeasureCategoryManagement=listMeasureCategory;
-    listTaxCategoryManagement=listTaxCategory;
+  late List<RecipeIngredientItem> ingredients = [];
+  List<MeasureCategoryModel> listMeasureCategoryManagement = [];
+  List<TaxCategoryModel> listTaxCategoryManagement = [];
+
+  void setManagerDataManagementProduct(
+    List<MeasureCategoryModel> listMeasureCategory,
+    List<TaxCategoryModel> listTaxCategory,
+  ) {
+    listMeasureCategoryManagement = listMeasureCategory;
+    listTaxCategoryManagement = listTaxCategory;
 
     notifyListeners();
   }
+
   void setManagerInitProduct(CrudType typeManagement, int productId) {
     typeManagementProduct = typeManagement;
     idManagementProduct = productId;
@@ -663,12 +717,9 @@ class ProductModalController extends BaseFormController {
       /// UNIT MEASURE
       final unitMeasureId = details['default_unit_measure']?['id'];
       final taxData = details['tax'];
-      final taxId=taxData['id'];
+      final taxId = taxData['id'];
 
-
-      selectedTax = listTaxCategoryManagement.firstWhere(
-            (e) => e.id == taxId,
-      );
+      selectedTax = listTaxCategoryManagement.firstWhere((e) => e.id == taxId);
 
       if (false) {
         selectedTax = TaxCategoryModel(

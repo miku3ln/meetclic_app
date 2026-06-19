@@ -798,18 +798,23 @@ class PosMockData {
   getProductsRecipeSearch({
     required String searchPhrase,
     required int componentProductId,
+    required String inventorType,
+
   }) async {
 
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
-
     final uri = Uri.parse(
-      '${ServerConfig.baseUrl}/pointsales/products-sales',
+      '${ServerConfig.baseUrl}/pointsales/products-by-type-for-recipe',
     ).replace(
       queryParameters: {
+        'current': '-1',
+        'rowCount': '-1',
         'componentProductId': componentProductId.toString(),
         'searchPhrase': searchPhrase,
         'business_id': businessId.toString(),
+        'inventory_type': inventorType,
+
       },
     );
 
@@ -826,11 +831,8 @@ class PosMockData {
     }
 
     final data = jsonDecode(response.body);
-
     return (data['rows'] as List).map((json) {
-
       final stock = json['stock'] ?? {};
-
       return GenericListItem<Map<String, dynamic>>(
         id: json['id'],
         title: json['name'] ?? '',

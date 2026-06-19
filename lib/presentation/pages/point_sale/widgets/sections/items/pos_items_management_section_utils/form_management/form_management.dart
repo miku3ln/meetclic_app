@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:convert';
 import '../../../../../../../../services/alert_manager.dart';
 import '../../../../../../../../shared/pagination_response.dart';
 import '../../../../../../../../shared/services/media_picker_service.dart';
@@ -811,25 +811,29 @@ Widget _buildTabRecipe(
                               children: [
                                 /// 🔥 CATEGORÍA
                                 PsFieldItem(
-                                  child:PsApiTypeAhead<GenericListItem<Map<String, dynamic>>>(
-                                    label: 'Ingrediente',
-                                    searchApi: (search) {
-                                      return PosMockData.getProductsRecipeSearch(
-                                        searchPhrase: search,
-                                        componentProductId: controller.idManagementProduct,
-                                      );
-                                    },
-
-                                    getLabel: (e) => e.title,
-
-                                    onSelected: (item) {
-
-                                      final product = item.data!;
-
-                                  //    controller.addIngredient(product);
-
-                                    },
-                                  ),
+                                  child:
+                                      PsApiTypeAhead<
+                                        GenericListItem<Map<String, dynamic>>
+                                      >(
+                                        label: 'Ingrediente',
+                                        searchApi: (search) {
+                                          return PosMockData.getProductsRecipeSearch(
+                                            searchPhrase: search,
+                                            componentProductId:
+                                                controller.idManagementProduct,
+                                            inventorType:
+                                                (controller.inventoryType.id ==
+                                                    InventoryType.processed.id
+                                                ? InventoryType.raw.id
+                                                : InventoryType.processed.id),
+                                          );
+                                        },
+                                        getLabel: (e) => e.title,
+                                        onSelected: (item) {
+                                          final product = item;
+                                          controller.addIngredient(product);
+                                        },
+                                      ),
                                 ),
                               ],
                             ),
@@ -854,15 +858,11 @@ Widget _buildTabRecipe(
                               ],
                             ),
                             AppSpacing.spaceBetweenSections,
-                            SizedBox(
-                              height: 400, // ajusta a tu necesidad
-                              child: ListView.separated(
-                                itemCount: controller.ingredients.length,
-                                separatorBuilder: (_, __) =>
-                                    const SizedBox(height: 12),
-                                itemBuilder: (_, index) {
-                                  final e = controller.ingredients[index];
-                                  return PsIngredientCard(
+                            Column(
+                              children: controller.ingredients.map((e) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 12),
+                                  child: PsIngredientCard(
                                     item: e,
                                     measureCategories: listMeasureCategory,
                                     onQuantityChanged: (value) {
@@ -876,9 +876,9 @@ Widget _buildTabRecipe(
                                     },
                                     onEdit: () {},
                                     onDelete: () {},
-                                  );
-                                },
-                              ),
+                                  ),
+                                );
+                              }).toList(),
                             ),
                           ],
                         ),
@@ -950,25 +950,51 @@ class PsIngredientCard extends StatelessWidget {
     required this.onDelete,
   });
 
-  List<UnitMeasureModel> getUnits(
-      RecipeIngredientItem item,
-      ) {
-    final category3 =
-    measureCategories.firstWhere(
-          (e) => e.baseUnit.id == item.baseUnit?.id,
-    );
-    final category = measureCategories.firstWhere(
-          (e) => e.id.toString() == item.baseUnitMeasureId.toString(),
-    );
+  List<UnitMeasureModel> getUnits(RecipeIngredientItem item) {
+    List<UnitMeasureModel> resultList = [];
+    if (measureCategories.isEmpty) {
+    } else {
+      final category = measureCategories.firstWhere(
+        (e) => e.id.toString() == item.baseUnitMeasureId.toString(),
+      );
 
+      if (category == null) {
+        resultList = [];
+      } else {
+        resultList = category.units;
+      }
+    }
 
-    return category.units;
+    return resultList;
   }
 
   @override
   Widget build(BuildContext context) {
-    return PsSectionCard(
-      title: item.name,
+    var itemsInformation = getUnits(item);
+    var itemMeasureSelect = item.inputUnit;
+    final details = jsonDecode(item.allData!);
+    final productMeasureTypeRoot = details['product_measure_type'];
+
+    var informationProduct = item.name + "(" + item.code + " )";
+    Color borderColor=Colors.green;
+    var typeMeasureId = productMeasureTypeRoot['id'].toString();
+    if(typeMeasureId==MeasureType.unit.id){
+      borderColor = Colors.orange;
+    }else if(typeMeasureId==MeasureType.volume.id){
+      borderColor = Colors.blue;
+    }else if(typeMeasureId==MeasureType.length.id){
+      borderColor = Colors.green;
+    }else if(typeMeasureId==MeasureType.area.id){
+      borderColor = Colors.grey;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8),
+        border: Border(left: BorderSide(color: borderColor, width: 6)),
+      ),
+      padding: const EdgeInsets.all(12),
       child: Column(
         children: [
           /// FILA 1
@@ -978,21 +1004,16 @@ class PsIngredientCard extends StatelessWidget {
               child: Wrap(
                 spacing: 4,
                 children: [
-                  Text(item.inventoryType),
-                  PsBadge(label: item.inventoryType),
+                  Text(informationProduct),
+                  PsBadge(label: productMeasureTypeRoot['value']),
                 ],
               ),
             ),
-
             right: Align(
               alignment: Alignment.centerRight,
               child: Wrap(
                 spacing: 4,
                 children: [
-                  IconButton(
-                    onPressed: onEdit,
-                    icon: const Icon(Icons.edit_outlined),
-                  ),
                   IconButton(
                     onPressed: onDelete,
                     icon: const Icon(Icons.delete_outline),
@@ -1003,28 +1024,30 @@ class PsIngredientCard extends StatelessWidget {
           ),
 
           AppSpacing.spaceBetweenInputs,
+
           PsFieldRow(
             children: [
               PsFieldItem(
                 flex: 2,
-                child: PsDropdown<UnitMeasureModel>(
-                  label: item.inputUnit?.name ?? 'Unidad',
-                  items: getUnits(item),
-                  value: item.inputUnit,
-                  getLabel: (e) => '${e.name} (${e.symbol})',
-                  onChanged: onUnitChanged,
+                child: PsInput(
+                  label: 'Cantidad',
+                  value: item.quantityInput.toString(),
+                  keyboardType: TextInputType.number,
+                  onChanged: onQuantityChanged,
                 ),
               ),
+
               PsFieldItem(
                 flex: 2,
                 child: PsDropdown<UnitMeasureModel>(
                   label: item.inputUnit?.name ?? 'Unidad',
-                  items: getUnits(item),
-                  value: item.inputUnit,
+                  items: itemsInformation,
+                  value: null,
                   getLabel: (e) => '${e.name} (${e.symbol})',
                   onChanged: onUnitChanged,
                 ),
               ),
+
               PsFieldItem(
                 flex: 2,
                 child: _buildBaseInfo(item, measureCategories),
@@ -1062,16 +1085,16 @@ class PsBadge extends StatelessWidget {
     );
   }
 }
+
 Widget _buildBaseInfo(
-    RecipeIngredientItem item,
-    List<MeasureCategoryModel> measureCategories,
-    ) {
+  RecipeIngredientItem item,
+  List<MeasureCategoryModel> measureCategories,
+) {
   if (item.inputUnit == null || item.baseUnit == null) {
     return const SizedBox.shrink();
   }
 
-  final baseValue =
-      item.quantityInput * item.conversionFactor;
+  final baseValue = item.quantityInput * item.conversionFactor;
 
   return Container(
     padding: const EdgeInsets.all(12),
@@ -1086,9 +1109,7 @@ Widget _buildBaseInfo(
         const SizedBox(height: 8),
         Text(
           '${baseValue.toStringAsFixed(2)} ${item.baseUnit!.symbol}',
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-          ),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
       ],
     ),
