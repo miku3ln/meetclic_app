@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../../../../../../domain/services/session_service.dart';
 import '../../../../../../infrastructure/config/server_config.dart';
 import '../../../../../../shared/models/api_response.dart';
+import '../../../../../../shared/pagination_response.dart' hide ApiResponse;
 import '../../../models/product_management_measure.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
@@ -16,7 +17,9 @@ class PosTabletLandscapeFixtures {
   // -------------------------
   // (1) PRODUCT CATEGORIES (Dropdown)
   // -------------------------
-  static List<PosCategoryItem> getCategoriesData(List<PosProductItem> products) {
+  static List<PosCategoryItem> getCategoriesData(
+    List<PosProductItem> products,
+  ) {
     final Map<String, PosCategoryItem> map = {};
 
     for (final p in products) {
@@ -40,7 +43,9 @@ class PosTabletLandscapeFixtures {
   // -------------------------
   // (2) MENU CATEGORIES (Bottom buttons)
   // -------------------------
-  static List<PosCategoryItem> getMenuCategoriesData(List<PosProductItem> products) {
+  static List<PosCategoryItem> getMenuCategoriesData(
+    List<PosProductItem> products,
+  ) {
     final Map<String, PosCategoryItem> map = {};
     for (final p in products) {
       map[p.menuCategoryId] = PosCategoryItem(
@@ -58,8 +63,6 @@ class PosTabletLandscapeFixtures {
       ),
       ...map.values,
     ];
-
-
   }
 
   // -------------------------
@@ -68,10 +71,8 @@ class PosTabletLandscapeFixtures {
   // -------------------------
   static List<PosMenuActionItem> getMenuDataActions({
     required void Function(String id) onTap,
-    required PosMainController controller
+    required PosMainController controller,
   }) {
-
-
     final menuCats = getMenuCategoriesData(controller.browser.allProducts);
 
     // Convertimos categorías en acciones (excepto "grid" si quieres mantenerlo)
@@ -731,8 +732,8 @@ class ProductMapperOther {
       id: json['id'].toString(),
       name: json['name'],
       imageUrl: json['source'],
-      code: json['code'] ,
-      type: json['type'] ,
+      code: json['code'],
+      type: json['type'],
 
       productCategoryId: json['product_category_id'].toString(),
       menuCategoryId: json['product_subcategory_id'].toString(),
@@ -793,18 +794,71 @@ class ProductController extends ChangeNotifier {
 }
 
 class PosMockData {
+  static Future<List<GenericListItem<Map<String, dynamic>>>>
+  getProductsRecipeSearch({
+    required String searchPhrase,
+    required int componentProductId,
+  }) async {
+
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    final uri = Uri.parse(
+      '${ServerConfig.baseUrl}/pointsales/products-sales',
+    ).replace(
+      queryParameters: {
+        'componentProductId': componentProductId.toString(),
+        'searchPhrase': searchPhrase,
+        'business_id': businessId.toString(),
+      },
+    );
+
+    final response = await http.get(
+      uri,
+      headers: {
+        'Authorization': 'Bearer ${token!}',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode != 200) {
+      return [];
+    }
+
+    final data = jsonDecode(response.body);
+
+    return (data['rows'] as List).map((json) {
+
+      final stock = json['stock'] ?? {};
+
+      return GenericListItem<Map<String, dynamic>>(
+        id: json['id'],
+        title: json['name'] ?? '',
+        subtitle:
+        'Stock: ${stock['quantity'] ?? 0} ${stock['unit'] ?? ''}',
+        description: json['category'] ?? '',
+        image: json['source'],
+        data: json,
+      );
+
+    }).toList();
+  }
+
   static Future<List<PosProductItem>> getProductsData() async {
     final token = SessionService().apiToken;
-final businessId=SessionService().businessId;
-    final uri = Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales')//POS-PRODUCTS -INIT-ONE
-        .replace(
-          queryParameters: {
-            'current': '1',
-            'rowCount': '-1',
-            'searchPhrase': '',
-            'business_id': businessId,
-          },
-        );
+    final businessId = SessionService().businessId;
+    final uri =
+        Uri.parse(
+              '${ServerConfig.baseUrl}/pointsales/products-sales',
+            ) //POS-PRODUCTS -INIT-ONE
+            .replace(
+              queryParameters: {
+                'current': '1',
+                'rowCount': '-1',
+                'searchPhrase': '',
+                'business_id': businessId,
+              },
+            );
     final response = await http.get(
       uri,
       headers: {
@@ -813,7 +867,6 @@ final businessId=SessionService().businessId;
       },
     );
     if (response.statusCode != 200) {
-
       List<PosProductItem> result = [];
       return result;
     }
@@ -835,7 +888,9 @@ final businessId=SessionService().businessId;
         productCategory: json['category'].toString(),
         type: json['type'].toString(),
         code: json['code'].toString(),
-        taxPercentage: double.tryParse(taxData['value_percentage'] ?.toString() ?? '0') ?? 0,
+        taxPercentage:
+            double.tryParse(taxData['value_percentage']?.toString() ?? '0') ??
+            0,
         unitPrice: double.tryParse(priceData['pv']?.toString() ?? '0') ?? 0,
         // 👉 si agregas estos campos al modelo
         stock: (stock['quantity'] ?? 0).toDouble(),
@@ -843,12 +898,12 @@ final businessId=SessionService().businessId;
       );
     }).toList();
   }
-  static UnitMeasureModel?  findUnit(
-      int unitId,
-      List<MeasureCategoryModel> categories,
-      ) {
-    for (final category in categories) {
 
+  static UnitMeasureModel? findUnit(
+    int unitId,
+    List<MeasureCategoryModel> categories,
+  ) {
+    for (final category in categories) {
       if (category.baseUnit.id == unitId) {
         return category.baseUnit;
       }
@@ -862,25 +917,26 @@ final businessId=SessionService().businessId;
 
     return null;
   }
-  static Future<List<RecipeIngredientItem>> getProductsRecipeData(
-      int componentProductId,
-      List<MeasureCategoryModel> categories,
-      ) async {
 
+  static Future<List<RecipeIngredientItem>> getProductsRecipeData(
+    int componentProductId,
+    List<MeasureCategoryModel> categories,
+  ) async {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
 
     final uri =
-    Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales-recipe')
-        .replace(
-      queryParameters: {
-        'current': '1',
-        'rowCount': '-1',
-        'searchPhrase': '',
-        'business_id': '$businessId',
-        'component_product_id': '$componentProductId',
-      },
-    );
+        Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/products-sales-recipe',
+        ).replace(
+          queryParameters: {
+            'current': '1',
+            'rowCount': '-1',
+            'searchPhrase': '',
+            'business_id': '$businessId',
+            'component_product_id': '$componentProductId',
+          },
+        );
 
     final response = await http.get(
       uri,
@@ -899,17 +955,14 @@ final businessId=SessionService().businessId;
     final rows = data['rows'] as List? ?? [];
 
     return rows.map<RecipeIngredientItem>((row) {
-
       final details = jsonDecode(row['details_all']);
 
       final recipe = details['recipe'];
       final product = details['product'];
 
-      final inputUnitId =
-      int.parse(recipe['unit_input_id'].toString());
+      final inputUnitId = int.parse(recipe['unit_input_id'].toString());
 
-      final baseUnitId =
-      int.parse(recipe['base_unit_measure_id'].toString());
+      final baseUnitId = int.parse(recipe['base_unit_measure_id'].toString());
 
       return RecipeIngredientItem(
         recipeId: recipe['id'],
@@ -924,42 +977,30 @@ final businessId=SessionService().businessId;
 
         productType: product['product_type'],
 
-        quantityInput:
-        double.parse(recipe['quantity_input'].toString()),
+        quantityInput: double.parse(recipe['quantity_input'].toString()),
 
-        quantityBase:
-        double.parse(recipe['quantity_base'].toString()),
+        quantityBase: double.parse(recipe['quantity_base'].toString()),
 
-        conversionFactor:
-        double.parse(recipe['conversion_factor'].toString()),
+        conversionFactor: double.parse(recipe['conversion_factor'].toString()),
 
         unitInputId: inputUnitId,
 
         baseUnitMeasureId: baseUnitId,
 
-        inputUnit: findUnit(
-          inputUnitId,
-          categories,
-        ),
+        inputUnit: findUnit(inputUnitId, categories),
 
-        baseUnit: findUnit(
-          baseUnitId,
-          categories,
-        ),
+        baseUnit: findUnit(baseUnitId, categories),
       );
     }).toList();
   }
+
   static Future<List<MeasureCategoryModel>> getCatalogMeasureData() async {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
 
     final uri = Uri.parse(
       '${ServerConfig.baseUrl}/pointsales/catalog-measure',
-    ).replace(
-      queryParameters: {
-        'business_id': businessId,
-      },
-    );
+    ).replace(queryParameters: {'business_id': businessId});
 
     final response = await http.get(
       uri,
@@ -974,21 +1015,16 @@ final businessId=SessionService().businessId;
     }
 
     final List<dynamic> data = jsonDecode(response.body);
-    return data
-        .map((e) => MeasureCategoryModel.fromJson(e))
-        .toList();
+    return data.map((e) => MeasureCategoryModel.fromJson(e)).toList();
   }
+
   static Future<List<TaxCategoryModel>> getCatalogTaxData() async {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
 
     final uri = Uri.parse(
       '${ServerConfig.baseUrl}/pointsales/catalog-tax',
-    ).replace(
-      queryParameters: {
-        'business_id': businessId,
-      },
-    );
+    ).replace(queryParameters: {'business_id': businessId});
 
     final response = await http.get(
       uri,
@@ -1003,9 +1039,7 @@ final businessId=SessionService().businessId;
     }
 
     final List<dynamic> data = jsonDecode(response.body);
-    return data
-        .map((e) => TaxCategoryModel.fromJson(e))
-        .toList();
+    return data.map((e) => TaxCategoryModel.fromJson(e)).toList();
   }
 }
 
@@ -1034,26 +1068,18 @@ class ProductCreateRequest {
     };
   }
 }
+
 class ProductApiError {
   final String? table;
   final Map<String, List<String>> errors;
 
-  ProductApiError({
-    this.table,
-    required this.errors,
-  });
+  ProductApiError({this.table, required this.errors});
 
-  factory ProductApiError.fromJson(
-      Map<String, dynamic> json,
-      ) {
+  factory ProductApiError.fromJson(Map<String, dynamic> json) {
     return ProductApiError(
       table: json['table'],
-      errors: (json['errors'] as Map<String, dynamic>? ?? {})
-          .map(
-            (k, v) => MapEntry(
-          k,
-          List<String>.from(v),
-        ),
+      errors: (json['errors'] as Map<String, dynamic>? ?? {}).map(
+        (k, v) => MapEntry(k, List<String>.from(v)),
       ),
     );
   }
@@ -1068,17 +1094,16 @@ class ProductApiError {
     return firstField.first;
   }
 }
+
 class ProductDataUtil {
   static Future<ApiResponse<Map<String, dynamic>>> createProduct(
-      Map<String, dynamic> payload,
-      ) async {
+    Map<String, dynamic> payload,
+  ) async {
     try {
       final token = SessionService().apiToken;
 
       final response = await http.post(
-        Uri.parse(
-          '${ServerConfig.baseUrl}/pointsales/product-type-save',
-        ),
+        Uri.parse('${ServerConfig.baseUrl}/pointsales/product-type-save'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -1100,42 +1125,34 @@ class ProductDataUtil {
         final errorRaw = body['error']?['message'];
 
         if (errorRaw != null) {
-          final errorJson =
-          jsonDecode(errorRaw) as Map<String, dynamic>;
+          final errorJson = jsonDecode(errorRaw) as Map<String, dynamic>;
           final table = errorJson['table'];
-          final errors =
-              errorJson['errors'] as Map<String, dynamic>? ?? {};
+          final errors = errorJson['errors'] as Map<String, dynamic>? ?? {};
           if (errors.isNotEmpty) {
             final field = errors.keys.first;
-            final fieldErrors =
-            List<String>.from(errors[field]);
-            message =
-            '[$table] ${fieldErrors.first}';
+            final fieldErrors = List<String>.from(errors[field]);
+            message = '[$table] ${fieldErrors.first}';
           }
         }
       } catch (_) {
-        message = body['error']?['message'] ??
-            body['message'] ??
-            'Error desconocido';
+        message =
+            body['error']?['message'] ?? body['message'] ?? 'Error desconocido';
       }
 
       return ApiResponse.error(message);
     } catch (e) {
-      return ApiResponse.error(
-        e.toString(),
-      );
+      return ApiResponse.error(e.toString());
     }
   }
+
   static Future<ApiResponse<Map<String, dynamic>>> updateProduct(
-      Map<String, dynamic> payload,
-      ) async {
+    Map<String, dynamic> payload,
+  ) async {
     try {
       final token = SessionService().apiToken;
 
       final response = await http.post(
-        Uri.parse(
-          '${ServerConfig.baseUrl}/pointsales/product-type-save',
-        ),
+        Uri.parse('${ServerConfig.baseUrl}/pointsales/product-type-save'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -1157,30 +1174,23 @@ class ProductDataUtil {
         final errorRaw = body['error']?['message'];
 
         if (errorRaw != null) {
-          final errorJson =
-          jsonDecode(errorRaw) as Map<String, dynamic>;
+          final errorJson = jsonDecode(errorRaw) as Map<String, dynamic>;
           final table = errorJson['table'];
-          final errors =
-              errorJson['errors'] as Map<String, dynamic>? ?? {};
+          final errors = errorJson['errors'] as Map<String, dynamic>? ?? {};
           if (errors.isNotEmpty) {
             final field = errors.keys.first;
-            final fieldErrors =
-            List<String>.from(errors[field]);
-            message =
-            '[$table] ${fieldErrors.first}';
+            final fieldErrors = List<String>.from(errors[field]);
+            message = '[$table] ${fieldErrors.first}';
           }
         }
       } catch (_) {
-        message = body['error']?['message'] ??
-            body['message'] ??
-            'Error desconocido';
+        message =
+            body['error']?['message'] ?? body['message'] ?? 'Error desconocido';
       }
 
       return ApiResponse.error(message);
     } catch (e) {
-      return ApiResponse.error(
-        e.toString(),
-      );
+      return ApiResponse.error(e.toString());
     }
   }
 }

@@ -2,14 +2,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../../../../services/alert_manager.dart';
+import '../../../../../../../../shared/pagination_response.dart';
 import '../../../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../../../shared/theme/configuration/app_text_styles.dart';
 import '../../../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+import '../../../../../../../../shared/utils/util_common.dart';
 import '../../../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../../../shared/responsive/device_gesture_observer.dart';
 import '../../../../../models/product_management_measure.dart';
 import '../../../../../state/product_modal_controller.dart';
+import '../../../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
+import '../../../../models/pos_product_item.dart';
 import '../../../../molecules/inputs/ps_dropdown.dart';
 import '../../../../molecules/inputs/ps_field_row.dart';
 import '../../../../molecules/inputs/ps_input.dart';
@@ -807,25 +811,24 @@ Widget _buildTabRecipe(
                               children: [
                                 /// 🔥 CATEGORÍA
                                 PsFieldItem(
-                                  child: PsDropdown(
-                                    label: switch (controller.inventoryType) {
-                                      InventoryType.raw => '',
-                                      InventoryType.processed =>
-                                        controller
-                                            .titleLabelProductProcessedRecipe,
-                                      InventoryType.forSale =>
-                                        controller
-                                            .titleLabelProductForSaleRecipe,
+                                  child:PsApiTypeAhead<GenericListItem<Map<String, dynamic>>>(
+                                    label: 'Ingrediente',
+                                    searchApi: (search) {
+                                      return PosMockData.getProductsRecipeSearch(
+                                        searchPhrase: search,
+                                        componentProductId: controller.idManagementProduct,
+                                      );
                                     },
-                                    items: controller.categories,
-                                    value: controller.selectedCategory,
-                                    getLabel: (e) => e.value,
-                                    onChanged: controller.selectCategory,
-                                    error: controller.categoryError,
-                                    requiredField: true,
-                                    isTouched: controller.categoryTouched,
-                                    isValid:
-                                        controller.selectedCategory != null,
+
+                                    getLabel: (e) => e.title,
+
+                                    onSelected: (item) {
+
+                                      final product = item.data!;
+
+                                  //    controller.addIngredient(product);
+
+                                    },
                                   ),
                                 ),
                               ],

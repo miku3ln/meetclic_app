@@ -113,7 +113,6 @@ class PosItemsManagementApi {
         'rowCount': rowCount.toString(),
         'searchPhrase': searchPhrase,
         'business_id': businessId.toString(),
-        'grid_id': '#grid-registers-grid',
       },
     );
     final response = await http.get(

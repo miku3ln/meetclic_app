@@ -2,6 +2,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 
@@ -124,6 +125,98 @@ class PaginatedApiService {
       rowCount: int.tryParse(queryParams['rowCount'] ?? '0') ?? 0,
       rows: mapped,
       total: total,
+    );
+  }
+}
+
+class PsApiTypeAhead<T> extends StatelessWidget {
+
+  final String label;
+
+  final T? value;
+
+  final Future<List<T>> Function(
+      String search,
+      ) searchApi;
+
+  final String Function(T item) getLabel;
+
+  final void Function(T item) onSelected;
+
+  final String? error;
+
+  final bool requiredField;
+  final bool isTouched;
+  final bool isValid;
+
+  const PsApiTypeAhead({
+    super.key,
+    required this.label,
+    required this.searchApi,
+    required this.getLabel,
+    required this.onSelected,
+
+    this.value,
+    this.error,
+    this.requiredField = false,
+    this.isTouched = false,
+    this.isValid = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+
+    return TypeAheadField<T>(
+
+      debounceDuration: const Duration(
+        milliseconds: 500,
+      ),
+
+      suggestionsCallback: (search) async {
+
+        return await searchApi(
+          search,
+        );
+
+      },
+
+      itemBuilder: (context, item) {
+
+        return ListTile(
+          title: Text(
+            getLabel(item),
+          ),
+        );
+
+      },
+
+      onSelected: (item) {
+
+        onSelected(item);
+
+      },
+
+      builder: (
+          context,
+          textController,
+          focusNode,
+          ) {
+
+        if (value != null &&
+            textController.text.isEmpty) {
+
+          textController.text =
+              getLabel(value as T);
+        }
+
+        return TextField(
+          controller: textController,
+          focusNode: focusNode,
+          decoration: InputDecoration(
+            labelText: label,
+          ),
+        );
+      },
     );
   }
 }
