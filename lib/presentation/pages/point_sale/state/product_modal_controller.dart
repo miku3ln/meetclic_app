@@ -1,6 +1,7 @@
 import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/models/product_management_measure.dart';
 import '../../../../domain/services/session_service.dart';
 import '../../../../shared/models/api_response.dart';
@@ -210,7 +211,6 @@ class ProductModalController extends BaseFormController {
       productId: product['id'],
       name: product['name'],
       code: product['code_product'] ?? '',
-
       inventoryType: product['inventory_type'],
       productType: product['product_type'],
       /// inicialmente vacío
@@ -220,7 +220,7 @@ class ProductModalController extends BaseFormController {
       unitInputId: defaultUnit['id'],
       baseUnitMeasureId: product['product_measure_type_id'],
       inputUnit: UnitMeasureModel(
-        id:defaultUnit['id'],
+        id: defaultUnit['id'],
         name: defaultUnit['name'],
         symbol: defaultUnit['symbol'],
         factorToBase: double.parse(defaultUnit['factor_to_base'].toString()),
@@ -240,13 +240,12 @@ class ProductModalController extends BaseFormController {
         decimalPrecision: defaultUnit['decimal_precision'],
         conversions: const [],
       ),
-        allData:data['details_all']
+      allData: data['details_all'],
     );
 
     late int information = 1;
     ingredients.add(itemAdd);
     notifyListeners();
-
   }
 
   void updateIngredientQuantity(RecipeIngredientItem item, String value) {
@@ -254,18 +253,46 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
   }
 
-  void updateIngredientUnit(RecipeIngredientItem item, UnitMeasureModel? unit) {
+  Future<void> updateIngredientUnit(
+    RecipeIngredientItem item,
+    UnitMeasureModel? unit,
+  ) async {
     if (unit == null) return;
-
     item.inputUnit = unit;
-
     item.unitInputId = unit.id;
-
     item.conversionFactor = unit.factorToBase;
-
     item.quantityBase = item.quantityInput * unit.factorToBase;
 
     notifyListeners();
+  }
+
+  Future<void> managerRegisterIngrediente(
+    RecipeIngredientItem item,
+    BuildContext context,
+  ) async {
+    final result = await PosMockData.saveProductRecipe(
+      recipeId: item.recipeId,
+      componentProductId: idManagementProduct,
+      // ⚠️ IMPORTANTE: aquí es el product base (component)
+      productId: item.productId,
+      quantityInput: item.quantityInput,
+      quantityBase: item.quantityBase,
+      conversionFactor: item.conversionFactor,
+      unitInputId: item.unitInputId,
+      baseUnitMeasureId: item.baseUnitMeasureId,
+    );
+
+    if (result.success) {
+      // éxito
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.message)));
+    } else {
+      // error
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.message)));
+    }
   }
 
   void setPrice(String value) {
@@ -446,7 +473,7 @@ class ProductModalController extends BaseFormController {
       listMeasureCategoryData,
     );
     print("Cargando receta...");
-
+    ingredients = [];
     // consumir api
     // llenar lista
     // notifyListeners();
@@ -619,6 +646,35 @@ class ProductModalController extends BaseFormController {
   late List<RecipeIngredientItem> ingredients = [];
   List<MeasureCategoryModel> listMeasureCategoryManagement = [];
   List<TaxCategoryModel> listTaxCategoryManagement = [];
+
+  void removeIngredient(RecipeIngredientItem item, context) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Eliminar ingrediente'),
+          content: Text('¿Desea eliminar ${item.name} de la receta?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      if (item.recipeId <= 0) {
+        ingredients.removeWhere((e) => e.productId == item.productId);
+        notifyListeners();
+      } else {}
+    }
+  }
 
   void setManagerDataManagementProduct(
     List<MeasureCategoryModel> listMeasureCategory,

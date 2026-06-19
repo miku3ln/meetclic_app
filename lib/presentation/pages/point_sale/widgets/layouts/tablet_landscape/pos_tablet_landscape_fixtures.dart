@@ -799,24 +799,22 @@ class PosMockData {
     required String searchPhrase,
     required int componentProductId,
     required String inventorType,
-
   }) async {
-
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
-    final uri = Uri.parse(
-      '${ServerConfig.baseUrl}/pointsales/products-by-type-for-recipe',
-    ).replace(
-      queryParameters: {
-        'current': '-1',
-        'rowCount': '-1',
-        'componentProductId': componentProductId.toString(),
-        'searchPhrase': searchPhrase,
-        'business_id': businessId.toString(),
-        'inventory_type': inventorType,
-
-      },
-    );
+    final uri =
+        Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/products-by-type-for-recipe',
+        ).replace(
+          queryParameters: {
+            'current': '-1',
+            'rowCount': '-1',
+            'componentProductId': componentProductId.toString(),
+            'searchPhrase': searchPhrase,
+            'business_id': businessId.toString(),
+            'inventory_type': inventorType,
+          },
+        );
 
     final response = await http.get(
       uri,
@@ -831,19 +829,18 @@ class PosMockData {
     }
 
     final data = jsonDecode(response.body);
-    return (data['rows'] as List).map((json) {
+    final result = (data['rows'] as List).map((json) {
       final stock = json['stock'] ?? {};
       return GenericListItem<Map<String, dynamic>>(
         id: json['id'],
         title: json['name'] ?? '',
-        subtitle:
-        'Stock: ${stock['quantity'] ?? 0} ${stock['unit'] ?? ''}',
+        subtitle: 'Stock: ${stock['quantity'] ?? 0} ${stock['unit'] ?? ''}',
         description: json['category'] ?? '',
         image: json['source'],
         data: json,
       );
-
     }).toList();
+    return result;
   }
 
   static Future<List<PosProductItem>> getProductsData() async {
@@ -920,6 +917,57 @@ class PosMockData {
     return null;
   }
 
+  static Future<ApiResponse<Map<String, dynamic>>> saveProductRecipe({
+    required int recipeId,
+    required int componentProductId,
+    required int productId,
+    required double quantityInput,
+    required double quantityBase,
+    required double conversionFactor,
+    required int unitInputId,
+    required int baseUnitMeasureId,
+  }) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    final uri = Uri.parse(
+      '${ServerConfig.baseUrl}/pointsales/save-product-recipe',
+    );
+
+    final body = {
+      "recipe_id": recipeId,
+      "business_id": businessId,
+      "component_product_id": componentProductId,
+      "product_id": productId,
+      "quantity_input": quantityInput,
+      "quantity_base": quantityBase,
+      "conversion_factor": conversionFactor,
+      "unit_input_id": unitInputId,
+      "base_unit_measure_id": baseUnitMeasureId,
+    };
+
+    final response = await http.post(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    final json = jsonDecode(response.body);
+
+    // 🔥 usa success real del backend
+    if (response.statusCode == 200 && json['success'] == true) {
+      return ApiResponse<Map<String, dynamic>>.success(
+        message: json['msj'] ?? '',
+        data: Map<String, dynamic>.from(json['data'] ?? {}),
+      );
+    }
+
+    return ApiResponse.error('error');
+  }
+
   static Future<List<RecipeIngredientItem>> getProductsRecipeData(
     int componentProductId,
     List<MeasureCategoryModel> categories,
@@ -984,14 +1032,12 @@ class PosMockData {
         quantityBase: double.parse(recipe['quantity_base'].toString()),
 
         conversionFactor: double.parse(recipe['conversion_factor'].toString()),
-
         unitInputId: inputUnitId,
-
         baseUnitMeasureId: baseUnitId,
-
         inputUnit: findUnit(inputUnitId, categories),
 
         baseUnit: findUnit(baseUnitId, categories),
+        allData: row['details_all'],
       );
     }).toList();
   }

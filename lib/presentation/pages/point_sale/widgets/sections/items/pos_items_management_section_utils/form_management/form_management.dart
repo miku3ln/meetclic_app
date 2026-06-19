@@ -817,16 +817,18 @@ Widget _buildTabRecipe(
                                       >(
                                         label: 'Ingrediente',
                                         searchApi: (search) {
-                                          return PosMockData.getProductsRecipeSearch(
+
+                                          final dataRecipe= PosMockData.getProductsRecipeSearch(
                                             searchPhrase: search,
                                             componentProductId:
-                                                controller.idManagementProduct,
+                                            controller.idManagementProduct,
                                             inventorType:
-                                                (controller.inventoryType.id ==
-                                                    InventoryType.processed.id
+                                            (controller.inventoryType.id ==
+                                                InventoryType.processed.id
                                                 ? InventoryType.raw.id
                                                 : InventoryType.processed.id),
                                           );
+                                          return  dataRecipe;
                                         },
                                         getLabel: (e) => e.title,
                                         onSelected: (item) {
@@ -871,11 +873,28 @@ Widget _buildTabRecipe(
                                         value,
                                       );
                                     },
-                                    onUnitChanged: (unit) {
-                                      controller.updateIngredientUnit(e, unit);
+                                    onUnitChanged: (unit) async {
+                                      await controller.updateIngredientUnit(
+                                        e,
+                                        unit,
+                                      );
                                     },
-                                    onEdit: () {},
-                                    onDelete: () {},
+                                    onEdit: (RecipeIngredientItem item) {
+                                      late RecipeIngredientItem deleteItem =
+                                          item;
+                                      controller.managerRegisterIngrediente(
+                                        deleteItem,
+                                        context,
+                                      );
+                                    },
+                                    onDelete: (RecipeIngredientItem item) {
+                                      late RecipeIngredientItem deleteItem =
+                                          item;
+                                      controller.removeIngredient(
+                                        deleteItem,
+                                        context,
+                                      );
+                                    },
                                   ),
                                 );
                               }).toList(),
@@ -936,9 +955,9 @@ class PsIngredientCard extends StatelessWidget {
 
   final ValueChanged<UnitMeasureModel?> onUnitChanged;
 
-  final VoidCallback onEdit;
+  final Function(RecipeIngredientItem item) onEdit;
 
-  final VoidCallback onDelete;
+  final Function(RecipeIngredientItem item) onDelete;
 
   const PsIngredientCard({
     super.key,
@@ -965,6 +984,7 @@ class PsIngredientCard extends StatelessWidget {
       }
     }
 
+
     return resultList;
   }
 
@@ -976,15 +996,15 @@ class PsIngredientCard extends StatelessWidget {
     final productMeasureTypeRoot = details['product_measure_type'];
 
     var informationProduct = item.name + "(" + item.code + " )";
-    Color borderColor=Colors.green;
+    Color borderColor = Colors.green;
     var typeMeasureId = productMeasureTypeRoot['id'].toString();
-    if(typeMeasureId==MeasureType.unit.id){
+    if (typeMeasureId == MeasureType.unit.id) {
       borderColor = Colors.orange;
-    }else if(typeMeasureId==MeasureType.volume.id){
+    } else if (typeMeasureId == MeasureType.volume.id) {
       borderColor = Colors.blue;
-    }else if(typeMeasureId==MeasureType.length.id){
+    } else if (typeMeasureId == MeasureType.length.id) {
       borderColor = Colors.green;
-    }else if(typeMeasureId==MeasureType.area.id){
+    } else if (typeMeasureId == MeasureType.area.id) {
       borderColor = Colors.grey;
     }
 
@@ -1015,7 +1035,11 @@ class PsIngredientCard extends StatelessWidget {
                 spacing: 4,
                 children: [
                   IconButton(
-                    onPressed: onDelete,
+                    onPressed: () => onEdit(item),
+                    icon: const Icon(Icons.save_sharp),
+                  ),
+                  IconButton(
+                    onPressed: () => onDelete(item),
                     icon: const Icon(Icons.delete_outline),
                   ),
                 ],
