@@ -11,6 +11,8 @@ class PsModalLayout extends StatelessWidget {
   final String btnCancelTitle;
   final String btnSaveTitle;
   final bool useDialog;
+  final bool isLoading;
+  final bool allowActions;
 
   const PsModalLayout({
     super.key,
@@ -20,6 +22,8 @@ class PsModalLayout extends StatelessWidget {
     required this.btnCancelTitle,
     required this.btnSaveTitle,
     this.useDialog = true,
+    this.isLoading = false,
+    this.allowActions = true,
   });
 
   @override
@@ -30,41 +34,49 @@ class PsModalLayout extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
-              title,
-              style: AppTextStyles.title(context),
-            ),
+            Text(title, style: AppTextStyles.title(context)),
             IconButton(
-              icon: Icon(
-                Icons.close,
-                color: c.iconPrimary,
-              ),
-              onPressed: () => Navigator.pop(context),
+              icon: Icon(Icons.close, color: c.iconPrimary),
+              onPressed: isLoading ? null : () => Navigator.pop(context),
             ),
           ],
         ),
-        Expanded(
-            child: body,
-        ),
+        Expanded(child: body),
         AppSpacing.spaceBetweenSections,
-        Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          children: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(btnCancelTitle),
-            ),
-            const SizedBox(width: AppSpacing.s),
-            ElevatedButton(
-              onPressed: onSave,
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                onSave == null ? c.disabled : c.secondary,
+        if (allowActions)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              TextButton(
+                onPressed: isLoading ? null : () => Navigator.pop(context),
+                child: Text(btnCancelTitle),
               ),
-              child: Text(btnSaveTitle),
-            ),
-          ],
-        ),
+              const SizedBox(width: AppSpacing.s),
+              ElevatedButton(
+                onPressed: (onSave == null || isLoading) ? null : onSave,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: onSave == null || isLoading
+                      ? c.disabled
+                      : c.secondary,
+                ),
+                child: Text(btnSaveTitle),
+              ),
+            ],
+          ),
+      ],
+    );
+
+    /// ============================
+    /// WRAPPER CON LOADING OVERLAY
+    /// ============================
+    Widget wrappedContent = Stack(
+      children: [
+        content,
+
+        if (isLoading) ...[
+          const ModalBarrier(dismissible: false, color: Colors.black45),
+          const Center(child: CircularProgressIndicator()),
+        ],
       ],
     );
 
@@ -82,50 +94,51 @@ class PsModalLayout extends StatelessWidget {
               children: [
                 /// HEADER
                 Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      title,
-                      style: AppTextStyles.title(context),
-                    ),
+                    Text(title, style: AppTextStyles.title(context)),
                     IconButton(
-                      icon: Icon(
-                        Icons.close,
-                        color: c.iconPrimary,
-                      ),
-                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close, color: c.iconPrimary),
+                      onPressed: isLoading
+                          ? null
+                          : () => Navigator.pop(context),
                     ),
                   ],
                 ),
 
                 AppSpacing.spaceBetweenSections,
-
                 Flexible(
-                  child: SingleChildScrollView(
-                    child: body,
+                  child: Stack(
+                    children: [
+                      SingleChildScrollView(child: body),
+
+                      if (isLoading) ...[
+                        const ModalBarrier(
+                          dismissible: false,
+                          color: Colors.black45,
+                        ),
+                        const Center(child: CircularProgressIndicator()),
+                      ],
+                    ],
                   ),
                 ),
 
                 AppSpacing.spaceBetweenSections,
 
                 Row(
-                  mainAxisAlignment:
-                  MainAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     TextButton(
-                      onPressed: () =>
-                          Navigator.pop(context),
+                      onPressed: isLoading
+                          ? null
+                          : () => Navigator.pop(context),
                       child: Text(btnCancelTitle),
                     ),
-                    const SizedBox(
-                      width: AppSpacing.s,
-                    ),
+                    const SizedBox(width: AppSpacing.s),
                     ElevatedButton(
-                      onPressed: onSave,
+                      onPressed: (onSave == null || isLoading) ? null : onSave,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor:
-                        onSave == null
+                        backgroundColor: onSave == null || isLoading
                             ? c.disabled
                             : c.secondary,
                       ),
@@ -148,7 +161,16 @@ class PsModalLayout extends StatelessWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.m),
-          child: content,
+          child: Stack(
+            children: [
+              content,
+
+              if (isLoading) ...[
+                const ModalBarrier(dismissible: false, color: Colors.black45),
+                const Center(child: CircularProgressIndicator()),
+              ],
+            ],
+          ),
         ),
       ),
     );

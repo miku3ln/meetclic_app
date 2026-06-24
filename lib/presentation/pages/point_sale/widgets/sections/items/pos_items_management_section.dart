@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/form_management/form_management.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/pos_items_controller.dart';
@@ -8,6 +10,17 @@ import '../../../models/product_draft.dart';
 import '../../../state/product_modal_controller.dart';
 import '../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../organisms/items/pos_items_content.dart';
+
+class ProductModalEvents {
+  static const save = 'save';
+  static const create = 'create';
+  static const update = 'update';
+  static const recipeAdd = 'recipe_add';
+  static const recipeDelete = 'recipe_delete';
+  static const recipeUpdate = 'recipe_update';
+  static const close = 'close';
+  static const cancel = 'cancel';
+}
 
 class PosItemsManagementSection extends StatefulWidget {
   const PosItemsManagementSection({super.key});
@@ -49,6 +62,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   void dispose() {
     _scrollController.dispose();
     _searchController.dispose();
+    _modalSub?.cancel();
     super.dispose();
   }
 
@@ -72,6 +86,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       _hasInitialLoadFinished = true;
       _isLoading = false;
     });
+    _listenModalEvents(controller);
   }
 
   Future<void> _loadMore() async {
@@ -119,6 +134,41 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     }
   }
 
+  StreamSubscription? _modalSub;
+
+  void _listenModalEvents(ProductModalController controller) {
+    _modalSub?.cancel();
+    _modalSub = controller.events.listen((event) {
+      final data = event.data as Map<String, dynamic>?;
+      switch (event.type) {
+        case ProductModalEvents.save:
+          final allowReload = data?['allowReload'] ?? false;
+          if (allowReload) {
+            _refreshAll();
+          }
+          break;
+        case ProductModalEvents.create:
+          _refreshAll();
+          break;
+        case ProductModalEvents.update:
+          _refreshAll();
+          break;
+        case ProductModalEvents.recipeAdd:
+          debugPrint('recipe add: ${event.data}');
+          break;
+        case ProductModalEvents.recipeDelete:
+          debugPrint('recipe delete: ${event.data}');
+          break;
+        case ProductModalEvents.close:
+          debugPrint('modal closed');
+          break;
+        case ProductModalEvents.cancel:
+          debugPrint('cancelled');
+          break;
+      }
+    });
+  }
+
   Future<void> _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
     if (item.data == null) return;
 
@@ -127,13 +177,17 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     });
 
     try {
-      final controller = ProductModalController();
+      controller.resetAllForm();
       await controller.init();
       final draft = ProductMapper.fromMap(item.data!);
       final catalogMeasureData = await PosMockData.getCatalogMeasureData();
       final catalogTaxData = await PosMockData.getCatalogTaxData();
-      controller.setManagerDataManagementProduct(catalogMeasureData, catalogTaxData);
+      controller.setManagerDataManagementProduct(
+        catalogMeasureData,
+        catalogTaxData,
+      );
       controller.loadAndValidate(draft);
+
       if (!mounted) return;
       await showManagerProduct(
         context: context,
@@ -145,7 +199,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
         typeManagement: CrudType.update,
         listMeasureCategory: catalogMeasureData,
         listTaxCategory: catalogTaxData,
-        productId: 8,
+        productId: draft.id!,
       );
     } finally {
       if (mounted) {
@@ -198,15 +252,17 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                     });
 
                     try {
-                      final controller = ProductModalController();
-
+                      controller.resetAllForm();
                       await controller.init();
 
                       final catalogMeasureData =
                           await PosMockData.getCatalogMeasureData();
                       final catalogTaxData =
                           await PosMockData.getCatalogTaxData();
-                      controller.setManagerDataManagementProduct(catalogMeasureData, catalogTaxData);
+                      controller.setManagerDataManagementProduct(
+                        catalogMeasureData,
+                        catalogTaxData,
+                      );
                       if (!mounted) return;
                       await showManagerProduct(
                         barrierDismissible: false,

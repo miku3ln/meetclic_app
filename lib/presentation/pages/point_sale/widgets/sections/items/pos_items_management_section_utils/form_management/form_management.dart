@@ -43,15 +43,18 @@ Future<void> showManagerProduct({
     animation: controller,
     builder: (_, __) {
       return PsModalLayout(
+        isLoading: controller.isLoading,
         useDialog: allowModal,
         title: controller.titleManagement,
         btnCancelTitle: btnCancelTitle,
         btnSaveTitle: btnSaveTitle,
+        allowActions: controller.allowActions,
         onSave: controller.canSubmit
             ? () async {
                 if (!controller.validateForm().success) {
                   return;
                 }
+                controller.setLoading(true);
                 final resultSave = await controller.saveProduct(typeManagement);
                 if (!context.mounted) return;
                 if (resultSave.success) {
@@ -59,6 +62,9 @@ Future<void> showManagerProduct({
                   AlertService.success(context, message: resultSave.message);
                   if (allowClose) {
                     Navigator.pop(context, resultSave);
+                    controller.emit(ProductModalEvents.save, {
+                      "allowReload": true,
+                    });
                   } else {
                     final product = resultSave.data?['saved']['product'];
                     final productIdCurrent = product["id"];
@@ -70,6 +76,7 @@ Future<void> showManagerProduct({
                 } else {
                   AlertService.error(context, message: resultSave.message);
                 }
+                controller.setLoading(false);
               }
             : null,
         body: _buildProductBody(
@@ -134,7 +141,6 @@ class ProductManagerFormWidget extends StatelessWidget {
     switch (device.layoutType) {
       case LayoutType.mobilePortrait:
         return Text('mobilePortrait');
-
       case LayoutType.mobileLandscape:
         return Text('mobileLandscape');
 
@@ -817,23 +823,30 @@ Widget _buildTabRecipe(
                                       >(
                                         label: 'Ingrediente',
                                         searchApi: (search) {
-
-                                          final dataRecipe= PosMockData.getProductsRecipeSearch(
-                                            searchPhrase: search,
-                                            componentProductId:
-                                            controller.idManagementProduct,
-                                            inventorType:
-                                            (controller.inventoryType.id ==
-                                                InventoryType.processed.id
-                                                ? InventoryType.raw.id
-                                                : InventoryType.processed.id),
-                                          );
-                                          return  dataRecipe;
+                                          final dataRecipe =
+                                              PosMockData.getProductsRecipeSearch(
+                                                searchPhrase: search,
+                                                componentProductId: controller
+                                                    .idManagementProduct,
+                                                inventorType:
+                                                    (controller
+                                                            .inventoryType
+                                                            .id ==
+                                                        InventoryType
+                                                            .processed
+                                                            .id
+                                                    ? InventoryType.raw.id
+                                                    : InventoryType
+                                                          .processed
+                                                          .id),
+                                              );
+                                          return dataRecipe;
                                         },
                                         getLabel: (e) => e.title,
                                         onSelected: (item) {
                                           final product = item;
-                                          controller.addIngredient(product);
+                                          controller.ingredientsController
+                                              .addIngredient(product);
                                         },
                                       ),
                                 ),
@@ -860,45 +873,59 @@ Widget _buildTabRecipe(
                               ],
                             ),
                             AppSpacing.spaceBetweenSections,
-                            Column(
-                              children: controller.ingredients.map((e) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: 12),
-                                  child: PsIngredientCard(
-                                    item: e,
-                                    measureCategories: listMeasureCategory,
-                                    onQuantityChanged: (value) {
-                                      controller.updateIngredientQuantity(
-                                        e,
-                                        value,
+                            if (controller.isLoadingDataRecipe)
+                              const Center(child: CircularProgressIndicator())
+                            else if (controller
+                                .ingredientsController
+                                .ingredients
+                                .isEmpty)
+                              const Center(child: Text("No hay ingredientes"))
+                            else
+                              Column(
+                                children: controller
+                                    .ingredientsController
+                                    .ingredients
+                                    .map((e) {
+                                      return Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 12,
+                                        ),
+                                        child: PsIngredientCard(
+                                          item: e,
+                                          measureCategories:
+                                              listMeasureCategory,
+                                          onQuantityChanged: (value) {
+                                            controller.ingredientsController
+                                                .updateIngredientQuantity(
+                                                  e,
+                                                  value,
+                                                );
+                                          },
+                                          onUnitChanged: (unit) async {
+                                            await controller
+                                                .ingredientsController
+                                                .updateIngredientUnit(e, unit);
+                                          },
+                                          onEdit: (RecipeIngredientItem item) {
+                                            controller.ingredientsController
+                                                .managerRegisterIngrediente(
+                                                  item,
+                                                  context,
+                                                );
+                                          },
+                                          onDelete:
+                                              (RecipeIngredientItem item) {
+                                                controller.ingredientsController
+                                                    .removeIngredient(
+                                                      item,
+                                                      context,
+                                                    );
+                                              },
+                                        ),
                                       );
-                                    },
-                                    onUnitChanged: (unit) async {
-                                      await controller.updateIngredientUnit(
-                                        e,
-                                        unit,
-                                      );
-                                    },
-                                    onEdit: (RecipeIngredientItem item) {
-                                      late RecipeIngredientItem deleteItem =
-                                          item;
-                                      controller.managerRegisterIngrediente(
-                                        deleteItem,
-                                        context,
-                                      );
-                                    },
-                                    onDelete: (RecipeIngredientItem item) {
-                                      late RecipeIngredientItem deleteItem =
-                                          item;
-                                      controller.removeIngredient(
-                                        deleteItem,
-                                        context,
-                                      );
-                                    },
-                                  ),
-                                );
-                              }).toList(),
-                            ),
+                                    })
+                                    .toList(),
+                              ),
                           ],
                         ),
                       )
@@ -983,7 +1010,6 @@ class PsIngredientCard extends StatelessWidget {
         resultList = category.units;
       }
     }
-
 
     return resultList;
   }
@@ -1166,6 +1192,11 @@ class _ProductTabsViewState extends State<ProductTabsView>
     super.initState();
     tabController = TabController(length: 2, vsync: this);
     tabController.addListener(() {
+      if (tabController.index == 1) {
+        widget.controller.setAllowActions(false);
+      } else {
+        widget.controller.setAllowActions(true);
+      }
       if (tabController.index == 1 && !recipeLoaded) {
         final recipeEnabled =
             widget.controller.inventoryType == InventoryType.processed ||
@@ -1173,8 +1204,8 @@ class _ProductTabsViewState extends State<ProductTabsView>
 
         if (recipeEnabled && widget.controller.idManagementProduct > 0) {
           recipeLoaded = true;
-          widget.controller.loadRecipe();
-        }
+          widget.controller.ingredientsController.loadRecipe();
+        } else {}
       } else {
         recipeLoaded = false;
       }

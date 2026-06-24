@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/cupertino.dart';
@@ -17,8 +18,167 @@ import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 import 'dart:convert';
 
+class ProductIngredientsController extends ChangeNotifier {
+  final ProductModalController parent;
+
+  ProductIngredientsController(this.parent);
+
+  Future<void> loadRecipe() async {
+    parent.setLoadingDataRecipe(true);
+    final ingredientsData = await PosMockData.getProductsRecipeData(
+      parent.idManagementProduct,
+      parent.listMeasureCategoryData,
+    );
+    parent.setLoadingDataRecipe(false);
+    ingredients = [];
+    ingredients = ingredientsData;
+    notifyListeners();
+  }
+
+  late List<RecipeIngredientItem> ingredients = [];
+
+  /// =========================
+  /// ✍️ SETTERS
+  /// =========================
+
+  void addIngredient(GenericListItem<Map<String, dynamic>> item) {
+    final data = item.data!;
+    final details = jsonDecode(data['details_all']);
+    final product = details['product'];
+    final defaultUnit = details['default_unit_measure'];
+    final itemAdd = RecipeIngredientItem(
+      recipeId: 0,
+      // nuevo, aún no existe en BD
+      productId: product['id'],
+      name: product['name'],
+      code: product['code_product'] ?? '',
+      inventoryType: product['inventory_type'],
+      productType: product['product_type'],
+
+      /// inicialmente vacío
+      quantityInput: 0,
+      quantityBase: 0,
+      conversionFactor: double.parse(defaultUnit['factor_to_base'].toString()),
+      unitInputId: defaultUnit['id'],
+      baseUnitMeasureId: product['product_measure_type_id'],
+      inputUnit: UnitMeasureModel(
+        id: defaultUnit['id'],
+        name: defaultUnit['name'],
+        symbol: defaultUnit['symbol'],
+        factorToBase: double.parse(defaultUnit['factor_to_base'].toString()),
+        isBase: defaultUnit['is_base'] == 1,
+        isDefault: true,
+        decimalPrecision: defaultUnit['decimal_precision'],
+        conversions: const [],
+      ),
+
+      baseUnit: UnitMeasureModel(
+        id: defaultUnit['id'],
+        name: defaultUnit['name'],
+        symbol: defaultUnit['symbol'],
+        factorToBase: double.parse(defaultUnit['factor_to_base'].toString()),
+        isBase: true,
+        isDefault: true,
+        decimalPrecision: defaultUnit['decimal_precision'],
+        conversions: const [],
+      ),
+      allData: data['details_all'],
+    );
+
+    late int information = 1;
+    ingredients.add(itemAdd);
+    notifyListeners();
+  }
+
+  void updateIngredientQuantity(RecipeIngredientItem item, String value) {
+    item.quantityInput = double.tryParse(value) ?? 0;
+    notifyListeners();
+  }
+
+  Future<void> updateIngredientUnit(
+    RecipeIngredientItem item,
+    UnitMeasureModel? unit,
+  ) async {
+    if (unit == null) return;
+    item.inputUnit = unit;
+    item.unitInputId = unit.id;
+    item.conversionFactor = unit.factorToBase;
+    item.quantityBase = item.quantityInput * unit.factorToBase;
+
+    notifyListeners();
+  }
+
+  Future<void> managerRegisterIngrediente(
+    RecipeIngredientItem item,
+    BuildContext context,
+  ) async {
+    final result = await PosMockData.saveProductRecipe(
+      recipeId: item.recipeId,
+      componentProductId: parent.idManagementProduct,
+      // ⚠️ IMPORTANTE: aquí es el product base (component)
+      productId: item.productId,
+      quantityInput: item.quantityInput,
+      quantityBase: item.quantityBase,
+      conversionFactor: item.conversionFactor,
+      unitInputId: item.unitInputId,
+      baseUnitMeasureId: item.baseUnitMeasureId,
+    );
+
+    if (result.success) {
+      // éxito
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.message)));
+    } else {
+      // error
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(result.message)));
+    }
+  }
+
+  void removeIngredient(RecipeIngredientItem item, context) async {
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) {
+        return AlertDialog(
+          title: const Text('Eliminar ingrediente'),
+          content: Text('¿Desea eliminar ${item.name} de la receta?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('Eliminar'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result == true) {
+      if (item.recipeId <= 0) {
+        ingredients.removeWhere((e) => e.productId == item.productId);
+        notifyListeners();
+      } else {}
+    }
+  }
+}
+
 class ProductModalController extends BaseFormController {
-  ProductModalController() {
+  final _eventController = StreamController<ProductModalEvent>.broadcast();
+
+  Stream<ProductModalEvent> get events => _eventController.stream;
+
+  void emit(String type, [dynamic data]) {
+    _eventController.add(ProductModalEvent(type, data));
+  }
+
+  late final ProductIngredientsController ingredientsController;
+
+  void initField() {
     fields.addAll({
       'name': FormFieldController<String>(
         label: 'Nombre',
@@ -63,6 +223,10 @@ class ProductModalController extends BaseFormController {
         validators: [ValidatorsUtil.nonNegativeDouble("Stock mínimo")],
       ),
     });
+  }
+
+  ProductModalController() {
+    ingredientsController = ProductIngredientsController(this);
   }
 
   FormFieldController<String> get nameField =>
@@ -191,110 +355,6 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
   }
 
-  /// =========================
-  /// ✍️ SETTERS
-  /// =========================
-
-  void setName(String value) {
-    nameField.setValue(value);
-    notifyListeners();
-  }
-
-  void addIngredient(GenericListItem<Map<String, dynamic>> item) {
-    final data = item.data!;
-    final details = jsonDecode(data['details_all']);
-    final product = details['product'];
-    final defaultUnit = details['default_unit_measure'];
-    final itemAdd = RecipeIngredientItem(
-      recipeId: 0,
-      // nuevo, aún no existe en BD
-      productId: product['id'],
-      name: product['name'],
-      code: product['code_product'] ?? '',
-      inventoryType: product['inventory_type'],
-      productType: product['product_type'],
-      /// inicialmente vacío
-      quantityInput: 0,
-      quantityBase: 0,
-      conversionFactor: double.parse(defaultUnit['factor_to_base'].toString()),
-      unitInputId: defaultUnit['id'],
-      baseUnitMeasureId: product['product_measure_type_id'],
-      inputUnit: UnitMeasureModel(
-        id: defaultUnit['id'],
-        name: defaultUnit['name'],
-        symbol: defaultUnit['symbol'],
-        factorToBase: double.parse(defaultUnit['factor_to_base'].toString()),
-        isBase: defaultUnit['is_base'] == 1,
-        isDefault: true,
-        decimalPrecision: defaultUnit['decimal_precision'],
-        conversions: const [],
-      ),
-
-      baseUnit: UnitMeasureModel(
-        id: defaultUnit['id'],
-        name: defaultUnit['name'],
-        symbol: defaultUnit['symbol'],
-        factorToBase: double.parse(defaultUnit['factor_to_base'].toString()),
-        isBase: true,
-        isDefault: true,
-        decimalPrecision: defaultUnit['decimal_precision'],
-        conversions: const [],
-      ),
-      allData: data['details_all'],
-    );
-
-    late int information = 1;
-    ingredients.add(itemAdd);
-    notifyListeners();
-  }
-
-  void updateIngredientQuantity(RecipeIngredientItem item, String value) {
-    item.quantityInput = double.tryParse(value) ?? 0;
-    notifyListeners();
-  }
-
-  Future<void> updateIngredientUnit(
-    RecipeIngredientItem item,
-    UnitMeasureModel? unit,
-  ) async {
-    if (unit == null) return;
-    item.inputUnit = unit;
-    item.unitInputId = unit.id;
-    item.conversionFactor = unit.factorToBase;
-    item.quantityBase = item.quantityInput * unit.factorToBase;
-
-    notifyListeners();
-  }
-
-  Future<void> managerRegisterIngrediente(
-    RecipeIngredientItem item,
-    BuildContext context,
-  ) async {
-    final result = await PosMockData.saveProductRecipe(
-      recipeId: item.recipeId,
-      componentProductId: idManagementProduct,
-      // ⚠️ IMPORTANTE: aquí es el product base (component)
-      productId: item.productId,
-      quantityInput: item.quantityInput,
-      quantityBase: item.quantityBase,
-      conversionFactor: item.conversionFactor,
-      unitInputId: item.unitInputId,
-      baseUnitMeasureId: item.baseUnitMeasureId,
-    );
-
-    if (result.success) {
-      // éxito
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.message)));
-    } else {
-      // error
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.message)));
-    }
-  }
-
   void setPrice(String value) {
     priceField.setValue(value.isEmpty ? null : double.tryParse(value));
     notifyListeners();
@@ -388,6 +448,11 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
   }
 
+  void setName(String value) {
+    nameField.setValue(value);
+    notifyListeners();
+  }
+
   /// =========================
   /// ✅ VALIDATE ALL
   /// =========================
@@ -467,214 +532,8 @@ class ProductModalController extends BaseFormController {
   int idManagementProduct = -1;
   String titleManagement = "";
 
-  Future<void> loadRecipe() async {
-    final ingredientsData = await PosMockData.getProductsRecipeData(
-      idManagementProduct,
-      listMeasureCategoryData,
-    );
-    print("Cargando receta...");
-    ingredients = [];
-    // consumir api
-    // llenar lista
-    // notifyListeners();
-
-    ingredients = ingredientsData;
-    final ingredients2 = [
-      RecipeIngredientItem(
-        recipeId: 1,
-        productId: 1,
-
-        name: 'Carne de Res',
-        code: 'A-01-MEASURABLE',
-
-        inventoryType: 'RAW',
-        productType: 'MEASURABLE',
-
-        quantityInput: 0.5,
-        quantityBase: 500,
-        conversionFactor: 1000,
-
-        unitInputId: 1,
-        baseUnitMeasureId: 5,
-
-        inputUnit: UnitMeasureModel(
-          id: 1,
-          name: 'Kilogramo',
-          symbol: 'kg',
-          factorToBase: 1000,
-          isBase: false,
-          isDefault: false,
-          decimalPrecision: 2,
-          conversions: const [],
-        ),
-
-        baseUnit: UnitMeasureModel(
-          id: 5,
-          name: 'Gramo',
-          symbol: 'g',
-          factorToBase: 1,
-          isBase: true,
-          isDefault: false,
-          decimalPrecision: 2,
-          conversions: const [],
-        ),
-      ),
-
-      RecipeIngredientItem(
-        recipeId: 2,
-        productId: 2,
-
-        name: 'Arroz',
-        code: 'A-02-MEASURABLE',
-
-        inventoryType: 'RAW',
-        productType: 'MEASURABLE',
-
-        quantityInput: 0.35,
-        quantityBase: 350,
-        conversionFactor: 1000,
-
-        unitInputId: 1,
-        baseUnitMeasureId: 5,
-
-        inputUnit: UnitMeasureModel(
-          id: 1,
-          name: 'Kilogramo',
-          symbol: 'kg',
-          factorToBase: 1000,
-          isBase: false,
-          isDefault: false,
-          decimalPrecision: 2,
-          conversions: const [],
-        ),
-
-        baseUnit: UnitMeasureModel(
-          id: 5,
-          name: 'Gramo',
-          symbol: 'g',
-          factorToBase: 1,
-          isBase: true,
-          isDefault: false,
-          decimalPrecision: 2,
-          conversions: const [],
-        ),
-      ),
-
-      RecipeIngredientItem(
-        recipeId: 3,
-        productId: 3,
-
-        name: 'Papa',
-        code: 'A-03-MEASURABLE',
-
-        inventoryType: 'RAW',
-        productType: 'MEASURABLE',
-
-        quantityInput: 0.075,
-        quantityBase: 75,
-        conversionFactor: 1000,
-
-        unitInputId: 1,
-        baseUnitMeasureId: 5,
-
-        inputUnit: UnitMeasureModel(
-          id: 1,
-          name: 'Kilogramo',
-          symbol: 'kg',
-          factorToBase: 1000,
-          isBase: false,
-          isDefault: false,
-          decimalPrecision: 2,
-          conversions: const [],
-        ),
-
-        baseUnit: UnitMeasureModel(
-          id: 5,
-          name: 'Gramo',
-          symbol: 'g',
-          factorToBase: 1,
-          isBase: true,
-          isDefault: false,
-          decimalPrecision: 2,
-          conversions: const [],
-        ),
-      ),
-
-      RecipeIngredientItem(
-        recipeId: 4,
-        productId: 4,
-
-        name: 'Chorizo',
-        code: 'A-04-UNIT',
-
-        inventoryType: 'RAW',
-        productType: 'UNIT',
-
-        quantityInput: 1,
-        quantityBase: 1,
-        conversionFactor: 1,
-
-        unitInputId: 35,
-        baseUnitMeasureId: 35,
-
-        inputUnit: UnitMeasureModel(
-          id: 35,
-          name: 'Unidad',
-          symbol: 'und',
-          factorToBase: 1,
-          isBase: true,
-          isDefault: true,
-          decimalPrecision: 0,
-          conversions: const [],
-        ),
-
-        baseUnit: UnitMeasureModel(
-          id: 35,
-          name: 'Unidad',
-          symbol: 'und',
-          factorToBase: 1,
-          isBase: true,
-          isDefault: true,
-          decimalPrecision: 0,
-          conversions: const [],
-        ),
-      ),
-    ];
-    notifyListeners();
-  }
-
-  late List<RecipeIngredientItem> ingredients = [];
   List<MeasureCategoryModel> listMeasureCategoryManagement = [];
   List<TaxCategoryModel> listTaxCategoryManagement = [];
-
-  void removeIngredient(RecipeIngredientItem item, context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: const Text('Eliminar ingrediente'),
-          content: Text('¿Desea eliminar ${item.name} de la receta?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Eliminar'),
-            ),
-          ],
-        );
-      },
-    );
-
-    if (result == true) {
-      if (item.recipeId <= 0) {
-        ingredients.removeWhere((e) => e.productId == item.productId);
-        notifyListeners();
-      } else {}
-    }
-  }
 
   void setManagerDataManagementProduct(
     List<MeasureCategoryModel> listMeasureCategory,
@@ -846,20 +705,65 @@ class ProductModalController extends BaseFormController {
   }
 
   /// =========================
+  /// 💾 get Data Recipe
+  /// =========================
+  bool _isLoadingDataRecipe = false;
+
+  bool get isLoadingDataRecipe => _isLoadingDataRecipe;
+
+  void setLoadingDataRecipe(bool value) {
+    _isLoadingDataRecipe = value;
+    notifyListeners();
+  }
+
+  /// =========================
   /// 💾 SAVE
   /// =========================
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  void setLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
+  bool _allowActions = true;
+
+  bool get allowActions => _allowActions;
+
+  void setAllowActions(bool value) {
+    _allowActions = value;
+    notifyListeners();
+  }
 
   Future<ApiResponse<Map<String, dynamic>>> saveProduct(CrudType type) async {
     if (!validateForm().success) {
       throw Exception("Formulario inválido");
     }
-    var payload = buildPayload();
+    var payload = buildPayload(type);
     if (type == CrudType.create) {
       final response = await ProductDataUtil.createProduct(payload);
       return response;
     }
     final response = await ProductDataUtil.updateProduct(payload);
     return response;
+  }
+
+  void resetAllForm() {
+    initField();
+    _resetTouched();
+    _resetErrors();
+    resetValues();
+  }
+
+  void resetValues() {
+    selectedTax = null;
+    selectedCategory = null;
+    selectedSubcategory = null;
+    selectedMeasureCategory = null;
+    selectedTaxCategory = null;
+    image = null;
   }
 
   void _resetTouched() {
@@ -888,15 +792,15 @@ class ProductModalController extends BaseFormController {
     imageError = null;
   }
 
-  Map<String, dynamic> buildPayload() {
+  Map<String, dynamic> buildPayload(CrudType type) {
     switch (inventoryType) {
       case InventoryType.raw:
-        return _buildBasePayload();
+        return _buildBasePayload(type);
       case InventoryType.processed:
-        return _buildBasePayload();
+        return _buildBasePayload(type);
 
       case InventoryType.forSale:
-        return _buildBasePayload();
+        return _buildBasePayload(type);
     }
   }
 
@@ -956,7 +860,7 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
   }
 
-  Map<String, dynamic> _buildBasePayload() {
+  Map<String, dynamic> _buildBasePayload(CrudType type) {
     final businessId = SessionService().businessId;
     final currentSession = SessionService().currentSession;
     final user_id = currentSession?.userId;
@@ -968,13 +872,20 @@ class ProductModalController extends BaseFormController {
       listMeasureCategory: listMeasureCategoryData,
     );
     final product_measure_type_id = sellType.id;
+    var stateCurrent = 'INACTIVE';
+    if (type == CrudType.create) {
+    } else if (type == CrudType.update) {
+      stateCurrent = ingredientsController.ingredients.isNotEmpty
+          ? 'ACTIVE'
+          : 'INACTIVE';
+    }
     return {
       'product': {
         'code': codeBar,
         'name': name,
         'product_type': 'MEASURABLE',
         'inventory_type': inventoryType.id,
-        'state': 'ACTIVE',
+        'state': stateCurrent,
         'product_trademark_id': 1,
         'product_category_id': selectedCategory?.id,
         'product_subcategory_id': selectedSubcategory?.id,

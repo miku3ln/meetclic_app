@@ -38,3 +38,11 @@ class ApiResponse<T> {
     );
   }
 }
+
+class ProductModalEvent {
+  final String type;
+  final dynamic data;
+
+  ProductModalEvent(this.type, [this.data]);
+}
+
