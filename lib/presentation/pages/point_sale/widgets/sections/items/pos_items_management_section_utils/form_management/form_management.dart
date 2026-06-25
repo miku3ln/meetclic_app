@@ -1,7 +1,10 @@
+import 'dart:async';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../../../../../../../services/alert_manager.dart';
+import '../../../../../../../../shared/models/api_response.dart';
 import '../../../../../../../../shared/pagination_response.dart';
 import '../../../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../../../shared/theme/configuration/app_spacing.dart';
@@ -13,7 +16,6 @@ import '../../../../../../../shared/responsive/device_gesture_observer.dart';
 import '../../../../../models/product_management_measure.dart';
 import '../../../../../state/product_modal_controller.dart';
 import '../../../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
-import '../../../../models/pos_product_item.dart';
 import '../../../../molecules/inputs/ps_dropdown.dart';
 import '../../../../molecules/inputs/ps_field_row.dart';
 import '../../../../molecules/inputs/ps_input.dart';
@@ -49,6 +51,7 @@ Future<void> showManagerProduct({
         btnCancelTitle: btnCancelTitle,
         btnSaveTitle: btnSaveTitle,
         allowActions: controller.allowActions,
+        eventController: controller.eventModalProductController,
         onSave: controller.canSubmit
             ? () async {
                 if (!controller.validateForm().success) {
@@ -65,6 +68,7 @@ Future<void> showManagerProduct({
                     controller.emit(ProductModalEvents.save, {
                       "allowReload": true,
                     });
+                    controller.setAllowReloadData(true);
                   } else {
                     final product = resultSave.data?['saved']['product'];
                     final productIdCurrent = product["id"];

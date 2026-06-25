@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../../../../../shared/models/api_response.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/theme/configuration/app_text_styles.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
@@ -13,6 +16,7 @@ class PsModalLayout extends StatelessWidget {
   final bool useDialog;
   final bool isLoading;
   final bool allowActions;
+  final StreamController<ProductModalEvent>? eventController;
 
   const PsModalLayout({
     super.key,
@@ -24,6 +28,7 @@ class PsModalLayout extends StatelessWidget {
     this.useDialog = true,
     this.isLoading = false,
     this.allowActions = true,
+    this.eventController,
   });
 
   @override
@@ -37,7 +42,10 @@ class PsModalLayout extends StatelessWidget {
             Text(title, style: AppTextStyles.title(context)),
             IconButton(
               icon: Icon(Icons.close, color: c.iconPrimary),
-              onPressed: isLoading ? null : () => Navigator.pop(context),
+              onPressed: isLoading ? null :() {
+                eventController?.add(ProductModalEvent('closeBtnHeader'));
+                Navigator.pop(context);
+              },
             ),
           ],
         ),
@@ -48,7 +56,12 @@ class PsModalLayout extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               TextButton(
-                onPressed: isLoading ? null : () => Navigator.pop(context),
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        Navigator.pop(context);
+                        eventController?.add(ProductModalEvent('cancelBtnFooter'));
+                      },
                 child: Text(btnCancelTitle),
               ),
               const SizedBox(width: AppSpacing.s),
@@ -101,7 +114,10 @@ class PsModalLayout extends StatelessWidget {
                       icon: Icon(Icons.close, color: c.iconPrimary),
                       onPressed: isLoading
                           ? null
-                          : () => Navigator.pop(context),
+                          : () {
+                              eventController?.add(ProductModalEvent('closeBtnHeader'));
+                              Navigator.pop(context);
+                            },
                     ),
                   ],
                 ),

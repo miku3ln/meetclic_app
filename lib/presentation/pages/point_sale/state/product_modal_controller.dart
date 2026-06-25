@@ -176,6 +176,15 @@ class ProductModalController extends BaseFormController {
     _eventController.add(ProductModalEvent(type, data));
   }
 
+  final _eventModalProductController =
+      StreamController<ProductModalEvent>.broadcast();
+
+  Stream<ProductModalEvent> get eventsModalProduct =>
+      _eventModalProductController.stream;
+
+  StreamController<ProductModalEvent> get eventModalProductController =>
+      _eventModalProductController;
+
   late final ProductIngredientsController ingredientsController;
 
   void initField() {
@@ -317,6 +326,7 @@ class ProductModalController extends BaseFormController {
   bool subcategoryTouched = false;
   bool measureCategoryTouched = false;
   bool taxTouched = false;
+  bool allowReloadData = false;
 
   /// =========================
   /// ⚠️ ERRORS
@@ -382,6 +392,11 @@ class ProductModalController extends BaseFormController {
 
   void setCodeBar(String value) {
     codeBarField.setValue(value);
+    notifyListeners();
+  }
+
+  void setAllowReloadData(bool value) {
+    allowReloadData = value;
     notifyListeners();
   }
 

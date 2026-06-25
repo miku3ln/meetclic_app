@@ -63,6 +63,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     _scrollController.dispose();
     _searchController.dispose();
     _modalSub?.cancel();
+    _modalActions?.cancel();
+
     super.dispose();
   }
 
@@ -135,9 +137,12 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 
   StreamSubscription? _modalSub;
+  StreamSubscription? _modalActions;
 
   void _listenModalEvents(ProductModalController controller) {
     _modalSub?.cancel();
+    _modalActions?.cancel();
+
     _modalSub = controller.events.listen((event) {
       final data = event.data as Map<String, dynamic>?;
       switch (event.type) {
@@ -164,6 +169,20 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           break;
         case ProductModalEvents.cancel:
           debugPrint('cancelled');
+          break;
+      }
+    });
+    _modalActions = controller.eventsModalProduct.listen((event) {
+      final data = event.data as Map<String, dynamic>?;
+      //controller.c
+      final allowReload = controller.allowReloadData;
+      if (allowReload) {
+        _refreshAll();
+      }
+      switch (event.type) {
+        case 'closeBtnHeader':
+          break;
+        case 'cancelBtnFooter':
           break;
       }
     });
