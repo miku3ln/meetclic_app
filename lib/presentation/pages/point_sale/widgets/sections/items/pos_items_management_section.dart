@@ -334,9 +334,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
               child: Center(child: CircularProgressIndicator()),
             );
           }
-
           final item = _items[index];
-
           return ProductListCard(item: item, onTap: () => _onTapItem(item));
         },
       ),

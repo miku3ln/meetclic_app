@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -109,6 +111,7 @@ class ProductListCard extends StatelessWidget {
     final measureType = measure_type_management["value"] ?? '';
 
     final inventoryType = classification['inventory_type'] ?? '';
+    final details = jsonDecode(data['details_all']);
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
@@ -151,9 +154,7 @@ class ProductListCard extends StatelessWidget {
                           color: colors.textPrimary,
                         ),
                       ),
-
                       const SizedBox(height: 4),
-
                       Text(
                         "${data['code']}",
                         style: TextStyle(
@@ -166,7 +167,7 @@ class ProductListCard extends StatelessWidget {
                 ),
                 _buildTypeChip(context, inventoryType),
                 const SizedBox(width: 8),
-                _buildTaxChip(context, tax+"%"),
+                _buildStateManager(context, details),
               ],
             ),
 
@@ -194,13 +195,14 @@ class ProductListCard extends StatelessWidget {
                   child: _InfoColumn(
                     icon: Icons.receipt_long_outlined,
                     title: "Impuesto",
-                    value: tax+"%",
+                    value: tax + "%",
                   ),
                 ),
               ],
             ),
 
             const SizedBox(height: 16),
+
             /// 2 FILAS - 3 COLUMNAS
             Row(
               children: [
@@ -226,11 +228,8 @@ class ProductListCard extends StatelessWidget {
                     value: "$quantity $unit",
                   ),
                 ),
-
-
               ],
             ),
-
           ],
         ),
       ),
@@ -306,8 +305,42 @@ class ProductListCard extends StatelessWidget {
     );
   }
 
+  Widget _buildBadgeManager(
+    BuildContext context,
+    String value,
+    Color colorBackground,
+    Color colorText,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: colorBackground,
+        borderRadius: BorderRadius.circular(30),
+      ),
+      child: Text(
+        value,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: colorText,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStateManager(BuildContext context, detailsData) {
+    final colors = AppThemeTokens.of(context);
+    final productData = detailsData['product'];
+    bool isActive = productData['state'] == 'ACTIVE' ? true : false;
+    final title = isActive ? 'ACTIVO' : 'INACTIVO';
+    Color colorBackground = isActive?colors.success:colors.warning;
+    Color colorText = colors.badge;
+    return _buildBadgeManager(context, title, colorBackground, colorText);
+  }
+
   Widget _buildTaxChip(BuildContext context, String value) {
     final colors = AppThemeTokens.of(context);
+    //_buildBadgeManager(context,value);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
@@ -316,7 +349,7 @@ class ProductListCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
       ),
       child: Text(
-        value,
+        'ACTIVO',
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,

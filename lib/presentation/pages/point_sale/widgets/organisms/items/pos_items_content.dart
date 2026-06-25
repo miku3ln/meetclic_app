@@ -99,14 +99,14 @@ class PosItemsManagementApi {
   Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
     required int current,
     required String searchPhrase,
-
     required int rowCount,
   }) async {
 
 
     final token = SessionService().apiToken;
     final businessId=SessionService().businessId;
-    final uri = Uri.parse('${ServerConfig.baseUrl}/pointsales/products-sales')//POS-PRODUCTS -INIT-ONE
+    final uriManagement='${ServerConfig.baseUrl}/pointsales/products-management';
+    final uri = Uri.parse(uriManagement)//POS-PRODUCTS -INIT-ONE
         .replace(
       queryParameters: {
         'current': current.toString(),

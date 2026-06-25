@@ -64,11 +64,12 @@ Future<void> showManagerProduct({
                   bool allowClose = controller.allowCloseModalBySave();
                   AlertService.success(context, message: resultSave.message);
                   if (allowClose) {
+                    controller.setAllowReloadData(true);
                     Navigator.pop(context, resultSave);
                     controller.emit(ProductModalEvents.save, {
                       "allowReload": true,
                     });
-                    controller.setAllowReloadData(true);
+
                   } else {
                     final product = resultSave.data?['saved']['product'];
                     final productIdCurrent = product["id"];
