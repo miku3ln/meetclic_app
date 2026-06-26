@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-enum PosItemsSection { items, categories, modifiers, discounts }
+enum PosItemsSection { items, categories, modifiers, discounts, subcategories }
 
 class PosItemsController extends ChangeNotifier {
   PosItemsSection _section = PosItemsSection.items;
@@ -24,6 +24,9 @@ class PosItemsController extends ChangeNotifier {
         return 'Modificadores';
       case PosItemsSection.discounts:
         return 'Descuentos';
+
+      case PosItemsSection.subcategories:
+        return 'Subcategorias';
     }
   }
 }

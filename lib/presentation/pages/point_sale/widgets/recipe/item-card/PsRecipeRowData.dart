@@ -12,7 +12,7 @@ import '../../molecules/inputs/ps_input.dart';
 class PsRecipeAction {
   final IconData icon;
 
-  final VoidCallback onPressed;
+  final VoidCallback?  onPressed;
 
   final Color color;
 

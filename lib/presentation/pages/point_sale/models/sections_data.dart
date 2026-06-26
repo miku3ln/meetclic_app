@@ -48,6 +48,8 @@ class Sections {
         return 'Modificadores';
       case PosItemsSection.discounts:
         return 'Descuentos';
+      case PosItemsSection.subcategories:
+        return 'Subcagetorias';
       default:
         return '';
     }
@@ -59,11 +61,12 @@ class Sections {
         return  Icons.format_list_bulleted;
       case PosItemsSection.categories:
         return Icons.copy_rounded;
-
       case PosItemsSection.modifiers:
         return Icons.note_alt_outlined;
       case PosItemsSection.discounts:
         return Icons.local_offer_outlined;
+      case PosItemsSection.subcategories:
+        return Icons.copy_outlined;
       default:
         return Icons.menu;
     }

@@ -113,6 +113,28 @@ class ProductListCard extends StatelessWidget {
     final inventoryType = classification['inventory_type'] ?? '';
     final details = jsonDecode(data['details_all']);
 
+    Color colorIconTax = colors.buttonPrimaryBackground;
+    Color colorAmount = Colors.orange;
+
+
+    if (details['product']['has_tax'] == 1) {
+      colorIconTax = Colors.orange;
+    }
+    final productMeasureTypeRoot = details['product_measure_type'];
+    var typeMeasureId = productMeasureTypeRoot['id'].toString();
+
+    Color managerTypeMeasureColor = Colors.orange;
+    if (typeMeasureId == MeasureType.unit.id) {
+      managerTypeMeasureColor = MeasureType.unit.color;
+    } else if (typeMeasureId == MeasureType.volume.id) {
+      managerTypeMeasureColor = MeasureType.volume.color;
+    } else if (typeMeasureId == MeasureType.length.id) {
+      managerTypeMeasureColor = MeasureType.length.color;
+    } else if (typeMeasureId == MeasureType.area.id) {
+      managerTypeMeasureColor = MeasureType.area.color;
+    } else if (typeMeasureId == MeasureType.mass.id) {
+      managerTypeMeasureColor = MeasureType.mass.color;
+    }
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
@@ -196,6 +218,8 @@ class ProductListCard extends StatelessWidget {
                     icon: Icons.receipt_long_outlined,
                     title: "Impuesto",
                     value: tax + "%",
+                    colorIcon: colorIconTax,
+                    backgroundIcon: AppColors.shade(colorIconTax, 90),
                   ),
                 ),
               ],
@@ -211,6 +235,11 @@ class ProductListCard extends StatelessWidget {
                     icon: Icons.scale_outlined,
                     title: "Tipo de Medida",
                     value: measureType,
+                    backgroundIcon: AppColors.shade(
+                      managerTypeMeasureColor,
+                      90,
+                    ),
+                    colorIcon: managerTypeMeasureColor,
                   ),
                 ),
                 Expanded(
@@ -226,6 +255,8 @@ class ProductListCard extends StatelessWidget {
                     icon: Icons.inventory_2_outlined,
                     title: "Cantidad",
                     value: "$quantity $unit",
+                    colorIcon: colorAmount,
+                    backgroundIcon: AppColors.shade(colorAmount, 90),
                   ),
                 ),
               ],
@@ -333,30 +364,9 @@ class ProductListCard extends StatelessWidget {
     final productData = detailsData['product'];
     bool isActive = productData['state'] == 'ACTIVE' ? true : false;
     final title = isActive ? 'ACTIVO' : 'INACTIVO';
-    Color colorBackground = isActive?colors.success:colors.warning;
+    Color colorBackground = isActive ? colors.success : colors.warning;
     Color colorText = colors.badge;
     return _buildBadgeManager(context, title, colorBackground, colorText);
-  }
-
-  Widget _buildTaxChip(BuildContext context, String value) {
-    final colors = AppThemeTokens.of(context);
-    //_buildBadgeManager(context,value);
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: colors.badge,
-        borderRadius: BorderRadius.circular(30),
-      ),
-      child: Text(
-        'ACTIVO',
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
-          color: colors.badgeText,
-        ),
-      ),
-    );
   }
 
   String _getInventoryLabel(String value) {
@@ -380,11 +390,15 @@ class _InfoColumn extends StatelessWidget {
   final IconData icon;
   final String title;
   final String value;
+  final Color? backgroundIcon;
+  final Color? colorIcon;
 
   const _InfoColumn({
     required this.icon,
     required this.title,
     required this.value,
+    this.backgroundIcon,
+    this.colorIcon,
   });
 
   @override
@@ -398,10 +412,10 @@ class _InfoColumn extends StatelessWidget {
           width: 36,
           height: 36,
           decoration: BoxDecoration(
-            color: colors.surfaceMuted,
+            color: backgroundIcon ?? colors.surfaceMuted,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Icon(icon, size: 18, color: colors.iconPrimary),
+          child: Icon(icon, size: 18, color: colorIcon ?? colors.iconPrimary),
         ),
 
         const SizedBox(width: 8),
@@ -434,4 +448,3 @@ class _InfoColumn extends StatelessWidget {
     );
   }
 }
-

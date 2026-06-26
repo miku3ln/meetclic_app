@@ -22,7 +22,6 @@ class ProductIngredientsController extends ChangeNotifier {
   final ProductModalController parent;
 
   ProductIngredientsController(this.parent);
-
   Future<void> loadRecipe() async {
     parent.setLoadingDataRecipe(true);
     final ingredientsData = await PosMockData.getProductsRecipeData(
@@ -32,10 +31,11 @@ class ProductIngredientsController extends ChangeNotifier {
     parent.setLoadingDataRecipe(false);
     ingredients = [];
     ingredients = ingredientsData;
-    notifyListeners();
+    updateProcess();
   }
 
   late List<RecipeIngredientItem> ingredients = [];
+
   /// =========================
   /// ✍️ SETTERS
   /// =========================
@@ -83,17 +83,24 @@ class ProductIngredientsController extends ChangeNotifier {
     );
 
     late int information = 1;
-    ingredients.add(itemAdd);
-    parent.notifyListeners();
-    notifyListeners();
+
+    ingredients = [
+      itemAdd,
+      ...ingredients,
+    ];
+
+    updateProcess();
+
   }
 
   void updateIngredientQuantity(RecipeIngredientItem item, String value) {
     item.quantityInput = double.tryParse(value) ?? 0;
-    parent.notifyListeners();
-    notifyListeners();
+    updateProcess();
   }
-
+void updateProcess(){
+  notifyListeners();
+  parent.notifyListeners();
+}
   Future<void> updateIngredientUnit(
     RecipeIngredientItem item,
     UnitMeasureModel? unit,
@@ -103,19 +110,17 @@ class ProductIngredientsController extends ChangeNotifier {
     item.unitInputId = unit.id;
     item.conversionFactor = unit.factorToBase;
     item.quantityBase = item.quantityInput * unit.factorToBase;
-    parent.notifyListeners();
+    updateProcess();
 
-    notifyListeners();
   }
 
-  Future<void> managerRegisterIngrediente(
+  Future<dynamic> managerRegisterIngrediente(
     RecipeIngredientItem item,
     BuildContext context,
   ) async {
     final result = await PosMockData.saveProductRecipe(
       recipeId: item.recipeId,
       componentProductId: parent.idManagementProduct,
-      // ⚠️ IMPORTANTE: aquí es el product base (component)
       productId: item.productId,
       quantityInput: item.quantityInput,
       quantityBase: item.quantityBase,
@@ -123,47 +128,56 @@ class ProductIngredientsController extends ChangeNotifier {
       unitInputId: item.unitInputId,
       baseUnitMeasureId: item.baseUnitMeasureId,
     );
-
-    if (result.success) {
-      // éxito
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.message)));
-    } else {
-      // error
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(result.message)));
-    }
+    return result;
   }
 
   void removeIngredient(RecipeIngredientItem item, context) async {
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) {
-        return AlertDialog(
-          title: const Text('Eliminar ingrediente'),
-          content: Text('¿Desea eliminar ${item.name} de la receta?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context, false),
-              child: const Text('Cancelar'),
-            ),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context, true),
-              child: const Text('Eliminar'),
-            ),
-          ],
-        );
-      },
-    );
+    if (item.recipeId <= 0) {
+      ingredients.removeWhere((e) => e.productId == item.productId);
+      notifyListeners();
+      parent.notifyListeners();
+    } else {
+      final result = await showDialog<bool>(
+        context: context,
+        builder: (_) {
+          return AlertDialog(
+            title: const Text('Eliminar ingrediente'),
+            content: Text('¿Desea eliminar ${item.name} de la receta?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Eliminar'),
+              ),
+            ],
+          );
+        },
+      );
 
-    if (result == true) {
-      if (item.recipeId <= 0) {
-        ingredients.removeWhere((e) => e.productId == item.productId);
-        notifyListeners();
-      } else {}
+      if (result == true) {
+
+      }
     }
+
+  }
+  bool canSaveIngredient(RecipeIngredientItem item) {
+    var result= item.quantityInput > 0 && item.unitInputId>0 ;
+
+    return result;
+  }
+  bool isNewIngredient(RecipeIngredientItem item) {
+    return item.recipeId <= 0;
+  }
+  String getActionText(RecipeIngredientItem item) {
+    return item.recipeId <= 0 ? 'Guardar' : 'Actualizar';
+  }
+  IconData getActionIcon(RecipeIngredientItem item) {
+    return item.recipeId <= 0
+        ? Icons.save
+        : Icons.edit;
   }
 }
 
@@ -751,11 +765,12 @@ class ProductModalController extends BaseFormController {
     _allowActions = value;
     notifyListeners();
   }
-void resetProcess(){
-  _allowActions=true;
-  notifyListeners();
 
-}
+  void resetProcess() {
+    _allowActions = true;
+    notifyListeners();
+  }
+
   Future<ApiResponse<Map<String, dynamic>>> saveProduct(CrudType type) async {
     if (!validateForm().success) {
       throw Exception("Formulario inválido");
@@ -893,6 +908,7 @@ void resetProcess(){
     final product_measure_type_id = sellType.id;
     var stateCurrent = 'INACTIVE';
     if (type == CrudType.create) {
+      stateCurrent = 'ACTIVE';
     } else if (type == CrudType.update) {
       stateCurrent = ingredientsController.ingredients.isNotEmpty
           ? 'ACTIVE'

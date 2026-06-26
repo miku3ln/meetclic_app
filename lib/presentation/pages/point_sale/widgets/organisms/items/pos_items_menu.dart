@@ -33,6 +33,13 @@ class PosItemsMenu extends StatelessWidget {//MENU MANAGEMENT PRODUCTS
                   onTap: () =>
                       settings.setSection(PosItemsSection.categories),
                 ),
+                menuItem(
+                  context,
+                  icon: Sections.getIconItems(PosItemsSection.subcategories),
+                  title:Sections.getTitleItems(PosItemsSection.subcategories),
+                  selected: settings.section == PosItemsSection.subcategories,
+                  onTap: () => settings.setSection(PosItemsSection.subcategories),
+                ),
                /* menuItem(
                   context,
                   icon: Sections.getIconItems(PosItemsSection.modifiers),
@@ -48,14 +55,13 @@ class PosItemsMenu extends StatelessWidget {//MENU MANAGEMENT PRODUCTS
                   selected: settings.section == PosItemsSection.items,
                   onTap: () => settings.setSection(PosItemsSection.items),
                 ),
-                menuItem(
+               /* menuItem(
                   context,
                   icon: Sections.getIconItems(PosItemsSection.discounts),
-
                   title:Sections.getTitleItems(PosItemsSection.discounts),
                   selected: settings.section == PosItemsSection.discounts,
                   onTap: () => settings.setSection(PosItemsSection.discounts),
-                ),
+                ),*/
               ],
             ),
           ),

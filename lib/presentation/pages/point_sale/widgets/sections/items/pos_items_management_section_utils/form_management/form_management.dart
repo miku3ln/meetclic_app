@@ -870,7 +870,7 @@ Widget _buildTabRecipe(
                                 controller
                                     .ingredientsController
                                     .ingredients
-                                    .isNotEmpty)
+                                    .isNotEmpty && false)
                               PsFieldRow(
                                 children: [
                                   PsFieldItem(
@@ -897,7 +897,7 @@ Widget _buildTabRecipe(
                                   icon: Icons.info_outline,
                                   title: 'Atención',
                                   description:
-                                      'Ingrese al menos un producto a la receta, asi ',
+                                      'Ingrese al menos un producto a la receta, asi podra utilizar el producto.!',
                                   onClose: () {
                                     debugPrint('cerrar');
                                   },
@@ -1290,7 +1290,7 @@ Widget _buildRecipeItemRow(
   var e = item;
   var managerCrudRegisterIcon = Icons.save_outlined;
   String managerCrudText = "Creacion";
-  final colors = AppThemeTokens.of(context);
+  final colorsApp = AppThemeTokens.of(context);
   var managerTypeMeasureIcon = Icons.restaurant;
   var managerTypeMeasureText = "";
   Color managerTypeMeasureColor = Colors.orange;
@@ -1322,8 +1322,8 @@ Widget _buildRecipeItemRow(
   }
   managerTypeMeasureColor = borderColor;
   if (item.recipeId > 0) {
-    managerCrudColorBackground = colors.badgeText;
-    managerCrudColorText = AppColors.shade(colors.badgeText, 50);
+    managerCrudColorBackground = colorsApp.badgeText;
+    managerCrudColorText = AppColors.shade(colorsApp.badgeText, 50);
     managerCrudText = "Actualizacion ";
     managerCrudRegisterIcon = Icons.edit;
   }
@@ -1342,12 +1342,21 @@ Widget _buildRecipeItemRow(
       actions: [
         PsRecipeAction(
           icon: managerCrudRegisterIcon,
-          onPressed: () {
-            controller.ingredientsController.managerRegisterIngrediente(
-              item,
-              context,
-            );
-          },
+          color: controller.ingredientsController.canSaveIngredient(item)
+              ? colorsApp.badgeText
+              : AppColors.shade(colorsApp.badgeText, 50),
+          onPressed: controller.ingredientsController.canSaveIngredient(item)
+              ? () async {
+                  final response = await controller.ingredientsController
+                      .managerRegisterIngrediente(item, context);
+                  if (response.success) {
+                    controller.setAllowReloadData(true);
+                  }
+                  ScaffoldMessenger.of(
+                    context,
+                  ).showSnackBar(SnackBar(content: Text(response.message)));
+                }
+              : null,
         ),
         PsRecipeAction(
           icon: Icons.delete,

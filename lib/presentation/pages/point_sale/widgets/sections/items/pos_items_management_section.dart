@@ -149,6 +149,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
         case ProductModalEvents.save:
           final allowReload = data?['allowReload'] ?? false;
           if (allowReload) {
+            controller.setAllowReloadData(false);
             _refreshAll();
           }
           break;
@@ -178,6 +179,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       final allowReload = controller.allowReloadData;
       if (allowReload) {
         _refreshAll();
+        controller.setAllowReloadData(false);
       }
       controller.resetProcess();
       switch (event.type) {

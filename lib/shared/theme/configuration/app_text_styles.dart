@@ -9,7 +9,7 @@ class AppTextStyles {
     return TextStyle(
       fontSize: 22,
       fontWeight: FontWeight.w600,
-      color: c.textPrimary,
+      color: AppColors.azulClic,
     );
   }
 

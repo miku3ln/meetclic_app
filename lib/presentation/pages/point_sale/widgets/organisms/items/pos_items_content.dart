@@ -34,6 +34,8 @@ class PosItemsContent extends StatelessWidget {
         return const PosItemsManagementSection();
       case PosItemsSection.categories:
         return const PosCategoriesManagementSection();
+      case PosItemsSection.subcategories:
+        return const PosCategoriesManagementSection();
       case PosItemsSection.modifiers:
         return const PosModifiersManagementSection();
       case PosItemsSection.discounts:
