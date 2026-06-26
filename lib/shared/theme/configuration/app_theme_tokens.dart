@@ -85,7 +85,15 @@ class AppThemeTokens {
     required this.inputFill,
     required this.link,
   });
+  static Color shade(Color color, int percent) {
+    assert(percent >= 0 && percent <= 100);
 
+    return Color.lerp(
+      color,
+      Colors.white,
+      percent / 100,
+    )!;
+  }
   static const AppThemeTokens light = AppThemeTokens(
     primary: AppColors.azulClic,
     secondary: AppColors.amarilloVital,
@@ -269,4 +277,14 @@ class AppColors {
     end: Alignment.bottomRight,
     colors: [azulClic, moradoSuave],
   );
+
+  static Color shade(Color color, int percent) {
+    assert(percent >= 0 && percent <= 100);
+
+    return Color.lerp(
+      color,
+      Colors.white,
+      percent / 100,
+    )!;
+  }
 }

@@ -179,6 +179,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       if (allowReload) {
         _refreshAll();
       }
+      controller.resetProcess();
       switch (event.type) {
         case 'closeBtnHeader':
           break;

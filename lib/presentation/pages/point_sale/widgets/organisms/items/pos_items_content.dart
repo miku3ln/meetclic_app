@@ -101,20 +101,20 @@ class PosItemsManagementApi {
     required String searchPhrase,
     required int rowCount,
   }) async {
-
-
     final token = SessionService().apiToken;
-    final businessId=SessionService().businessId;
-    final uriManagement='${ServerConfig.baseUrl}/pointsales/products-management';
-    final uri = Uri.parse(uriManagement)//POS-PRODUCTS -INIT-ONE
-        .replace(
-      queryParameters: {
-        'current': current.toString(),
-        'rowCount': rowCount.toString(),
-        'searchPhrase': searchPhrase,
-        'business_id': businessId.toString(),
-      },
-    );
+    final businessId = SessionService().businessId;
+    final uriManagement =
+        '${ServerConfig.baseUrl}/pointsales/products-management';
+    final uri =
+        Uri.parse(uriManagement) //POS-PRODUCTS -INIT-ONE
+            .replace(
+              queryParameters: {
+                'current': current.toString(),
+                'rowCount': rowCount.toString(),
+                'searchPhrase': searchPhrase,
+                'business_id': businessId.toString(),
+              },
+            );
     final response = await http.get(
       uri,
       headers: {
@@ -123,8 +123,7 @@ class PosItemsManagementApi {
       },
     );
     if (response.statusCode != 200) {
-      return const PaginatedResponse<
-          GenericListItem<Map<String, dynamic>>>(
+      return const PaginatedResponse<GenericListItem<Map<String, dynamic>>>(
         current: 1,
         rowCount: 0,
         rows: [],
@@ -152,7 +151,6 @@ class PosItemsManagementApi {
       rows: rows,
       total: data['total'] ?? 0,
     );
-
   }
 }
 
@@ -177,33 +175,34 @@ class PosTicketManagementApi {
         'current': '$current',
         'rowCount': '$rowCount',
         'searchPhrase': '',
-        'business_id':businessId!,
+        'business_id': businessId!,
       },
       totalKey: 'total',
       rowsKey: 'rows',
       // 🔥 AQUÍ está toda tu lógica real ahora
       mapper: (json) {
-        final payments=json['payments'];
-        final payment=payments[0];
+        final payments = json['payments'];
+        final payment = payments[0];
         final header = json['header'];
         final meta = json['meta'];
-        final amount =  double.parse(payment['amount']);
-        final lineTotal=amount;
+        final amount = double.parse(payment['amount']);
+        final lineTotal = amount;
         final code = '#${header['id']}';
         final hour = '22:15';
 
-        final paymentMethod=payment['payment_method'];
-        final dateInvoice=DateTime.parse(header['invoice_date']);
+        final paymentMethod = payment['payment_method'];
+        final dateInvoice = DateTime.parse(header['invoice_date']);
 
-        final dateInvoiceString='Fecha: ${DateFormat('dd/MM/yyyy HH:mm a').format(dateInvoice)}';
+        final dateInvoiceString =
+            'Fecha: ${DateFormat('dd/MM/yyyy HH:mm a').format(dateInvoice)}';
         return GenericListItem<Map<String, dynamic>>(
           id: header['id'],
-          title:lineTotal.toString(),
+          title: lineTotal.toString(),
           subtitle: dateInvoiceString,
           description: paymentMethod,
           image: null,
           data: {
-            'receiptNumber': '${ header['id']}',
+            'receiptNumber': '${header['id']}',
             'employee': 'Trece',
             'tpv': 'TPV 1',
             'orderType': 'Para Servirse',
@@ -216,7 +215,7 @@ class PosTicketManagementApi {
             'paymentAmount': (amount),
             'code': code,
             'hour': hour,
-            'date':dateInvoice,
+            'date': dateInvoice,
             'all': json,
           },
         );

@@ -36,11 +36,9 @@ class ProductIngredientsController extends ChangeNotifier {
   }
 
   late List<RecipeIngredientItem> ingredients = [];
-
   /// =========================
   /// ✍️ SETTERS
   /// =========================
-
   void addIngredient(GenericListItem<Map<String, dynamic>> item) {
     final data = item.data!;
     final details = jsonDecode(data['details_all']);
@@ -71,7 +69,6 @@ class ProductIngredientsController extends ChangeNotifier {
         decimalPrecision: defaultUnit['decimal_precision'],
         conversions: const [],
       ),
-
       baseUnit: UnitMeasureModel(
         id: defaultUnit['id'],
         name: defaultUnit['name'],
@@ -87,11 +84,13 @@ class ProductIngredientsController extends ChangeNotifier {
 
     late int information = 1;
     ingredients.add(itemAdd);
+    parent.notifyListeners();
     notifyListeners();
   }
 
   void updateIngredientQuantity(RecipeIngredientItem item, String value) {
     item.quantityInput = double.tryParse(value) ?? 0;
+    parent.notifyListeners();
     notifyListeners();
   }
 
@@ -104,6 +103,7 @@ class ProductIngredientsController extends ChangeNotifier {
     item.unitInputId = unit.id;
     item.conversionFactor = unit.factorToBase;
     item.quantityBase = item.quantityInput * unit.factorToBase;
+    parent.notifyListeners();
 
     notifyListeners();
   }
@@ -751,7 +751,11 @@ class ProductModalController extends BaseFormController {
     _allowActions = value;
     notifyListeners();
   }
+void resetProcess(){
+  _allowActions=true;
+  notifyListeners();
 
+}
   Future<ApiResponse<Map<String, dynamic>>> saveProduct(CrudType type) async {
     if (!validateForm().success) {
       throw Exception("Formulario inválido");

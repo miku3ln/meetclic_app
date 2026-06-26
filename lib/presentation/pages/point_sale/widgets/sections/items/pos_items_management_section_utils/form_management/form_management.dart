@@ -13,6 +13,7 @@ import '../../../../../../../../shared/theme/configuration/app_theme_tokens.dart
 import '../../../../../../../../shared/utils/util_common.dart';
 import '../../../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../../../shared/responsive/device_gesture_observer.dart';
+import '../../../../../../../widgets/cards/cards.dart';
 import '../../../../../models/product_management_measure.dart';
 import '../../../../../state/product_modal_controller.dart';
 import '../../../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
@@ -22,8 +23,10 @@ import '../../../../molecules/inputs/ps_input.dart';
 import '../../../../molecules/ps_image_picker.dart';
 import '../../../../organisms/dialogs/product_modal.dart';
 import '../../../../organisms/ps_toogle_group.dart';
+import '../../../../recipe/item-card/PsRecipeRowData.dart';
 import '../../../product/ps_section_card.dart';
 import '../../pos_items_management_section.dart';
+import '../pos_items_controller.dart';
 
 Future<void> showManagerProduct({
   required BuildContext context,
@@ -69,7 +72,6 @@ Future<void> showManagerProduct({
                     controller.emit(ProductModalEvents.save, {
                       "allowReload": true,
                     });
-
                   } else {
                     final product = resultSave.data?['saved']['product'];
                     final productIdCurrent = product["id"];
@@ -77,6 +79,7 @@ Future<void> showManagerProduct({
                       CrudType.update,
                       productIdCurrent,
                     );
+                    controller.setAllowReloadData(true);
                   }
                 } else {
                   AlertService.error(context, message: resultSave.message);
@@ -826,7 +829,8 @@ Widget _buildTabRecipe(
                                       PsApiTypeAhead<
                                         GenericListItem<Map<String, dynamic>>
                                       >(
-                                        label: 'Ingrediente',
+                                        label:
+                                            'Seleccione los Ingredientes para la receta.!',
                                         searchApi: (search) {
                                           final dataRecipe =
                                               PosMockData.getProductsRecipeSearch(
@@ -841,13 +845,17 @@ Widget _buildTabRecipe(
                                                             .processed
                                                             .id
                                                     ? InventoryType.raw.id
-                                                    : InventoryType
-                                                          .processed
-                                                          .id),
+                                                    : ('${InventoryType.processed.id},${InventoryType.raw.id}')),
                                               );
                                           return dataRecipe;
                                         },
-                                        getLabel: (e) => e.title,
+                                        getLabel: (e) {
+                                          final title = e.title ?? '';
+                                          final stock = e.data?['stock'] ?? 0;
+                                          final code = e.data?['code'] ?? '';
+
+                                          return '$code - $title';
+                                        },
                                         onSelected: (item) {
                                           final product = item;
                                           controller.ingredientsController
@@ -858,25 +866,23 @@ Widget _buildTabRecipe(
                               ],
                             ),
                             AppSpacing.spaceBetweenSections,
-                            PsFieldRow(
-                              children: [
-                                PsFieldItem(
-                                  child: PsToggleSelector<MeasureType>(
-                                    title: controller.titleLabelTotalRecipe,
-                                    value: controller.sellType,
-                                    items: MeasureType.values,
-                                    onChanged: controller.setMeasureType,
+                            if (!controller.isLoadingDataRecipe &&
+                                controller
+                                    .ingredientsController
+                                    .ingredients
+                                    .isNotEmpty)
+                              PsFieldRow(
+                                children: [
+                                  PsFieldItem(
+                                    child: PsToggleSelector<MeasureType>(
+                                      title: controller.titleLabelTotalRecipe,
+                                      value: controller.sellType,
+                                      items: MeasureType.values,
+                                      onChanged: controller.setMeasureType,
+                                    ),
                                   ),
-                                ),
-                                PsFieldItem(
-                                  child: _buildMeasureWidget(
-                                    controller.sellType,
-                                    listMeasureCategory,
-                                    controller,
-                                  ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              ),
                             AppSpacing.spaceBetweenSections,
                             if (controller.isLoadingDataRecipe)
                               const Center(child: CircularProgressIndicator())
@@ -884,7 +890,19 @@ Widget _buildTabRecipe(
                                 .ingredientsController
                                 .ingredients
                                 .isEmpty)
-                              const Center(child: Text("No hay ingredientes"))
+                              Center(
+                                child: PsInfoCard(
+                                  type: PsInfoCardType.simple,
+                                  config: warningCard,
+                                  icon: Icons.info_outline,
+                                  title: 'Atención',
+                                  description:
+                                      'Ingrese al menos un producto a la receta, asi ',
+                                  onClose: () {
+                                    debugPrint('cerrar');
+                                  },
+                                ),
+                              )
                             else
                               Column(
                                 children: controller
@@ -895,37 +913,11 @@ Widget _buildTabRecipe(
                                         padding: const EdgeInsets.only(
                                           bottom: 12,
                                         ),
-                                        child: PsIngredientCard(
-                                          item: e,
-                                          measureCategories:
-                                              listMeasureCategory,
-                                          onQuantityChanged: (value) {
-                                            controller.ingredientsController
-                                                .updateIngredientQuantity(
-                                                  e,
-                                                  value,
-                                                );
-                                          },
-                                          onUnitChanged: (unit) async {
-                                            await controller
-                                                .ingredientsController
-                                                .updateIngredientUnit(e, unit);
-                                          },
-                                          onEdit: (RecipeIngredientItem item) {
-                                            controller.ingredientsController
-                                                .managerRegisterIngrediente(
-                                                  item,
-                                                  context,
-                                                );
-                                          },
-                                          onDelete:
-                                              (RecipeIngredientItem item) {
-                                                controller.ingredientsController
-                                                    .removeIngredient(
-                                                      item,
-                                                      context,
-                                                    );
-                                              },
+                                        child: _buildRecipeItemRow(
+                                          e,
+                                          listMeasureCategory,
+                                          controller,
+                                          context,
                                         ),
                                       );
                                     })
@@ -1030,13 +1022,15 @@ class PsIngredientCard extends StatelessWidget {
     Color borderColor = Colors.green;
     var typeMeasureId = productMeasureTypeRoot['id'].toString();
     if (typeMeasureId == MeasureType.unit.id) {
-      borderColor = Colors.orange;
+      borderColor = MeasureType.unit.color;
     } else if (typeMeasureId == MeasureType.volume.id) {
-      borderColor = Colors.blue;
+      borderColor = MeasureType.volume.color;
     } else if (typeMeasureId == MeasureType.length.id) {
-      borderColor = Colors.green;
+      borderColor = MeasureType.length.color;
     } else if (typeMeasureId == MeasureType.area.id) {
-      borderColor = Colors.grey;
+      borderColor = MeasureType.area.color;
+    } else if (typeMeasureId == MeasureType.mass.id) {
+      borderColor = MeasureType.mass.color;
     }
 
     return Container(
@@ -1261,9 +1255,18 @@ class _ProductTabsViewState extends State<ProductTabsView>
                       widget.controller,
                       widget.listMeasureCategory,
                     )
-                  : const Center(
-                      child: Text(
-                        'Disponible únicamente para productos procesados',
+                  : Center(
+                      child: PsInfoCard(
+                        widthPercent: 100,
+                        type: PsInfoCardType.simple,
+                        config: warningCard,
+                        icon: Icons.info_outline,
+                        title: 'Atención',
+                        description:
+                            'Disponible únicamente para productos que se agregan recetas.!',
+                        onClose: () {
+                          debugPrint('cerrar');
+                        },
                       ),
                     ),
             ],
@@ -1272,4 +1275,133 @@ class _ProductTabsViewState extends State<ProductTabsView>
       ],
     );
   }
+}
+
+Widget _buildRecipeItemRow(
+  RecipeIngredientItem item,
+  List<MeasureCategoryModel> listMeasureCategory,
+  ProductModalController controller,
+  BuildContext context,
+) {
+  //CREATE  item.recipeId==0
+  //UPDATE item.recipeId>0
+  Color managerCrudColorBackground = Colors.green;
+  Color managerCrudColorText = Colors.green.shade100;
+  var e = item;
+  var managerCrudRegisterIcon = Icons.save_outlined;
+  String managerCrudText = "Creacion";
+  final colors = AppThemeTokens.of(context);
+  var managerTypeMeasureIcon = Icons.restaurant;
+  var managerTypeMeasureText = "";
+  Color managerTypeMeasureColor = Colors.orange;
+  final details = jsonDecode(item.allData!);
+  final productMeasureTypeRoot = details['product_measure_type'];
+  var informationProduct = item.name + "(" + item.code + " )";
+  Color borderColor = Colors.green;
+  var typeMeasureId = productMeasureTypeRoot['id'].toString();
+  if (typeMeasureId == MeasureType.unit.id) {
+    borderColor = MeasureType.unit.color;
+    managerTypeMeasureIcon = MeasureType.unit.icon;
+    managerTypeMeasureText = MeasureType.unit.value;
+  } else if (typeMeasureId == MeasureType.volume.id) {
+    borderColor = MeasureType.volume.color;
+    managerTypeMeasureIcon = MeasureType.volume.icon;
+    managerTypeMeasureText = MeasureType.volume.value;
+  } else if (typeMeasureId == MeasureType.length.id) {
+    borderColor = MeasureType.length.color;
+    managerTypeMeasureIcon = MeasureType.length.icon;
+    managerTypeMeasureText = MeasureType.length.value;
+  } else if (typeMeasureId == MeasureType.area.id) {
+    borderColor = MeasureType.area.color;
+    managerTypeMeasureIcon = MeasureType.area.icon;
+    managerTypeMeasureText = MeasureType.area.value;
+  } else if (typeMeasureId == MeasureType.mass.id) {
+    borderColor = MeasureType.mass.color;
+    managerTypeMeasureIcon = MeasureType.mass.icon;
+    managerTypeMeasureText = MeasureType.mass.value;
+  }
+  managerTypeMeasureColor = borderColor;
+  if (item.recipeId > 0) {
+    managerCrudColorBackground = colors.badgeText;
+    managerCrudColorText = AppColors.shade(colors.badgeText, 50);
+    managerCrudText = "Actualizacion ";
+    managerCrudRegisterIcon = Icons.edit;
+  }
+
+  List<UnitMeasureModel> itemsInformation = getUnits(item, listMeasureCategory);
+  int i = 0;
+  return PsRecipeRowItem<UnitMeasureModel>(
+    data: PsRecipeRowData<UnitMeasureModel>(
+      leftBorderColor: borderColor,
+      title: informationProduct,
+      badgeTitle: managerCrudText,
+      badgeBackground: managerCrudColorText,
+      badgeTextColor: managerCrudColorBackground,
+      item: item,
+      measureCategories: listMeasureCategory,
+      actions: [
+        PsRecipeAction(
+          icon: managerCrudRegisterIcon,
+          onPressed: () {
+            controller.ingredientsController.managerRegisterIngrediente(
+              item,
+              context,
+            );
+          },
+        ),
+        PsRecipeAction(
+          icon: Icons.delete,
+          color: Colors.red,
+          onPressed: () {
+            controller.ingredientsController.removeIngredient(item, context);
+          },
+        ),
+      ],
+
+      leading: PsRecipeLeading(
+        icon: managerTypeMeasureIcon,
+        title: managerTypeMeasureText,
+        backgroundColor: managerTypeMeasureColor,
+      ),
+      inputLabel: "Cantidad",
+      inputValue: item.quantityInput.toString(),
+      onInputChanged: (value) {
+        controller.ingredientsController.updateIngredientQuantity(e, value);
+      },
+      dropdownLabel: controller.sellTypeLabel,
+      dropdownItems: itemsInformation,
+      dropdownValue: itemsInformation.first,
+      dropdownItemLabel: (e) => '${e.name} (${e.symbol})',
+      onDropdownChanged: (value) async {
+        await controller.ingredientsController.updateIngredientUnit(e, value);
+      },
+      equivalenceTitle: "Equiv.",
+      equivalenceValue: "0.25 Kg",
+      footerItems: [
+        // PsRecipeFooterItem(title: "Código", value: "ING-001"),
+        // PsRecipeFooterItem(title: "Stock", value: "50 Kg"),
+      ],
+    ),
+  );
+}
+
+List<UnitMeasureModel> getUnits(
+  RecipeIngredientItem item,
+  List<MeasureCategoryModel> measureCategories,
+) {
+  List<UnitMeasureModel> resultList = [];
+  if (measureCategories.isEmpty) {
+  } else {
+    final category = measureCategories.firstWhere(
+      (e) => e.id.toString() == item.baseUnitMeasureId.toString(),
+    );
+
+    if (category == null) {
+      resultList = [];
+    } else {
+      resultList = category.units;
+    }
+  }
+
+  return resultList;
 }

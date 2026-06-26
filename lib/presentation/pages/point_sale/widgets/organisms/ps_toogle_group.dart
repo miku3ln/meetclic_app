@@ -25,25 +25,28 @@ enum TypeDesgloce {
 }
 
 enum MeasureType  implements ToggleOptionItem{
-  unit('UNIDAD', Icons.inventory_2_outlined,'5'),
-  mass('MASA', Icons.scale_outlined,'1'),
-  volume('VOLUMEN', Icons.local_drink_outlined,'3'),
-  length('LONGITUD', Icons.straighten_outlined,'2'),
-  area('AREA', Icons.crop_square_outlined,'4');
-  const MeasureType(this.value, this.icon,this.id);
+  unit('UNIDAD', Icons.inventory_2_outlined,'5',Colors.cyan),
+  mass('MASA', Icons.scale_outlined,'1',Colors.amber),
+  volume('VOLUMEN', Icons.local_drink_outlined,'3',Colors.blue),
+  length('LONGITUD', Icons.straighten_outlined,'2',Colors.grey),
+  area('AREA', Icons.crop_square_outlined,'4',Colors.brown);
+  const MeasureType(this.value, this.icon,this.id,this.color);
   @override
   final String value;
   @override
   final String id;
   @override
   final IconData icon;
+
+  @override
+  final Color color;
 }
 
 enum InventoryType implements ToggleOptionItem{
-  raw('Materia prima', Icons.inventory_outlined,'RAW'),
-  processed('Elaborado', Icons.restaurant_outlined,'PROCESSED'),
-  forSale('Menu', Icons.point_of_sale_outlined,'FOR_SALE');
-  const InventoryType(this.value, this.icon,this.id);
+  raw('Materia prima', Icons.inventory_outlined,'RAW',Colors.grey),
+  processed('Elaborado', Icons.restaurant_outlined,'PROCESSED',Colors.blueAccent),
+  forSale('Menu', Icons.point_of_sale_outlined,'FOR_SALE',Colors.amber);
+  const InventoryType(this.value, this.icon,this.id,this.color);
 
   @override
   final String value;
@@ -53,12 +56,17 @@ enum InventoryType implements ToggleOptionItem{
 
   @override
   final IconData icon;
+
+  @override
+  final Color color;
 }
 
 abstract class ToggleOptionItem {
   String get id;
   String get value;
   IconData get icon;
+  Color get color;
+
 }
 
 class PsToggleSelector<T extends ToggleOptionItem>
