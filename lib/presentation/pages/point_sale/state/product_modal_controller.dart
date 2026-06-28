@@ -22,6 +22,7 @@ class ProductIngredientsController extends ChangeNotifier {
   final ProductModalController parent;
 
   ProductIngredientsController(this.parent);
+
   Future<void> loadRecipe() async {
     parent.setLoadingDataRecipe(true);
     final ingredientsData = await PosMockData.getProductsRecipeData(
@@ -84,23 +85,21 @@ class ProductIngredientsController extends ChangeNotifier {
 
     late int information = 1;
 
-    ingredients = [
-      itemAdd,
-      ...ingredients,
-    ];
+    ingredients = [itemAdd, ...ingredients];
 
     updateProcess();
-
   }
 
   void updateIngredientQuantity(RecipeIngredientItem item, String value) {
     item.quantityInput = double.tryParse(value) ?? 0;
     updateProcess();
   }
-void updateProcess(){
-  notifyListeners();
-  parent.notifyListeners();
-}
+
+  void updateProcess() {
+    notifyListeners();
+    parent.notifyListeners();
+  }
+
   Future<void> updateIngredientUnit(
     RecipeIngredientItem item,
     UnitMeasureModel? unit,
@@ -111,7 +110,6 @@ void updateProcess(){
     item.conversionFactor = unit.factorToBase;
     item.quantityBase = item.quantityInput * unit.factorToBase;
     updateProcess();
-
   }
 
   Future<dynamic> managerRegisterIngrediente(
@@ -157,27 +155,26 @@ void updateProcess(){
         },
       );
 
-      if (result == true) {
-
-      }
+      if (result == true) {}
     }
-
   }
+
   bool canSaveIngredient(RecipeIngredientItem item) {
-    var result= item.quantityInput > 0 && item.unitInputId>0 ;
+    var result = item.quantityInput > 0 && item.unitInputId > 0;
 
     return result;
   }
+
   bool isNewIngredient(RecipeIngredientItem item) {
     return item.recipeId <= 0;
   }
+
   String getActionText(RecipeIngredientItem item) {
     return item.recipeId <= 0 ? 'Guardar' : 'Actualizar';
   }
+
   IconData getActionIcon(RecipeIngredientItem item) {
-    return item.recipeId <= 0
-        ? Icons.save
-        : Icons.edit;
+    return item.recipeId <= 0 ? Icons.save : Icons.edit;
   }
 }
 
@@ -908,7 +905,18 @@ class ProductModalController extends BaseFormController {
     final product_measure_type_id = sellType.id;
     var stateCurrent = 'INACTIVE';
     if (type == CrudType.create) {
-      stateCurrent = 'ACTIVE';
+      stateCurrent = ingredientsController.ingredients.isNotEmpty
+          ? 'ACTIVE'
+          : 'INACTIVE';
+
+      var inventory_type = inventoryType.id;
+      if (InventoryType.raw.id == inventory_type) {
+        stateCurrent = 'ACTIVE';
+      } else if (InventoryType.processed.id == inventory_type) {
+        stateCurrent = 'INACTIVE';
+      } else if (InventoryType.forSale.id == inventory_type) {
+        stateCurrent = 'INACTIVE';
+      }
     } else if (type == CrudType.update) {
       stateCurrent = ingredientsController.ingredients.isNotEmpty
           ? 'ACTIVE'

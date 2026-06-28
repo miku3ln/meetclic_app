@@ -4,6 +4,32 @@ import '../../../../shared/theme/configuration/app_theme_tokens.dart';
 
 
 class AppStyles {
+  static const TextStyle textTitleMainPrimary = TextStyle(
+    fontSize: 25,
+    color: AppColors.blanco,
+    fontWeight: FontWeight.bold,
+  );
+  static const TextStyle textLabelByPrimary = TextStyle(
+    fontSize: 14,
+    color: AppColors.blanco,
+    fontWeight: FontWeight.bold,
+  );
+  static const TextStyle labelDropdownByPrimary = TextStyle(
+    fontSize: 14,
+    color: AppColors.blanco,
+    fontWeight: FontWeight.bold,
+  );
+  static TextStyle labelMergeSelectDrop(
+      BuildContext context,
+      TextStyle style,
+      ) {
+    return Theme.of(context).textTheme.bodyMedium!.merge(style);
+  }
+  static const TextStyle labelDropdownItemByPrimary = TextStyle(
+    fontSize: 12,
+    color: AppColors.azulClic,
+    fontWeight: FontWeight.bold,
+  );
   static const TextStyle textFieldStyle = TextStyle(
     fontSize: 16,
     color: AppColors.grisOscuro,

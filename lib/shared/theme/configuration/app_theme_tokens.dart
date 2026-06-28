@@ -19,6 +19,7 @@ class AppThemeTokens {
   final Color shadow;
   final Color overlay;
   final Color disabled;
+  final Color white;
 
   final Color success;
   final Color successBackground;
@@ -56,6 +57,8 @@ class AppThemeTokens {
     required this.surfaceMuted,
     required this.cardBackground,
     required this.textPrimary,
+    required this.white,
+
     required this.textSecondary,
     required this.textInverse,
     required this.divider,
@@ -85,16 +88,15 @@ class AppThemeTokens {
     required this.inputFill,
     required this.link,
   });
+
   static Color shade(Color color, int percent) {
     assert(percent >= 0 && percent <= 100);
 
-    return Color.lerp(
-      color,
-      Colors.white,
-      percent / 100,
-    )!;
+    return Color.lerp(color, Colors.white, percent / 100)!;
   }
+
   static const AppThemeTokens light = AppThemeTokens(
+    white: AppColors.blanco,
     primary: AppColors.azulClic,
     secondary: AppColors.amarilloVital,
     accent: AppColors.moradoSuave,
@@ -146,7 +148,7 @@ class AppThemeTokens {
     primary: AppColors.amarilloVital,
     secondary: AppColors.azulClic,
     accent: AppColors.moradoSuave,
-
+    white: AppColors.blanco,
     background: AppColors.backgroundDark,
     surface: AppColors.surfaceDark,
     surfaceMuted: AppColors.surfaceMutedDark,
@@ -196,9 +198,9 @@ class AppThemeTokens {
   }
 }
 
-
 class AppColors {
   AppColors._();
+
   // 🎯 Colores principales de marca
   static const Color azulClic = Color(0xFF4C4CFF); // Primary
   static const Color amarilloVital = Color(
@@ -281,10 +283,6 @@ class AppColors {
   static Color shade(Color color, int percent) {
     assert(percent >= 0 && percent <= 100);
 
-    return Color.lerp(
-      color,
-      Colors.white,
-      percent / 100,
-    )!;
+    return Color.lerp(color, Colors.white, percent / 100)!;
   }
 }

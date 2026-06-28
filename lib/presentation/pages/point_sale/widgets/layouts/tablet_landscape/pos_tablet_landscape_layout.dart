@@ -30,7 +30,6 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
     ))
       ..addListener(_onControllerChanged);
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
-
     _initialize();
   }
 
