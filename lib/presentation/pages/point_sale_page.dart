@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/repositories/config_repository.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/services/config_api_service.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/dialogs/pos_open_shift_dialog.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/drawers/pos_app_drawer.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/models/pos_product_item.dart';
@@ -87,6 +88,8 @@ class _PointSalePageState extends State<PointSalePage> {
     final device = DeviceGestureObserver.snapshotOf(context);
 
     return Scaffold(
+      key: _scaffoldKey,
+      drawer: const PosAppDrawer(), // ✅ tu drawer estilo Drive
       body: DeviceGestureObserver(
         onEvent: (d, e) {
           debugPrint('DEVICE => $d');

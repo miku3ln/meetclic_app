@@ -27,10 +27,7 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
   @override
   Widget build(BuildContext context) {
     final slots = PosTabletLandscapeSlots.build(controller: widget.controller);
-    return Scaffold(
-      key: widget.scaffoldKey,
-      drawer: const PosAppDrawer(), // ✅ tu drawer estilo Drive
-      body: PosSplitTemplate(slots: slots),
-    );
+    return PosSplitTemplate(slots: slots);
+
   }
 }
