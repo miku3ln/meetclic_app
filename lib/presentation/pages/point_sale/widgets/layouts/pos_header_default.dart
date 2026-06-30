@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
-import '../../../../../shared/controllers/app_controller.dart';
 import '../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../home/modals/show_register_user.dart';
-import '../../repositories/config_repository.dart';
-import '../../services/config_api_service.dart';
-import '../dialogs/pos_open_shift_dialog.dart';
 import '../models/pos_product_item.dart';
 import '../organisms/pos_search_overlay.dart';
-import 'package:provider/provider.dart';
 
 class PosHeaderDefaultLayout extends StatefulWidget
     implements PreferredSizeWidget {
@@ -49,11 +43,9 @@ class PosHeaderDefaultLayout extends StatefulWidget
 }
 
 class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
-  late final PosMainController controller;
-    List<PosCategoryItem> productCategories=[];
+
   String? selectedProductCategoryId;
   String query = '';
-  final _scaffoldKey = GlobalKey<ScaffoldState>(); // ✅
   final GlobalKey _searchKey = GlobalKey();
   bool _open = false;
 
@@ -74,57 +66,24 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
     }
   }
 
-  void _onChanged() {
-    if (!mounted) return;
-    setState(() {});
-  }
-
-  // ✅ Modal vive aquí
-  Future<void> _showOpenShiftModal() async {
-    final opened = await showDialog<bool>(
-      context: context,
-      barrierDismissible: true,
-      builder: (_) => PosOpenShiftDialog(controller: controller),
-    );
-
-    if (!mounted) return;
-    if (opened != true) return;
-  }
-
-  Future<void> initDataPointOfSales(PosMainController controller) async {
-
-
+  Future<void> initDataPointOfSales( ) async {
     await widget.controllerMain.initDataPointOfSales();
-
   }
 
-  void initControllerMain() {
-    final app = context.read<AppController>();
-    controller = PosMainController(
-      app: app,
-      configRepository: ConfigRepository(
-        ConfigApiService(), // 👈 mock por ahora
-      ),
-    )..addListener(_onChanged);
-    controller.shift.onRequestOpenShift = _showOpenShiftModal; //
-    // Drawer
-    controller.ui.onRequestOpenDrawer = () {
-      _scaffoldKey.currentState?.openDrawer();
-    };
-  }
+
 
   @override
   void initState() {
     super.initState();
-    initControllerMain();
+    //initControllerMain();
   }
 
   @override
   void dispose() {
-    controller.removeListener(_onChanged);
     PosSearchOverlay.hide();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     final w = MediaQuery.of(context).size.width;
@@ -158,7 +117,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
       titleSpacing: 0,
       leading: IconButton(
         onPressed: widget.onMenuTap,
-        icon:  Icon(Icons.menu,color: colors.white,),
+        icon: Icon(Icons.menu, color: colors.white),
       ),
       actions: [
         IconButton(
@@ -167,7 +126,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
             "type": isAddCustomer ? "create_user" : "update_user",
           }),
           icon: isAddCustomer
-              ?  Icon(Icons.person_add_alt_1, color:colors.white)
+              ? Icon(Icons.person_add_alt_1, color: colors.white)
               : Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -183,7 +142,6 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
                       Icons.quick_contacts_mail_outlined,
                       color: colors.white,
                       size: 20,
-
                     ),
                   ],
                 ),
@@ -191,7 +149,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
         IconButton(
           onPressed: () =>
               widget.onMoreTap(context, {"source": "header", "type": ""}),
-          icon:  Icon(Icons.more_vert,color: colors.white),
+          icon: Icon(Icons.more_vert, color: colors.white),
         ),
       ],
       title: Row(
@@ -255,15 +213,15 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
           IconButton(
             key: _searchKey,
             onPressed: _toggleSearch,
-            icon: Icon(_open ? Icons.close : Icons.search,color: Colors.white),
+            icon: Icon(_open ? Icons.close : Icons.search, color: Colors.white),
           ),
           IconButton(
             tooltip: 'Actualizar información',
             onPressed: () async {
               // Capturas el evento aquí
-              await initDataPointOfSales(controller);
+              await initDataPointOfSales();
             },
-            icon: const Icon(Icons.refresh_rounded,color: Colors.white),
+            icon: const Icon(Icons.refresh_rounded, color: Colors.white),
           ),
           const SizedBox(width: 10),
           // DERECHA: Ticket (placeholder como antes)
