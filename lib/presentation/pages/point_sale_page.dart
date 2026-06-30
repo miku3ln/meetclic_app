@@ -88,6 +88,7 @@ class _PointSalePageState extends State<PointSalePage> {
     final device = DeviceGestureObserver.snapshotOf(context);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
       drawer: const PosAppDrawer(), // ✅ tu drawer estilo Drive
       body: DeviceGestureObserver(
@@ -111,7 +112,7 @@ class _PointSalePageState extends State<PointSalePage> {
         return PosTabletPortraitLayout(controller: controller,scaffoldKey: _scaffoldKey);
 
       case LayoutType.tabletLandscape:
-        return PosTabletLandscapeLayout(controller: controller,scaffoldKey: _scaffoldKey);
+        return PosTabletLandscapeLayout(controller: controller);
     }
   }
 }

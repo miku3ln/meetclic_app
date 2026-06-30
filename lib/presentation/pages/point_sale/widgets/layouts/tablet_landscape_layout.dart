@@ -8,11 +8,11 @@ import 'tablet_landscape/pos_tablet_landscape_slots.dart';
 
 class PosTabletLandscapeLayout extends StatefulWidget {
   final PosMainController controller;
-  final scaffoldKey;
+
   const PosTabletLandscapeLayout({
     super.key,
     required this.controller,
-    required this.scaffoldKey,
+
   });
 
   @override
