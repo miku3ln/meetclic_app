@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
 import '../../../../../shared/controllers/app_controller.dart';
 import '../../repositories/config_repository.dart';
@@ -174,6 +175,25 @@ class PosMainController extends ChangeNotifier {
   CustomerModelPosCurrent? selectedCustomer;
   CustomerModelPosCurrent? dataCustomerFinal;
 
+  Future<void> initDataPointOfSales() async {
+    final products = await PosTabletLandscapeFixtures.getProductsData();
+
+    browser.allProducts = products;
+    init(
+      initialProducts: products,
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(
+        products,
+      ),
+      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(
+        products,
+      ),
+      initialSelectedProductCategoryId: 'all',
+      initialSelectedMenuCategoryId: 'all',
+    );
+
+    notifyListeners();
+  }
+
   void setCustomerTicket(CustomerModelPosCurrent? selectedCustomerCurrent) {
     selectedCustomer = selectedCustomerCurrent;
     notifyListeners();
@@ -240,6 +260,7 @@ class PosMainController extends ChangeNotifier {
   CustomerModelPosCurrent get customerInUse {
     return selectedCustomer ?? dataCustomerFinal!;
   }
+
   bool get canUseCoupons {
     return ticket.items.isNotEmpty && shift.isShiftOpen;
   }

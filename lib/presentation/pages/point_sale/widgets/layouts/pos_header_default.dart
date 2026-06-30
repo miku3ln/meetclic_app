@@ -92,25 +92,10 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
   }
 
   Future<void> initDataPointOfSales(PosMainController controller) async {
-    final products = await PosTabletLandscapeFixtures.getProductsData();
-    controller.browser.allProducts = products;
-    // ✅ Carga data inicial (fixtures)
-    controller.init(
-      initialProducts: products,
-      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(
-        products,
-      ),
-      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(
-        products,
-      ),
-      // opcional:
-      initialSelectedProductCategoryId: 'all',
-      initialSelectedMenuCategoryId: 'all',
-    );
-    productCategories = PosTabletLandscapeFixtures.getCategoriesData(products);
-    selectedProductCategoryId = productCategories.isNotEmpty
-        ? productCategories.first.id
-        : null;
+
+
+    await widget.controllerMain.initDataPointOfSales();
+
   }
 
   void initControllerMain() {
