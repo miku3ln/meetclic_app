@@ -31,7 +31,7 @@ class PosRightPanel extends StatelessWidget {
           child: controller.shift. isShiftOpen
               ? Column(
             children: [
-              PosTicketHeader(title: 'Ticket', itemsCount: items.length,controllerMain:controller),
+              PosTicketHeader(title: 'Ticketss', itemsCount: items.length,controllerMain:controller),
               const SizedBox(height: 50), // ✅ antes 50
               const Divider(height: 0),
               // ✅ Lista ocupa todo menos checkout

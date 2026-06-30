@@ -109,7 +109,7 @@ class _PointSalePageState extends State<PointSalePage> {
         return PosMobileLandscapeLayout(controller: controller,scaffoldKey: _scaffoldKey);
 
       case LayoutType.tabletPortrait:
-        return PosTabletPortraitLayout(controller: controller,scaffoldKey: _scaffoldKey);
+        return PosTabletLandscapeLayout(controller: controller);//TODO DESIGN
 
       case LayoutType.tabletLandscape:
         return PosTabletLandscapeLayout(controller: controller);

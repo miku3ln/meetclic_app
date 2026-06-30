@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:meetclic_app/shared/providers_session.dart';
 import '../../../../../infrastructure/config/server_config.dart';
 import '../../../../../shared/controllers/app_controller.dart';
+import '../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../repositories/config_repository.dart';
 import '../../shared/utils.dart';
 import '../../state/pos_checkout_state.dart';
@@ -157,11 +158,11 @@ class PosPaymentLayoutController extends ChangeNotifier {
 
   bool get isCompleted => _isCompleted;
 
-  Future<Map<String, dynamic>>  completePayment() async {
+  Future<Map<String, dynamic>> completePayment() async {
     try {
       final customer = main.selectedCustomer;
       final customerId = customer?.id;
-      final businessId=SessionService().businessId;
+      final businessId = SessionService().businessId;
       final currentSession = SessionService().currentSession;
       final userId = currentSession?.userId;
       final paymentMethod = main.payment.paymentMethodCode;
@@ -210,14 +211,14 @@ class PosPaymentLayoutController extends ChangeNotifier {
           "paymentMethod": paymentMethod,
           "customer_id": customerId,
           "userId": userId,
-          "business_id":businessId,
+          "business_id": businessId,
           "typeSave": typeSave,
           "typeService": typeService.value,
         },
       };
       final token = SessionService().apiToken;
       final uri = Uri.parse(
-        '${ServerConfig.baseUrl}/pointsales/generate-ticket',//POS-PRODUCTS-SALES -INIT-TWO
+        '${ServerConfig.baseUrl}/pointsales/generate-ticket', //POS-PRODUCTS-SALES -INIT-TWO
       );
       final response = await http.post(
         uri,
@@ -230,7 +231,6 @@ class PosPaymentLayoutController extends ChangeNotifier {
       // 🔥 VALIDACIÓN REAL
       if (response.statusCode == 200) {
         final decoded = jsonDecode(response.body);
-
 
         final success = decoded["success"] ?? false;
         final message = decoded["msj"] ?? "Sin mensaje";
@@ -246,27 +246,22 @@ class PosPaymentLayoutController extends ChangeNotifier {
           "data": decoded["data"],
           "errors": decoded["errors"] ?? [],
         };
-
       } else {
         return {
           "success": false,
           "message": "Error Servidor.!",
           "data": [],
-          "errors":  [],
+          "errors": [],
         };
       }
-
     } catch (e) {
-
       return {
         "success": false,
         "message": e.toString(),
         "data": null,
         "errors": [],
       };
-
     }
-
   }
 
   void reset() {
@@ -335,24 +330,24 @@ class PosPaymentLayout extends StatelessWidget {
                 icon: Icons.check,
                 label: mainController.payment.getNameButtonManagementPointSale,
                 backgroundColor: Colors.blue,
-                onPressed: () async{//SAVE DATA
+                onPressed: () async {
+                  //SAVE DATA
                   final result = await controller.completePayment();
                   final success = result["success"];
                   final message = result["message"];
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(message),
-                        backgroundColor:
-                        success ? Colors.green : Colors.red,
-                        behavior: SnackBarBehavior.floating,
-                        margin: const EdgeInsets.only(
-                          top: 20,
-                          left: 20,
-                          right: 20,
-                          bottom: 0,
-                        ),
-                        duration: const Duration(seconds: 3),
+                    SnackBar(
+                      content: Text(message),
+                      backgroundColor: success ? Colors.green : Colors.red,
+                      behavior: SnackBarBehavior.floating,
+                      margin: const EdgeInsets.only(
+                        top: 20,
+                        left: 20,
+                        right: 20,
+                        bottom: 0,
                       ),
+                      duration: const Duration(seconds: 3),
+                    ),
                   );
                 },
               ),
@@ -633,8 +628,7 @@ Widget posPaymentManagement(
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(message),
-                          backgroundColor:
-                          success ? Colors.green : Colors.red,
+                          backgroundColor: success ? Colors.green : Colors.red,
                           behavior: SnackBarBehavior.floating,
                           margin: const EdgeInsets.only(
                             top: 20,
@@ -890,6 +884,7 @@ enum HeaderSide { left, right }
 
 class HeaderItemData {
   final String? label;
+  final BuildContext? context;
   final IconData? icon;
   final int flex;
   final VoidCallback? onTap;
@@ -898,6 +893,8 @@ class HeaderItemData {
 
   const HeaderItemData({
     this.label,
+    this.context,
+
     this.icon,
     this.flex = 1,
     this.colorIcon = Colors.green,
@@ -914,6 +911,8 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeTokens.of(context);
+
     bool isAddCustomer = mainController.selectedCustomer == null ? true : false;
     String fullName = !isAddCustomer
         ? mainController.selectedCustomer!.name
@@ -935,13 +934,15 @@ class _Header extends StatelessWidget {
               side: HeaderSide.left,
               items: [
                 HeaderItemData(
+                  colorIcon: colors.white,
                   label: "Ticket",
                   flex: 6,
                   alignment: HeaderItemAlignment.left, // 🔥
                   onTap: () {},
                 ),
                 HeaderItemData(
-                  colorIcon: isAddCustomer ? Colors.green : Colors.orange,
+                  context: context,
+                  colorIcon: isAddCustomer ? colors.secondary : colors.white,
                   icon: isAddCustomer
                       ? Icons.person_add
                       : Icons.quick_contacts_mail_outlined,
@@ -990,6 +991,7 @@ class _Header extends StatelessWidget {
                 HeaderItemData(
                   icon: Icons.arrow_back,
                   flex: 3,
+                  colorIcon: colors.white,
                   alignment: HeaderItemAlignment.left, // 🔥
                   onTap: () {
                     if (controller.isCompleted) {
@@ -1009,6 +1011,8 @@ class _Header extends StatelessWidget {
 }
 
 class HeaderItem extends StatelessWidget {
+
+
   final List<HeaderItemData> items;
   final HeaderSide side;
   final Color color;
@@ -1025,12 +1029,13 @@ class HeaderItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeTokens.of(context);
     final isLeft = side == HeaderSide.left;
 
     return Container(
       width: double.infinity,
       height: double.infinity,
-      color: color,
+      color: colors.primary,
       padding: const EdgeInsets.symmetric(horizontal: 12),
       child: Row(children: _buildItems(isLeft)),
     );
@@ -1057,12 +1062,12 @@ Alignment _mapAlignment(HeaderItemAlignment alignment) {
 }
 
 Widget _buildContentItems(HeaderItemData item) {
-  if (item.icon != null && item.label == null) {
-    return Icon(item.icon);
+  if (item.icon != null && (item.label == null ||item.label == '')) {
+    return Icon(item.icon,color: item.colorIcon);
   }
 
   if (item.label != null && item.icon == null) {
-    return Text(item.label!);
+    return Text(item.label!,style:  TextStyle(color: item.colorIcon, fontWeight: FontWeight.w600));
   }
 
   return Row(
@@ -1088,7 +1093,7 @@ Widget _wrapItem(HeaderItemData item) {
   if (isIconOnly) {
     return Align(
       alignment: _mapAlignment(item.alignment),
-      child: IconButton(icon: Icon(item.icon), onPressed: item.onTap),
+      child: IconButton(icon: Icon(item.icon,color: item.colorIcon), onPressed: item.onTap),
     );
   }
 
@@ -1546,13 +1551,13 @@ class PosFloatingActionsColumn extends StatelessWidget {
 
 Widget _buildContent(PosActionButton action) {
   if (action.icon != null && action.label == null) {
-    return Icon(action.icon, size: 20); // 👈 más pequeño
+    return Icon(action.icon, size: 20,color:Colors.white); // 👈 más pequeño
   }
 
   if (action.label != null && action.icon == null) {
     return Text(
       action.label!,
-      style: const TextStyle(fontSize: 12), // 👈 más pequeño
+      style: const TextStyle(fontSize: 12,color: Colors.white), // 👈 más pequeño
     );
   }
 
@@ -1560,9 +1565,9 @@ Widget _buildContent(PosActionButton action) {
     mainAxisAlignment: MainAxisAlignment.center,
     mainAxisSize: MainAxisSize.min, // 🔥 CLAVE
     children: [
-      Icon(action.icon, size: 20),
+      Icon(action.icon, size: 20,color: Colors.white),
       const SizedBox(height: 2), // 👈 reduce espacio
-      Text(action.label!, style: const TextStyle(fontSize: 11)),
+      Text(action.label!, style: const TextStyle(fontSize: 11,color: Colors.white)),
     ],
   );
 }
