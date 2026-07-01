@@ -142,7 +142,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   void _listenModalEvents(ProductModalController controller) {
     _modalSub?.cancel();
     _modalActions?.cancel();
-
     _modalSub = controller.events.listen((event) {
       final data = event.data as Map<String, dynamic>?;
       switch (event.type) {

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/util-manager.dart';
 
 import '../../../../../../../shared/pagination_response.dart';
 import '../../../../../../../shared/theme/configuration/app_theme_tokens.dart';
@@ -122,29 +123,23 @@ class ProductListCard extends StatelessWidget {
     }
     final productMeasureTypeRoot = details['product_measure_type'];
     var typeMeasureId = productMeasureTypeRoot['id'].toString();
+    final configuration = MeasureTypeUtils.getConfiguration(
+      typeMeasureId: typeMeasureId,
+    );
+    Color managerTypeMeasureColor =configuration.borderColor;
 
-    Color managerTypeMeasureColor = Colors.orange;
-    if (typeMeasureId == MeasureType.unit.id) {
-      managerTypeMeasureColor = MeasureType.unit.color;
-    } else if (typeMeasureId == MeasureType.volume.id) {
-      managerTypeMeasureColor = MeasureType.volume.color;
-    } else if (typeMeasureId == MeasureType.length.id) {
-      managerTypeMeasureColor = MeasureType.length.color;
-    } else if (typeMeasureId == MeasureType.area.id) {
-      managerTypeMeasureColor = MeasureType.area.color;
-    } else if (typeMeasureId == MeasureType.mass.id) {
-      managerTypeMeasureColor = MeasureType.mass.color;
-    }
+
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
       child: Container(
+
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: colors.cardBackground,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: colors.border),
+          border: Border(left: BorderSide(color: configuration.borderColor, width: 6)),
           boxShadow: [
             BoxShadow(
               color: colors.shadow,
@@ -232,7 +227,7 @@ class ProductListCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _InfoColumn(
-                    icon: Icons.scale_outlined,
+                    icon: configuration.icon,
                     title: "Tipo de Medida",
                     value: measureType,
                     backgroundIcon: AppColors.shade(

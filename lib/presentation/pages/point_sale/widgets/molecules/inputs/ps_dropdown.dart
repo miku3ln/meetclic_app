@@ -56,9 +56,9 @@ class PsDropdown<T> extends StatelessWidget {
           children: [
             Text(
               label,
-              style: AppTextStyles.bodySecondary(context).copyWith(
-                color: labelColor,
-              ),
+              style: AppTextStyles.bodySecondary(
+                context,
+              ).copyWith(color: labelColor),
             ),
             if (requiredField)
               Text(
@@ -73,26 +73,28 @@ class PsDropdown<T> extends StatelessWidget {
         ),
 
         AppSpacing.spaceBetweenInputs,
-
         /// 🔥 DROPDOWN
         DropdownButtonFormField<T>(
+          isExpanded: true,
           value: value,
           items: items
               .map(
                 (e) => DropdownMenuItem(
-              value: e,
-              child: Text(getLabel(e)),
-            ),
-          )
+                  value: e,
+                  child: Text(
+                    getLabel(e),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              )
               .toList(),
           onChanged: (val) {
             onChanged(val);
           },
-
           decoration: InputDecoration(
             filled: true,
             fillColor: c.inputFill,
-
             /// 🔥 BORDES
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
@@ -100,22 +102,17 @@ class PsDropdown<T> extends StatelessWidget {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: borderColor,
-                width: 1.5,
-              ),
+              borderSide: BorderSide(color: borderColor, width: 1.5),
             ),
 
             /// 🔥 ERROR SOLO SI TOCADO
             errorText: showError ? error : null,
-
             /// 🔥 ICONOS
             suffixIcon: showError
                 ? Icon(Icons.error_outline, color: c.error)
                 : showSuccess
                 ? const Icon(Icons.check_circle, color: Colors.green)
                 : null,
-
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 12,
               vertical: 14,

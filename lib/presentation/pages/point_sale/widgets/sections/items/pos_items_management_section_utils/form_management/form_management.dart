@@ -27,6 +27,7 @@ import '../../../../recipe/item-card/PsRecipeRowData.dart';
 import '../../../product/ps_section_card.dart';
 import '../../pos_items_management_section.dart';
 import '../pos_items_controller.dart';
+import '../util-manager.dart';
 
 Future<void> showManagerProduct({
   required BuildContext context,
@@ -870,7 +871,8 @@ Widget _buildTabRecipe(
                                 controller
                                     .ingredientsController
                                     .ingredients
-                                    .isNotEmpty && false)
+                                    .isNotEmpty &&
+                                false)
                               PsFieldRow(
                                 children: [
                                   PsFieldItem(
@@ -1019,20 +1021,12 @@ class PsIngredientCard extends StatelessWidget {
     final productMeasureTypeRoot = details['product_measure_type'];
 
     var informationProduct = item.name + "(" + item.code + " )";
-    Color borderColor = Colors.green;
-    var typeMeasureId = productMeasureTypeRoot['id'].toString();
-    if (typeMeasureId == MeasureType.unit.id) {
-      borderColor = MeasureType.unit.color;
-    } else if (typeMeasureId == MeasureType.volume.id) {
-      borderColor = MeasureType.volume.color;
-    } else if (typeMeasureId == MeasureType.length.id) {
-      borderColor = MeasureType.length.color;
-    } else if (typeMeasureId == MeasureType.area.id) {
-      borderColor = MeasureType.area.color;
-    } else if (typeMeasureId == MeasureType.mass.id) {
-      borderColor = MeasureType.mass.color;
-    }
 
+    var typeMeasureId = productMeasureTypeRoot['id'].toString();
+    final configuration = MeasureTypeUtils.getConfiguration(
+      typeMeasureId: typeMeasureId,
+    );
+    Color borderColor = configuration.borderColor;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -1299,28 +1293,15 @@ Widget _buildRecipeItemRow(
   var informationProduct = item.name + "(" + item.code + " )";
   Color borderColor = Colors.green;
   var typeMeasureId = productMeasureTypeRoot['id'].toString();
-  if (typeMeasureId == MeasureType.unit.id) {
-    borderColor = MeasureType.unit.color;
-    managerTypeMeasureIcon = MeasureType.unit.icon;
-    managerTypeMeasureText = MeasureType.unit.value;
-  } else if (typeMeasureId == MeasureType.volume.id) {
-    borderColor = MeasureType.volume.color;
-    managerTypeMeasureIcon = MeasureType.volume.icon;
-    managerTypeMeasureText = MeasureType.volume.value;
-  } else if (typeMeasureId == MeasureType.length.id) {
-    borderColor = MeasureType.length.color;
-    managerTypeMeasureIcon = MeasureType.length.icon;
-    managerTypeMeasureText = MeasureType.length.value;
-  } else if (typeMeasureId == MeasureType.area.id) {
-    borderColor = MeasureType.area.color;
-    managerTypeMeasureIcon = MeasureType.area.icon;
-    managerTypeMeasureText = MeasureType.area.value;
-  } else if (typeMeasureId == MeasureType.mass.id) {
-    borderColor = MeasureType.mass.color;
-    managerTypeMeasureIcon = MeasureType.mass.icon;
-    managerTypeMeasureText = MeasureType.mass.value;
-  }
+
+  final configuration = MeasureTypeUtils.getConfiguration(
+    typeMeasureId: typeMeasureId,
+  );
+  borderColor = configuration.borderColor;
+  managerTypeMeasureIcon = configuration.icon;
+  managerTypeMeasureText = configuration.text;
   managerTypeMeasureColor = borderColor;
+
   if (item.recipeId > 0) {
     managerCrudColorBackground = colorsApp.badgeText;
     managerCrudColorText = AppColors.shade(colorsApp.badgeText, 50);
