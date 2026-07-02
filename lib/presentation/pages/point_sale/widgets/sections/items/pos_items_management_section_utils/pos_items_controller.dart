@@ -154,9 +154,7 @@ class ProductListCard extends StatelessWidget {
             Row(
               children: [
                 _buildAvatar(context, item.image),
-
                 const SizedBox(width: 16),
-
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

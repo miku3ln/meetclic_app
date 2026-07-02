@@ -373,6 +373,10 @@ class ProductModalController extends BaseFormController {
   /// =========================
   Future<void> init() async {
     categories = await _service.getCategories();
+    final catalogMeasureData = await PosMockData.getCatalogMeasureData();
+    final catalogTaxData = await PosMockData.getCatalogTaxData();
+    setManagerDataManagementProduct(catalogMeasureData, catalogTaxData);
+
     notifyListeners();
   }
 
@@ -424,7 +428,7 @@ class ProductModalController extends BaseFormController {
     subcategoryError = "Selecciona una subcategoría";
 
     if (category != null) {
-      subcategories = await _service.getSubcategories(category.id);
+      subcategories = category.subcategories;
     }
 
     notifyListeners();
@@ -661,7 +665,20 @@ class ProductModalController extends BaseFormController {
       final taxId = taxData['id'];
 
       selectedTax = listTaxCategoryManagement.firstWhere((e) => e.id == taxId);
+      //selectedUnitMeasure=draft.selectedUnitMeasure;
 
+      final resultData = getDataSubMeasureByMeasure(
+        listMeasureCategoryManagement,
+        draft.sellType,
+      );
+
+      final unitsWithConversions = resultData.units.firstWhere(
+        (unit) => unit.id == draft.selectedUnitMeasure?.id,
+      );
+
+      if (unitsWithConversions.id >0) {
+        selectedUnitMeasure=unitsWithConversions;
+      }
       if (false) {
         selectedTax = TaxCategoryModel(
           id: taxData['id'],
@@ -698,12 +715,15 @@ class ProductModalController extends BaseFormController {
         (c) => c.id == draft.category.id,
         orElse: () => ProductCategory.empty(),
       );
-      subcategories = await _service.getSubcategories(selectedCategory!.id);
+      subcategories = selectedCategory!.subcategories;
       if (draft.subcategory.id > 0) {
-        selectedSubcategory = subcategories.firstWhere(
+        var needleSearch = subcategories.firstWhere(
           (s) => s.id == draft.subcategory.id,
           orElse: () => ProductSubcategory.empty(),
         );
+        if (needleSearch.id > 0) {
+          selectedSubcategory = needleSearch;
+        }
       }
     }
 

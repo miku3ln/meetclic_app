@@ -201,12 +201,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       controller.resetAllForm();
       await controller.init();
       final draft = ProductMapper.fromMap(item.data!);
-      final catalogMeasureData = await PosMockData.getCatalogMeasureData();
-      final catalogTaxData = await PosMockData.getCatalogTaxData();
-      controller.setManagerDataManagementProduct(
-        catalogMeasureData,
-        catalogTaxData,
-      );
       controller.loadAndValidate(draft);
 
       if (!mounted) return;
@@ -218,8 +212,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
         controller: controller,
         title: "Actualizar Producto",
         typeManagement: CrudType.update,
-        listMeasureCategory: catalogMeasureData,
-        listTaxCategory: catalogTaxData,
+        listMeasureCategory: controller.listMeasureCategoryManagement,
+        listTaxCategory: controller.listTaxCategoryManagement,
         productId: draft.id!,
       );
     } finally {
@@ -275,15 +269,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                     try {
                       controller.resetAllForm();
                       await controller.init();
-
-                      final catalogMeasureData =
-                          await PosMockData.getCatalogMeasureData();
-                      final catalogTaxData =
-                          await PosMockData.getCatalogTaxData();
-                      controller.setManagerDataManagementProduct(
-                        catalogMeasureData,
-                        catalogTaxData,
-                      );
                       if (!mounted) return;
                       await showManagerProduct(
                         barrierDismissible: false,
@@ -293,8 +278,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                         btnCancelTitle: "Cancelar",
                         title: "Crear Producto",
                         typeManagement: CrudType.create,
-                        listMeasureCategory: catalogMeasureData,
-                        listTaxCategory: catalogTaxData,
+                        listMeasureCategory: controller.listMeasureCategoryManagement,
+                        listTaxCategory: controller.listTaxCategoryManagement,
                       );
                     } finally {
                       if (mounted) {

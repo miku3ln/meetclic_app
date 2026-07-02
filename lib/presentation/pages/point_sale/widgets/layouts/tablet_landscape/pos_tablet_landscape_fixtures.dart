@@ -10,7 +10,6 @@ import '../../../../../../shared/pagination_response.dart' hide ApiResponse;
 import '../../../models/product_management_measure.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
-import '../../organisms/ps_toogle_group.dart';
 import '../pos_main_controller.dart';
 
 class PosTabletLandscapeFixtures {

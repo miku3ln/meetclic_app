@@ -15,10 +15,10 @@ class ProductSubcategory {
 
   factory ProductSubcategory.fromMap(Map<String, dynamic> json) {
     return ProductSubcategory(
-      id: json['id'],
-      value: json['value'],
-      description: json['description'],
-      source: json['source'],
+      id: json['product_subcategory_id'],
+      value: json['product_subcategory'],
+      description: json['product_subcategory_description'],
+      source: json['source'] ?? '',
       productCategoryId: json['product_category_id'],
     );
   }

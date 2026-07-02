@@ -62,14 +62,15 @@ class ProductType {
 
   });
 }
+
 class UnitMeasureModel {
-  final int id;
-  final String name;
-  final String symbol;
-  final double factorToBase;
-  final bool isBase;
-  final bool isDefault;
-  final int decimalPrecision;
+  late final int id;
+  late final String name;
+  late final String symbol;
+  late final double factorToBase;
+  late final bool isBase;
+  late final bool isDefault;
+  late final int decimalPrecision;
   final List<ConversionModel> conversions;
 
   UnitMeasureModel({
@@ -95,6 +96,18 @@ class UnitMeasureModel {
       conversions: (json['conversions'] as List<dynamic>)
           .map((e) => ConversionModel.fromJson(e))
           .toList(),
+    );
+  }
+  factory UnitMeasureModel.empty() {
+    return UnitMeasureModel(
+      id: 0,
+      name: '',
+      symbol: '',
+      factorToBase: 0.0,
+      isBase: false,
+      isDefault: false,
+      decimalPrecision: 0,
+      conversions: const [],
     );
   }
 }

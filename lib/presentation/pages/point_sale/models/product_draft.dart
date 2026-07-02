@@ -58,7 +58,7 @@ class ProductMapper {
 
   static ProductDraft fromMap(Map<String, dynamic>? map) {
     final m = map ?? {};
-    final String currentTypeMeasureId = m['measure_type_management'][0]
+    final String currentTypeMeasureId = m['measure_type_management']['id']
         .toString();
     MeasureType sellType = MeasureType.unit;
 
@@ -92,18 +92,42 @@ class ProductMapper {
       name: '',
       priority: 0,
     );
+    double price = double.parse(m['price']['pv']);
+    double cost = double.parse(m['price']['pc']);
+    double stock = (m['stock']['quantity'] as num).toDouble();
+    double lowStock = (m['lowStock'] is num)
+        ? (m['lowStock'] as num).toDouble()
+        : 0.0;
+    String nombreArchivo = "not-image-product-point-sales.png";
+    var sourceManager = m['source'];
+    var source = null;
+    if (!sourceManager.contains(nombreArchivo)) {
+      source = sourceManager;
+    }
+
+    final details_all = m['details_all'];
+    final details = jsonDecode(details_all);
+    final inventoryInitial = details['inventory_initial'];
+    final unitInput = inventoryInitial['unit_input'];
+    final selectedUnitMeasure = UnitMeasureModel(
+      id: unitInput['id'],
+      name: unitInput['name'],
+      symbol: unitInput['symbol'],
+      factorToBase: (unitInput['factor_to_base'] as num).toDouble(),
+      isBase: unitInput['is_base'] == 1,
+      isDefault: unitInput['measure_unit_config']['is_default'] == 1,
+      decimalPrecision: unitInput['decimal_precision'],
+      conversions: [],
+    );
+
     return ProductDraft(
       id: m['id'],
       name: m['name']?.toString() ?? '',
-      detailsAll: m['details_all']?.toString() ?? '',
-      price: (m['price'] is num) ? (m['price'] as num).toDouble() : 0.0,
-      cost: (m['cost'] is num) ? (m['cost'] as num).toDouble() : 0.0,
-      stock: (m['stock']['quantity'] is num)
-          ? (m['stock']['quantity'] as num).toDouble()
-          : 0.0,
-      lowStock: (m['lowStock'] is num)
-          ? (m['lowStock'] as num).toDouble()
-          : 0.0,
+      detailsAll: details_all?.toString() ?? '',
+      price: price,
+      cost: cost,
+      stock: stock,
+      lowStock: lowStock,
       code: m['code']?.toString() ?? '',
       barcode: m['barcode']?.toString() ?? '',
       description: m['description']?.toString() ?? '',
@@ -114,6 +138,7 @@ class ProductMapper {
         value: m['category'],
         description: "noe",
         source: '',
+        subcategories: [],
       ),
       // 👈 debes crear esto
       subcategory: ProductSubcategory(
@@ -124,10 +149,10 @@ class ProductMapper {
         productCategoryId: m['product_category_id'],
       ),
       sellType: sellType,
-      selectedUnitMeasure: m['selectedUnitMeasure'] as UnitMeasureModel?,
+      selectedUnitMeasure: selectedUnitMeasure,
       inventoryType: inventoryType,
       tax: taxCurrent,
-      image: null,
+      image: source,
     );
   }
 }
@@ -151,6 +176,46 @@ class ProductCategoryMapper {
     return ProductCategoryDraft(
       name: m.title.toString() ?? '',
       image: m.image?.toString() ?? '',
+    );
+  }
+}
+
+class MeasureDataResult {
+  final MeasureCategoryModel measureCategory;
+  final List<UnitMeasureModel> units;
+
+  MeasureDataResult({required this.measureCategory, required this.units});
+}
+
+MeasureDataResult getDataSubMeasureByMeasure(
+  List<MeasureCategoryModel> listMeasureCategory,
+  MeasureType type,
+) {
+  try {
+    final resultSet = listMeasureCategory.firstWhere(
+      (e) => e.id.toString() == type.id,
+    );
+
+    final unitsWithConversions = resultSet.units
+        .where((unit) => unit.conversions.isNotEmpty)
+        .toList();
+
+    return MeasureDataResult(
+      measureCategory: resultSet,
+      units: unitsWithConversions,
+    );
+  } catch (e, stackTrace) {
+    return MeasureDataResult(
+      measureCategory: MeasureCategoryModel(
+        id: 0,
+        name: '',
+        units: [],
+        description: '',
+        prefix: '',
+        symbol: '',
+        baseUnit: UnitMeasureModel.empty(),
+      ),
+      units: [],
     );
   }
 }

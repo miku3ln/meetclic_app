@@ -14,6 +14,7 @@ import '../../../../../../../../shared/utils/util_common.dart';
 import '../../../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../../../shared/responsive/device_gesture_observer.dart';
 import '../../../../../../../widgets/cards/cards.dart';
+import '../../../../../models/product_draft.dart';
 import '../../../../../models/product_management_measure.dart';
 import '../../../../../state/product_modal_controller.dart';
 import '../../../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
@@ -26,7 +27,6 @@ import '../../../../organisms/ps_toogle_group.dart';
 import '../../../../recipe/item-card/PsRecipeRowData.dart';
 import '../../../product/ps_section_card.dart';
 import '../../pos_items_management_section.dart';
-import '../pos_items_controller.dart';
 import '../util-manager.dart';
 
 Future<void> showManagerProduct({
@@ -149,9 +149,19 @@ class ProductManagerFormWidget extends StatelessWidget {
 
     switch (device.layoutType) {
       case LayoutType.mobilePortrait:
-        return Text('mobilePortrait');
+        return PortraitProductWidget(
+          controller: controller,
+          listMeasureCategory: listMeasureCategory,
+          listTaxCategory: listTaxCategory,
+          buildContextParent: buildContextParent,
+        );
       case LayoutType.mobileLandscape:
-        return Text('mobileLandscape');
+        return LandProductWidget(
+          controller: controller,
+          listMeasureCategory: listMeasureCategory,
+          listTaxCategory: listTaxCategory,
+          buildContextParent: buildContextParent,
+        );
 
       case LayoutType.tabletPortrait:
         return PortraitProductWidget(
@@ -950,15 +960,9 @@ Widget _buildMeasureWidget(
   if (type == MeasureType.unit) {
     return const SizedBox.shrink();
   }
-
-  final resultSet = listMeasureCategory.firstWhere(
-    (e) => e.id.toString() == type.id,
-  );
-
-  final unitsWithConversions = resultSet.units
-      .where((unit) => unit.conversions.isNotEmpty)
-      .toList();
-
+ final resultData= getDataSubMeasureByMeasure(listMeasureCategory,type);
+  final resultSet = resultData.measureCategory;
+  final unitsWithConversions = resultData.units;
   return PsDropdown<UnitMeasureModel>(
     label: "Medida",
     items: unitsWithConversions,
