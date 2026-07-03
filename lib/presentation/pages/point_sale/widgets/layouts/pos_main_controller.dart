@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
 import '../../../../../shared/controllers/app_controller.dart';
+import '../../../../shared/responsive/device_gesture_observer.dart';
 import '../../repositories/config_repository.dart';
+import '../../services/pos_labels_service.dart';
 import '../../shared/utils.dart';
 import '../../state/pos_product_browser_state.dart';
 import '../dialogs/moda_managerl.dart';
@@ -23,6 +25,7 @@ class PosMainController extends ChangeNotifier {
   final PosCheckoutState checkout;
   final PosUiState ui;
   final ConfigRepository configRepository;
+  final PosLabelsService labels;
 
   PosMainController({
     required AppController app,
@@ -33,12 +36,14 @@ class PosMainController extends ChangeNotifier {
     PosPaymentState? payment,
     PosCheckoutState? checkout,
     PosUiState? ui,
+    PosLabelsService? labels,
   }) : app = app,
        shift = shift ?? PosShiftState(app: app, storage: PosShiftStorage()),
        browser = browser ?? PosProductBrowserState(),
        ticket = ticket ?? PosTicketState(),
        payment = payment ?? PosPaymentState(),
        checkout = checkout ?? PosCheckoutState(),
+       labels = labels ?? const PosLabelsService(),
        ui = ui ?? PosUiState() {
     typeService = typeServicesData.first; // 🔥 AQUÍ
     initDataConfig();
@@ -263,5 +268,55 @@ class PosMainController extends ChangeNotifier {
 
   bool get canUseCoupons {
     return ticket.items.isNotEmpty && shift.isShiftOpen;
+  }
+
+  void onDeviceEvent(DeviceSnapshot device, GestureEvent event) {
+    switch (event.type) {
+      case GestureEventType.orientationChanged:
+        debugPrint('Orientación: ${device.orientation.name}');
+        if (device.orientation.name == 'portrait') {
+          if (device.layoutType == LayoutType.mobilePortrait) {
+          } else if (device.layoutType == LayoutType.tabletPortrait) {
+            setColsNumberRowPosSales(4);
+          }
+        } else if (device.orientation.name == 'landscape') {
+          if (device.layoutType == LayoutType.mobileLandscape) {
+          } else if (device.layoutType == LayoutType.tabletLandscape) {
+            setColsNumberRowPosSales(5);
+          }
+        }
+        break;
+
+      case GestureEventType.metricsChanged:
+        break;
+
+      case GestureEventType.tap:
+        break;
+
+      case GestureEventType.doubleTap:
+        break;
+
+      case GestureEventType.longPress:
+        break;
+
+      case GestureEventType.panUpdate:
+        break;
+
+      case GestureEventType.scaleStart:
+        break;
+
+      case GestureEventType.scaleUpdate:
+        break;
+
+      case GestureEventType.scaleEnd:
+        break;
+    }
+  }
+
+  int colsNumberRowPosSales = 5;
+
+  void setColsNumberRowPosSales(int value) {
+    colsNumberRowPosSales = value;
+    notifyListeners();
   }
 }

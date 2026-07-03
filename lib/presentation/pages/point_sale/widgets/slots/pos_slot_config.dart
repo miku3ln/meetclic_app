@@ -11,4 +11,7 @@ class PosSlotConfig {
     this.rightFlex = 40,
     this.footerHeight = 96, // 🔥 sube para que se note
   });
+
+
+
 }

@@ -492,7 +492,7 @@ class PosPaymentPanel extends StatelessWidget {
 
           /// 🔥 SWITCH ENTRE FORM Y SUCCESS
           child: controller.isCompleted
-              ? PosPaymentSuccess(controller: controller)
+              ? PosPaymentSuccess(controller: controller,mainController:mainController)
               : posPaymentManagement(context, controller, mainController),
         );
       },
@@ -733,8 +733,9 @@ Widget _buildTopSection(
 
 class PosPaymentSuccess extends StatefulWidget {
   final PosPaymentLayoutController controller;
+  final PosMainController mainController;
 
-  const PosPaymentSuccess({super.key, required this.controller});
+  const PosPaymentSuccess({super.key, required this.controller,required this.mainController});
 
   @override
   State<PosPaymentSuccess> createState() => _PosPaymentSuccessState();
@@ -785,7 +786,7 @@ class _PosPaymentSuccessState extends State<PosPaymentSuccess> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text('Total pagado'),
+                               Text(widget.mainController.labels.totalPayment),
                             ],
                           ),
                         ),
@@ -808,7 +809,7 @@ class _PosPaymentSuccessState extends State<PosPaymentSuccess> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                              const Text('Cambio'),
+                               Text(widget.mainController.labels.change),
                             ],
                           ),
                         ),
@@ -825,7 +826,6 @@ class _PosPaymentSuccessState extends State<PosPaymentSuccess> {
                     children: [
                       const Icon(Icons.email_outlined),
                       const SizedBox(width: 8),
-
                       Expanded(
                         child: TextField(
                           controller: _emailController,
@@ -935,7 +935,7 @@ class _Header extends StatelessWidget {
               items: [
                 HeaderItemData(
                   colorIcon: colors.white,
-                  label: "Ticket",
+                  label:mainController.labels.ticket,
                   flex: 6,
                   alignment: HeaderItemAlignment.left, // 🔥
                   onTap: () {},

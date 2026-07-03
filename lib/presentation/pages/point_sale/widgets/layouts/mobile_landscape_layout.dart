@@ -20,23 +20,17 @@ class PosMobileLandscapeLayout extends StatelessWidget {
 
       appBar: PosHeaderBar(
         controllerMain: controller,
-
         // ✅ TODO DESDE EL CONTROLLER
         productCategories: controller.productCategories,
         selectedProductCategoryId: controller.selectedProductCategoryId,
-
         onProductCategoryChanged: (id) {
           controller.setProductCategory(id!); // 🔥
         },
-
         onMenuTap: () {},
-
         onUserTap: (context, data) =>
             controller.ui.onUserTap(context, null, controller),
-
         onMoreTap: (context, data) =>
             controller.ui.onMoreTap(context, null, controller),
-
         onSearchChanged: (text) {
           controller.setQuery(text); // 🔥
         },

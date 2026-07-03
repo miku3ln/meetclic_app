@@ -18,6 +18,9 @@ enum GestureEventType {
   scaleStart,
   scaleUpdate,
   scaleEnd,
+  // NUEVOS
+  orientationChanged,
+  metricsChanged,
 }
 
 // ----------------------------
@@ -77,11 +80,10 @@ typedef DeviceGestureCallback = void Function(
     DeviceSnapshot device,
     GestureEvent event,
     );
-
 // ----------------------------
 // Widget Observer
 // ----------------------------
-class DeviceGestureObserver extends StatelessWidget {
+class DeviceGestureObserver extends StatefulWidget {
   final Widget child;
 
   /// Se dispara en CADA gesto y te manda:
@@ -120,12 +122,13 @@ class DeviceGestureObserver extends StatelessWidget {
     this.rotationThreshold = 0.001,
   });
 
-  // ✅ Para decidir layout sin gestos (usa esto en tu PointSalePage)
+  /// Para decidir layout sin gestos
   static DeviceSnapshot snapshotOf(
       BuildContext context, {
         double tabletBreakpoint = 600,
       }) {
     final mq = MediaQuery.of(context);
+
     final size = mq.size;
     final orientation = mq.orientation;
     final shortest = size.shortestSide;
@@ -150,13 +153,72 @@ class DeviceGestureObserver extends StatelessWidget {
     );
   }
 
-  DeviceSnapshot _snapshot(BuildContext context) {
-    return snapshotOf(context, tabletBreakpoint: tabletBreakpoint);
+  @override
+  State<DeviceGestureObserver> createState() =>
+      _DeviceGestureObserverState();
+}
+
+class _DeviceGestureObserverState extends State<DeviceGestureObserver>
+    with WidgetsBindingObserver {
+  Orientation? _lastOrientation;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addObserver(this);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      _lastOrientation = MediaQuery.of(context).orientation;
+    });
   }
 
-  void _emit(BuildContext context, GestureEvent event) {
-    final device = _snapshot(context);
-    onEvent(device, event);
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  DeviceSnapshot _snapshot() {
+    return DeviceGestureObserver.snapshotOf(
+      context,
+      tabletBreakpoint: widget.tabletBreakpoint,
+    );
+  }
+
+  void _emit(GestureEvent event) {
+    widget.onEvent(_snapshot(), event);
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+
+      final snapshot = _snapshot();
+
+      if (_lastOrientation != snapshot.orientation) {
+        _lastOrientation = snapshot.orientation;
+
+        _emit(
+          GestureEvent(
+            type: GestureEventType.orientationChanged,
+            at: DateTime.now(),
+          ),
+        );
+      } else {
+        _emit(
+          GestureEvent(
+            type: GestureEventType.metricsChanged,
+            at: DateTime.now(),
+          ),
+        );
+      }
+    });
   }
 
   @override
@@ -165,37 +227,42 @@ class DeviceGestureObserver extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
 
       onTap: () => _emit(
-        context,
-        GestureEvent(type: GestureEventType.tap, at: DateTime.now()),
+        GestureEvent(
+          type: GestureEventType.tap,
+          at: DateTime.now(),
+        ),
       ),
 
       onDoubleTap: () => _emit(
-        context,
-        GestureEvent(type: GestureEventType.doubleTap, at: DateTime.now()),
+        GestureEvent(
+          type: GestureEventType.doubleTap,
+          at: DateTime.now(),
+        ),
       ),
 
       onLongPress: () => _emit(
-        context,
-        GestureEvent(type: GestureEventType.longPress, at: DateTime.now()),
+        GestureEvent(
+          type: GestureEventType.longPress,
+          at: DateTime.now(),
+        ),
       ),
 
-      // ✅ SOLO SCALE (incluye pan)
-      onScaleStart: enableScale
+      onScaleStart: widget.enableScale
           ? (_) => _emit(
-        context,
-        GestureEvent(type: GestureEventType.scaleStart, at: DateTime.now()),
+        GestureEvent(
+          type: GestureEventType.scaleStart,
+          at: DateTime.now(),
+        ),
       )
           : null,
 
-      onScaleUpdate: enableScale
-          ? (d) {
-        // PAN (drag) desde scale
-        final delta = d.focalPointDelta;
-        final moved = delta.distance > panDeltaThreshold;
+      onScaleUpdate: widget.enableScale
+          ? (details) {
+        final delta = details.focalPointDelta;
 
-        if (enablePan && moved) {
+        if (widget.enablePan &&
+            delta.distance > widget.panDeltaThreshold) {
           _emit(
-            context,
             GestureEvent(
               type: GestureEventType.panUpdate,
               delta: delta,
@@ -204,17 +271,19 @@ class DeviceGestureObserver extends StatelessWidget {
           );
         }
 
-        // SCALE / ROTATION
-        final isZooming = (d.scale - 1.0).abs() > scaleThreshold;
-        final isRotating = d.rotation.abs() > rotationThreshold;
+        final zoom =
+            (details.scale - 1).abs() > widget.scaleThreshold;
 
-        if (isZooming || isRotating) {
+        final rotation =
+            details.rotation.abs() >
+                widget.rotationThreshold;
+
+        if (zoom || rotation) {
           _emit(
-            context,
             GestureEvent(
               type: GestureEventType.scaleUpdate,
-              scale: d.scale,
-              rotation: d.rotation,
+              scale: details.scale,
+              rotation: details.rotation,
               at: DateTime.now(),
             ),
           );
@@ -222,14 +291,16 @@ class DeviceGestureObserver extends StatelessWidget {
       }
           : null,
 
-      onScaleEnd: enableScale
+      onScaleEnd: widget.enableScale
           ? (_) => _emit(
-        context,
-        GestureEvent(type: GestureEventType.scaleEnd, at: DateTime.now()),
+        GestureEvent(
+          type: GestureEventType.scaleEnd,
+          at: DateTime.now(),
+        ),
       )
           : null,
 
-      child: child,
+      child: widget.child,
     );
   }
 }

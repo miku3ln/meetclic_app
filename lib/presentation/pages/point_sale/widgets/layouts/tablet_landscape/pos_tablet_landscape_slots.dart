@@ -26,7 +26,7 @@ class PosTabletLandscapeSlots {
       ),
       left: PosLeftPanel(
         controller: controller,
-        columns: 5,
+        columns: controller.colsNumberRowPosSales,
       ),
       right: PosRightPanel(
         controller: controller,

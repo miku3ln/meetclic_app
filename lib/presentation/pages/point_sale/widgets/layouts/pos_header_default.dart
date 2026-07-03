@@ -226,7 +226,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
           const SizedBox(width: 10),
           // DERECHA: Ticket (placeholder como antes)
           Text(
-            'Ticket',
+            widget.controllerMain.labels.ticket,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: AppStyles.textTitleMainPrimary,

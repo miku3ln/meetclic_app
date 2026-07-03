@@ -640,7 +640,6 @@ class ProductModalController extends BaseFormController {
   InventoryType inventoryType = InventoryType.raw;
   String inventoryTypeLabel = 'Tipo de Producto';
   String nameLabel = 'Nombre';
-
   String titleCardInformationProduct = 'Informacion General';
   String titleCardCostPricesProduct = 'Costos y Precios';
   String titleCardInventoryInitProduct = 'Inventario Inicial';
@@ -662,7 +661,7 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
   }
 
-  int productId = -1;
+  int productId = 0;
 
   void loadAndValidate(ProductDraft draft) {
     loadDataModel(draft);

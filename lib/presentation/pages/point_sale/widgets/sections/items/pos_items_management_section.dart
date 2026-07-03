@@ -201,7 +201,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       await controller.init();
       final draft = ProductMapper.fromMap(item.data!);
       controller.loadAndValidate(draft);
-
       if (!mounted) return;
       await showManagerProduct(
         context: context,

@@ -17,7 +17,6 @@ import 'package:provider/provider.dart';
 
 class PointSalePage extends StatefulWidget {
   const PointSalePage({super.key});
-
   @override
   State<PointSalePage> createState() => _PointSalePageState();
 }
@@ -86,16 +85,12 @@ class _PointSalePageState extends State<PointSalePage> {
   @override
   Widget build(BuildContext context) {
     final device = DeviceGestureObserver.snapshotOf(context);
-
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       key: _scaffoldKey,
-      drawer: const PosAppDrawer(), // ✅ tu drawer estilo Drive
+      resizeToAvoidBottomInset: false,
+      drawer: const PosAppDrawer(),
       body: DeviceGestureObserver(
-        onEvent: (d, e) {
-          debugPrint('DEVICE => $d');
-          debugPrint('EVENT  => $e');
-        },
+        onEvent: controller.onDeviceEvent,
         child: _buildByLayout(device.layoutType),
       ),
     );
@@ -103,14 +98,131 @@ class _PointSalePageState extends State<PointSalePage> {
   Widget _buildByLayout(LayoutType layout) {
     switch (layout) {
       case LayoutType.mobilePortrait:
-        return PosMobilePortraitLayout(controller: controller,scaffoldKey: _scaffoldKey);
-
+        return PosTabletLandscapeLayout(controller: controller);
       case LayoutType.mobileLandscape:
-        return PosMobileLandscapeLayout(controller: controller,scaffoldKey: _scaffoldKey);
-
+        return PosTabletLandscapeLayout(controller: controller);
       case LayoutType.tabletPortrait:
-        return PosTabletLandscapeLayout(controller: controller);//TODO DESIGN
+        return PosTabletLandscapeLayout(controller: controller);
+      case LayoutType.tabletLandscape:
+        return PosTabletLandscapeLayout(controller: controller);
+    }
+  }
+}
 
+
+class _PointSalePageState2 extends State<PointSalePage> {
+  late final PosMainController controller;
+
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _initialize();
+  }
+
+  Future<void> _initialize() async {
+    await _initController();
+    await _loadInitialData();
+
+    if (!mounted) return;
+
+    setState(() {
+      _loading = false;
+    });
+  }
+
+  Future<void> _initController() async {
+    final app = context.read<AppController>();
+    controller = PosMainController(
+      app: app,
+      configRepository: ConfigRepository(
+        ConfigApiService(),
+      ),
+    );
+
+    controller.addListener(_onChanged);
+    _bindControllerEvents();
+  }
+  void _bindControllerEvents() {
+    controller.shift.onRequestOpenShift = _showOpenShiftModal;
+    controller.ui.onRequestOpenDrawer = () {
+      _scaffoldKey.currentState?.openDrawer();
+    };
+  }
+  Future<void> _loadInitialData() async {
+    final products =
+    await PosTabletLandscapeFixtures.getProductsData();
+    controller.browser.allProducts = products;
+    controller.init(
+      initialProducts: products,
+      initialProductCategories:
+      PosTabletLandscapeFixtures.getCategoriesData(products),
+      initialMenuCategories:
+      PosTabletLandscapeFixtures.getMenuCategoriesData(products),
+      initialSelectedProductCategoryId: 'all',
+      initialSelectedMenuCategoryId: 'all',
+    );
+    final categories =
+    PosTabletLandscapeFixtures.getCategoriesData(products);
+    if (categories.isNotEmpty) {
+      controller.setProductCategory(categories.first.id);
+    }
+  }
+
+  Future<void> _showOpenShiftModal() async {
+    await showDialog(
+      context: context,
+      builder: (_) => PosOpenShiftDialog(controller: controller),
+    );
+  }
+
+  void _onChanged() {
+    if (!mounted) return;
+
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(_onChanged);
+    controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_loading) {
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
+    final device = DeviceGestureObserver.snapshotOf(context);
+
+    return Scaffold(
+      key: _scaffoldKey,
+      resizeToAvoidBottomInset: false,
+      drawer: const PosAppDrawer(),
+      body: DeviceGestureObserver(
+        onEvent: controller.onDeviceEvent,
+        child: _buildByLayout(device.layoutType),
+      ),
+    );
+  }
+
+  Widget _buildByLayout(LayoutType layout) {
+    switch (layout) {
+      case LayoutType.mobilePortrait:
+        return PosTabletLandscapeLayout(controller: controller);
+      case LayoutType.mobileLandscape:
+        return PosTabletLandscapeLayout(controller: controller);
+      case LayoutType.tabletPortrait:
+        return PosTabletLandscapeLayout(controller: controller);
       case LayoutType.tabletLandscape:
         return PosTabletLandscapeLayout(controller: controller);
     }
