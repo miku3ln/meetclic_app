@@ -47,24 +47,7 @@ class _PointSalePageState extends State<PointSalePage> {
     controller.ui.onRequestOpenDrawer = () {
       _scaffoldKey.currentState?.openDrawer();
     };
-    final products = await PosTabletLandscapeFixtures.getProductsData();
-    controller.browser.allProducts=products;
-
-    // ✅ Carga data inicial (fixtures)
-    controller.init(
-      initialProducts:products,
-      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(products),
-      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(products),
-      // opcional:
-      initialSelectedProductCategoryId: 'all',
-      initialSelectedMenuCategoryId: 'all',
-    );
-    productCategories = PosTabletLandscapeFixtures.getCategoriesData(products);
-    selectedProductCategoryId = productCategories.isNotEmpty
-        ? productCategories.first.id
-        : null;
-    controller.setProductCategory(selectedProductCategoryId!);
-
+    await controller.initDataPointOfSales();
   }
   // ✅ Modal vive aquí
   Future<void> _showOpenShiftModal() async {

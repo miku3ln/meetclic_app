@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import '../../../../../shared/controllers/app_controller.dart';
+import '../../../../widgets/loading_manager.dart';
 import '../atoms/pos_menu_carousel.dart';
 import '../layouts/pos_main_controller.dart';
 import '../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
@@ -28,13 +29,18 @@ class PosLeftPanel extends StatelessWidget {
         controller:controller
     );
     final showMenu = controller.shift.isShiftOpen;
+    if (controller.browser.loadingData) {
+      return PosLoadingView();
+    }
     return Padding(
-      padding:  EdgeInsets.all(paddingAll),
+      padding: EdgeInsets.all(paddingAll),
       child: Column(
         children: [
           Expanded(
             child: !controller.shift.isShiftOpen
-                ? _ShiftClosedView(onOpenTap: controller.shift.onOpenShiftTap)
+                ? _ShiftClosedView(
+              onOpenTap: controller.shift.onOpenShiftTap,
+            )
                 : PosProductGrid(
               products: controller.browser.products,
               columns: columns,
@@ -42,14 +48,13 @@ class PosLeftPanel extends StatelessWidget {
             ),
           ),
 
-          // ✅ Menú inferior solo cuando el turno está abierto (igual que tu lógica)
           if (showMenu) ...[
-             SizedBox(height: heightSliderBox),
+            SizedBox(height: heightSliderBox),
             SizedBox(
               height: heightSliderMenu,
               child: PosMenuCarousel(
                 items: menuDataActions,
-                selectedId: controller.browser. selectedMenuCategoryId,
+                selectedId: controller.browser.selectedMenuCategoryId,
                 onTap: controller.browser.onMenuCategoryTap,
               ),
             ),

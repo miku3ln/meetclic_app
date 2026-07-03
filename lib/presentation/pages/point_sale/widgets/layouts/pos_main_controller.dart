@@ -181,6 +181,7 @@ class PosMainController extends ChangeNotifier {
   CustomerModelPosCurrent? dataCustomerFinal;
 
   Future<void> initDataPointOfSales() async {
+    browser.setLoadingData(true);
     final products = await PosTabletLandscapeFixtures.getProductsData();
 
     browser.allProducts = products;
@@ -195,7 +196,7 @@ class PosMainController extends ChangeNotifier {
       initialSelectedProductCategoryId: 'all',
       initialSelectedMenuCategoryId: 'all',
     );
-
+    browser.setLoadingData(false);
     notifyListeners();
   }
 
