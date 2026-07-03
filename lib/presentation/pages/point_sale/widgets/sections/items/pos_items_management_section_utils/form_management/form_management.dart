@@ -4,7 +4,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import '../../../../../../../../services/alert_manager.dart';
-import '../../../../../../../../shared/models/api_response.dart';
 import '../../../../../../../../shared/pagination_response.dart';
 import '../../../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../../../shared/theme/configuration/app_spacing.dart';
@@ -424,7 +423,40 @@ Widget _buildManagerProduct(
         ),
       ),
       AppSpacing.spaceBetweenSections,
-
+      PsSectionCard(
+        //TODO
+        title: controller.titleCardInventoryStockManagement, //oki
+        child: Column(children: [
+          PsFieldRow(
+            children: [
+              PsFieldItem(
+                child: PsInput(
+                  value: controller.lowStock?.toString() ?? '',
+                  requiredField: true,
+                  label: controller.lowStockLabel,
+                  keyboardType: TextInputType.number,
+                  onChanged: controller.setLowStock,
+                  error: controller.lowStockError,
+                  isTouched: controller.lowStockTouched,
+                  isValid: controller.lowStockError == null,
+                ),
+              ),
+              PsFieldItem(
+                child: PsInput(
+                  value: controller.maxStock?.toString() ?? '',
+                  requiredField: true,
+                  label: controller.maxStockLabel,
+                  keyboardType: TextInputType.number,
+                  onChanged: controller.setMaxStock,
+                  error: controller.maxStockError,
+                  isTouched: controller.maxStockTouched,
+                  isValid: controller.maxStockError == null,
+                ),
+              ),
+            ],
+          ),
+        ]),
+      ),
       PsSectionCard(
         //TODO
         title: controller.titleCardInventoryInitProduct, //oki
@@ -456,7 +488,6 @@ Widget _buildManagerProduct(
               ],
             ),
             AppSpacing.spaceBetweenInputs,
-
             PsFieldRow(
               children: [
                 PsFieldItem(
@@ -484,22 +515,7 @@ Widget _buildManagerProduct(
               ],
             ),
             AppSpacing.spaceBetweenInputs,
-            PsFieldRow(
-              children: [
-                PsFieldItem(
-                  child: PsInput(
-                    value: controller.lowStock?.toString() ?? '',
-                    requiredField: true,
-                    label: controller.lowStockLabel,
-                    keyboardType: TextInputType.number,
-                    onChanged: controller.setLowStock,
-                    error: controller.lowStockError,
-                    isTouched: controller.lowStockTouched,
-                    isValid: controller.lowStockError == null,
-                  ),
-                ),
-              ],
-            ),
+
           ],
         ),
       ),

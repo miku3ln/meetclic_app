@@ -243,6 +243,10 @@ class ProductModalController extends BaseFormController {
         label: 'Stock Minimo',
         validators: [ValidatorsUtil.nonNegativeDouble("Stock mínimo")],
       ),
+      'maxStock': FormFieldController<double>(
+        label: 'Stock Maximo',
+        validators: [ValidatorsUtil.nonNegativeDouble("Stock maximo")],
+      ),
     });
   }
 
@@ -271,6 +275,9 @@ class ProductModalController extends BaseFormController {
   FormFieldController<double> get lowStockField =>
       field<FormFieldController<double>>('lowStock');
 
+  FormFieldController<double> get maxStockField =>
+      field<FormFieldController<double>>('maxStock');
+
   String get name => nameField.value ?? '';
 
   String? get description => descriptionField.value;
@@ -284,6 +291,8 @@ class ProductModalController extends BaseFormController {
   double? get stock => stockField.value;
 
   double? get lowStock => lowStockField.value;
+
+  double? get maxStock => maxStockField.value;
 
   String? get nameError => nameField.error;
 
@@ -299,6 +308,8 @@ class ProductModalController extends BaseFormController {
 
   String? get lowStockError => lowStockField.error;
 
+  String? get maxStockError => maxStockField.error;
+
   bool get nameTouched => nameField.touched;
 
   bool get descriptionTouched => descriptionField.touched;
@@ -313,6 +324,8 @@ class ProductModalController extends BaseFormController {
 
   bool get lowStockTouched => lowStockField.touched;
 
+  bool get maxStockTouched => maxStockField.touched;
+
   /// =========================
   /// 🧾 DATA
   /// =========================
@@ -322,6 +335,8 @@ class ProductModalController extends BaseFormController {
   String costProductionLabel = 'Precio Costo';
   String stockLabel = 'Stock';
   String lowStockLabel = 'Stock Minimo';
+  String maxStockLabel = 'Stock Maximo';
+
   String descriptionLabel = 'Descripcion';
   String codeBarLabel = 'Codigo';
   String categoriesLabel = 'Categoria';
@@ -398,6 +413,11 @@ class ProductModalController extends BaseFormController {
 
   void setLowStock(String value) {
     lowStockField.setValue(value.isEmpty ? null : double.tryParse(value));
+    notifyListeners();
+  }
+
+  void setMaxStock(String value) {
+    maxStockField.setValue(value.isEmpty ? null : double.tryParse(value));
     notifyListeners();
   }
 
@@ -507,6 +527,7 @@ class ProductModalController extends BaseFormController {
       'cost': costError,
       'stock': stockError,
       'lowStock': lowStockError,
+      'maxStock': maxStockError,
       'description': descriptionError,
       'codeBar': codeBarError,
       'category': categoryError,
@@ -537,6 +558,7 @@ class ProductModalController extends BaseFormController {
         costTouched &&
         stockTouched &&
         lowStockTouched &&
+        maxStockTouched &&
         descriptionTouched &&
         codeBarTouched &&
         imageTouched &&
@@ -551,6 +573,7 @@ class ProductModalController extends BaseFormController {
       costError,
       stockError,
       lowStockError,
+      maxStockError,
       descriptionError,
       codeBarError,
       categoryError,
@@ -621,6 +644,8 @@ class ProductModalController extends BaseFormController {
   String titleCardInformationProduct = 'Informacion General';
   String titleCardCostPricesProduct = 'Costos y Precios';
   String titleCardInventoryInitProduct = 'Inventario Inicial';
+  String titleCardInventoryStockManagement = 'Stock Gestion';
+
   String titleCardProcessedProductRecipe = 'Receta - Materias Primas';
   String titleCardForSaleProductRecipe = 'Receta - Productos Procesados';
   String titleLabelProductProcessedRecipe = 'Materia Prima';
@@ -654,7 +679,6 @@ class ProductModalController extends BaseFormController {
     priceField.value = draft.price;
     costField.value = draft.cost;
     stockField.value = draft.stock;
-    lowStockField.value = draft.lowStock;
 
     codeBarField.value = draft.code;
     inventoryType = draft.inventoryType;
@@ -662,7 +686,9 @@ class ProductModalController extends BaseFormController {
       final details = jsonDecode(draft.detailsAll!);
       final productCurrent = details['product'];
       final productByStock = details['product_by_stock'];
-      lowStockField.value = productByStock['min'];
+      lowStockField.value = (productByStock['min'] ?? 0).toDouble();
+      maxStockField.value = (productByStock['max'] ?? 0).toDouble();
+
       descriptionField.value = productCurrent['description'];
 
       /// UNIT MEASURE
@@ -988,7 +1014,7 @@ class ProductModalController extends BaseFormController {
     var saveRegister = {
       'product': product,
       'business_by_products': {'business_id': businessId},
-      'product_by_stock': {"min": lowStock, "max": lowStock},
+      'product_by_stock': {"min": lowStock, "max": maxStock},
       'product_inventory': {
         'business_id': businessId,
         'avarage_kardex_value': cost,
