@@ -5,20 +5,24 @@ class PsToggleOption extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isSelected;
-  final VoidCallback onTap;
-
+  final VoidCallback? onTap;
+  final bool enabled;
   const PsToggleOption({
     super.key,
     required this.icon,
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final c = AppThemeTokens.of(context);
-
+  var colorCurrent=   (isSelected ? c.primary : c.surface);
+  if(!enabled){
+    colorCurrent=AppColors.shade(colorCurrent , 50);
+  }
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -29,7 +33,7 @@ class PsToggleOption extends StatelessWidget {
         height: 40,
 
         decoration: BoxDecoration(
-          color: isSelected ? c.primary : c.surface,
+          color:colorCurrent,
           borderRadius: BorderRadius.circular(8),
           border: Border.all(
             color: isSelected ? c.primary : c.border,

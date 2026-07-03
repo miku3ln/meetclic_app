@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
@@ -1144,19 +1145,32 @@ class ProductApiError {
 
 class ProductDataUtil {
   static Future<ApiResponse<Map<String, dynamic>>> createProduct(
-    Map<String, dynamic> payload,
-  ) async {
+    Map<String, dynamic> payload, {
+    File? image,
+  }) async {
     try {
       final token = SessionService().apiToken;
 
-      final response = await http.post(
+      final request = http.MultipartRequest(
+        'POST',
         Uri.parse('${ServerConfig.baseUrl}/pointsales/product-type-save'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(payload),
       );
+
+      request.headers['Authorization'] = 'Bearer $token';
+
+      // Payload como JSON
+      request.fields['payload'] = jsonEncode(payload);
+      if (image == null) {
+
+      }else{
+        request.files.add(
+          await http.MultipartFile.fromPath('image', image.path),
+        );
+      }
+      // Imagen
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
       final body = jsonDecode(response.body);
       if (body['success'] == true) {
@@ -1167,7 +1181,6 @@ class ProductDataUtil {
       }
 
       String message = 'Error desconocido';
-
       try {
         final errorRaw = body['error']?['message'];
 
@@ -1193,20 +1206,27 @@ class ProductDataUtil {
   }
 
   static Future<ApiResponse<Map<String, dynamic>>> updateProduct(
-    Map<String, dynamic> payload,
-  ) async {
+    Map<String, dynamic> payload, {
+    File? image,
+  }) async {
     try {
       final token = SessionService().apiToken;
-
-      final response = await http.post(
-        Uri.parse('${ServerConfig.baseUrl}/pointsales/product-type-save'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(payload),
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('${ServerConfig.baseUrl}/pointsales/product-type-update'),
       );
+      request.headers['Authorization'] = 'Bearer $token';
+      // Payload como JSON
+      request.fields['payload'] = jsonEncode(payload);
+      if (image == null) {
 
+      }else{
+        request.files.add(
+          await http.MultipartFile.fromPath('image', image.path),
+        );
+      }
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
       final body = jsonDecode(response.body);
       if (body['success'] == true) {
         return ApiResponse.success(

@@ -12,7 +12,7 @@ class PsInput extends StatefulWidget {
   final bool requiredField;
   final bool isTouched;
   final bool isValid;
-
+  final bool enabled;
   final bool selectAllOnFocus;
   const PsInput({
     super.key,
@@ -25,6 +25,7 @@ class PsInput extends StatefulWidget {
     this.isTouched = false,
     this.isValid = false,
     this.selectAllOnFocus = true, // 👈 nuevo
+    this.enabled = true, // 👈 nuevo
   });
 
   @override
@@ -82,12 +83,14 @@ class _PsInputState extends State<PsInput> {
     Color borderColor = c.border;
     Color labelColor = Colors.black;
 
-    if (showError) {
-      borderColor = c.error;
-      labelColor = c.error;
-    } else if (showSuccess) {
-      borderColor = Colors.green;
-      labelColor = Colors.green;
+    if (widget.enabled) {
+      if (showError) {
+        borderColor = c.error;
+        labelColor = c.error;
+      } else if (showSuccess) {
+        borderColor = Colors.green;
+        labelColor = Colors.green;
+      }
     }
 
     return Column(
@@ -111,9 +114,10 @@ class _PsInputState extends State<PsInput> {
         AppSpacing.spaceBetweenInputs,
 
         TextField(
+          enabled: widget.enabled,
           focusNode: _focusNode, // 👈 clave
           controller: _controller,
-          onChanged: widget.onChanged,
+          onChanged: widget.enabled ? widget.onChanged : null,
           keyboardType: widget.keyboardType,
           decoration: InputDecoration(
             filled: true,
@@ -122,15 +126,21 @@ class _PsInputState extends State<PsInput> {
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: borderColor),
             ),
+            disabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: BorderSide(color: c.border),
+            ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
               borderSide: BorderSide(color: borderColor, width: 1.5),
             ),
-            errorText: showError ? widget.error : null,
-            suffixIcon: showError
+            errorText: widget.enabled && showError ? widget.error : null,
+            suffixIcon: widget.enabled
+                ? showError
                 ? Icon(Icons.error_outline, color: c.error)
                 : showSuccess
                 ? const Icon(Icons.check_circle, color: Colors.green)
+                : null
                 : null,
           ),
         ),

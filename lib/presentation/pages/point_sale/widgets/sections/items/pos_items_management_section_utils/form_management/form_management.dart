@@ -198,225 +198,49 @@ class LandProductWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AppSpacing.spaceBetweenSections,
+    return _buildManagerProduct(
+      controller,
+      listMeasureCategory,
+      listTaxCategory,
+      context,
+    );
+  }
+}
 
-        /// =========================
-        /// 📦 INFORMACIÓN
-        /// =========================
-        PsSectionSplit(
-          leftFlex: 7,
-          rightFlex: 3,
-          left: PsSectionCard(
-            title: labelCardInformationProduct(controller),
-            child: Column(
-              children: [
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsToggleSelector<InventoryType>(
-                        title: controller.inventoryTypeLabel,
-                        value: controller.inventoryType,
-                        items: InventoryType.values,
-                        onChanged: controller.setInventoryType,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsInput(
-                        requiredField: true,
-                        label: controller.codeBarLabel,
-                        value: controller.codeBar,
-                        keyboardType: TextInputType.text,
-                        onChanged: controller.setCodeBar,
-                        error: controller.codeBarError,
-                        isTouched: controller.codeBarTouched,
-                        isValid: controller.codeBarError == null,
-                      ),
-                    ),
-                    PsFieldItem(
-                      child: PsInput(
-                        requiredField: true,
-                        label: controller.descriptionLabel,
-                        value: controller.description,
-                        keyboardType: TextInputType.text,
-                        onChanged: controller.setDescription,
-                        error: controller.descriptionError,
-                        isTouched: controller.descriptionTouched,
-                        isValid: controller.descriptionError == null,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      flex: 2,
-                      child: PsInput(
-                        label: controller.nameLabel,
-                        requiredField: true,
-                        value: controller.name,
-                        onChanged: controller.setName,
-                        error: controller.nameError,
-                        isTouched: controller.nameTouched,
-                        isValid:
-                            controller.nameError == null &&
-                            controller.name.isNotEmpty,
-                      ),
-                    ),
+String labelCardInformationProduct(ProductModalController controller) {
+  return controller.titleCardInformationProduct;
+}
 
-                    PsFieldItem(
-                      flex: 2,
-                      child: Center(
-                        child: PsImagePicker(
-                          image: controller.image,
-                          error: controller.imageError,
-                          onPick: () async {
-                            final mediaService = MediaPickerService();
-                            final file = await showImageSourceSelector(
-                              context,
-                              mediaService.pickFromCamera,
-                              mediaService.pickFromGallery,
-                            );
+Widget _buildManagerProduct(
+  ProductModalController controller,
+  List<MeasureCategoryModel> listMeasureCategory,
+  List<TaxCategoryModel> listTaxCategory,
+  BuildContext context,
+) {
+  return Column(
+    children: [
+      AppSpacing.spaceBetweenSections,
 
-                            if (file != null) {
-                              controller.setImage(file);
-                            }
-                          },
-                          onRemove: controller.removeImage,
-                          requiredField: true,
-                          isTouched: controller.imageTouched,
-                          isValid: controller.image != null,
-                        ),
-                      ),
-                    ),
-
-                    /// 🔥 NOMBRE
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-                PsFieldRow(
-                  children: [
-                    /// 🔥 CATEGORÍA
-                    PsFieldItem(
-                      child: PsDropdown(
-                        label: controller.categoriesLabel,
-                        items: controller.categories,
-                        value: controller.selectedCategory,
-                        getLabel: (e) => e.value,
-                        onChanged: controller.selectCategory,
-                        error: controller.categoryError,
-                        requiredField: true,
-                        isTouched: controller.categoryTouched,
-                        isValid: controller.selectedCategory != null,
-                      ),
-                    ),
-                    PsFieldItem(
-                      child:
-                          /// 🔥 SUBCATEGORÍA
-                          PsDropdown(
-                            label: controller.subcategoriesLabel,
-                            items: controller.subcategories,
-                            value: controller.selectedSubcategory,
-                            getLabel: (e) => e.value,
-                            onChanged: controller.selectSubcategory,
-                            error: controller.subcategoryError,
-                            requiredField: true,
-                            isTouched: controller.subcategoryTouched,
-                            isValid: controller.selectedSubcategory != null,
-                          ),
-                    ),
-                  ],
-                ),
-
-                AppSpacing.spaceBetweenInputs,
-              ],
-            ),
-          ),
-          right: PsSectionCard(
-            title: controller.titleCardCostPricesProduct,
-            child: Column(
-              children: [
-                /// 🔥 PRECIO + COSTE
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      flex: 1,
-                      child: PsDropdown<TaxCategoryModel>(
-                        label: controller.taxsLabel,
-                        items: listTaxCategory,
-                        value: controller.selectedTax,
-                        getLabel: (e) => '${e.name} (${e.description})',
-                        onChanged: controller.selectTax,
-                        error: controller.taxCategoryError,
-                        requiredField: true,
-                        isTouched: controller.taxTouched,
-                        isValid: controller.selectedTax != null,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsInput(
-                        value: controller.price?.toString() ?? '',
-                        requiredField: true,
-                        label: controller.priceLabel,
-                        keyboardType: TextInputType.number,
-                        onChanged: controller.setPrice,
-                        error: controller.priceError,
-                        isTouched: controller.priceTouched,
-                        isValid: controller.priceError == null,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsInput(
-                        requiredField: true,
-                        value: controller.cost?.toString() ?? '',
-                        label: controller.getLabelPriceName(),
-                        keyboardType: TextInputType.number,
-                        onChanged: controller.setCost,
-                        error: controller.costError,
-                        isTouched: controller.costTouched,
-                        isValid: controller.costError == null,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        AppSpacing.spaceBetweenSections,
-
-        PsSectionCard(
-          //TODO
-          title: controller.titleCardInventoryInitProduct,
+      /// =========================
+      /// 📦 INFORMACIÓN
+      /// =========================
+      PsSectionSplit(
+        leftFlex: 7,
+        rightFlex: 3,
+        left: PsSectionCard(
+          title: labelCardInformationProduct(controller),
           child: Column(
             children: [
               PsFieldRow(
                 children: [
                   PsFieldItem(
-                    child: PsToggleSelector<MeasureType>(
-                      title: controller.sellTypeLabel,
-                      value: controller.sellType,
-                      items: MeasureType.values,
-                      onChanged: controller.setMeasureType,
+                    child: PsToggleSelector<InventoryType>(
+                      enabled:
+                          controller.typeManagementProduct == CrudType.create,
+                      title: controller.inventoryTypeLabel,
+                      value: controller.inventoryType,
+                      items: InventoryType.values,
+                      onChanged: controller.setInventoryType,
                     ),
                   ),
                 ],
@@ -427,20 +251,25 @@ class LandProductWidget extends StatelessWidget {
                   PsFieldItem(
                     child: PsInput(
                       requiredField: true,
-                      value: controller.stock?.toString() ?? '',
-                      label: controller.stockLabel,
-                      keyboardType: TextInputType.number,
-                      onChanged: controller.setStock,
-                      isTouched: controller.stockTouched,
-                      error: controller.stockError,
-                      isValid: controller.stockError == null,
+                      label: controller.codeBarLabel,
+                      value: controller.codeBar,
+                      keyboardType: TextInputType.text,
+                      onChanged: controller.setCodeBar,
+                      error: controller.codeBarError,
+                      isTouched: controller.codeBarTouched,
+                      isValid: controller.codeBarError == null,
                     ),
                   ),
                   PsFieldItem(
-                    child: _buildMeasureWidget(
-                      controller.sellType,
-                      listMeasureCategory,
-                      controller,
+                    child: PsInput(
+                      requiredField: true,
+                      label: controller.descriptionLabel,
+                      value: controller.description,
+                      keyboardType: TextInputType.text,
+                      onChanged: controller.setDescription,
+                      error: controller.descriptionError,
+                      isTouched: controller.descriptionTouched,
+                      isValid: controller.descriptionError == null,
                     ),
                   ),
                 ],
@@ -449,15 +278,143 @@ class LandProductWidget extends StatelessWidget {
               PsFieldRow(
                 children: [
                   PsFieldItem(
+                    flex: 2,
                     child: PsInput(
-                      value: controller.lowStock?.toString() ?? '',
+                      label: controller.nameLabel,
                       requiredField: true,
-                      label: controller.lowStockLabel,
+                      value: controller.name,
+                      onChanged: controller.setName,
+                      error: controller.nameError,
+                      isTouched: controller.nameTouched,
+                      isValid:
+                          controller.nameError == null &&
+                          controller.name.isNotEmpty,
+                    ),
+                  ),
+
+                  PsFieldItem(
+                    flex: 2,
+                    child: Center(
+                      child: PsImagePicker(
+                        image: controller.image,
+                        error: controller.imageError,
+                        onPick: () async {
+                          final mediaService = MediaPickerService();
+                          final file = await showImageSourceSelector(
+                            context,
+                            mediaService.pickFromCamera,
+                            mediaService.pickFromGallery,
+                          );
+
+                          if (file != null) {
+                            controller.setImage(file);
+                          }
+                        },
+                        onRemove: controller.removeImage,
+                        requiredField: true,
+                        isTouched: controller.imageTouched,
+                        isValid: controller.image != null,
+                      ),
+                    ),
+                  ),
+
+                  /// 🔥 NOMBRE
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+              PsFieldRow(
+                children: [
+                  /// 🔥 CATEGORÍA
+                  PsFieldItem(
+                    child: PsDropdown(
+                      label: controller.categoriesLabel,
+                      items: controller.categories,
+                      value: controller.selectedCategory,
+                      getLabel: (e) => e.value,
+                      onChanged: controller.selectCategory,
+                      error: controller.categoryError,
+                      requiredField: true,
+                      isTouched: controller.categoryTouched,
+                      isValid: controller.selectedCategory != null,
+                    ),
+                  ),
+                  PsFieldItem(
+                    child:
+                        /// 🔥 SUBCATEGORÍA
+                        PsDropdown(
+                          label: controller.subcategoriesLabel,
+                          items: controller.subcategories,
+                          value: controller.selectedSubcategory,
+                          getLabel: (e) => e.value,
+                          onChanged: controller.selectSubcategory,
+                          error: controller.subcategoryError,
+                          requiredField: true,
+                          isTouched: controller.subcategoryTouched,
+                          isValid: controller.selectedSubcategory != null,
+                        ),
+                  ),
+                ],
+              ),
+
+              AppSpacing.spaceBetweenInputs,
+            ],
+          ),
+        ),
+        right: PsSectionCard(
+          title: controller.titleCardCostPricesProduct,
+          child: Column(
+            children: [
+              /// 🔥 PRECIO + COSTE
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    flex: 1,
+                    child: PsDropdown<TaxCategoryModel>(
+                      label: controller.taxsLabel,
+                      items: listTaxCategory,
+                      value: controller.selectedTax,
+                      getLabel: (e) => '${e.name} (${e.description})',
+                      onChanged: controller.selectTax,
+                      error: controller.taxCategoryError,
+                      requiredField: true,
+                      isTouched: controller.taxTouched,
+                      isValid: controller.selectedTax != null,
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      value: controller.price?.toString() ?? '',
+                      requiredField: true,
+                      label: controller.priceLabel,
                       keyboardType: TextInputType.number,
-                      onChanged: controller.setLowStock,
-                      error: controller.lowStockError,
-                      isTouched: controller.lowStockTouched,
-                      isValid: controller.lowStockError == null,
+                      onChanged: controller.setPrice,
+                      error: controller.priceError,
+                      isTouched: controller.priceTouched,
+                      isValid: controller.priceError == null,
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      requiredField: true,
+                      value: controller.cost?.toString() ?? '',
+                      label: controller.getLabelPriceName(),
+                      keyboardType: TextInputType.number,
+                      onChanged: controller.setCost,
+                      error: controller.costError,
+                      isTouched: controller.costTouched,
+                      isValid: controller.costError == null,
                     ),
                   ),
                 ],
@@ -465,18 +422,94 @@ class LandProductWidget extends StatelessWidget {
             ],
           ),
         ),
-        AppSpacing.spaceBetweenSections,
+      ),
+      AppSpacing.spaceBetweenSections,
 
-        /// =========================
-        /// 📦 INVENTARIO
-        /// =========================
-      ],
-    );
-  }
-}
+      PsSectionCard(
+        //TODO
+        title: controller.titleCardInventoryInitProduct, //oki
+        child: Column(
+          children: [
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  child: _InventoryInfoHint(
+                    type: controller.sellType,
+                    listMeasureCategoryManagement:
+                        controller.listMeasureCategoryManagement,
+                  ),
+                ),
+              ],
+            ),
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  child: PsToggleSelector<MeasureType>(
+                    title: controller.sellTypeLabel,
+                    value: controller.sellType,
+                    items: MeasureType.values,
+                    enabled:
+                        controller.typeManagementProduct == CrudType.create,
+                    onChanged: controller.setMeasureType,
+                  ),
+                ),
+              ],
+            ),
+            AppSpacing.spaceBetweenInputs,
 
-String labelCardInformationProduct(ProductModalController controller) {
-  return controller.titleCardInformationProduct;
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  child: PsInput(
+                    requiredField: true,
+                    value: controller.stock?.toString() ?? '',
+                    enabled:
+                        controller.typeManagementProduct == CrudType.create,
+                    label: controller.stockLabel,
+                    keyboardType: TextInputType.number,
+                    onChanged: controller.setStock,
+                    isTouched: controller.stockTouched,
+                    error: controller.stockError,
+                    isValid: controller.stockError == null,
+                  ),
+                ),
+
+                PsFieldItem(
+                  child: _buildMeasureWidget(
+                    controller.sellType,
+                    listMeasureCategory,
+                    controller,
+                  ),
+                ),
+              ],
+            ),
+            AppSpacing.spaceBetweenInputs,
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  child: PsInput(
+                    value: controller.lowStock?.toString() ?? '',
+                    requiredField: true,
+                    label: controller.lowStockLabel,
+                    keyboardType: TextInputType.number,
+                    onChanged: controller.setLowStock,
+                    error: controller.lowStockError,
+                    isTouched: controller.lowStockTouched,
+                    isValid: controller.lowStockError == null,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      AppSpacing.spaceBetweenSections,
+
+      /// =========================
+      /// 📦 INVENTARIO
+      /// =========================
+    ],
+  );
 }
 
 class PortraitProductWidget extends StatelessWidget {
@@ -495,278 +528,11 @@ class PortraitProductWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        AppSpacing.spaceBetweenSections,
-
-        /// =========================
-        /// 📦 INFORMACIÓN
-        /// =========================
-        PsSectionSplit(
-          leftFlex: 7,
-          rightFlex: 3,
-          left: PsSectionCard(
-            title: labelCardInformationProduct(controller),
-            child: Column(
-              children: [
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsToggleSelector<InventoryType>(
-                        title: controller.inventoryTypeLabel,
-                        value: controller.inventoryType,
-                        items: InventoryType.values,
-                        onChanged: controller.setInventoryType,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsInput(
-                        requiredField: true,
-                        label: controller.codeBarLabel,
-                        value: controller.codeBar,
-                        keyboardType: TextInputType.text,
-                        onChanged: controller.setCodeBar,
-                        error: controller.codeBarError,
-                        isTouched: controller.codeBarTouched,
-                        isValid: controller.codeBarError == null,
-                      ),
-                    ),
-                    PsFieldItem(
-                      child: PsInput(
-                        requiredField: true,
-                        label: controller.descriptionLabel,
-                        value: controller.description,
-                        keyboardType: TextInputType.text,
-                        onChanged: controller.setDescription,
-                        error: controller.descriptionError,
-                        isTouched: controller.descriptionTouched,
-                        isValid: controller.descriptionError == null,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      flex: 2,
-                      child: PsInput(
-                        label: controller.nameLabel,
-                        requiredField: true,
-                        value: controller.name,
-                        onChanged: controller.setName,
-                        error: controller.nameError,
-                        isTouched: controller.nameTouched,
-                        isValid:
-                            controller.nameError == null &&
-                            controller.name.isNotEmpty,
-                      ),
-                    ),
-
-                    PsFieldItem(
-                      flex: 2,
-                      child: Center(
-                        child: PsImagePicker(
-                          image: controller.image,
-                          error: controller.imageError,
-                          onPick: () async {
-                            final mediaService = MediaPickerService();
-                            final file = await showImageSourceSelector(
-                              context,
-                              mediaService.pickFromCamera,
-                              mediaService.pickFromGallery,
-                            );
-
-                            if (file != null) {
-                              controller.setImage(file);
-                            }
-                          },
-                          onRemove: controller.removeImage,
-                          requiredField: true,
-                          isTouched: controller.imageTouched,
-                          isValid: controller.image != null,
-                        ),
-                      ),
-                    ),
-
-                    /// 🔥 NOMBRE
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-                PsFieldRow(
-                  children: [
-                    /// 🔥 CATEGORÍA
-                    PsFieldItem(
-                      child: PsDropdown(
-                        label: controller.categoriesLabel,
-                        items: controller.categories,
-                        value: controller.selectedCategory,
-                        getLabel: (e) => e.value,
-                        onChanged: controller.selectCategory,
-                        error: controller.categoryError,
-                        requiredField: true,
-                        isTouched: controller.categoryTouched,
-                        isValid: controller.selectedCategory != null,
-                      ),
-                    ),
-                    PsFieldItem(
-                      child:
-                          /// 🔥 SUBCATEGORÍA
-                          PsDropdown(
-                            label: controller.subcategoriesLabel,
-                            items: controller.subcategories,
-                            value: controller.selectedSubcategory,
-                            getLabel: (e) => e.value,
-                            onChanged: controller.selectSubcategory,
-                            error: controller.subcategoryError,
-                            requiredField: true,
-                            isTouched: controller.subcategoryTouched,
-                            isValid: controller.selectedSubcategory != null,
-                          ),
-                    ),
-                  ],
-                ),
-
-                AppSpacing.spaceBetweenInputs,
-              ],
-            ),
-          ),
-          right: PsSectionCard(
-            title: controller.titleCardCostPricesProduct,
-            child: Column(
-              children: [
-                /// 🔥 PRECIO + COSTE
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      flex: 1,
-                      child: PsDropdown<TaxCategoryModel>(
-                        label: controller.taxsLabel,
-                        items: listTaxCategory,
-                        value: controller.selectedTax,
-                        getLabel: (e) => '${e.name} (${e.description})',
-                        onChanged: controller.selectTax,
-                        error: controller.taxCategoryError,
-                        requiredField: true,
-                        isTouched: controller.taxTouched,
-                        isValid: controller.selectedTax != null,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsInput(
-                        value: controller.price?.toString() ?? '',
-                        requiredField: true,
-                        label: controller.priceLabel,
-                        keyboardType: TextInputType.number,
-                        onChanged: controller.setPrice,
-                        error: controller.priceError,
-                        isTouched: controller.priceTouched,
-                        isValid: controller.priceError == null,
-                      ),
-                    ),
-                  ],
-                ),
-                AppSpacing.spaceBetweenInputs,
-
-                PsFieldRow(
-                  children: [
-                    PsFieldItem(
-                      child: PsInput(
-                        requiredField: true,
-                        value: controller.cost?.toString() ?? '',
-                        label: controller.getLabelPriceName(),
-                        keyboardType: TextInputType.number,
-                        onChanged: controller.setCost,
-                        error: controller.costError,
-                        isTouched: controller.costTouched,
-                        isValid: controller.costError == null,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-        AppSpacing.spaceBetweenSections,
-
-        PsSectionCard(
-          title: controller.titleCardInventoryInitProduct,
-          child: Column(
-            children: [
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsToggleSelector<MeasureType>(
-                      title: controller.sellTypeLabel,
-                      value: controller.sellType,
-                      items: MeasureType.values,
-                      onChanged: controller.setMeasureType,
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsInput(
-                      requiredField: true,
-                      value: controller.stock?.toString() ?? '',
-                      label: controller.stockLabel,
-                      keyboardType: TextInputType.number,
-                      onChanged: controller.setStock,
-                      isTouched: controller.stockTouched,
-                      error: controller.stockError,
-                      isValid: controller.stockError == null,
-                    ),
-                  ),
-                  PsFieldItem(
-                    child: _buildMeasureWidget(
-                      controller.sellType,
-                      listMeasureCategory,
-                      controller,
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsInput(
-                      value: controller.lowStock?.toString() ?? '',
-                      requiredField: true,
-                      label: controller.lowStockLabel,
-                      keyboardType: TextInputType.number,
-                      onChanged: controller.setLowStock,
-                      error: controller.lowStockError,
-                      isTouched: controller.lowStockTouched,
-                      isValid: controller.lowStockError == null,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        AppSpacing.spaceBetweenSections,
-
-        /// =========================
-        /// 📦 INVENTARIO
-        /// =========================
-      ],
+    return _buildManagerProduct(
+      controller,
+      listMeasureCategory,
+      listTaxCategory,
+      context,
     );
   }
 }
@@ -960,7 +726,7 @@ Widget _buildMeasureWidget(
   if (type == MeasureType.unit) {
     return const SizedBox.shrink();
   }
- final resultData= getDataSubMeasureByMeasure(listMeasureCategory,type);
+  final resultData = getDataSubMeasureByMeasure(listMeasureCategory, type);
   final resultSet = resultData.measureCategory;
   final unitsWithConversions = resultData.units;
   return PsDropdown<UnitMeasureModel>(
@@ -1398,4 +1164,240 @@ List<UnitMeasureModel> getUnits(
   }
 
   return resultList;
+}
+
+class _InventoryInfoHint extends StatelessWidget {
+  final MeasureType type;
+  final List<MeasureCategoryModel> listMeasureCategoryManagement;
+
+  const _InventoryInfoHint({
+    required this.type,
+    required this.listMeasureCategoryManagement,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final allowView = type.id == MeasureType.unit.id ? false : true;
+    if (allowView) {
+      final resultData = getDataSubMeasureByMeasure(
+        listMeasureCategoryManagement,
+        type,
+      );
+      final baseUnit = resultData.measureCategory.baseUnit;
+      final units = resultData.units;
+      final exampleValue = 10;
+      final exampleUnit = units.firstWhere(
+        (u) => !u.isBase,
+        orElse: () => units.first,
+      );
+      final convertedValue = exampleValue * exampleUnit.factorToBase;
+      return InkWell(
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: Text(
+                  'Conversión de inventario (${resultData.measureCategory.name})',
+                ),
+                content: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 🧭 BASE UNIT
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFEFF6FF),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Text(
+                          'Unidad base: ${baseUnit.name} (${baseUnit.symbol})',
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      const Text(
+                        'Matriz de conversión:',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      // 📊 TABLE
+                      Table(
+                        border: TableBorder.all(color: Colors.grey.shade300),
+                        columnWidths: const {
+                          0: FlexColumnWidth(2),
+                          1: FlexColumnWidth(1),
+                          2: FlexColumnWidth(3),
+                        },
+                        children: [
+                          const TableRow(
+                            decoration: BoxDecoration(color: Color(0xFFF3F4F6)),
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.all(6),
+                                child: Text('Unidad'),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(6),
+                                child: Text('Factor'),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(6),
+                                child: Text('Ejemplo (10)'),
+                              ),
+                            ],
+                          ),
+
+                          ...units.map((u) {
+                            final example = (10 * u.factorToBase);
+                            final isBase = u.isBase;
+                            final isDefault = u.isDefault;
+                            return TableRow(
+                              decoration: BoxDecoration(
+                                color: isBase
+                                    ? const Color(0xFFEFF6FF) // azul base
+                                    : isDefault
+                                    ? const Color(0xFFF0FDF4) // verde default
+                                    : null,
+                              ),
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(6),
+                                  child: Row(
+                                    children: [
+                                      Text('${u.name} (${u.symbol})'),
+
+                                      const SizedBox(width: 6),
+
+                                      if (isBase) _badge('BASE', Colors.blue),
+
+                                      if (isDefault && !isBase)
+                                        _badge('DEFAULT', Colors.green),
+                                    ],
+                                  ),
+                                ),
+
+                                Padding(
+                                  padding: const EdgeInsets.all(6),
+                                  child: Text(u.factorToBase.toString()),
+                                ),
+
+                                Padding(
+                                  padding: const EdgeInsets.all(6),
+                                  child: Text(
+                                    '10 ${u.symbol} = ${(10 * u.factorToBase)} ${baseUnit.symbol}',
+                                  ),
+                                ),
+                              ],
+                            );
+                          }),
+                        ],
+                      ),
+
+                      const SizedBox(height: 16),
+
+                      // 🔁 EXPLANATION
+                      Text(
+                        'Ejemplo:',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+
+                      const SizedBox(height: 6),
+
+                      RichText(
+                        text: TextSpan(
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.black87,
+                            height: 1.4,
+                          ),
+                          children: [
+                            const TextSpan(
+                              text:
+                                  'Todo ingreso o egreso en el sistema se convierte automáticamente a ',
+                            ),
+
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: _badge(baseUnit.symbol, Colors.blue),
+                            ),
+
+                            const TextSpan(text: '. Por ejemplo, si ingresas '),
+
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: _badge(
+                                '$exampleValue ${exampleUnit.symbol}',
+                                Colors.green,
+                              ),
+                            ),
+
+                            const TextSpan(text: ', se almacenará como '),
+
+                            WidgetSpan(
+                              alignment: PlaceholderAlignment.middle,
+                              child: _badge(
+                                '$convertedValue ${baseUnit.symbol}',
+                                Colors.blue,
+                              ),
+                            ),
+
+                            const TextSpan(text: '.'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Entendido'),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+        child: const Padding(
+          padding: EdgeInsets.only(top: 12),
+          child: Row(
+            children: [
+              Icon(Icons.info_outline, size: 18),
+              SizedBox(width: 4),
+              Text(
+                '¿Cómo funciona?',
+                style: TextStyle(
+                  fontSize: 12,
+                  decoration: TextDecoration.underline,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return SizedBox.shrink();
+    }
+  }
+}
+
+Widget _badge(String text, Color color) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+    decoration: BoxDecoration(
+      color: color.withOpacity(0.15),
+      borderRadius: BorderRadius.circular(6),
+      border: Border.all(color: color),
+    ),
+    child: Text(
+      text,
+      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
+    ),
+  );
 }

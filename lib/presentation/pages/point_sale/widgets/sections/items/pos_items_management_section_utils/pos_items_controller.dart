@@ -272,7 +272,7 @@ class ProductListCard extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: image == null
-          ? Icon(Icons.inventory_2_outlined, color: colors.iconMuted, size: 30)
+          ? Icon(Icons.error_outlined, color: colors.iconMuted, size: 30)
           : Image.network(
               image,
               fit: BoxFit.cover,

@@ -15,6 +15,7 @@ import '../repositories/config_repository.dart';
 import '../services/product_catalog_service.dart';
 import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
+import '../widgets/molecules/ps_image_picker.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 import 'dart:convert';
 
@@ -366,7 +367,7 @@ class ProductModalController extends BaseFormController {
   /// =========================
   /// 🖼 IMAGE
   /// =========================
-  File? image;
+  Object? image;
 
   /// =========================
   /// 🧠 INIT
@@ -636,12 +637,15 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
   }
 
+  int productId = -1;
+
   void loadAndValidate(ProductDraft draft) {
     loadDataModel(draft);
   }
 
   void loadDataModel(ProductDraft draft) async {
     mode = CrudType.update;
+    productId = draft.id!;
 
     /// =========================
     /// 🧾 DATA
@@ -657,6 +661,8 @@ class ProductModalController extends BaseFormController {
     if (draft.detailsAll?.isNotEmpty == true) {
       final details = jsonDecode(draft.detailsAll!);
       final productCurrent = details['product'];
+      final productByStock = details['product_by_stock'];
+      lowStockField.value = productByStock['min'];
       descriptionField.value = productCurrent['description'];
 
       /// UNIT MEASURE
@@ -666,19 +672,22 @@ class ProductModalController extends BaseFormController {
 
       selectedTax = listTaxCategoryManagement.firstWhere((e) => e.id == taxId);
       //selectedUnitMeasure=draft.selectedUnitMeasure;
+      if (draft.sellType.id == MeasureType.unit.id) {
+      } else {
+        final resultData = getDataSubMeasureByMeasure(
+          listMeasureCategoryManagement,
+          draft.sellType,
+        );
 
-      final resultData = getDataSubMeasureByMeasure(
-        listMeasureCategoryManagement,
-        draft.sellType,
-      );
+        final unitsWithConversions = resultData.units.firstWhere(
+          (unit) => unit.id == draft.selectedUnitMeasure?.id,
+        );
 
-      final unitsWithConversions = resultData.units.firstWhere(
-        (unit) => unit.id == draft.selectedUnitMeasure?.id,
-      );
-
-      if (unitsWithConversions.id >0) {
-        selectedUnitMeasure=unitsWithConversions;
+        if (unitsWithConversions.id > 0) {
+          selectedUnitMeasure = unitsWithConversions;
+        }
       }
+
       if (false) {
         selectedTax = TaxCategoryModel(
           id: taxData['id'],
@@ -792,12 +801,23 @@ class ProductModalController extends BaseFormController {
     if (!validateForm().success) {
       throw Exception("Formulario inválido");
     }
+    final imageManager = ImageMapper.map(image);
+
+    final File? setImageCrud = imageManager.type == ImageSourceType.file
+        ? imageManager.source as File
+        : null;
     var payload = buildPayload(type);
     if (type == CrudType.create) {
-      final response = await ProductDataUtil.createProduct(payload);
+      final response = await ProductDataUtil.createProduct(
+        payload,
+        image: setImageCrud,
+      );
       return response;
     }
-    final response = await ProductDataUtil.updateProduct(payload);
+    final response = await ProductDataUtil.updateProduct(
+      payload,
+      image: setImageCrud,
+    );
     return response;
   }
 
@@ -942,27 +962,33 @@ class ProductModalController extends BaseFormController {
           ? 'ACTIVE'
           : 'INACTIVE';
     }
-    return {
-      'product': {
-        'code': codeBar,
-        'name': name,
-        'product_type': 'MEASURABLE',
-        'inventory_type': inventoryType.id,
-        'state': stateCurrent,
-        'product_trademark_id': 1,
-        'product_category_id': selectedCategory?.id,
-        'product_subcategory_id': selectedSubcategory?.id,
-        'source': '',
-        'description': description,
-        'code_provider': codeBar,
-        'code_product': codeBar,
-        'has_tax': hasTax ? 1 : 0,
-        'is_service': 0,
-        'user_id': user_id,
-        'product_measure_type_id': product_measure_type_id,
-        'view_online': 1,
-      },
+
+    var product = {
+      'code': codeBar,
+      'name': name,
+      'product_type': 'MEASURABLE',
+      'inventory_type': inventoryType.id,
+      'state': stateCurrent,
+      'product_trademark_id': 1,
+      'product_category_id': selectedCategory?.id,
+      'product_subcategory_id': selectedSubcategory?.id,
+      'source': '',
+      'description': description,
+      'code_provider': codeBar,
+      'code_product': codeBar,
+      'has_tax': hasTax ? 1 : 0,
+      'is_service': 0,
+      'user_id': user_id,
+      'product_measure_type_id': product_measure_type_id,
+      'view_online': 1,
+    };
+    if (type == CrudType.update) {
+      product['id'] = productId;
+    }
+    var saveRegister = {
+      'product': product,
       'business_by_products': {'business_id': businessId},
+      'product_by_stock': {"min": lowStock, "max": lowStock},
       'product_inventory': {
         'business_id': businessId,
         'avarage_kardex_value': cost,
@@ -976,7 +1002,7 @@ class ProductModalController extends BaseFormController {
         'note': 'descrip',
         'sale_price2': price,
         'sale_price3': price,
-        'sale_price4': price,
+        'sale_price4': cost,
       },
       'product_sell_config': {
         'allow_pos': 1,
@@ -996,6 +1022,8 @@ class ProductModalController extends BaseFormController {
         'description': measureData["description"],
       },
     };
+    final jsonBody = jsonEncode(saveRegister);
+    return saveRegister;
   }
 }
 

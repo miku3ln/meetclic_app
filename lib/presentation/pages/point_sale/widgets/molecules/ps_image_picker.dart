@@ -4,9 +4,107 @@ import 'package:flutter/material.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/theme/configuration/app_text_styles.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+enum ImageSourceType {
+  none,
+  file,
+  network,
+  imageProvider,
+  unsupported,
+}
 
+class ImageMapperResponse {
+  final bool success;
+
+  /// Tipo detectado
+  final ImageSourceType type;
+
+  /// Dato original (File, String, ImageProvider...)
+  final Object? source;
+
+  /// Para pintar en la UI
+  final ImageProvider? provider;
+
+  final String? message;
+  final Object? error;
+
+  const ImageMapperResponse({
+    required this.success,
+    required this.type,
+    this.source,
+    this.provider,
+    this.message,
+    this.error,
+  });
+}
+class ImageMapper {
+  static ImageMapperResponse map(Object? source) {
+    try {
+      if (source == null) {
+        return const ImageMapperResponse(
+          success: true,
+          type: ImageSourceType.none,
+        );
+      }
+
+      if (source is File) {
+        return ImageMapperResponse(
+          success: true,
+          type: ImageSourceType.file,
+          source: source,
+          provider: FileImage(source),
+        );
+      }
+
+      if (source is ImageProvider) {
+        return ImageMapperResponse(
+          success: true,
+          type: ImageSourceType.imageProvider,
+          source: source,
+          provider: source,
+        );
+      }
+
+      if (source is String) {
+        final value = source.trim();
+
+        if (value.isEmpty) {
+          return const ImageMapperResponse(
+            success: true,
+            type: ImageSourceType.none,
+          );
+        }
+
+        final isNetwork =
+            value.startsWith('http://') ||
+                value.startsWith('https://');
+
+        return ImageMapperResponse(
+          success: true,
+          type: ImageSourceType.network,
+          source: value,
+          provider: isNetwork
+              ? NetworkImage(value)
+              : FileImage(File(value)),
+        );
+      }
+
+      return ImageMapperResponse(
+        success: false,
+        type: ImageSourceType.unsupported,
+        message: 'Tipo ${source.runtimeType} no soportado.',
+      );
+    } catch (e) {
+      return ImageMapperResponse(
+        success: false,
+        type: ImageSourceType.unsupported,
+        message: 'Error al procesar la imagen.',
+        error: e,
+      );
+    }
+  }
+}
 class PsImagePicker extends StatelessWidget {
-  final File? image;
+  final Object? image;
   final VoidCallback onPick;
   final VoidCallback? onRemove;
   final String? error;
@@ -27,7 +125,32 @@ class PsImagePicker extends StatelessWidget {
     this.isTouched = false,
     this.isValid = false,
   });
+  ImageProvider? _resolveImageProvider() {
+    if (image == null) return null;
 
+    if (image is ImageProvider) {
+      return image as ImageProvider;
+    }
+
+    if (image is File) {
+      return FileImage(image as File);
+    }
+
+    if (image is String) {
+      final value = image as String;
+
+      if (value.isEmpty) return null;
+
+      if (value.startsWith('http://') ||
+          value.startsWith('https://')) {
+        return NetworkImage(value);
+      }
+
+      return FileImage(File(value));
+    }
+
+    return null;
+  }
   Future<void> _confirmDelete(BuildContext context) async {
     final c = AppThemeTokens.of(context);
 
@@ -60,7 +183,7 @@ class PsImagePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final c = AppThemeTokens.of(context);
-
+    final provider = _resolveImageProvider();
     final showError = isTouched && error != null;
     final showSuccess = isTouched && error == null && isValid;
 
@@ -120,15 +243,15 @@ class PsImagePicker extends StatelessWidget {
                       width: 1.5,
                     ),
                   ),
-                  child: image == null
+                  child: provider == null
                       ? Icon(
                     Icons.camera_alt_outlined,
                     size: 40,
                     color: c.textSecondary,
                   )
                       : ClipOval(
-                    child: Image.file(
-                      image!,
+                    child: Image(
+                      image: provider,
                       fit: BoxFit.cover,
                       width: 120,
                       height: 120,

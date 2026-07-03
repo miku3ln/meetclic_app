@@ -25,7 +25,7 @@ class ProductDraft {
   final String barcode;
   final String description;
 
-  final File? image;
+  final Object? image;
   final InventoryType inventoryType;
 
   final TaxCategoryModel? tax;

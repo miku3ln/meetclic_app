@@ -8,7 +8,6 @@ import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../widgets/empty_data.dart';
 import '../../../models/product_draft.dart';
 import '../../../state/product_modal_controller.dart';
-import '../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../organisms/items/pos_items_content.dart';
 
 class ProductModalEvents {

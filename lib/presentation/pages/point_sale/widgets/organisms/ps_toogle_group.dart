@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/theme/configuration/app_text_styles.dart';
+import '../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../molecules/ps_toogle_option.dart';
 enum TypeDesgloce {
   processedRecipe(
@@ -75,6 +76,7 @@ class PsToggleSelector<T extends ToggleOptionItem>
   final T value;
   final List<T> items;
   final ValueChanged<T> onChanged;
+  final bool enabled;
 
   const PsToggleSelector({
     super.key,
@@ -82,16 +84,21 @@ class PsToggleSelector<T extends ToggleOptionItem>
     required this.value,
     required this.items,
     required this.onChanged,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    final c = AppThemeTokens.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           title,
-          style: AppTextStyles.bodySecondary(context),
+          style: AppTextStyles.bodySecondary(context).copyWith(
+            color: enabled ? null : c.textDisabled,
+          ),
         ),
 
         AppSpacing.spaceBetweenInputs,
@@ -104,7 +111,10 @@ class PsToggleSelector<T extends ToggleOptionItem>
               icon: item.icon,
               label: item.value,
               isSelected: item == value,
-              onTap: () => onChanged(item),
+              enabled: enabled,
+              onTap: enabled
+                  ? () => onChanged(item)
+                  : null,
             );
           }).toList(),
         ),

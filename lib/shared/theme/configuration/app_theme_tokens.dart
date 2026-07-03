@@ -4,7 +4,7 @@ class AppThemeTokens {
   final Color primary;
   final Color secondary;
   final Color accent;
-
+  final Color textDisabled;
   final Color background;
   final Color surface;
   final Color surfaceMuted;
@@ -58,6 +58,7 @@ class AppThemeTokens {
     required this.cardBackground,
     required this.textPrimary,
     required this.white,
+    required this.textDisabled,
 
     required this.textSecondary,
     required this.textInverse,
@@ -100,7 +101,7 @@ class AppThemeTokens {
     primary: AppColors.azulClic,
     secondary: AppColors.amarilloVital,
     accent: AppColors.moradoSuave,
-
+    textDisabled: Color(0xFF9E9E9E),
     background: AppColors.backgroundLight,
     surface: AppColors.surfaceLight,
     surfaceMuted: AppColors.surfaceMutedLight,
@@ -153,6 +154,7 @@ class AppThemeTokens {
     surface: AppColors.surfaceDark,
     surfaceMuted: AppColors.surfaceMutedDark,
     cardBackground: AppColors.surfaceDark,
+    textDisabled: Color(0xFF9E9E9E),
 
     textPrimary: AppColors.textPrimaryDark,
     textSecondary: AppColors.textSecondaryDark,
