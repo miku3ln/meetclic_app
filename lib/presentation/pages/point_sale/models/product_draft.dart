@@ -159,10 +159,11 @@ class ProductMapper {
 
 class ProductCategoryDraft {
   final String name;
+  final int? id;
 
   final String? image;
 
-  ProductCategoryDraft({required this.name, required this.image});
+  ProductCategoryDraft({required this.name, required this.image,this.id});
 }
 
 class ProductCategoryMapper {

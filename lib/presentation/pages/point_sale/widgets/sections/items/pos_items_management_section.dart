@@ -327,4 +327,4 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 }
 
-enum ProductViewMode { dialog, page }
+

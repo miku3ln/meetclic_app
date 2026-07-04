@@ -220,3 +220,4 @@ class PsApiTypeAhead<T> extends StatelessWidget {
     );
   }
 }
+enum ModalType { dialog, page }

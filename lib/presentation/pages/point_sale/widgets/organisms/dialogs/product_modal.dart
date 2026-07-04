@@ -16,7 +16,7 @@ class PsModalLayout extends StatelessWidget {
   final bool useDialog;
   final bool isLoading;
   final bool allowActions;
-  final StreamController<ProductModalEvent>? eventController;
+  final StreamController<ManagementModalEvent>? eventController;
 
   const PsModalLayout({
     super.key,
@@ -43,7 +43,7 @@ class PsModalLayout extends StatelessWidget {
             IconButton(
               icon: Icon(Icons.close, color: c.iconPrimary),
               onPressed: isLoading ? null :() {
-                eventController?.add(ProductModalEvent('closeBtnHeader'));
+                eventController?.add(ManagementModalEvent('closeBtnHeader'));
                 Navigator.pop(context);
               },
             ),
@@ -60,7 +60,7 @@ class PsModalLayout extends StatelessWidget {
                     ? null
                     : () {
                         Navigator.pop(context);
-                        eventController?.add(ProductModalEvent('cancelBtnFooter'));
+                        eventController?.add(ManagementModalEvent('cancelBtnFooter'));
                       },
                 child: Text(btnCancelTitle),
               ),
@@ -115,7 +115,7 @@ class PsModalLayout extends StatelessWidget {
                       onPressed: isLoading
                           ? null
                           : () {
-                              eventController?.add(ProductModalEvent('closeBtnHeader'));
+                              eventController?.add(ManagementModalEvent('closeBtnHeader'));
                               Navigator.pop(context);
                             },
                     ),

@@ -17,28 +17,36 @@ import 'package:provider/provider.dart';
 
 class PointSalePage extends StatefulWidget {
   const PointSalePage({super.key});
+
   @override
   State<PointSalePage> createState() => _PointSalePageState();
 }
+
 class _PointSalePageState extends State<PointSalePage> {
   late final PosMainController controller;
   final _scaffoldKey = GlobalKey<ScaffoldState>(); // ✅
   late final List<PosCategoryItem> productCategories;
   String? selectedProductCategoryId;
+
   // ✅ (3) search
   String query = '';
+
   @override
   @override
   void initState() {
     super.initState();
     initControllerMain();
   }
-  Future<void> initControllerMain() async{
+
+  Future<void> initControllerMain() async {
     final app = context.read<AppController>();
 
-    controller = PosMainController(app: app,configRepository: ConfigRepository(
+    controller = PosMainController(
+      app: app,
+      configRepository: ConfigRepository(
         ConfigApiService(), // 👈 mock por ahora
-    ))..addListener(_onChanged);
+      ),
+    )..addListener(_onChanged);
 
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     // ✅ Conecta request del controller al modal (porque aquí sí hay context)
@@ -49,6 +57,7 @@ class _PointSalePageState extends State<PointSalePage> {
     };
     await controller.initDataPointOfSales();
   }
+
   // ✅ Modal vive aquí
   Future<void> _showOpenShiftModal() async {
     final opened = await showDialog<bool>(
@@ -59,15 +68,17 @@ class _PointSalePageState extends State<PointSalePage> {
 
     if (!mounted) return;
     if (opened != true) return;
-
   }
+
   void _onChanged() {
     if (!mounted) return;
     setState(() {});
   }
+
   @override
   Widget build(BuildContext context) {
     final device = DeviceGestureObserver.snapshotOf(context);
+    controller.initManagerDataByDevice(device);
     return Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
@@ -78,6 +89,7 @@ class _PointSalePageState extends State<PointSalePage> {
       ),
     );
   }
+
   Widget _buildByLayout(LayoutType layout) {
     switch (layout) {
       case LayoutType.mobilePortrait:
@@ -91,7 +103,6 @@ class _PointSalePageState extends State<PointSalePage> {
     }
   }
 }
-
 
 class _PointSalePageState2 extends State<PointSalePage> {
   late final PosMainController controller;
@@ -121,35 +132,35 @@ class _PointSalePageState2 extends State<PointSalePage> {
     final app = context.read<AppController>();
     controller = PosMainController(
       app: app,
-      configRepository: ConfigRepository(
-        ConfigApiService(),
-      ),
+      configRepository: ConfigRepository(ConfigApiService()),
     );
 
     controller.addListener(_onChanged);
     _bindControllerEvents();
   }
+
   void _bindControllerEvents() {
     controller.shift.onRequestOpenShift = _showOpenShiftModal;
     controller.ui.onRequestOpenDrawer = () {
       _scaffoldKey.currentState?.openDrawer();
     };
   }
+
   Future<void> _loadInitialData() async {
-    final products =
-    await PosTabletLandscapeFixtures.getProductsData();
+    final products = await PosTabletLandscapeFixtures.getProductsData();
     controller.browser.allProducts = products;
     controller.init(
       initialProducts: products,
-      initialProductCategories:
-      PosTabletLandscapeFixtures.getCategoriesData(products),
-      initialMenuCategories:
-      PosTabletLandscapeFixtures.getMenuCategoriesData(products),
+      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(
+        products,
+      ),
+      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(
+        products,
+      ),
       initialSelectedProductCategoryId: 'all',
       initialSelectedMenuCategoryId: 'all',
     );
-    final categories =
-    PosTabletLandscapeFixtures.getCategoriesData(products);
+    final categories = PosTabletLandscapeFixtures.getCategoriesData(products);
     if (categories.isNotEmpty) {
       controller.setProductCategory(categories.first.id);
     }
@@ -178,11 +189,7 @@ class _PointSalePageState2 extends State<PointSalePage> {
   @override
   Widget build(BuildContext context) {
     if (_loading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final device = DeviceGestureObserver.snapshotOf(context);

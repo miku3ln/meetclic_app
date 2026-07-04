@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/models/totem_management.dart';
 
+import '../../../widgets/loading_manager.dart';
 import 'atoms.dart';
 
 class InfoCardAR extends StatelessWidget {
@@ -66,9 +67,7 @@ class InfoCardAR extends StatelessWidget {
                               SizedBox(
                                 width: 22,
                                 height: 22,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                ),
+                                child: PosLoadingView(),
                               ),
                               SizedBox(height: 6),
                               Text('Cargando…', style: TextStyle(fontSize: 10)),

@@ -180,21 +180,21 @@ class ProductIngredientsController extends ChangeNotifier {
 }
 
 class ProductModalController extends BaseFormController {
-  final _eventController = StreamController<ProductModalEvent>.broadcast();
+  final _eventController = StreamController<ManagementModalEvent>.broadcast();
 
-  Stream<ProductModalEvent> get events => _eventController.stream;
+  Stream<ManagementModalEvent> get events => _eventController.stream;
 
   void emit(String type, [dynamic data]) {
-    _eventController.add(ProductModalEvent(type, data));
+    _eventController.add(ManagementModalEvent(type, data));
   }
 
   final _eventModalProductController =
-      StreamController<ProductModalEvent>.broadcast();
+      StreamController<ManagementModalEvent>.broadcast();
 
-  Stream<ProductModalEvent> get eventsModalProduct =>
+  Stream<ManagementModalEvent> get eventsModalProduct =>
       _eventModalProductController.stream;
 
-  StreamController<ProductModalEvent> get eventModalProductController =>
+  StreamController<ManagementModalEvent> get eventModalProductController =>
       _eventModalProductController;
 
   late final ProductIngredientsController ingredientsController;
@@ -1532,3 +1532,7 @@ class CustomerModalController extends ChangeNotifier {
     }
   }
 }
+
+
+
+

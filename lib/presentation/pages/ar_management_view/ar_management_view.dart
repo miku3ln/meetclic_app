@@ -16,6 +16,7 @@ import 'package:image_gallery_saver_plus/image_gallery_saver_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../../models/totem_management.dart'; // ItemAR, itemsSources
+import '../../widgets/loading_manager.dart';
 import 'services/ar_config.dart';
 import 'services/ar_service.dart';
 import 'services/download_helper.dart';
@@ -493,10 +494,7 @@ class _ARManagementViewState extends State<ARManagementView> {
                                               SizedBox(
                                                 width: 22,
                                                 height: 22,
-                                                child:
-                                                    CircularProgressIndicator(
-                                                      strokeWidth: 2,
-                                                    ),
+                                                child:PosLoadingView(),
                                               ),
                                               SizedBox(height: 6),
                                               Text(

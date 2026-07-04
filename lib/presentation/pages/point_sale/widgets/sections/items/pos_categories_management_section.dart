@@ -1,10 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section/category_management.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section.dart';
+import '../../../../../../services/alert_manager.dart';
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../widgets/empty_data.dart';
 
+import '../../../../../widgets/loading_manager.dart';
 import '../../../models/product_draft.dart';
 import '../../../models/sections_data.dart';
 import '../../../state/pos_items_controller.dart';
@@ -16,6 +22,7 @@ import '../../organisms/dialogs/product_modal.dart';
 import '../../organisms/items/pos_items_content.dart';
 import '../../templates/row_grid.dart';
 import '../product/ps_section_card.dart';
+
 class PosCategoriesManagementSection extends StatefulWidget {
   const PosCategoriesManagementSection({super.key});
 
@@ -24,7 +31,8 @@ class PosCategoriesManagementSection extends StatefulWidget {
       _PosCategoriesManagementSectionState();
 }
 
-class _PosCategoriesManagementSectionState extends State<PosCategoriesManagementSection> {
+class _PosCategoriesManagementSectionState
+    extends State<PosCategoriesManagementSection> {
   final ScrollController _scrollController = ScrollController();
 
   /// aquí decides el total simulado
@@ -79,6 +87,9 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
       _hasInitialLoadFinished = true;
       _isLoading = false;
     });
+    _listenModalEvents(controller);
+
+
   }
 
   Future<void> _loadMore() async {
@@ -125,41 +136,60 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
     }
   }
 
-  void _onTapItem( GenericListItem<Map<String, dynamic>>item) async {
+  StreamSubscription? _modalActions;
+  void _listenModalEvents(CategoryModalController controller) {
 
-    final controller = CategoriaModalController();
+    _modalActions?.cancel();
+    _modalActions = controller.eventsMainProcess.listen((event) {
+      final data = event.data as Map<String, dynamic>?;
+      //controller.c
+      final allowReload = controller.allowReloadData;
+      if (allowReload) {
+        _refreshAll();
+        controller.setAllowReloadData(false);
+      }
+      controller.resetProcess();
+      switch (event.type) {
+        case 'closeBtnHeader':
+          break;
+        case 'cancelBtnFooter':
+          break;
+      }
+    });
+  }
+  void _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
+
     await controller.init();
-    final draft = ProductCategoryMapper.fromMap(item );
+    final draft = ProductCategoryMapper.fromMap(item);
     controller.loadAndValidate(draft);
-    await showProductModal(
+    await showManagementMainModal(
       context: context,
       btnSaveTitle: "Actualizar",
       btnCancelTitle: "Cancelar",
       barrierDismissible: false,
       controller: controller,
       title: "Actualizar Categoria",
-      type: CrudType.update,
+      typeManagement: CrudType.update,
     );
   }
 
-  final controller = CategoriaModalController();
-
+  final controller = CategoryModalController();
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         if (!_hasInitialLoadFinished && _isLoading)
-          const Center(child: CircularProgressIndicator())
+          const Center(child: PosLoadingView())
         else if (!_hasData)
           RefreshIndicator(
             onRefresh: _refreshAll,
             child: ListView(
               physics: const AlwaysScrollableScrollPhysics(),
-              children:  [
+              children: [
                 SizedBox(
                   height: 600,
                   child: EmptyData(
-                    icon:Sections.getIconItems(PosItemsSection.categories),
+                    icon: Sections.getIconItems(PosItemsSection.categories),
                     title: 'Todavía no hay Categorias',
                     descriptionText: 'Aquí puedes verificar',
                     linkText: 'Más información',
@@ -175,16 +205,16 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
           bottom: 80,
           child: FloatingActionButton(
             onPressed: () async {
-              final controller = CategoriaModalController();
+              final controller = CategoryModalController();
               await controller.init();
-              showProductModal(
+              showManagementMainModal(
                 barrierDismissible: false,
                 context: context,
                 controller: controller,
                 btnSaveTitle: "Guardar",
                 btnCancelTitle: "Cancelar",
                 title: "Crear Categoria",
-                type: CrudType.create,
+                typeManagement: CrudType.create,
               );
             },
             child: const Icon(Icons.add),
@@ -206,17 +236,17 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
           if (index >= _items.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(child: PosLoadingView()),
             );
           }
 
           final item = _items[index];
 
-          return  PsHeaderWithBadge(
+          return PsHeaderWithBadge(
             title: item.title,
             badgeCount: item.countData,
             badgeText: "Artículos Prueba",
-            imageUrl:item.image,
+            imageUrl: item.image,
             onTap: () => _onTapItem(item),
           );
         },
@@ -225,117 +255,167 @@ class _PosCategoriesManagementSectionState extends State<PosCategoriesManagement
   }
 }
 
-
-
-Future<void> showProductModal({
+Future<void> showManagementMainModal({
   required BuildContext context,
-  required CategoriaModalController controller,
+  required CategoryModalController controller,
   required String title,
   required String btnCancelTitle,
   required String btnSaveTitle,
-
-  CrudType type = CrudType.update,
-  required bool barrierDismissible
+  CrudType typeManagement = CrudType.update,
+  required bool barrierDismissible,
 }) async {
-  await showDialog(
-    barrierDismissible: barrierDismissible,
-    context: context,
-    builder: (_) => AnimatedBuilder(
-      animation: controller,
-      builder: (_, __) {
-        return PsModalLayout(
-          title: title,
-          btnCancelTitle: btnCancelTitle,
-          btnSaveTitle: btnSaveTitle,
-          onSave: controller.canSubmit
-              ? () {
-            if (controller.validate().success) {
-              final product = controller.save(type);
+  final content = AnimatedBuilder(
+    animation: controller,
+    builder: (_, __) {
+      return PsModalLayout(
+        isLoading: controller.isLoading,
+        useDialog: false,
+        title: title,
+        btnCancelTitle: btnCancelTitle,
+        btnSaveTitle: btnSaveTitle,
+        onSave: controller.canSubmit
+            ? () async {
+                if (controller.validateForm().success) {
+                  controller.setLoading(true);
+                  final resultSave = await controller.saveCategory(typeManagement);
+                  if (!context.mounted) return;
+                  if (resultSave.success) {
+                    bool allowClose = true;
+                    AlertService.success(context, message: resultSave.message);
+                    if (allowClose) {
+                      controller.setAllowReloadData(true);
+                      Navigator.pop(context, resultSave);
+                      controller.emit(ProductModalEvents.save, {
+                        "allowReload": true,
+                      });
+                    }
+                  } else {
+                    AlertService.error(context, message: resultSave.message);
+                  }
+                  controller.setLoading(false);
+                }
+              }
+            : null,
+        body: _buildManagerCategory(context, controller, typeManagement, title),
+      );
+    },
+  );
 
-              Navigator.pop(context);
-            }
-          }
-              : null,
-          body: _buildProductBody(context, controller, type, title),
+  await Navigator.push(
+    context,
+    PageRouteBuilder(
+      transitionDuration: const Duration(milliseconds: 300),
+      pageBuilder: (_, __, ___) {
+        return content;
+      },
+      transitionsBuilder: (_, animation, __, child) {
+        return SlideTransition(
+          position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+              .animate(
+                CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+              ),
+          child: child,
         );
       },
     ),
   );
 }
 
-Widget _buildProductBody(
-    BuildContext context,
-    CategoriaModalController controller,
-    CrudType type,
-    String title,
-    ) {
-  return Column(
+Widget _buildManagerCategory(
+  BuildContext context,
+  CategoryModalController controller,
+  CrudType type,
+  String title,
+) {
+  return SingleChildScrollView(
+      child: Column(
     children: [
-      /// =========================
-      /// 📦 INFORMACIÓN
-      /// =========================
-      PsSectionCard(
-        title: "Información",
-        child: Column(
-          children: [
-            PsFieldRow(
-              children: [
-                /// 🔥 NOMBRE
-                PsInput(
-                  label: "Nombre",
-                  requiredField: true,
-                  value: controller.name,
-                  onChanged: controller.setName,
-                  error: controller.nameError,
-                  isTouched: controller.nameTouched,
-                  isValid:
-                  controller.nameError == null &&
-                      controller.name.isNotEmpty,
-                ),
-                Center(
-                  child: PsImagePicker(
-                    image: controller.image,
-                    error: controller.imageError,
-                    onPick: () async {
-                      final mediaService = MediaPickerService();
-                      final file = await showImageSourceSelector(
-                        context,
-                        mediaService.pickFromCamera,
-                        mediaService.pickFromGallery,
-                      );
-
-                      if (file != null) {
-                        controller.setImage(file);
-                      }
-                    },
-                    onRemove: controller.removeImage,
-                    requiredField: true,
-                    isTouched: controller.imageTouched,
-                    isValid: controller.image != null,
-                  ),
-                ),
-              ],
-            ),
-
-            AppSpacing.spaceBetweenInputs,
-
-
-          ],
-        ),
-      ),
       AppSpacing.spaceBetweenSections,
 
-      /// =========================
-      /// 📦 INVENTARIO
-      /// =========================
-      type==CrudType.update? PsSectionCard(
-        title: "Inventario",
-        child: Column(
-          children: [
+      PsSectionSplit(
+        leftFlex: 7,
+        rightFlex: 3,
 
-          ],
+        left: PsSectionCard(
+          title: controller.titleCardInformation,
+          child: Column(
+            children: [
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      label: controller.codeLabel,
+                      requiredField: true,
+                      value: controller.code,
+                      onChanged: controller.setCode,
+                      error: controller.codeError,
+                      isTouched: controller.codeTouched,
+                      isValid: controller.codeError == null,
+                    ),
+                  ),
+
+                  PsFieldItem(
+                    child: PsInput(
+                      label: controller.descriptionLabel,
+                      requiredField: true,
+                      value: controller.description,
+                      onChanged: controller.setDescription,
+                      error: controller.descriptionError,
+                      isTouched: controller.descriptionTouched,
+                      isValid: controller.descriptionError == null,
+                    ),
+                  ),
+                ],
+              ),
+
+              AppSpacing.spaceBetweenInputs,
+
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      label: controller.nameLabel,
+                      requiredField: true,
+                      value: controller.name,
+                      onChanged: controller.setName,
+                      error: controller.nameError,
+                      isTouched: controller.nameTouched,
+                      isValid: controller.nameError == null,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ):AppSpacing.spaceBetweenSections,
+
+        right: PsSectionCard(
+          title: controller.imageLabel,
+          child: Center(
+            child: PsImagePicker(
+              image: controller.image,
+              error: controller.imageError,
+              requiredField: true,
+              isTouched: controller.imageTouched,
+              isValid: controller.image != null,
+              onPick: () async {
+                final mediaService = MediaPickerService();
+
+                final file = await showImageSourceSelector(
+                  context,
+                  mediaService.pickFromCamera,
+                  mediaService.pickFromGallery,
+                );
+
+                if (file != null) {
+                  controller.setImage(file);
+                }
+              },
+              onRemove: controller.removeImage,
+            ),
+          ),
+        ),
+      ),
     ],
-  );
+  ));
 }

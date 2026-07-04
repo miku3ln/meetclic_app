@@ -38,10 +38,10 @@ Future<void> showManagerProduct({
   required List<TaxCategoryModel> listTaxCategory,
   CrudType typeManagement = CrudType.update,
   required bool barrierDismissible,
-  ProductViewMode viewMode = ProductViewMode.page,
+  ModalType viewMode = ModalType.page,
   int productId = -1,
 }) async {
-  final allowModal = viewMode == ProductViewMode.dialog;
+  final allowModal = viewMode == ModalType.dialog;
   controller.setManagerInitProduct(typeManagement, productId);
   controller.setListMeasureCategory(listMeasureCategory);
   final content = AnimatedBuilder(
@@ -99,7 +99,7 @@ Future<void> showManagerProduct({
     },
   );
 
-  if (viewMode == ProductViewMode.dialog) {
+  if (viewMode == ModalType.dialog) {
     await showDialog(
       context: context,
       barrierDismissible: barrierDismissible,

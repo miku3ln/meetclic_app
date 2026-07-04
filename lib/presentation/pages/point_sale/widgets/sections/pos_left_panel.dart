@@ -39,6 +39,7 @@ class PosLeftPanel extends StatelessWidget {
           Expanded(
             child: !controller.shift.isShiftOpen
                 ? _ShiftClosedView(
+              controller: controller,
               onOpenTap: controller.shift.onOpenShiftTap,
             )
                 : PosProductGrid(
@@ -67,7 +68,10 @@ class PosLeftPanel extends StatelessWidget {
 
 class _ShiftClosedView extends StatelessWidget {
   final VoidCallback onOpenTap;
-  const _ShiftClosedView({required this.onOpenTap});
+  final PosMainController controller;
+
+
+  const _ShiftClosedView({required this.onOpenTap,required this.controller});
   @override
   Widget build(BuildContext context) {
     // ✅ Scroll por seguridad: si el panel queda bajo (teclado, split view, etc.)
@@ -81,20 +85,19 @@ class _ShiftClosedView extends StatelessWidget {
             children: [
               const Icon(Icons.access_time, size: 72, color: Colors.grey),
               const SizedBox(height: 10),
-              const Text(
-                'El turno está cerrado',
+               Text( controller.labels.shiftClosedTitle,
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
-              const Text(
-                'Abra el turno para realizar ventas',
+               Text(
+                controller.labels.shiftClosedDescription,
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 18),
               ElevatedButton(
                 onPressed: onOpenTap,
-                child: const Text('ABRIR EL TURNO OK'),
+                child:  Text(   controller.labels.openShiftButton),
               ),
             ],
           ),

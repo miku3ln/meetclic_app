@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../presentation/auth/login_page.dart';
 
+import '../presentation/widgets/loading_manager.dart';
 import '../shared/controllers/app_controller.dart';
 import '../presentation/pages/splash_screen.dart';
 
@@ -23,7 +24,7 @@ class AppGate extends StatelessWidget {
       session.ensureLoaded(); // una sola vez realmente, por hydrated
       return const Scaffold(
         backgroundColor: Colors.white,
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: PosLoadingView()),
       );
     }
     // 🔒 si exige login y no hay sesión => Login

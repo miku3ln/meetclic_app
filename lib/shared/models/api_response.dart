@@ -39,10 +39,10 @@ class ApiResponse<T> {
   }
 }
 
-class ProductModalEvent {
+class ManagementModalEvent {
   final String type;
   final dynamic data;
 
-  ProductModalEvent(this.type, [this.data]);
+  ManagementModalEvent(this.type, [this.data]);
 }
 

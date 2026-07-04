@@ -271,21 +271,16 @@ class PosMainController extends ChangeNotifier {
     return ticket.items.isNotEmpty && shift.isShiftOpen;
   }
 
+  void initManagerDataByDevice(DeviceSnapshot device) {
+    setCurrentManagerDevice(device);
+    setColsNumberRowPosSales(getColsNumberRowPosSales(device));
+  }
+
   void onDeviceEvent(DeviceSnapshot device, GestureEvent event) {
     switch (event.type) {
       case GestureEventType.orientationChanged:
-        debugPrint('Orientación: ${device.orientation.name}');
-        if (device.orientation.name == 'portrait') {
-          if (device.layoutType == LayoutType.mobilePortrait) {
-          } else if (device.layoutType == LayoutType.tabletPortrait) {
-            setColsNumberRowPosSales(4);
-          }
-        } else if (device.orientation.name == 'landscape') {
-          if (device.layoutType == LayoutType.mobileLandscape) {
-          } else if (device.layoutType == LayoutType.tabletLandscape) {
-            setColsNumberRowPosSales(5);
-          }
-        }
+        initManagerDataByDevice(device);
+
         break;
 
       case GestureEventType.metricsChanged:
@@ -314,10 +309,32 @@ class PosMainController extends ChangeNotifier {
     }
   }
 
-  int colsNumberRowPosSales = 5;
-
   void setColsNumberRowPosSales(int value) {
     colsNumberRowPosSales = value;
     notifyListeners();
+  }
+
+  int colsNumberRowPosSales = 5;
+  DeviceSnapshot? currentManagerDevice;
+
+  void setCurrentManagerDevice(DeviceSnapshot value) {
+    currentManagerDevice = value;
+    notifyListeners();
+  }
+
+  int getColsNumberRowPosSales(DeviceSnapshot device) {
+    switch (device.layoutType) {
+      case LayoutType.mobilePortrait:
+        return 2;
+
+      case LayoutType.mobileLandscape:
+        return 3;
+
+      case LayoutType.tabletPortrait:
+        return 4;
+
+      case LayoutType.tabletLandscape:
+        return 5;
+    }
   }
 }

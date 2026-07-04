@@ -13,6 +13,7 @@ import 'package:meetclic_app/domain/services/fake_auth_service.dart';
 
 import '../../shared/theme/configuration/app_spacing.dart';
 import '../pages/splash_screen.dart';
+import '../widgets/loading_manager.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -189,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: isLoading
-                      ? const CircularProgressIndicator()
+                      ? const PosLoadingView()
                       : Text(
                           appLocalizations.translate(
                             'loginManagerTitle.singInButton',
