@@ -6,6 +6,7 @@ import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/item
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../widgets/empty_data.dart';
+import '../../../../../widgets/loading_manager.dart';
 import '../../../models/product_draft.dart';
 import '../../../state/product_modal_controller.dart';
 import '../../organisms/items/pos_items_content.dart';
@@ -234,7 +235,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           child: Stack(
             children: [
               if (!_hasInitialLoadFinished && _isLoading)
-                const Center(child: CircularProgressIndicator())
+                const Center(child: PosLoadingView())
               else if (!_hasData)
                 RefreshIndicator(
                   onRefresh: _refreshAll,
@@ -316,7 +317,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           if (index >= _items.length) {
             return const Padding(
               padding: EdgeInsets.zero,
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(child: PosLoadingView()),
             );
           }
           final item = _items[index];

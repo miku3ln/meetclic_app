@@ -52,7 +52,7 @@ class AppRouter {
       case AppRoutes.sales:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => const PointSalePage(),
+          builder: (_) => const PointSaleScope(),
         );
       case AppRoutes.settings:
         final args = settings.arguments as PosSettingsLayoutArgs?;

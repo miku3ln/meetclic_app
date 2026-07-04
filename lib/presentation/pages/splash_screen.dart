@@ -41,7 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
         switch (app.afterLoginDestination) {
           case AppAfterLoginDestination.pointSale:
             targetRoute = AppRoutes.sales;
-            target = const PointSalePage();
+            target = const PointSaleScope();
             selectedMenuId =
                 AppRoutes.salesKey; // ✅ debe coincidir con tu item id
             break;

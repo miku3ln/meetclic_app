@@ -8,7 +8,8 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/services/session_service.dart';
 import '../pagination_response.dart';
-
+import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 class UtilCommon {
   static Future<void> handleTap({
     required BuildContext context,
@@ -221,3 +222,71 @@ class PsApiTypeAhead<T> extends StatelessWidget {
   }
 }
 enum ModalType { dialog, page }
+enum ControllerType {
+  app,
+  session,
+  drawer,
+  posMain,
+}
+
+class ControllerData<T> {
+  final T data;
+  final ControllerType type;
+  final String name;
+  final String description;
+
+  const ControllerData({
+    required this.data,
+    required this.type,
+    required this.name,
+    required this.description,
+  });
+}
+class ControllerProvider {
+  ControllerProvider._();
+
+  static ControllerData<T> get<T>(
+      BuildContext context,
+      ControllerType type, {
+        bool listen = false,
+      }) {
+    final controller = listen
+        ? context.watch<T>()
+        : context.read<T>();
+
+    switch (type) {
+      case ControllerType.app:
+        return ControllerData<T>(
+          data: controller,
+          type: type,
+          name: 'AppController',
+          description: 'Controla la aplicación.',
+        );
+
+      case ControllerType.session:
+        return ControllerData<T>(
+          data: controller,
+          type: type,
+          name: 'SessionService',
+          description: 'Administra la sesión del usuario.',
+        );
+
+      case ControllerType.drawer:
+        return ControllerData<T>(
+          data: controller,
+          type: type,
+          name: 'AppDrawerController',
+          description: 'Administra el menú lateral.',
+        );
+
+      case ControllerType.posMain:
+        return ControllerData<T>(
+          data: controller,
+          type: type,
+          name: 'PosMainController',
+          description:
+          'Controller principal del Punto de Venta.',
+        );
+    }
+  }
+}

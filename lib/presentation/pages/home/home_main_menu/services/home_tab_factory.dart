@@ -47,7 +47,7 @@ class HomeTabFactory {
                 body: const HomeScrollView(),
               );*/
 
-          return PointSalePage();
+          return PointSaleScope();
         },
         navItemBuilder: (localL10n) => HomeNavItemAtom.build(
           icon: Icons.home,
