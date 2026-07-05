@@ -5,6 +5,13 @@ import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/item
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/pos_items_controller.dart';
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
+import '../../../../../../shared/widgets/search_filter/controller/search_filter_controller.dart';
+import '../../../../../../shared/widgets/search_filter/controller/search_filter_events.dart';
+import '../../../../../../shared/widgets/search_filter/models/filter_field.dart';
+import '../../../../../../shared/widgets/search_filter/models/filter_item.dart';
+import '../../../../../../shared/widgets/search_filter/models/search_filter_config.dart';
+import '../../../../../../shared/widgets/search_filter/models/search_filter_result.dart';
+import '../../../../../../shared/widgets/search_filter/search_filter_widget.dart';
 import '../../../../../widgets/empty_data.dart';
 import '../../../../../widgets/loading_manager.dart';
 import '../../../models/product_draft.dart';
@@ -49,6 +56,42 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   /// aquí decides el total simulado
   int _simulatedTotal = 592;
+  final searchController = SearchFilterController();//TODO SEARCH
+  StreamSubscription? _searchSub; //TODO SEARCH
+  void _listenSearchEvents() {//TODO SEARCH
+    _searchSub?.cancel();
+    _searchSub = searchController.events.listen((event) {
+      switch (event.type) {
+        case SearchFilterEvents.searchChanged:
+          debugPrint(event.data);
+
+          break;
+
+        case SearchFilterEvents.searchSubmitted:
+          final result = event.data as SearchFilterResult;
+
+          _searchCode = result.search;
+
+          _refreshAll();
+
+          break;
+
+        case SearchFilterEvents.filterChanged:
+          debugPrint(event.data);
+
+          break;
+
+        case SearchFilterEvents.filterApplied:
+          final result = event.data as SearchFilterResult;
+          debugPrint(result.toMap().toString());
+          _refreshAll();
+          break;
+        case SearchFilterEvents.filterReset:
+          _refreshAll();
+          break;
+      }
+    });
+  }
 
   @override
   void initState() {
@@ -56,6 +99,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     _api = PosItemsManagementApi(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
+
+    _listenSearchEvents();//TODO SEARCH
   }
 
   @override
@@ -65,9 +110,67 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     _modalSub?.cancel();
     _modalActions?.cancel();
 
+    _searchSub?.cancel();//TODO SEARCH
+    searchController.dispose();//TODO SEARCH
     super.dispose();
   }
+  final config = SearchFilterConfig(
+    hint: "Buscar artículos",
+    drawerTitle: "Filtros",
+    fields: [
+      FilterField(
+        id: "status",
+        label: "Estado",
 
+        type: FilterFieldType.dropdown,
+
+        items: [
+
+          FilterItem(
+            id: "1",
+            label: "Activo",
+            value: "ACTIVE",
+          ),
+
+          FilterItem(
+            id: "2",
+            label: "Inactivo",
+            value: "INACTIVE",
+          ),
+
+        ],
+
+      ),
+
+      FilterField(
+
+        id: "category",
+
+        label: "Categoría",
+
+        type: FilterFieldType.dropdown,
+
+        items: [
+
+          FilterItem(
+            id: "1",
+            label: "Menú",
+            value: 1,
+          ),
+
+          FilterItem(
+            id: "2",
+            label: "Materia Prima",
+            value: 2,
+          ),
+
+        ],
+
+      ),
+
+    ],
+
+  );
   Future<void> _loadInitial() async {
     if (_isLoading) return;
     setState(() {
@@ -225,9 +328,93 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 
   final controller = ProductModalController();
-
   @override
   Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        IgnorePointer(
+          ignoring: _isOpeningProduct,
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildBody(),
+            ],
+          ),
+        ),
+
+        // 🔥 FAB (overlay layer)
+        Positioned(
+          right: 32,
+          bottom: 80,
+          child: FloatingActionButton(
+            onPressed: () async {
+              setState(() {
+                _isOpeningProduct = true;
+              });
+
+              try {
+                controller.resetAllForm();
+                await controller.init();
+
+                if (!mounted) return;
+
+                await showManagerProduct(
+                  barrierDismissible: false,
+                  context: context,
+                  controller: controller,
+                  btnSaveTitle: "Guardar",
+                  btnCancelTitle: "Cancelar",
+                  title: "Crear Producto",
+                  typeManagement: CrudType.create,
+                  listMeasureCategory:
+                  controller.listMeasureCategoryManagement,
+                  listTaxCategory: controller.listTaxCategoryManagement,
+                );
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    _isOpeningProduct = false;
+                  });
+                }
+              }
+            },
+            child: const Icon(Icons.add),
+          ),
+        ),
+
+        // 🔥 LOADING OVERLAY
+        if (_isOpeningProduct)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.25),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildList() {
+    return RefreshIndicator(
+      onRefresh: _refreshAll,
+      child: ListView.builder(
+        controller: _scrollController,
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
+        itemBuilder: (context, index) {
+          if (index >= _items.length) {
+            return const Padding(
+              padding: EdgeInsets.zero,
+              child: Center(child: PosLoadingView()),
+            );
+          }
+          final item = _items[index];
+          return ProductListCard(item: item, onTap: () => _onTapItem(item));
+        },
+      ),
+    );
+  }
+  Widget build2(BuildContext context) {
     return Stack(
       children: [
         IgnorePointer(
@@ -277,7 +464,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                         btnCancelTitle: "Cancelar",
                         title: "Crear Producto",
                         typeManagement: CrudType.create,
-                        listMeasureCategory: controller.listMeasureCategoryManagement,
+                        listMeasureCategory:
+                        controller.listMeasureCategoryManagement,
                         listTaxCategory: controller.listTaxCategoryManagement,
                       );
                     } finally {
@@ -305,27 +493,58 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       ],
     );
   }
-
-  Widget _buildList() {
-    return RefreshIndicator(
-      onRefresh: _refreshAll,
-      child: ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= _items.length) {
-            return const Padding(
-              padding: EdgeInsets.zero,
-              child: Center(child: PosLoadingView()),
-            );
-          }
-          final item = _items[index];
-          return ProductListCard(item: item, onTap: () => _onTapItem(item));
-        },
+  Widget _buildHeader() {
+    return Container(
+      color: Colors.white,
+      child: SearchFilterWidget(
+        controller: searchController,
+        config: config,
       ),
     );
   }
+  Widget _buildBody() {
+    return Expanded(
+      child: RefreshIndicator(
+        onRefresh: _refreshAll,
+        child: _hasInitialLoadFinished && _hasData
+            ? ListView.builder(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
+          itemBuilder: (context, index) {
+            if (index >= _items.length) {
+              return const Center(child: PosLoadingView());
+            }
+
+            final item = _items[index];
+            return ProductListCard(
+              item: item,
+              onTap: () => _onTapItem(item),
+            );
+          },
+        )
+            : _buildEmptyOrLoading(),
+      ),
+    );
+  }
+  Widget _buildEmptyOrLoading() {
+    if (!_hasInitialLoadFinished && _isLoading) {
+      return const Center(child: PosLoadingView());
+    }
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: const [
+        SizedBox(
+          height: 600,
+          child: EmptyData(
+            icon: Icons.print_rounded,
+            title: 'Todavía no hay productos',
+            descriptionText: 'Aquí puedes verificar',
+            linkText: 'Más información',
+          ),
+        ),
+      ],
+    );
+  }
 }
-
-
