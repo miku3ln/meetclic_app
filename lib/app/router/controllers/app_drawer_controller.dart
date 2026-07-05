@@ -32,7 +32,16 @@ class AppDrawerController extends ChangeNotifier {
 
     if (route == null) return;
 
-    setSelectedByRoute(route);
+    // 🔥 SIEMPRE sincroniza correctamente
+    final match = items.where((i) => i.routeName == route).toList();
+
+    if (match.isEmpty) {
+      // fallback seguro → SALES
+      _selectedId = AppRoutes.salesKey;
+    } else {
+      _selectedId = match.first.id;
+    }
+    notifyListeners();
   }
   AppDrawerController({
     required this.app,

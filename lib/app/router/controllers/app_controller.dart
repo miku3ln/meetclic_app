@@ -34,15 +34,20 @@ class AppController extends ChangeNotifier {
   void goToModule(String routeName) {
     final nav = navigatorKey.currentState;
     if (nav == null) return;
+    // 🔥 1. si es la misma ruta → NO HACER NADA
+    if (_currentRouteName == routeName) return;
+
     _currentRouteName = routeName;
+    // 🔥 2. regla especial: SALES nunca se empuja
+    if (routeName == AppRoutes.sales) {
+      nav.popUntil((route) => route.settings.name == AppRoutes.sales);
+      return;
+    }
+    notifyListeners();
+    // 🔥 3. resto de módulos → reemplazan
     nav.pushNamedAndRemoveUntil(
       routeName,
-          (route) {
-        final name = route.settings.name;
-
-        // 👇 ESTA ES LA CLAVE
-        return name == AppRoutes.sales || route.isFirst;
-      },
+          (route) => route.settings.name == AppRoutes.sales,
     );
 
     notifyListeners();
@@ -170,7 +175,9 @@ class AppController extends ChangeNotifier {
  // String? get currentRouteName => _currentRouteName;
   void setCurrentRoute(String routeName) {
     _currentRouteName = routeName;
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      notifyListeners();
+    });
   }
   void goToNamedIfNotCurrent(String routeName, {Object? arguments}) {
     if (_currentRouteName == routeName) return;
@@ -211,17 +218,18 @@ class AppController extends ChangeNotifier {
     nav.pushNamed(routeName, arguments: arguments);
   }
 }
-
 class AppRouteObserver extends NavigatorObserver {
   final AppController app;
 
   AppRouteObserver(this.app);
 
-  void _update(Route route) {
-    final name = route.settings.name;
-    if (name != null) {
+  void _update(Route? route) {
+    final name = route?.settings.name;
+    if (name == null) return;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       app.setCurrentRoute(name);
-    }
+    });
   }
 
   @override
@@ -231,11 +239,12 @@ class AppRouteObserver extends NavigatorObserver {
 
   @override
   void didReplace({Route? newRoute, Route? oldRoute}) {
-    if (newRoute != null) _update(newRoute);
+    _update(newRoute);
   }
 
   @override
   void didPop(Route route, Route? previousRoute) {
-    if (previousRoute != null) _update(previousRoute);
+    // 🔥 ESTA ES LA CLAVE REAL
+    _update(previousRoute);
   }
 }

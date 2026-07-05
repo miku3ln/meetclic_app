@@ -38,6 +38,10 @@ class MeetclicMaterialApp extends StatelessWidget {
      // routes: AppRouter.routes(),
       onGenerateRoute: AppRouter.onGenerateRoute,
       home: const AppGate(),
+      navigatorObservers: [
+        AppRouteObserver(app),
+      ],
+
     );
   }
 }
