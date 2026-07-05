@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../../app/di/app_providers.dart';
-import '../../domain/models/user_data_login.dart';
-import '../../domain/services/session_service.dart';
-import '../models/app_config.dart';
-import '../../app/router/app_router.dart';
+
+import '../../../domain/models/user_data_login.dart';
+import '../../../domain/services/session_service.dart';
+import '../../../shared/models/app_config.dart';
+import '../../di/app_providers.dart';
+import '../app_router.dart';
 import 'app_drawer_controller.dart';
 
 /// 🔒 IMPORTANTE:
@@ -30,6 +31,22 @@ class DrawerItemDef {
 }
 
 class AppController extends ChangeNotifier {
+  void goToModule(String routeName) {
+    final nav = navigatorKey.currentState;
+    if (nav == null) return;
+    _currentRouteName = routeName;
+    nav.pushNamedAndRemoveUntil(
+      routeName,
+          (route) {
+        final name = route.settings.name;
+
+        // 👇 ESTA ES LA CLAVE
+        return name == AppRoutes.sales || route.isFirst;
+      },
+    );
+
+    notifyListeners();
+  }
   String? get currentRouteName => _currentRouteName;
 
   bool isCurrentRoute(String route) {
@@ -192,5 +209,33 @@ class AppController extends ChangeNotifier {
     _currentRouteName = routeName;
     notifyListeners();
     nav.pushNamed(routeName, arguments: arguments);
+  }
+}
+
+class AppRouteObserver extends NavigatorObserver {
+  final AppController app;
+
+  AppRouteObserver(this.app);
+
+  void _update(Route route) {
+    final name = route.settings.name;
+    if (name != null) {
+      app.setCurrentRoute(name);
+    }
+  }
+
+  @override
+  void didPush(Route route, Route? previousRoute) {
+    _update(route);
+  }
+
+  @override
+  void didReplace({Route? newRoute, Route? oldRoute}) {
+    if (newRoute != null) _update(newRoute);
+  }
+
+  @override
+  void didPop(Route route, Route? previousRoute) {
+    if (previousRoute != null) _update(previousRoute);
   }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
-import '../../../../../shared/controllers/app_controller.dart';
+import '../../../../../app/router/controllers/app_controller.dart';
+
 import '../../../../widgets/loading_manager.dart';
 import '../atoms/pos_menu_carousel.dart';
 import '../layouts/pos_main_controller.dart';

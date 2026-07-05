@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
-import '../../../../../shared/controllers/app_controller.dart';
+
+
+import '../../../../../app/router/controllers/app_controller.dart';
 import '../../theme/pos_ticket_styles.dart';
 import '../layouts/pos_main_controller.dart';
 import '../molecules/pos_ticket_header.dart';

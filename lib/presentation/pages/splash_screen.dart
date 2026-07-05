@@ -5,8 +5,9 @@ import 'package:meetclic_app/data/data-sources/module_api_fake.dart';
 import 'package:meetclic_app/presentation/pages/home/home_page.dart';
 import 'package:meetclic_app/presentation/pages/point_sale_page.dart';
 
-import '../../shared/controllers/app_controller.dart';
-import '../../shared/controllers/app_drawer_controller.dart';
+import '../../../../../app/router/controllers/app_controller.dart';
+import '../../../../../app/router/controllers/app_drawer_controller.dart';
+
 import '../../app/router/app_router.dart';
 import '../widgets/loading_manager.dart';
 

@@ -12,10 +12,7 @@ import 'package:meetclic_app/shared/localization/app_localizations.dart';
 import 'package:meetclic_app/shared/models/app_config.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 import 'package:meetclic_app/shared/utils/deep_link_type.dart';
-
-
-import '../../../../../../shared/controllers/app_controller.dart';
-
+import '../../../../../../app/router/controllers/app_controller.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../models/home_tab_definition.dart';
 import '../../models/home_tab_id.dart';

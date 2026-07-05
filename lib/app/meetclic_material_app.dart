@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:meetclic_app/app/router/controllers/app_controller.dart';
 import 'package:provider/provider.dart';
-
-import '../shared/controllers/app_controller.dart';
 import '../shared/models/app_config.dart';
 import '../shared/theme/configuration/app_theme_controller.dart';
 import '../shared/themes/app_theme.dart';

@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/app/router/controllers/app_controller.dart';
 import 'package:provider/provider.dart';
-
 import '../presentation/auth/login_page.dart';
-
 import '../presentation/widgets/loading_manager.dart';
-import '../shared/controllers/app_controller.dart';
 import '../presentation/pages/splash_screen.dart';
 
 import '../domain/services/session_service.dart';

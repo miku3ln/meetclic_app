@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../domain/services/session_service.dart';
-import '../../../../../../shared/controllers/app_controller.dart';
+
+import '/../../../../app/router/controllers/app_controller.dart';
 
 import '../../../models/sections_data.dart';
 import '../../../shared/styles.dart';

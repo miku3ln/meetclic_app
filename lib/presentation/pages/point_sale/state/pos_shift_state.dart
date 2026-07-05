@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../shared/controllers/app_controller.dart';
+import '../../../../../app/router/controllers/app_controller.dart';
+
 class PosShiftSession {
   final int userId;
   final double openingAmount;

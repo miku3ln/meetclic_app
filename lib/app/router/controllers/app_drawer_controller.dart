@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../app/router/app_router.dart';
+import '../app_router.dart';
 import 'app_controller.dart';
 
 enum DrawerNavigationMode { replace, push, restoreIfExists }
@@ -66,7 +66,7 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.receipt_long_rounded,
       routeName: AppRoutes.receipts,
       requireLogin: true,
-      navigationMode: DrawerNavigationMode.push,
+        navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: AppRoutes.shiftKey,
@@ -74,7 +74,7 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.access_time_rounded,
       routeName: AppRoutes.shift,
       requireLogin: true,
-      navigationMode: DrawerNavigationMode.push,
+        navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: AppRoutes.itemsKey,
@@ -82,7 +82,7 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.format_list_bulleted_rounded,
       routeName: AppRoutes.items,
       requireLogin: true,
-      navigationMode: DrawerNavigationMode.push,
+        navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: AppRoutes.loyaltyKey,
@@ -90,7 +90,7 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.favorite,
       routeName: AppRoutes.loyalty,
       requireLogin: true,
-      navigationMode: DrawerNavigationMode.push,
+        navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: AppRoutes.settingsKey,
@@ -98,7 +98,7 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.settings,
       requireLogin: true,
       routeName: AppRoutes.settings,
-      navigationMode: DrawerNavigationMode.push,
+        navigationMode: DrawerNavigationMode.replace,
     ),
   ];
 
@@ -124,19 +124,7 @@ class AppDrawerController extends ChangeNotifier {
     }
     Navigator.of(context).pop();
     Future.microtask(() {
-      switch (item.navigationMode) {
-        case DrawerNavigationMode.replace:
-          app.goToNamedReplacement(item.routeName);
-          break;
-
-        case DrawerNavigationMode.push:
-          app.goToNamed(item.routeName);
-          break;
-
-        case DrawerNavigationMode.restoreIfExists:
-          app.restoreRouteOrPush(item.routeName);
-          break;
-      }
+      app.goToModule(item.routeName);
     });
   }
 

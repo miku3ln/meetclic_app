@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:meetclic_app/shared/providers_session.dart';
 import '../../../../../infrastructure/config/server_config.dart';
-import '../../../../../shared/controllers/app_controller.dart';
+import '../../../../../app/router/controllers/app_controller.dart';
+
 import '../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../repositories/config_repository.dart';
 import '../../shared/utils.dart';

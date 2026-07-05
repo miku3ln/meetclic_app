@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
-import '../../../../../shared/controllers/app_controller.dart';
+import '../../../../../app/router/controllers/app_controller.dart';
+
 import '../../../../shared/responsive/device_gesture_observer.dart';
 import '../../repositories/config_repository.dart';
 import '../../services/pos_labels_service.dart';

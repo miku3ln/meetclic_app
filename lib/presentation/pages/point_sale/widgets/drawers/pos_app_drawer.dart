@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../domain/services/session_service.dart';
-import '../../../../../shared/controllers/app_controller.dart';
-import '../../../../../shared/controllers/app_drawer_controller.dart';
+import '../../../../../app/router/controllers/app_controller.dart';
+import '../../../../../app/router/controllers/app_drawer_controller.dart';
 class PosAppDrawer extends StatelessWidget {
 
   const PosAppDrawer({super.key});

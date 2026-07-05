@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../../../shared/controllers/app_controller.dart';
+import '/../../../../app/router/controllers/app_controller.dart';
+
 import '../../../repositories/config_repository.dart';
 import '../../../services/config_api_service.dart';
 import '../../dialogs/pos_open_shift_dialog.dart';

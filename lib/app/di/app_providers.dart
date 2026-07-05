@@ -1,12 +1,12 @@
 import 'package:provider/provider.dart';
 
-import '../../shared/controllers/app_controller.dart';
-import '../../shared/controllers/app_drawer_controller.dart';
 import '../../shared/models/app_config.dart';
 import '../../domain/services/session_service.dart';
 import 'package:provider/single_child_widget.dart';
 
 import '../../shared/theme/configuration/app_theme_controller.dart';
+import '../router/controllers/app_controller.dart';
+import '../router/controllers/app_drawer_controller.dart';
 enum AppMode {
   guestHome,        // allowGuest + home
   requireLoginPos,  // requireLogin + pointSale

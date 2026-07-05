@@ -7,7 +7,8 @@ import 'package:meetclic_app/presentation/pages/point_sale/widgets/drawers/pos_a
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/models/pos_product_item.dart';
-import '../../shared/controllers/app_controller.dart';
+import '../../../../../app/router/controllers/app_controller.dart';
+
 import '../../shared/utils/util_common.dart';
 import '../shared/responsive/device_gesture_observer.dart';
 
