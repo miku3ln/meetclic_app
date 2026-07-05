@@ -27,8 +27,23 @@ class AppDrawerItem {
 
 class AppDrawerController extends ChangeNotifier {
   final AppController app;
+  void _syncRoute() {
+    final route = app.currentRouteName;
 
-  AppDrawerController({required this.app});
+    if (route == null) return;
+
+    setSelectedByRoute(route);
+  }
+  AppDrawerController({
+    required this.app,
+  }) {
+    app.addListener(_syncRoute);
+  }
+  @override
+  void dispose() {
+    app.removeListener(_syncRoute);
+    super.dispose();
+  }
 
   String _selectedId = AppRoutes.salesKey;
 
@@ -107,8 +122,6 @@ class AppDrawerController extends ChangeNotifier {
       Navigator.of(context).pop();
       return;
     }
-    _selectedId = item.id;
-    notifyListeners();
     Navigator.of(context).pop();
     Future.microtask(() {
       switch (item.navigationMode) {

@@ -44,7 +44,7 @@ class PosAppDrawer extends StatelessWidget {
               ListTile(
                 leading: Icon(item.icon),
                 title: Text(item.title),
-                selected: drawer.selectedId == item.id,
+                selected: app.isCurrentDrawerItem(item),
                 onTap: () => drawer.onItemTap(context,item),
               ),
 

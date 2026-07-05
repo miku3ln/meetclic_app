@@ -5,6 +5,7 @@ import '../../domain/models/user_data_login.dart';
 import '../../domain/services/session_service.dart';
 import '../models/app_config.dart';
 import '../../app/router/app_router.dart';
+import 'app_drawer_controller.dart';
 
 /// 🔒 IMPORTANTE:
 /// - Por defecto NO obliga login (igual que tu app actual)
@@ -29,7 +30,15 @@ class DrawerItemDef {
 }
 
 class AppController extends ChangeNotifier {
+  String? get currentRouteName => _currentRouteName;
 
+  bool isCurrentRoute(String route) {
+    return _currentRouteName == route;
+  }
+
+  bool isCurrentDrawerItem(AppDrawerItem item) {
+    return item.routeName == _currentRouteName;
+  }
   final AppConfig config;
   final SessionService session;
 
@@ -111,6 +120,7 @@ class AppController extends ChangeNotifier {
     final nav = navigatorKey.currentState;
     if (nav == null) return;
     _currentRouteName = route;
+    notifyListeners();
     nav.pushNamed(route, arguments: arguments);
   }
   /// (Opcional) si algún día necesitas limpiar sin navegar
@@ -136,10 +146,11 @@ class AppController extends ChangeNotifier {
     final nav = navigatorKey.currentState;
     if (nav == null) return;
     _currentRouteName = routeName;
+    notifyListeners();
     nav.pushReplacementNamed(routeName, arguments: arguments);
   }
   String? _currentRouteName=AppRoutes.sales;
-  String? get currentRouteName => _currentRouteName;
+ // String? get currentRouteName => _currentRouteName;
   void setCurrentRoute(String routeName) {
     _currentRouteName = routeName;
     notifyListeners();
@@ -179,6 +190,7 @@ class AppController extends ChangeNotifier {
     }
 
     _currentRouteName = routeName;
+    notifyListeners();
     nav.pushNamed(routeName, arguments: arguments);
   }
 }
