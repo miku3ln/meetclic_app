@@ -49,9 +49,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   bool _isLoading = false;
   bool _hasInitialLoadFinished = false;
   String _searchCode = '';
-
   bool get _hasData => _items.isNotEmpty;
-
   bool get _hasMore => _items.length < _total;
 
   /// aquí decides el total simulado
@@ -64,23 +62,15 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       switch (event.type) {
         case SearchFilterEvents.searchChanged:
           debugPrint(event.data);
-
           break;
-
         case SearchFilterEvents.searchSubmitted:
           final result = event.data as SearchFilterResult;
-
           _searchCode = result.search;
-
           _refreshAll();
-
           break;
-
         case SearchFilterEvents.filterChanged:
           debugPrint(event.data);
-
           break;
-
         case SearchFilterEvents.filterApplied:
           final result = event.data as SearchFilterResult;
           debugPrint(result.toMap().toString());
@@ -92,14 +82,12 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       }
     });
   }
-
   @override
   void initState() {
     super.initState();
     _api = PosItemsManagementApi(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
-
     _listenSearchEvents();//TODO SEARCH
   }
 
