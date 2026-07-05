@@ -106,58 +106,176 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     hint: "Buscar artículos",
     drawerTitle: "Filtros",
     fields: [
-      FilterField(
+
+      //-----------------------------------------
+      // TEXT
+      //-----------------------------------------
+
+      FilterField<String>(
+        id: "code",
+        label: "Código",
+        hint: "Ingrese un código",
+        type: FilterFieldType.text,
+      ),
+
+      //-----------------------------------------
+      // DROPDOWN
+      //-----------------------------------------
+
+      FilterField<String>(
         id: "status",
         label: "Estado",
-
+        hint: "Seleccione un estado",
         type: FilterFieldType.dropdown,
-
         items: [
 
           FilterItem(
             id: "1",
             label: "Activo",
             value: "ACTIVE",
+            icon: Icons.check_circle_rounded,
           ),
 
           FilterItem(
             id: "2",
             label: "Inactivo",
             value: "INACTIVE",
+            icon: Icons.cancel_rounded,
           ),
 
         ],
-
       ),
 
-      FilterField(
+      //-----------------------------------------
+      // MULTI SELECT
+      //-----------------------------------------
 
+      FilterField<int>(
         id: "category",
-
-        label: "Categoría",
-
-        type: FilterFieldType.dropdown,
-
+        label: "Categorías",
+        type: FilterFieldType.multiSelect,
+        multiple: true,
         items: [
 
           FilterItem(
             id: "1",
             label: "Menú",
             value: 1,
+            icon: Icons.restaurant_menu_rounded,
           ),
 
           FilterItem(
             id: "2",
             label: "Materia Prima",
             value: 2,
+            icon: Icons.inventory_2_rounded,
+          ),
+
+          FilterItem(
+            id: "3",
+            label: "Bebidas",
+            value: 3,
+            icon: Icons.local_bar_rounded,
           ),
 
         ],
+      ),
 
+      //-----------------------------------------
+      // CHECKBOX
+      //-----------------------------------------
+
+      FilterField<bool>(
+        id: "favorite",
+        label: "Solo favoritos",
+        type: FilterFieldType.checkbox,
+        defaultValue: false,
+      ),
+
+      //-----------------------------------------
+      // RADIO
+      //-----------------------------------------
+
+      FilterField<String>(
+        id: "stock",
+        label: "Disponibilidad",
+        type: FilterFieldType.radio,
+        items: [
+
+          FilterItem(
+            id: "1",
+            label: "Con Stock",
+            value: "STOCK",
+          ),
+
+          FilterItem(
+            id: "2",
+            label: "Sin Stock",
+            value: "EMPTY",
+          ),
+
+        ],
+      ),
+
+      //-----------------------------------------
+      // SWITCH
+      //-----------------------------------------
+
+      FilterField<bool>(
+        id: "enabled",
+        label: "Mostrar solo activos",
+        type: FilterFieldType.switchField,
+        defaultValue: true,
+      ),
+
+      //-----------------------------------------
+      // DATE
+      //-----------------------------------------
+
+      FilterField<DateTime>(
+        id: "createdAt",
+        label: "Fecha creación",
+        hint: "Seleccione una fecha",
+        type: FilterFieldType.date,
+      ),
+
+      //-----------------------------------------
+      // DATE RANGE
+      //-----------------------------------------
+
+      FilterField<DateTime>(
+        id: "period",
+        label: "Periodo",
+        hint: "Seleccione un rango",
+        type: FilterFieldType.dateRange,
+      ),
+
+      //-----------------------------------------
+      // NUMBER
+      //-----------------------------------------
+
+      FilterField<int>(
+        id: "quantity",
+        label: "Cantidad mínima",
+        hint: "0",
+        type: FilterFieldType.number,
+        minValue: 0,
+        maxValue: 1000,
+      ),
+
+      //-----------------------------------------
+      // NUMBER RANGE
+      //-----------------------------------------
+
+      FilterField<double>(
+        id: "price",
+        label: "Rango de precio",
+        type: FilterFieldType.numberRange,
+        minValue: 0,
+        maxValue: 500,
       ),
 
     ],
-
   );
   Future<void> _loadInitial() async {
     if (_isLoading) return;
@@ -483,6 +601,12 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
   Widget _buildHeader() {
     return Container(
+      padding: const EdgeInsets.fromLTRB(
+        20, // izquierda
+        16, // arriba
+        20, // derecha
+        12, // abajo
+      ),
       color: Colors.white,
       child: SearchFilterWidget(
         controller: searchController,

@@ -14,7 +14,6 @@ enum FilterFieldType {
   number,
   numberRange,
 }
-
 class FilterField<T> {
   final String id;
 
@@ -32,11 +31,28 @@ class FilterField<T> {
 
   final bool required;
 
+  /// Permite seleccionar varios valores
   final bool multiple;
 
-  final dynamic defaultValue;
+  /// Valor inicial
+  final T? defaultValue;
 
+  /// Lista de opciones (Dropdown, Radio, MultiSelect...)
   final List<FilterItem<T>> items;
+
+  /// Placeholder del campo
+  final String? placeholder;
+
+  /// Texto de ayuda
+  final String? helperText;
+
+  /// Para DatePicker, Number, etc.
+  final T? minValue;
+
+  final T? maxValue;
+
+  /// Si es obligatorio
+  final String? validationMessage;
 
   const FilterField({
     required this.id,
@@ -50,6 +66,11 @@ class FilterField<T> {
     this.multiple = false,
     this.defaultValue,
     this.items = const [],
+    this.placeholder,
+    this.helperText,
+    this.minValue,
+    this.maxValue,
+    this.validationMessage,
   });
 
   FilterField<T> copyWith({
@@ -62,8 +83,13 @@ class FilterField<T> {
     bool? enabled,
     bool? required,
     bool? multiple,
-    dynamic defaultValue,
+    T? defaultValue,
     List<FilterItem<T>>? items,
+    String? placeholder,
+    String? helperText,
+    T? minValue,
+    T? maxValue,
+    String? validationMessage,
   }) {
     return FilterField<T>(
       id: id ?? this.id,
@@ -77,6 +103,12 @@ class FilterField<T> {
       multiple: multiple ?? this.multiple,
       defaultValue: defaultValue ?? this.defaultValue,
       items: items ?? this.items,
+      placeholder: placeholder ?? this.placeholder,
+      helperText: helperText ?? this.helperText,
+      minValue: minValue ?? this.minValue,
+      maxValue: maxValue ?? this.maxValue,
+      validationMessage:
+      validationMessage ?? this.validationMessage,
     );
   }
 }
