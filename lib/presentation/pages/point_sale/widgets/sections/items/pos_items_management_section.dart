@@ -69,7 +69,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           _refreshAll();
           break;
         case SearchFilterEvents.filterChanged:
-          debugPrint(event.data);
+          debugPrint("filterchanged");
           break;
         case SearchFilterEvents.filterApplied:
           final result = event.data as SearchFilterResult;

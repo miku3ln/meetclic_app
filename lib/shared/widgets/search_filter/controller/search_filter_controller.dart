@@ -9,6 +9,36 @@ import 'search_filter_events.dart';
 
 class SearchFilterController {
   SearchFilterController();
+  void setValue<T>(
+      String fieldId,
+      T? value,
+      String displayValue,
+      ) {
+    final index = _filters.indexWhere((e) => e.fieldId == fieldId);
+
+    final newValue = FilterValue<T>(
+      fieldId: fieldId,
+      value: value,
+      displayValue: displayValue,
+    );
+
+    if (index == -1) {
+      _filters.add(newValue);
+    } else {
+      _filters[index] = newValue;
+    }
+
+    emit(SearchFilterEvents.filterChanged, newValue);
+  }
+
+  T? getValue<T>(String fieldId) {
+    final filter = _filters.where((e) => e.fieldId == fieldId);
+
+    if (filter.isEmpty) return null;
+
+    return filter.first.value as T?;
+  }
+
 
   //---------------------------------------------------------
   // Controllers

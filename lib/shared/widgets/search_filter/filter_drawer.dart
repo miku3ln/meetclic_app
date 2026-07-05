@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'controller/search_filter_controller.dart';
+import 'models/filter_field.dart';
 import 'models/search_filter_config.dart';
 
 
@@ -230,14 +231,38 @@ class _FilterDrawerState extends State<FilterDrawer> {
   // FACTORY
   //------------------------------------------------------
 
-  Widget _buildField(dynamic field){
+  Widget _buildField(FilterField field) {
+    switch (field.type) {
 
-    /// siguiente paso
-    /// aquí construiremos todos
-    /// los tipos de filtros.
+      case FilterFieldType.dropdown:
+        return DropdownButtonFormField(
+          value: widget.controller.getValue(field.id),
 
-    return const SizedBox();
+          items: field.items.map<DropdownMenuItem>((item) {
+            return DropdownMenuItem(
+              value: item.value,
+              child: Text(item.label),
+            );
+          }).toList(),
 
+          onChanged: (value) {
+            final selectedItem = field.items.firstWhere(
+                  (e) => e.value == value,
+            );
+
+            widget.controller.setValue(
+              field.id,
+              value,
+              selectedItem.label, // 👈 IMPORTANTE
+            );
+
+            setState(() {});
+          },
+        );
+
+      default:
+        return const SizedBox();
+    }
   }
 
 
