@@ -218,7 +218,7 @@ class FormFieldController<T> extends ChangeNotifier {
     value = newValue;
     touched = true;
     validate();
-  notifyListeners();
+
   }
 
   bool validate() {
@@ -228,6 +228,8 @@ class FormFieldController<T> extends ChangeNotifier {
   }
 
   bool get isValid => error == null;
+
+
 }
 
 abstract class BaseFormController extends ChangeNotifier {
@@ -250,6 +252,79 @@ abstract class BaseFormController extends ChangeNotifier {
   }
   T field<T>(String key) {
     return fields[key] as T;
+  }
+
+  /// Limpia únicamente los valores
+  void clearValues() {
+    for (final field in fields.values) {
+      if (field is FormFieldController) {
+        field.value = null;
+      }
+    }
+
+    notifyListeners();
+  }
+
+  /// Limpia únicamente los errores
+  void clearErrors() {
+    for (final field in fields.values) {
+      if (field is FormFieldController) {
+        field.error = null;
+      }
+    }
+
+    notifyListeners();
+  }
+
+  /// Limpia únicamente touched
+  void clearTouched() {
+    for (final field in fields.values) {
+      if (field is FormFieldController) {
+        field.touched = false;
+      }
+    }
+
+    notifyListeners();
+  }
+
+  bool get areAllFieldsTouched {
+    for (final field in fields.values) {
+      if (field is FormFieldController && !field.touched) {
+        return false;
+      }
+    }
+    return true;
+  }
+  /// Reinicia completamente el formulario
+  void resetForm() {
+    for (final field in fields.values) {
+      if (field is FormFieldController) {
+        field.value = null;
+        field.error = null;
+        field.touched = false;
+      }
+    }
+
+    notifyListeners();
+  }
+  ValidationResult validateFields() {
+    final success = validate();
+
+    final errors = <String, String?>{};
+
+    fields.forEach((key, field) {
+      if (field is FormFieldController) {
+        errors[key] = field.error;
+      }
+    });
+
+    return ValidationResult(
+      success: success,
+      errors: errors,
+      message: success
+          ? "Formulario válido"
+          : "Formulario inválido",
+    );
   }
 }
 void _setTextField(

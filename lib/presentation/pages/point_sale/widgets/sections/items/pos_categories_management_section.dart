@@ -88,6 +88,7 @@ class _PosCategoriesManagementSectionState
 
 
   }
+  //GRID
   Future<void> _loadInitial() async {
     if (_isLoading) return;
 
@@ -111,7 +112,7 @@ class _PosCategoriesManagementSectionState
     });
     _listenModalEvents(controller);
   }
-
+//GRID
   Future<void> _loadMore() async {
     if (_isLoading || !_hasMore) return;
     setState(() {
@@ -132,7 +133,7 @@ class _PosCategoriesManagementSectionState
       _isLoading = false;
     });
   }
-
+//GRID
   Future<void> _refreshAll() async {
     if (_isLoading) return;
     _api = CategoryListRepository(total: _simulatedTotal);
@@ -146,7 +147,7 @@ class _PosCategoriesManagementSectionState
 
     await _loadInitial();
   }
-
+//GRID
   void _onScroll() {
     if (!_scrollController.hasClients) return;
 
@@ -184,7 +185,7 @@ class _PosCategoriesManagementSectionState
       _isOpeningProduct = true;
     });
     try {
-      controller.resetAllForm();
+
       await controller.init();
       final draft = ProductCategoryMapper.fromMap(item.data);
       controller.loadAndValidate(draft);
@@ -233,9 +234,7 @@ class _PosCategoriesManagementSectionState
               });
 
               try {
-                controller.resetAllForm();
                 await controller.init();
-
                 if (!mounted) return;
                 showManagementForm(
                   barrierDismissible: false,

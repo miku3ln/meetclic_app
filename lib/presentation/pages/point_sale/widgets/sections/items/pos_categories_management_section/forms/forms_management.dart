@@ -24,9 +24,7 @@ Future<void> showManagementForm({
   int managementId = -1,
 
 }) async {
-
   controller.setManagerInitProcess(typeManagement, managementId);
-
   final content = AnimatedBuilder(
     animation: controller,
     builder: (_, __) {
@@ -40,14 +38,12 @@ Future<void> showManagementForm({
             ? () async {
           if (controller.validateForm().success) {
             controller.setLoading(true);
-            final resultSave = await controller.saveCategory(
+            final resultSave = await controller.saveRegister(
               typeManagement,
             );
-
             if (resultSave.success) {
               bool allowClose = true;
               AlertService.success(context, message: resultSave.message);
-
               var allowReload = true;
               controller.setAllowReloadData(allowReload);
               controller.emit(ProductModalEvents.save, {
@@ -97,7 +93,6 @@ Widget _buildManagerForm(
     child: Column(
       children: [
         AppSpacing.spaceBetweenSections,
-
         PsSectionSplit(
           leftFlex: 7,
           rightFlex: 3,

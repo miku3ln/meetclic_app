@@ -1,5 +1,3 @@
-
-
 import 'dart:async';
 import 'dart:io';
 
@@ -7,27 +5,34 @@ import '../../../../../../../../domain/services/session_service.dart';
 import '../../../../../../../../shared/models/api_response.dart';
 import '../../../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../services/pos_labels_service.dart';
-import '../../../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../../../molecules/ps_image_picker.dart';
 import '../models/models_management.dart';
 import '../repository/repository_management.dart';
-
 
 class CategoryModalController extends BaseFormController {
   CrudType mode = CrudType.create;
   bool submitted = false;
   int categoryId = 0;
-  final PosLabelsService labels = const PosLabelsService();
-  final _eventController =
-  StreamController<ManagementModalEvent>.broadcast();
+  bool allowReloadData = false;
+  Object? image;
+  bool imageTouched = false;
+  String? imageError;
+  bool _isLoading = false;
 
-  Stream<ManagementModalEvent> get eventsMainProcess =>
-      _eventController.stream;
+  bool get isLoading => _isLoading;
+  bool _allowActions = true;
+
+  final PosLabelsService labels = const PosLabelsService();
+  final _eventController = StreamController<ManagementModalEvent>.broadcast();
+
+  Stream<ManagementModalEvent> get eventsMainProcess => _eventController.stream;
 
   void emit(String type, [dynamic data]) {
     _eventController.add(ManagementModalEvent(type, data));
   }
-  void initField() {
+
+  void initFields() {
+    fields.clear();
     fields.addAll({
       'value': FormFieldController<String>(
         label: labels.categoryNameLabel,
@@ -45,9 +50,7 @@ class CategoryModalController extends BaseFormController {
       ),
       'description': FormFieldController<String>(
         label: labels.categoryDescriptionLabel,
-        validators: [
-          ValidatorsUtil.required(labels.categoryDescriptionLabel),
-        ],
+        validators: [ValidatorsUtil.required(labels.categoryDescriptionLabel)],
       ),
 
       'code': FormFieldController<String>(
@@ -61,95 +64,68 @@ class CategoryModalController extends BaseFormController {
   }
 
   CategoryModalController() {
-    initField();
+    initFields();
   }
 
   void loadAndValidate(ProductCategoryDraft draft) {
     load(draft);
   }
-  bool _allowActions = true;
+
   void resetProcess() {
     _allowActions = true;
     notifyListeners();
   }
+
   void load(ProductCategoryDraft draft) async {
     mode = CrudType.update;
     nameField.value = draft.name;
     subtitleField.value = draft.name;
-
     descriptionField.value = draft.name;
     codeField.value = draft.name;
     categoryId = draft.id!;
     image = draft.image;
-    nameField.touched = false;
-    subtitleField.touched = false;
-    descriptionField.touched = false;
-    codeField.touched = false;
-    imageTouched = false;
-    nameField.error = null;
-    subtitleField.error = null;
-    descriptionField.error = null;
-    codeField.error = null;
-    imageError = null;
     validate();
     notifyListeners();
   }
+
   void resetAllForm() {
-    initField();
-    resetValues();
-    _resetTouched();
-    _resetErrors();
+    initFields();
+    _resetValuesManagement();
   }
-  void _resetErrors() {
 
-    nameField.error = null;
-    subtitleField.error = null;
-
-    descriptionField.error = null;
-    codeField.error = null;
-
-    imageError = null;
-
-  }
-  void _resetTouched() {
-    nameField.touched = false;
-    subtitleField.touched = false;
-    descriptionField.touched = false;
-    codeField.touched = false;
-    imageTouched = false;
-  }
-  void resetValues() {
+  void _resetValuesManagement() {
+    resetForm();
     image = null;
-    nameField.value = null;
-    subtitleField.value = null;
-    descriptionField.value = null;
-    codeField.value = null;
     categoryId = 0;
   }
+
   Future<void> init() async {
+    resetAllForm();
     notifyListeners();
   }
+
   FormFieldController<String> get nameField =>
       field<FormFieldController<String>>('value');
+
   FormFieldController<String> get subtitleField =>
       field<FormFieldController<String>>('subtitle');
-
 
   FormFieldController<String> get descriptionField =>
       field<FormFieldController<String>>('description');
 
   FormFieldController<String> get codeField =>
       field<FormFieldController<String>>('code');
+
   String get name => nameField.value ?? '';
+
   String get subtitle => subtitleField.value ?? '';
-
-
 
   String? get description => descriptionField.value;
 
   String? get code => codeField.value;
 
   String? get nameError => nameField.error;
+
   String? get subtitleError => subtitleField.error;
 
   String? get descriptionError => descriptionField.error;
@@ -157,14 +133,35 @@ class CategoryModalController extends BaseFormController {
   String? get codeError => codeField.error;
 
   bool get nameTouched => nameField.touched;
+
   bool get subtitleTouched => subtitleField.touched;
 
   bool get descriptionTouched => descriptionField.touched;
 
   bool get codeTouched => codeField.touched;
 
-  Map<String, dynamic> buildPayload(CrudType type) {
+  String get nameLabel => labels.categoryNameLabel;
 
+  String get subtitleLabel => labels.categorySubtitleLabel;
+
+  String get descriptionLabel => labels.categoryDescriptionLabel;
+
+  String get codeLabel => labels.categoryCodeLabel;
+
+  String get imageLabel => labels.categoryImageLabel;
+
+  String get titleCardInformation => labels.categoryTitleCardInformation;
+  CrudType typeManagementRegister = CrudType.create;
+  int idManagementRow = -1;
+  String titleManagement = "";
+  String get imageLabelRequired =>"Imagen requerida";
+  String get formLabelValid =>"Formulario inválido";
+  String get formLabelInValid =>"Formulario válido";
+  String get titleMainCreate =>  "Crear Categoria";
+  String get titleMainUpdate =>  "Actualizar Categoria";
+
+
+  Map<String, dynamic> buildPayload(CrudType type) {
     final currentSession = SessionService().currentSession;
     final businessId = SessionService().businessId;
     final productCategory = {
@@ -177,19 +174,12 @@ class CategoryModalController extends BaseFormController {
       "user_id": currentSession?.userId,
     };
 
-    if(type == CrudType.update){
+    if (type == CrudType.update) {
       productCategory["id"] = categoryId;
     }
 
-    return {
-      "product_category": productCategory
-    };
+    return {"product_category": productCategory};
   }
-  Object? image;
-
-  bool imageTouched = false;
-
-  String? imageError;
 
   void setImage(File file) {
     image = file;
@@ -201,17 +191,20 @@ class CategoryModalController extends BaseFormController {
   void removeImage() {
     image = null;
     imageTouched = true;
-    imageError = "Imagen requerida";
+    imageError = imageLabelRequired;
     notifyListeners();
   }
+
   void setName(String value) {
     nameField.setValue(value);
     notifyListeners();
   }
+
   void setSubtitle(String value) {
-   subtitleField.setValue(value);
+    subtitleField.setValue(value);
     notifyListeners();
   }
+
   void setDescription(String value) {
     descriptionField.setValue(value);
     notifyListeners();
@@ -221,37 +214,25 @@ class CategoryModalController extends BaseFormController {
     codeField.setValue(value);
     notifyListeners();
   }
+
   ValidationResult validateForm() {
     submitted = true;
-
-    super.validate();
-
-    imageError = image == null
-        ? "Imagen requerida"
-        : null;
-
+    final resultFields = validateFields();
+    imageError = image == null ? imageLabelRequired : null;
     final errors = {
-      'value': nameError,
-      'description': descriptionError,
-      'code': codeError,
+      ...resultFields.errors,
       'image': imageError,
     };
 
     final hasErrors = errors.values.any((e) => e != null);
-
     notifyListeners();
-
     return ValidationResult(
       success: !hasErrors,
       errors: errors,
-      message: hasErrors
-          ? "Formulario inválido"
-          : "Formulario válido",
+      message: hasErrors ? formLabelInValid : formLabelValid,
     );
   }
-  bool _isLoading = false;
 
-  bool get isLoading => _isLoading;
   void setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
@@ -259,87 +240,48 @@ class CategoryModalController extends BaseFormController {
 
   bool get canSubmit {
     if (mode == CrudType.update) {
-      return validateForm().success;
+      return isValid && imageError == null;
     }
 
-    return isFormValid &&
-        nameTouched &&
-        subtitleTouched &&
-        descriptionTouched &&
-        codeTouched &&
+    return isValid &&
+        areAllFieldsTouched &&
         imageTouched;
   }
 
-  bool get isFormValid {
-    return [
-      nameError,
-      subtitleError,
-      descriptionError,
-      codeError,
-      imageError,
-    ].every((e) => e == null);
-  }
-  bool allowReloadData = false;
+  bool get isFormValid  =>
+      isValid && imageError == null;
 
   void setAllowReloadData(bool value) {
     allowReloadData = value;
     notifyListeners();
   }
-  Future<ApiResponse<Map<String, dynamic>>> saveCategory(
-      CrudType type) async {
 
+  Future<ApiResponse<Map<String, dynamic>>> saveRegister(CrudType type) async {
     if (!validateForm().success) {
-      throw Exception("Formulario inválido");
+      throw Exception(formLabelInValid);
     }
-
     final imageManager = ImageMapper.map(image);
-
-    final File? setImageCrud =
-    imageManager.type == ImageSourceType.file
+    final File? setImageCrud = imageManager.type == ImageSourceType.file
         ? imageManager.source as File
         : null;
-
     final payload = buildPayload(type);
-
     if (type == CrudType.create) {
       return CategoryListRepository.createCategory(
         payload,
         image: setImageCrud,
       );
     }
-
-    return CategoryListRepository.updateCategory(
-      payload,
-      image: setImageCrud,
-    );
+    return CategoryListRepository.updateCategory(payload, image: setImageCrud);
   }
-  String get nameLabel => labels.categoryNameLabel;
-  String get subtitleLabel => labels.categorySubtitleLabel;
-
-  String get descriptionLabel => labels.categoryDescriptionLabel;
-
-  String get codeLabel => labels.categoryCodeLabel;
-
-  String get imageLabel => labels.categoryImageLabel;
-
-  String get titleCardInformation =>
-      labels.categoryTitleCardInformation;
-
-
-  CrudType typeManagementRegister = CrudType.create;
-  int idManagementRow = -1;
-  String titleManagement = "";
 
   void setManagerInitProcess(CrudType typeManagement, int managementId) {
     typeManagementRegister = typeManagement;
     idManagementRow = managementId;
     if (typeManagement == CrudType.create) {
-      titleManagement = "Crear Categoria";
+      titleManagement = titleMainCreate;
     } else {
-      titleManagement = "Actualizar Categoria";
+      titleManagement =titleMainUpdate;
     }
     notifyListeners();
   }
 }
-
-
