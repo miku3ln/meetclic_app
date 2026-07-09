@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import '../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../home/modals/show_register_user.dart';
@@ -111,6 +112,7 @@ class _PosHeaderDefaultLayoutState extends State<PosHeaderDefaultLayout> {
         ? widget.controllerMain.selectedCustomer!.name
         : "";
     return AppBar(
+
       backgroundColor: colorHeader,
       elevation: 0,
       centerTitle: true,

@@ -11,10 +11,10 @@ Future<void> main() async {
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
+      statusBarIconBrightness: Brightness.light,
+      statusBarBrightness: Brightness.dark,
       systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarIconBrightness: Brightness.dark,
-      systemNavigationBarDividerColor: Colors.transparent,
+      systemNavigationBarIconBrightness: Brightness.light,
     ),
   );
   await SessionService().loadSession();

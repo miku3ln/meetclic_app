@@ -60,6 +60,7 @@ class CategoryModalController extends BaseFormController {
           ValidatorsUtil.alphanumeric(),
         ],
       ),
+
     });
   }
 

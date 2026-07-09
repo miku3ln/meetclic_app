@@ -81,11 +81,6 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
       elevation: 0,
       toolbarHeight: style.toolbarHeight,
       backgroundColor: style.bottomBackgroundColor,
-      systemOverlayStyle: SystemUiOverlayStyle(
-        statusBarColor: style.topBackgroundColor,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
-      ),
       flexibleSpace: Column(
         children: [
           Container(

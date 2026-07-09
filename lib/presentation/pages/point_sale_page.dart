@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/repositories/config_repository.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/services/config_api_service.dart';
@@ -9,6 +10,7 @@ import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/table
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/models/pos_product_item.dart';
 import '../../../../../app/router/controllers/app_controller.dart';
 
+import '../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../shared/utils/util_common.dart';
 import '../shared/responsive/device_gesture_observer.dart';
 
@@ -29,7 +31,7 @@ class PointSaleScope extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final app = context.read<AppController>();
-
+    final colors = AppThemeTokens.of(context);
     return ChangeNotifierProvider(
       create: (_) => PosMainController(
         app: app,
@@ -61,9 +63,14 @@ class PointSalePage extends StatefulWidget {
 class _PointSalePageState extends State<PointSalePage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+
   bool _callbacksInitialized = false;
   bool _deviceInitialized = false;
+  @override
+  void initState() {
+    super.initState();
 
+  }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

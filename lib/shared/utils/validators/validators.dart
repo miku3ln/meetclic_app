@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 typedef Validator<T> = String? Function(T value);
 enum CrudType { create, update }
@@ -21,7 +23,19 @@ class ValidatorsUtil {
   /// =========================
   static Validator<String?> required([String field = "Campo"]) {
     return (value) {
-      if (value == null || value.trim().isEmpty) {
+      if (value == null) {
+        return "$field requerido";
+      }
+
+      if (value is String && value.trim().isEmpty) {
+        return "$field requerido";
+      }
+
+      if (value is Iterable && value.isEmpty) {
+        return "$field requerido";
+      }
+
+      if (value is Map && value.isEmpty) {
         return "$field requerido";
       }
       return null;
@@ -346,4 +360,15 @@ String formatInput(num? value) {
   }
 
   return value.toString();
+}
+class ImageValue {
+  final File? file;
+  final String? url;
+
+  const ImageValue({
+    this.file,
+    this.url,
+  });
+
+  bool get hasImage => file != null || (url?.isNotEmpty ?? false);
 }
