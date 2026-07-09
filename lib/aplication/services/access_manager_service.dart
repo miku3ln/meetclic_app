@@ -12,12 +12,13 @@ import 'package:meetclic_app/domain/services/session_service.dart';
 import 'package:meetclic_app/domain/usecases/login_user_usecase.dart';
 import 'package:meetclic_app/domain/usecases/register_user_usecase.dart';
 import 'package:meetclic_app/infrastructure/models/summary_model.dart';
-import 'package:meetclic_app/infrastructure/repositories/implementations/user_repository_impl.dart';
 import 'package:meetclic_app/presentation/widgets/modals/register_user_modal.dart';
 import 'package:meetclic_app/presentation/widgets/modals/show_login_user_modal.dart';
 import 'package:meetclic_app/presentation/widgets/modals/show_management_login_modal.dart';
 import 'package:meetclic_app/shared/models/api_response.dart';
 import 'package:provider/provider.dart';
+
+import '../../infrastructure/repositories/implementations/user_repository_impl.dart';
 
 final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['email', 'profile']);
 

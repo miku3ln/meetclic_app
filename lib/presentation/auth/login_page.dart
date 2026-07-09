@@ -190,7 +190,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   child: isLoading
-                      ? const PosLoadingView()
+                      ? const CircularProgressIndicator()
                       : Text(
                           appLocalizations.translate(
                             'loginManagerTitle.singInButton',

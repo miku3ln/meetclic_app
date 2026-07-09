@@ -3,7 +3,6 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
-import 'package:meetclic_app/domain/services/session_service.dart';
 import 'package:meetclic_app/infrastructure/models/summary_model.dart';
 
 import '../../infrastructure/config/server_config.dart';

@@ -1,8 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
+
 import '../../../../../../../../domain/services/session_service.dart';
 import '../../../../../../../../shared/models/api_response.dart';
+import '../../../../../../../../shared/pagination_response.dart';
 import '../../../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../services/pos_labels_service.dart';
 import '../../../../molecules/ps_image_picker.dart';
@@ -160,6 +163,13 @@ class CategoryModalController extends BaseFormController {
   String get formLabelInValid =>"Formulario válido";
   String get titleMainCreate =>  "Crear Categoria";
   String get titleMainUpdate =>  "Actualizar Categoria";
+  String get titleEmptyRegisters =>  "Todavía no hay Categorias.!";
+  String get titleEmptyDescription =>  "Aquí puedes verificar";
+  String get titleEmptyLinkText =>  "Más información";
+  String get btnSaveText =>  "Guardar";
+  String get btnUpdateText =>  "Actualizar";
+
+  String get btnCancelText =>  "Cancelar";
 
 
   Map<String, dynamic> buildPayload(CrudType type) {
@@ -284,5 +294,98 @@ class CategoryModalController extends BaseFormController {
       titleManagement =titleMainUpdate;
     }
     notifyListeners();
+  }
+}
+class CategoryListController {
+  CategoryListController({
+    required this.repository,
+    this.rowCount = 10,
+  });
+
+  CategoryListRepository repository;
+
+  final int rowCount;
+
+  int simulatedTotal = 0;
+
+  final List<GenericListItem<Map<String, dynamic>>> items = [];
+
+  int currentPage = 1;
+
+  String searchCode = '';
+
+  int total = 0;
+
+  bool isLoading = false;
+
+  bool hasInitialLoadFinished = false;
+
+  bool get hasData => items.isNotEmpty;
+
+  bool get hasMore => items.length < total;
+
+  Future<void> loadInitial() async {
+    if (isLoading) return;
+
+    isLoading = true;
+
+    final response = await repository.fetchPage(
+      current: currentPage,
+      rowCount: rowCount,
+      searchPhrase: searchCode,
+    );
+
+    simulatedTotal = response.total;
+
+    items.addAll(response.rows);
+
+    total = response.total;
+
+    hasInitialLoadFinished = true;
+
+    isLoading = false;
+  }
+
+  Future<void> loadMore() async {
+    if (isLoading || !hasMore) return;
+
+    isLoading = true;
+
+    currentPage++;
+
+    final response = await repository.fetchPage(
+      current: currentPage,
+      rowCount: rowCount,
+      searchPhrase: searchCode,
+    );
+
+    items.addAll(response.rows);
+
+    total = response.total;
+
+    isLoading = false;
+  }
+
+  Future<void> resetAll() async {
+    if (isLoading) return;
+
+    repository = CategoryListRepository(
+      total: simulatedTotal,
+    );
+
+    currentPage = 1;
+
+    items.clear();
+
+    total = 0;
+
+    hasInitialLoadFinished = false;
+
+    await loadInitial();
+  }
+
+  Future<void> search(String value) async {
+    searchCode = value;
+    await resetAll();
   }
 }
