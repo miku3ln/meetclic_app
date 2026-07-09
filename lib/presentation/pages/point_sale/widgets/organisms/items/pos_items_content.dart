@@ -49,54 +49,71 @@ class FakeCategoriesApi {
 
   const FakeCategoriesApi({required this.total});
 
-  Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
-    required int current,
-    required int rowCount,
-  }) async {
-    await Future.delayed(const Duration(milliseconds: 800));
 
-    final start = (current - 1) * rowCount;
-    final end = (start + rowCount) > total ? total : (start + rowCount);
+    Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
+      required int current,
+      required String searchPhrase,
+      required int rowCount,
+    }) async {
+      final token = SessionService().apiToken;
+      final businessId = SessionService().businessId;
+      final uriManagement =
+          '${ServerConfig.baseUrl}/pointsales/category-by-business';
+      final uri =
+      Uri.parse(uriManagement) //POS-PRODUCTS -INIT-ONE
+          .replace(
+        queryParameters: {
+          'current': current.toString(),
+          'rowCount': rowCount.toString(),
+          'searchPhrase': searchPhrase,
+          'business_id': businessId.toString(),
+        },
+      );
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer ${token!}',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200) {
+        return const PaginatedResponse<GenericListItem<Map<String, dynamic>>>(
+          current: 1,
+          rowCount: 0,
+          rows: [],
+          total: 0,
+        );
+      }
+      final data = jsonDecode(response.body);
 
-    if (start >= total) {
-      return PaginatedResponse(
-        current: current,
-        rowCount: rowCount,
-        rows: const [],
-        total: total,
+      final rows = (data['rows'] as List).map((json) {
+
+        return GenericListItem<Map<String, dynamic>>(
+          id: json['id'],
+          title: json['value'] ,
+          subtitle: json['subtitle'],
+          description: json['description'] ?? '',
+          image: json['source'],
+          data: json,
+        );
+      }).toList();
+
+      return PaginatedResponse<GenericListItem<Map<String, dynamic>>>(
+        current: data['current'] ?? current,
+        rowCount: data['rowCount'] ?? rowCount,
+        rows: rows,
+        total: data['total'] ?? 0,
       );
     }
 
-    final rows = List.generate(end - start, (index) {
-      final itemNumber = start + index + 1;
-
-      return GenericListItem<Map<String, dynamic>>(
-        id: itemNumber,
-        title: 'Categoria $itemNumber',
-        subtitle: 'Estado: activa',
-        description: 'Descripcion de categoria #$itemNumber',
-        image:
-            'https://meetclic.com/public//uploads/business/gamification/default/tinkuy-encuentro-08.jpg',
-        businessId: '1',
-        countData: 50 + (start + index),
-      );
-    });
-
-    return PaginatedResponse(
-      current: current,
-      rowCount: rowCount,
-      rows: rows,
-      total: total,
-    );
-  }
 }
 
-class PosItemsManagementApi {
+class PosItemsManagementRepository {
   final int total;
 
   final api = PaginatedApiService(baseUrl: ServerConfig.baseUrl);
 
-  PosItemsManagementApi({required this.total});
+  PosItemsManagementRepository({required this.total});
 
   Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
     required int current,

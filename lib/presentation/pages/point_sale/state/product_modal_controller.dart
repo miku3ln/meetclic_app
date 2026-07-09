@@ -19,6 +19,9 @@ import '../widgets/molecules/ps_image_picker.dart';
 import '../widgets/organisms/ps_toogle_group.dart';
 import 'dart:convert';
 
+import '../widgets/sections/items/pos_categories_management_section/models/models_management.dart';
+
+
 class ProductIngredientsController extends ChangeNotifier {
   final ProductModalController parent;
 
@@ -1219,7 +1222,7 @@ class CategoriaModalController extends ChangeNotifier {
       throw Exception("Formulario inválido");
     }
 
-    return ProductCategoryDraft(name: name, image: "");
+    return ProductCategoryDraft(name: name, image: "",description: "",id: -1,business_id: -1,code: '',subtitle: '');
   }
 
   void _resetTouched() {

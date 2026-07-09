@@ -8,6 +8,7 @@ import '../../../../../../domain/services/session_service.dart';
 import '../../../../../../infrastructure/config/server_config.dart';
 import '../../../../../../shared/models/api_response.dart';
 import '../../../../../../shared/pagination_response.dart' hide ApiResponse;
+import '../../../../../../shared/utils/util_common.dart';
 import '../../../models/product_management_measure.dart';
 import '../../models/pos_action_item.dart';
 import '../../models/pos_product_item.dart';
@@ -554,56 +555,60 @@ class PosMockData {
   static Future<List<PosProductItem>> getProductsData() async {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
-    final uri =
-        Uri.parse(
-              '${ServerConfig.baseUrl}/pointsales/products-sales',
-            ) //POS-PRODUCTS -INIT-ONE
-            .replace(
-              queryParameters: {
-                'current': '1',
-                'rowCount': '-1',
-                'searchPhrase': '',
-                'business_id': businessId,
-              },
-            );
-    final response = await http.get(
-      uri,
-      headers: {
-        'Authorization': 'Bearer ${token!}',
-        'Content-Type': 'application/json',
-      },
-    );
-    if (response.statusCode != 200) {
-      List<PosProductItem> result = [];
-      return result;
-    }
-    final data = jsonDecode(response.body);
-    final List rows = data['rows'];
-    // 🔥 aquí haces el mapper DIRECTO
-    return rows.map<PosProductItem>((json) {
-      final stock = json['stock'] ?? {};
-      final taxData = json['tax'] ?? {};
-      final priceData = json['price'] ?? {};
+    return SafeExecutor.run(() async {
 
-      return PosProductItem(
-        id: json['id'].toString(),
-        name: json['name'],
-        imageUrl: json['source'],
-        productCategoryId: json['product_category_id'].toString(),
-        menuCategoryId: json['product_subcategory_id'].toString(),
-        menuCategory: json['subcategory'].toString(),
-        productCategory: json['category'].toString(),
-        type: json['type'].toString(),
-        code: json['code'].toString(),
-        taxPercentage:
-            double.tryParse(taxData['value_percentage']?.toString() ?? '0') ??
-            0,
-        unitPrice: double.tryParse(priceData['pv']?.toString() ?? '0') ?? 0,
-        // 👉 si agregas estos campos al modelo
-        stock: (stock['quantity'] ?? 0).toDouble(),
-        unit: stock['unit'] ?? 'u',
+      final uri =
+      Uri.parse(
+        '${ServerConfig.baseUrl}/pointsales/products-sales',
+      ) //POS-PRODUCTS -INIT-ONE
+          .replace(
+        queryParameters: {
+          'current': '1',
+          'rowCount': '-1',
+          'searchPhrase': '',
+          'business_id': businessId,
+        },
       );
-    }).toList();
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer ${token!}',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode != 200) {
+        List<PosProductItem> result = [];
+        return result;
+      }
+      final data = jsonDecode(response.body);
+      final List rows = data['rows'];
+      // 🔥 aquí haces el mapper DIRECTO
+      return rows.map<PosProductItem>((json) {
+        final stock = json['stock'] ?? {};
+        final taxData = json['tax'] ?? {};
+        final priceData = json['price'] ?? {};
+
+        return PosProductItem(
+          id: json['id'].toString(),
+          name: json['name'],
+          imageUrl: json['source'],
+          productCategoryId: json['product_category_id'].toString(),
+          menuCategoryId: json['product_subcategory_id'].toString(),
+          menuCategory: json['subcategory'].toString(),
+          productCategory: json['category'].toString(),
+          type: json['type'].toString(),
+          code: json['code'].toString(),
+          taxPercentage:
+          double.tryParse(taxData['value_percentage']?.toString() ?? '0') ??
+              0,
+          unitPrice: double.tryParse(priceData['pv']?.toString() ?? '0') ?? 0,
+          // 👉 si agregas estos campos al modelo
+          stock: (stock['quantity'] ?? 0).toDouble(),
+          unit: stock['unit'] ?? 'u',
+        );
+      }).toList();
+
+    }, <PosProductItem>[]);
   }
 
   static UnitMeasureModel? findUnit(
@@ -917,124 +922,6 @@ class ProductDataUtil {
     Map<String, dynamic> payload, {
     File? image,
   }) async {
-    try {
-      final token = SessionService().apiToken;
-      final request = http.MultipartRequest(
-        'POST',
-        Uri.parse('${ServerConfig.baseUrl}/pointsales/product-type-update'),
-      );
-      request.headers['Authorization'] = 'Bearer $token';
-      // Payload como JSON
-      request.fields['payload'] = jsonEncode(payload);
-      if (image == null) {
-
-      }else{
-        request.files.add(
-          await http.MultipartFile.fromPath('image', image.path),
-        );
-      }
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-      final body = jsonDecode(response.body);
-      if (body['success'] == true) {
-        return ApiResponse.success(
-          message: body['message'] ?? 'Operación realizada correctamente',
-          data: body,
-        );
-      }
-
-      String message = 'Error desconocido';
-
-      try {
-        final errorRaw = body['error']?['message'];
-
-        if (errorRaw != null) {
-          final errorJson = jsonDecode(errorRaw) as Map<String, dynamic>;
-          final table = errorJson['table'];
-          final errors = errorJson['errors'] as Map<String, dynamic>? ?? {};
-          if (errors.isNotEmpty) {
-            final field = errors.keys.first;
-            final fieldErrors = List<String>.from(errors[field]);
-            message = '[$table] ${fieldErrors.first}';
-          }
-        }
-      } catch (_) {
-        message =
-            body['error']?['message'] ?? body['message'] ?? 'Error desconocido';
-      }
-
-      return ApiResponse.error(message);
-    } catch (e) {
-      return ApiResponse.error(e.toString());
-    }
-  }
-}
-class CategoryDataUtil {
-  static Future<ApiResponse<Map<String, dynamic>>> createCategory(
-      Map<String, dynamic> payload, {
-        File? image,
-      }) async {
-    try {
-      final token = SessionService().apiToken;
-
-      final request = http.MultipartRequest(
-        'POST',
-        Uri.parse('${ServerConfig.baseUrl}/pointsales/product-type-save'),
-      );
-
-      request.headers['Authorization'] = 'Bearer $token';
-
-      // Payload como JSON
-      request.fields['payload'] = jsonEncode(payload);
-      if (image == null) {
-
-      }else{
-        request.files.add(
-          await http.MultipartFile.fromPath('image', image.path),
-        );
-      }
-      // Imagen
-
-      final streamedResponse = await request.send();
-      final response = await http.Response.fromStream(streamedResponse);
-
-      final body = jsonDecode(response.body);
-      if (body['success'] == true) {
-        return ApiResponse.success(
-          message: body['message'] ?? 'Operación realizada correctamente',
-          data: body,
-        );
-      }
-
-      String message = 'Error desconocido';
-      try {
-        final errorRaw = body['error']?['message'];
-
-        if (errorRaw != null) {
-          final errorJson = jsonDecode(errorRaw) as Map<String, dynamic>;
-          final table = errorJson['table'];
-          final errors = errorJson['errors'] as Map<String, dynamic>? ?? {};
-          if (errors.isNotEmpty) {
-            final field = errors.keys.first;
-            final fieldErrors = List<String>.from(errors[field]);
-            message = '[$table] ${fieldErrors.first}';
-          }
-        }
-      } catch (_) {
-        message =
-            body['error']?['message'] ?? body['message'] ?? 'Error desconocido';
-      }
-
-      return ApiResponse.error(message);
-    } catch (e) {
-      return ApiResponse.error(e.toString());
-    }
-  }
-
-  static Future<ApiResponse<Map<String, dynamic>>> updateCategory(
-      Map<String, dynamic> payload, {
-        File? image,
-      }) async {
     try {
       final token = SessionService().apiToken;
       final request = http.MultipartRequest(

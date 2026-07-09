@@ -157,30 +157,6 @@ class ProductMapper {
   }
 }
 
-class ProductCategoryDraft {
-  final String name;
-  final int? id;
-
-  final String? image;
-
-  ProductCategoryDraft({required this.name, required this.image,this.id});
-}
-
-class ProductCategoryMapper {
-  ProductCategoryMapper._();
-
-  static ProductCategoryDraft fromMap(
-    GenericListItem<Map<String, dynamic>> item,
-  ) {
-    final m = item;
-
-    return ProductCategoryDraft(
-      name: m.title.toString() ?? '',
-      image: m.image?.toString() ?? '',
-    );
-  }
-}
-
 class MeasureDataResult {
   final MeasureCategoryModel measureCategory;
   final List<UnitMeasureModel> units;

@@ -3,34 +3,46 @@
 import 'dart:async';
 import 'dart:io';
 
-import '../../../../../../../domain/services/session_service.dart';
-import '../../../../../../../shared/models/api_response.dart';
-import '../../../../../../../shared/utils/validators/validators.dart';
-import '../../../../models/product_draft.dart';
-import '../../../../services/pos_labels_service.dart';
-import '../../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
-import '../../../molecules/ps_image_picker.dart';
+import '../../../../../../../../domain/services/session_service.dart';
+import '../../../../../../../../shared/models/api_response.dart';
+import '../../../../../../../../shared/utils/validators/validators.dart';
+import '../../../../../services/pos_labels_service.dart';
+import '../../../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
+import '../../../../molecules/ps_image_picker.dart';
+import '../models/models_management.dart';
+import '../repository/repository_management.dart';
+
 
 class CategoryModalController extends BaseFormController {
   CrudType mode = CrudType.create;
   bool submitted = false;
   int categoryId = 0;
   final PosLabelsService labels = const PosLabelsService();
-  final _eventModalProductController =
+  final _eventController =
   StreamController<ManagementModalEvent>.broadcast();
-  Stream<ManagementModalEvent> get eventsMainProcess =>
-      _eventModalProductController.stream;
 
+  Stream<ManagementModalEvent> get eventsMainProcess =>
+      _eventController.stream;
+
+  void emit(String type, [dynamic data]) {
+    _eventController.add(ManagementModalEvent(type, data));
+  }
   void initField() {
     fields.addAll({
-      'name': FormFieldController<String>(
+      'value': FormFieldController<String>(
         label: labels.categoryNameLabel,
         validators: [
           ValidatorsUtil.required(labels.categoryNameLabel),
           ValidatorsUtil.minLength(3),
         ],
       ),
-
+      'subtitle': FormFieldController<String>(
+        label: labels.categoryNameLabel,
+        validators: [
+          ValidatorsUtil.required(labels.categoryNameLabel),
+          ValidatorsUtil.minLength(3),
+        ],
+      ),
       'description': FormFieldController<String>(
         label: labels.categoryDescriptionLabel,
         validators: [
@@ -63,15 +75,19 @@ class CategoryModalController extends BaseFormController {
   void load(ProductCategoryDraft draft) async {
     mode = CrudType.update;
     nameField.value = draft.name;
+    subtitleField.value = draft.name;
+
     descriptionField.value = draft.name;
     codeField.value = draft.name;
     categoryId = draft.id!;
     image = draft.image;
     nameField.touched = false;
+    subtitleField.touched = false;
     descriptionField.touched = false;
     codeField.touched = false;
     imageTouched = false;
     nameField.error = null;
+    subtitleField.error = null;
     descriptionField.error = null;
     codeField.error = null;
     imageError = null;
@@ -87,6 +103,8 @@ class CategoryModalController extends BaseFormController {
   void _resetErrors() {
 
     nameField.error = null;
+    subtitleField.error = null;
+
     descriptionField.error = null;
     codeField.error = null;
 
@@ -94,29 +112,28 @@ class CategoryModalController extends BaseFormController {
 
   }
   void _resetTouched() {
-
     nameField.touched = false;
+    subtitleField.touched = false;
     descriptionField.touched = false;
     codeField.touched = false;
-
     imageTouched = false;
-
   }
   void resetValues() {
     image = null;
-
     nameField.value = null;
+    subtitleField.value = null;
     descriptionField.value = null;
     codeField.value = null;
-
     categoryId = 0;
   }
   Future<void> init() async {
-
     notifyListeners();
   }
   FormFieldController<String> get nameField =>
-      field<FormFieldController<String>>('name');
+      field<FormFieldController<String>>('value');
+  FormFieldController<String> get subtitleField =>
+      field<FormFieldController<String>>('subtitle');
+
 
   FormFieldController<String> get descriptionField =>
       field<FormFieldController<String>>('description');
@@ -124,18 +141,23 @@ class CategoryModalController extends BaseFormController {
   FormFieldController<String> get codeField =>
       field<FormFieldController<String>>('code');
   String get name => nameField.value ?? '';
+  String get subtitle => subtitleField.value ?? '';
+
+
 
   String? get description => descriptionField.value;
 
   String? get code => codeField.value;
 
   String? get nameError => nameField.error;
+  String? get subtitleError => subtitleField.error;
 
   String? get descriptionError => descriptionField.error;
 
   String? get codeError => codeField.error;
 
   bool get nameTouched => nameField.touched;
+  bool get subtitleTouched => subtitleField.touched;
 
   bool get descriptionTouched => descriptionField.touched;
 
@@ -144,9 +166,12 @@ class CategoryModalController extends BaseFormController {
   Map<String, dynamic> buildPayload(CrudType type) {
 
     final currentSession = SessionService().currentSession;
-
+    final businessId = SessionService().businessId;
     final productCategory = {
-      "name": name,
+      "value": name,
+      "subtitle": subtitle,
+      "state": 'ACTIVE',
+      "business_id": businessId,
       "description": description,
       "code": code,
       "user_id": currentSession?.userId,
@@ -183,7 +208,10 @@ class CategoryModalController extends BaseFormController {
     nameField.setValue(value);
     notifyListeners();
   }
-
+  void setSubtitle(String value) {
+   subtitleField.setValue(value);
+    notifyListeners();
+  }
   void setDescription(String value) {
     descriptionField.setValue(value);
     notifyListeners();
@@ -203,7 +231,7 @@ class CategoryModalController extends BaseFormController {
         : null;
 
     final errors = {
-      'name': nameError,
+      'value': nameError,
       'description': descriptionError,
       'code': codeError,
       'image': imageError,
@@ -228,11 +256,7 @@ class CategoryModalController extends BaseFormController {
     _isLoading = value;
     notifyListeners();
   }
-  final _eventController = StreamController<ManagementModalEvent>.broadcast();
 
-  void emit(String type, [dynamic data]) {
-    _eventController.add(ManagementModalEvent(type, data));
-  }
   bool get canSubmit {
     if (mode == CrudType.update) {
       return validateForm().success;
@@ -240,6 +264,7 @@ class CategoryModalController extends BaseFormController {
 
     return isFormValid &&
         nameTouched &&
+        subtitleTouched &&
         descriptionTouched &&
         codeTouched &&
         imageTouched;
@@ -248,6 +273,7 @@ class CategoryModalController extends BaseFormController {
   bool get isFormValid {
     return [
       nameError,
+      subtitleError,
       descriptionError,
       codeError,
       imageError,
@@ -276,18 +302,19 @@ class CategoryModalController extends BaseFormController {
     final payload = buildPayload(type);
 
     if (type == CrudType.create) {
-      return CategoryDataUtil.createCategory(
+      return CategoryListRepository.createCategory(
         payload,
         image: setImageCrud,
       );
     }
 
-    return CategoryDataUtil.updateCategory(
+    return CategoryListRepository.updateCategory(
       payload,
       image: setImageCrud,
     );
   }
   String get nameLabel => labels.categoryNameLabel;
+  String get subtitleLabel => labels.categorySubtitleLabel;
 
   String get descriptionLabel => labels.categoryDescriptionLabel;
 
@@ -298,6 +325,21 @@ class CategoryModalController extends BaseFormController {
   String get titleCardInformation =>
       labels.categoryTitleCardInformation;
 
+
+  CrudType typeManagementRegister = CrudType.create;
+  int idManagementRow = -1;
+  String titleManagement = "";
+
+  void setManagerInitProcess(CrudType typeManagement, int managementId) {
+    typeManagementRegister = typeManagement;
+    idManagementRow = managementId;
+    if (typeManagement == CrudType.create) {
+      titleManagement = "Crear Categoria";
+    } else {
+      titleManagement = "Actualizar Categoria";
+    }
+    notifyListeners();
+  }
 }
 
 

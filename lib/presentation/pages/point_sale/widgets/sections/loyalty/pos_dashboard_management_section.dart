@@ -17,6 +17,7 @@ import '../../organisms/dialogs/product_modal.dart';
 import '../../organisms/items/pos_items_content.dart';
 
 import '../../templates/row_grid.dart';
+import '../items/pos_categories_management_section/models/models_management.dart';
 import '../product/ps_section_card.dart';
 
 class PosDashboardManagementSection extends StatefulWidget {
@@ -39,6 +40,8 @@ class _PosDashboardManagementSectionState extends State<PosDashboardManagementSe
 
   int _currentPage = 1;
   final int _rowCount = 10;
+  String _searchCode = '';
+
   int _total = 0;
 
   bool _isLoading = false;
@@ -71,6 +74,7 @@ class _PosDashboardManagementSectionState extends State<PosDashboardManagementSe
 
     final response = await _api.fetchPage(
       current: _currentPage,
+      searchPhrase: _searchCode,
       rowCount: _rowCount,
     );
 
@@ -93,6 +97,8 @@ class _PosDashboardManagementSectionState extends State<PosDashboardManagementSe
     final response = await _api.fetchPage(
       current: _currentPage,
       rowCount: _rowCount,
+      searchPhrase: _searchCode,
+
     );
 
     if (!mounted) return;
@@ -132,7 +138,7 @@ class _PosDashboardManagementSectionState extends State<PosDashboardManagementSe
 
     final controller = CategoriaModalController();
     await controller.init();
-    final draft = ProductCategoryMapper.fromMap(item );
+    final draft = ProductCategoryMapper.fromMap(item.data );
     controller.loadAndValidate(draft);
     await showProductModal(
       context: context,

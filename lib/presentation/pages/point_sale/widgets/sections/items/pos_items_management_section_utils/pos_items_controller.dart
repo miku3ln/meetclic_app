@@ -10,7 +10,7 @@ import '../../../organisms/items/pos_items_content.dart';
 import '../../../organisms/ps_toogle_group.dart';
 
 class PosItemsController extends ChangeNotifier {
-  final PosItemsManagementApi api;
+  final PosItemsManagementRepository api;
 
   PosItemsController({required this.api});
 

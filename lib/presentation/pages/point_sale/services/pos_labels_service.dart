@@ -18,6 +18,8 @@ class PosLabelsService {
 
 
   final String categoryNameLabel = 'Nombre';
+  final String categorySubtitleLabel = 'Subtitulo';
+
   final String categoryDescriptionLabel = 'Descripción';
   final String categoryCodeLabel = 'Código';
   final String categoryImageLabel = 'Imagen';

@@ -1,15 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/filters/filters_management_main.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/form_management/form_management.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/pos_items_controller.dart';
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../../shared/widgets/search_filter/controller/search_filter_controller.dart';
 import '../../../../../../shared/widgets/search_filter/controller/search_filter_events.dart';
-import '../../../../../../shared/widgets/search_filter/models/filter_field.dart';
-import '../../../../../../shared/widgets/search_filter/models/filter_item.dart';
-import '../../../../../../shared/widgets/search_filter/models/search_filter_config.dart';
 import '../../../../../../shared/widgets/search_filter/models/search_filter_result.dart';
 import '../../../../../../shared/widgets/search_filter/search_filter_widget.dart';
 import '../../../../../widgets/empty_data.dart';
@@ -41,7 +39,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   final ScrollController _scrollController = ScrollController();
   bool _isOpeningProduct = false;
   final TextEditingController _searchController = TextEditingController();
-  late PosItemsManagementApi _api;
+  late PosItemsManagementRepository _api;
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
   int _currentPage = 1;
   final int _rowCount = 10;
@@ -85,7 +83,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   @override
   void initState() {
     super.initState();
-    _api = PosItemsManagementApi(total: _simulatedTotal);
+    _api = PosItemsManagementRepository(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
     _listenSearchEvents();//TODO SEARCH
@@ -102,181 +100,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     searchController.dispose();//TODO SEARCH
     super.dispose();
   }
-  final config = SearchFilterConfig(
-    hint: "Buscar artículos",
-    drawerTitle: "Filtros",
-    fields: [
 
-      //-----------------------------------------
-      // TEXT
-      //-----------------------------------------
-
-      FilterField<String>(
-        id: "code",
-        label: "Código",
-        hint: "Ingrese un código",
-        type: FilterFieldType.text,
-      ),
-
-      //-----------------------------------------
-      // DROPDOWN
-      //-----------------------------------------
-
-      FilterField<String>(
-        id: "status",
-        label: "Estado",
-        hint: "Seleccione un estado",
-        type: FilterFieldType.dropdown,
-        items: [
-
-          FilterItem(
-            id: "1",
-            label: "Activo",
-            value: "ACTIVE",
-            icon: Icons.check_circle_rounded,
-          ),
-
-          FilterItem(
-            id: "2",
-            label: "Inactivo",
-            value: "INACTIVE",
-            icon: Icons.cancel_rounded,
-          ),
-
-        ],
-      ),
-
-      //-----------------------------------------
-      // MULTI SELECT
-      //-----------------------------------------
-
-      FilterField<int>(
-        id: "category",
-        label: "Categorías",
-        type: FilterFieldType.multiSelect,
-        multiple: true,
-        items: [
-
-          FilterItem(
-            id: "1",
-            label: "Menú",
-            value: 1,
-            icon: Icons.restaurant_menu_rounded,
-          ),
-
-          FilterItem(
-            id: "2",
-            label: "Materia Prima",
-            value: 2,
-            icon: Icons.inventory_2_rounded,
-          ),
-
-          FilterItem(
-            id: "3",
-            label: "Bebidas",
-            value: 3,
-            icon: Icons.local_bar_rounded,
-          ),
-
-        ],
-      ),
-
-      //-----------------------------------------
-      // CHECKBOX
-      //-----------------------------------------
-
-      FilterField<bool>(
-        id: "favorite",
-        label: "Solo favoritos",
-        type: FilterFieldType.checkbox,
-        defaultValue: false,
-      ),
-
-      //-----------------------------------------
-      // RADIO
-      //-----------------------------------------
-
-      FilterField<String>(
-        id: "stock",
-        label: "Disponibilidad",
-        type: FilterFieldType.radio,
-        items: [
-
-          FilterItem(
-            id: "1",
-            label: "Con Stock",
-            value: "STOCK",
-          ),
-
-          FilterItem(
-            id: "2",
-            label: "Sin Stock",
-            value: "EMPTY",
-          ),
-
-        ],
-      ),
-
-      //-----------------------------------------
-      // SWITCH
-      //-----------------------------------------
-
-      FilterField<bool>(
-        id: "enabled",
-        label: "Mostrar solo activos",
-        type: FilterFieldType.switchField,
-        defaultValue: true,
-      ),
-
-      //-----------------------------------------
-      // DATE
-      //-----------------------------------------
-
-      FilterField<DateTime>(
-        id: "createdAt",
-        label: "Fecha creación",
-        hint: "Seleccione una fecha",
-        type: FilterFieldType.date,
-      ),
-
-      //-----------------------------------------
-      // DATE RANGE
-      //-----------------------------------------
-
-      FilterField<DateTime>(
-        id: "period",
-        label: "Periodo",
-        hint: "Seleccione un rango",
-        type: FilterFieldType.dateRange,
-      ),
-
-      //-----------------------------------------
-      // NUMBER
-      //-----------------------------------------
-
-      FilterField<int>(
-        id: "quantity",
-        label: "Cantidad mínima",
-        hint: "0",
-        type: FilterFieldType.number,
-        minValue: 0,
-        maxValue: 1000,
-      ),
-
-      //-----------------------------------------
-      // NUMBER RANGE
-      //-----------------------------------------
-
-      FilterField<double>(
-        id: "price",
-        label: "Rango de precio",
-        type: FilterFieldType.numberRange,
-        minValue: 0,
-        maxValue: 500,
-      ),
-
-    ],
-  );
   Future<void> _loadInitial() async {
     if (_isLoading) return;
     setState(() {
@@ -323,7 +147,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   Future<void> _refreshAll() async {
     if (_isLoading) return;
-    _api = PosItemsManagementApi(total: _simulatedTotal);
+    _api = PosItemsManagementRepository(total: _simulatedTotal);
 
     setState(() {
       _currentPage = 1;
@@ -337,9 +161,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-
     final position = _scrollController.position;
-
     if (position.pixels >= position.maxScrollExtent - 200) {
       _loadMore();
     }
@@ -347,7 +169,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   StreamSubscription? _modalSub;
   StreamSubscription? _modalActions;
-
   void _listenModalEvents(ProductModalController controller) {
     _modalSub?.cancel();
     _modalActions?.cancel();
@@ -405,7 +226,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     setState(() {
       _isOpeningProduct = true;
     });
-
     try {
       controller.resetAllForm();
       await controller.init();
@@ -499,106 +319,6 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       ],
     );
   }
-
-  Widget _buildList() {
-    return RefreshIndicator(
-      onRefresh: _refreshAll,
-      child: ListView.builder(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
-        itemBuilder: (context, index) {
-          if (index >= _items.length) {
-            return const Padding(
-              padding: EdgeInsets.zero,
-              child: Center(child: PosLoadingView()),
-            );
-          }
-          final item = _items[index];
-          return ProductListCard(item: item, onTap: () => _onTapItem(item));
-        },
-      ),
-    );
-  }
-  Widget build2(BuildContext context) {
-    return Stack(
-      children: [
-        IgnorePointer(
-          ignoring: _isOpeningProduct,
-          child: Stack(
-            children: [
-              if (!_hasInitialLoadFinished && _isLoading)
-                const Center(child: PosLoadingView())
-              else if (!_hasData)
-                RefreshIndicator(
-                  onRefresh: _refreshAll,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    children: const [
-                      SizedBox(
-                        height: 600,
-                        child: EmptyData(
-                          icon: Icons.print_rounded,
-                          title: 'Todavía no hay productos',
-                          descriptionText: 'Aquí puedes verificar',
-                          linkText: 'Más información',
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              else
-                _buildList(),
-              Positioned(
-                right: 32,
-                bottom: 80,
-                child: FloatingActionButton(
-                  onPressed: () async {
-                    setState(() {
-                      _isOpeningProduct = true;
-                    });
-
-                    try {
-                      controller.resetAllForm();
-                      await controller.init();
-                      if (!mounted) return;
-                      await showManagerProduct(
-                        barrierDismissible: false,
-                        context: context,
-                        controller: controller,
-                        btnSaveTitle: "Guardar",
-                        btnCancelTitle: "Cancelar",
-                        title: "Crear Producto",
-                        typeManagement: CrudType.create,
-                        listMeasureCategory:
-                        controller.listMeasureCategoryManagement,
-                        listTaxCategory: controller.listTaxCategoryManagement,
-                      );
-                    } finally {
-                      if (mounted) {
-                        setState(() {
-                          _isOpeningProduct = false;
-                        });
-                      }
-                    }
-                  },
-                  child: const Icon(Icons.add),
-                ),
-              ),
-            ],
-          ),
-        ),
-
-        if (_isOpeningProduct)
-          Positioned.fill(
-            child: Container(
-              color: Colors.black.withOpacity(0.25),
-              child: const Center(child: CircularProgressIndicator()),
-            ),
-          ),
-      ],
-    );
-  }
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(
@@ -610,7 +330,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       color: Colors.white,
       child: SearchFilterWidget(
         controller: searchController,
-        config: config,
+        config: configFilters,
       ),
     );
   }

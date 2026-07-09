@@ -13,9 +13,9 @@ import '../../molecules/inputs/ps_field_row.dart';
 import '../../molecules/inputs/ps_input.dart';
 import '../../molecules/ps_image_picker.dart';
 import '../../organisms/dialogs/product_modal.dart';
-import '../../organisms/items/pos_items_content.dart';
 import '../../organisms/loyalty/pos_loyalty_content.dart';
 import '../../templates/row_grid.dart';
+import '../items/pos_categories_management_section/models/models_management.dart';
 import '../product/ps_section_card.dart';
 class PosCuponsManagementSection extends StatefulWidget {
   const PosCuponsManagementSection({super.key});
@@ -130,7 +130,7 @@ class _PosCuponsManagementSectionState extends State<PosCuponsManagementSection>
 
     final controller = CategoriaModalController();
     await controller.init();
-    final draft = ProductCategoryMapper.fromMap(item );
+    final draft = ProductCategoryMapper.fromMap(item.data! );
     controller.loadAndValidate(draft);
     await showProductModal(
       context: context,

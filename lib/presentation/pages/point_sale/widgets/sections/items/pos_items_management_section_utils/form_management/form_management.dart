@@ -41,7 +41,7 @@ Future<void> showManagerProduct({
   ModalType viewMode = ModalType.page,
   int productId = -1,
 }) async {
-  final allowModal = viewMode == ModalType.dialog;
+  final allowModal = false;
   controller.setManagerInitProduct(typeManagement, productId);
   controller.setListMeasureCategory(listMeasureCategory);
   final content = AnimatedBuilder(
@@ -99,14 +99,7 @@ Future<void> showManagerProduct({
     },
   );
 
-  if (viewMode == ModalType.dialog) {
-    await showDialog(
-      context: context,
-      barrierDismissible: barrierDismissible,
-      builder: (_) => content,
-    );
-    return;
-  }
+
 
   await Navigator.push(
     context,

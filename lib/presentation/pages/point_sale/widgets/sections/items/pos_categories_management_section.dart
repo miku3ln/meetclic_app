@@ -1,27 +1,21 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section/category_management.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section.dart';
-import '../../../../../../services/alert_manager.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section/filters/filters_management_main.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section/forms/forms_management.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section/controller/controllers_management.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section/models/models_management.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section/repository/repository_management.dart';
 import '../../../../../../shared/pagination_response.dart';
-import '../../../../../../shared/services/media_picker_service.dart';
-import '../../../../../../shared/theme/configuration/app_spacing.dart';
+import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
+import '../../../../../../shared/widgets/grids/card-rows/ps_management_row.dart';
+import '../../../../../../shared/widgets/search_filter/controller/search_filter_controller.dart';
+import '../../../../../../shared/widgets/search_filter/controller/search_filter_events.dart';
+import '../../../../../../shared/widgets/search_filter/models/search_filter_result.dart';
+import '../../../../../../shared/widgets/search_filter/search_filter_widget.dart';
 import '../../../../../widgets/empty_data.dart';
-
 import '../../../../../widgets/loading_manager.dart';
-import '../../../models/product_draft.dart';
-import '../../../models/sections_data.dart';
-import '../../../state/pos_items_controller.dart';
-import '../../../state/product_modal_controller.dart';
-import '../../molecules/inputs/ps_field_row.dart';
-import '../../molecules/inputs/ps_input.dart';
-import '../../molecules/ps_image_picker.dart';
-import '../../organisms/dialogs/product_modal.dart';
-import '../../organisms/items/pos_items_content.dart';
-import '../../templates/row_grid.dart';
-import '../product/ps_section_card.dart';
 
 class PosCategoriesManagementSection extends StatefulWidget {
   const PosCategoriesManagementSection({super.key});
@@ -34,39 +28,66 @@ class PosCategoriesManagementSection extends StatefulWidget {
 class _PosCategoriesManagementSectionState
     extends State<PosCategoriesManagementSection> {
   final ScrollController _scrollController = ScrollController();
-
-  /// aquí decides el total simulado
   int _simulatedTotal = 592;
-
-  late FakeCategoriesApi _api;
-
+  bool _isOpeningProduct = false;
+  late CategoryListRepository _api;
   final List<GenericListItem<Map<String, dynamic>>> _items = [];
-
   int _currentPage = 1;
   final int _rowCount = 10;
+  String _searchCode = '';
   int _total = 0;
-
   bool _isLoading = false;
   bool _hasInitialLoadFinished = false;
-
   bool get _hasData => _items.isNotEmpty;
-
   bool get _hasMore => _items.length < _total;
-
+  final searchController = SearchFilterController();//TODO SEARCH
+  StreamSubscription? _searchSub; //TODO SEARCH
+  void _listenSearchEvents() {//TODO SEARCH
+    _searchSub?.cancel();
+    _searchSub = searchController.events.listen((event) {
+      switch (event.type) {
+        case SearchFilterEvents.searchChanged:
+          debugPrint(event.data);
+          break;
+        case SearchFilterEvents.searchSubmitted:
+          final result = event.data as SearchFilterResult;
+          _searchCode = result.search;
+          _refreshAll();
+          break;
+        case SearchFilterEvents.filterChanged:
+          debugPrint("filterchanged");
+          break;
+        case SearchFilterEvents.filterApplied:
+          final result = event.data as SearchFilterResult;
+          debugPrint(result.toMap().toString());
+          _refreshAll();
+          break;
+        case SearchFilterEvents.filterReset:
+          _refreshAll();
+          break;
+      }
+    });
+  }
   @override
   void initState() {
     super.initState();
-    _api = FakeCategoriesApi(total: _simulatedTotal);
+    _api = CategoryListRepository(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
-  }
+    _listenSearchEvents();//TODO SEARCH
 
+  }
   @override
   void dispose() {
     _scrollController.dispose();
-    super.dispose();
-  }
+    _modalActions?.cancel();
 
+    _searchSub?.cancel();//TODO SEARCH
+    searchController.dispose();//TODO SEARCH
+    super.dispose();
+
+
+  }
   Future<void> _loadInitial() async {
     if (_isLoading) return;
 
@@ -77,6 +98,7 @@ class _PosCategoriesManagementSectionState
     final response = await _api.fetchPage(
       current: _currentPage,
       rowCount: _rowCount,
+      searchPhrase: _searchCode,
     );
 
     if (!mounted) return;
@@ -88,8 +110,6 @@ class _PosCategoriesManagementSectionState
       _isLoading = false;
     });
     _listenModalEvents(controller);
-
-
   }
 
   Future<void> _loadMore() async {
@@ -101,6 +121,7 @@ class _PosCategoriesManagementSectionState
     final response = await _api.fetchPage(
       current: _currentPage,
       rowCount: _rowCount,
+      searchPhrase: _searchCode,
     );
 
     if (!mounted) return;
@@ -114,7 +135,7 @@ class _PosCategoriesManagementSectionState
 
   Future<void> _refreshAll() async {
     if (_isLoading) return;
-    _api = FakeCategoriesApi(total: _simulatedTotal);
+    _api = CategoryListRepository(total: _simulatedTotal);
 
     setState(() {
       _currentPage = 1;
@@ -138,7 +159,6 @@ class _PosCategoriesManagementSectionState
 
   StreamSubscription? _modalActions;
   void _listenModalEvents(CategoryModalController controller) {
-
     _modalActions?.cancel();
     _modalActions = controller.eventsMainProcess.listen((event) {
       final data = event.data as Map<String, dynamic>?;
@@ -157,265 +177,181 @@ class _PosCategoriesManagementSectionState
       }
     });
   }
+
   void _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
+    if (item.data == null) return;
+    setState(() {
+      _isOpeningProduct = true;
+    });
+    try {
+      controller.resetAllForm();
+      await controller.init();
+      final draft = ProductCategoryMapper.fromMap(item.data);
+      controller.loadAndValidate(draft);
+      await showManagementForm(
+        context: context,
+        btnSaveTitle: "Actualizar",
+        btnCancelTitle: "Cancelar",
+        barrierDismissible: false,
+        controller: controller,
+        title: "Actualizar Categoria",
+        typeManagement: CrudType.update,
+        managementId: draft.id!,
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isOpeningProduct = false;
+        });
+      }
+    }
 
-    await controller.init();
-    final draft = ProductCategoryMapper.fromMap(item);
-    controller.loadAndValidate(draft);
-    await showManagementMainModal(
-      context: context,
-      btnSaveTitle: "Actualizar",
-      btnCancelTitle: "Cancelar",
-      barrierDismissible: false,
-      controller: controller,
-      title: "Actualizar Categoria",
-      typeManagement: CrudType.update,
-    );
   }
-
   final controller = CategoryModalController();
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        if (!_hasInitialLoadFinished && _isLoading)
-          const Center(child: PosLoadingView())
-        else if (!_hasData)
-          RefreshIndicator(
-            onRefresh: _refreshAll,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: [
-                SizedBox(
-                  height: 600,
-                  child: EmptyData(
-                    icon: Sections.getIconItems(PosItemsSection.categories),
-                    title: 'Todavía no hay Categorias',
-                    descriptionText: 'Aquí puedes verificar',
-                    linkText: 'Más información',
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          _buildList(),
+        IgnorePointer(
+          ignoring: _isOpeningProduct,
+          child: Column(
+            children: [
+              _buildHeader(),
+              _buildBody(),
+            ],
+          ),
+        ),
+
+        // 🔥 FAB (overlay layer)
         Positioned(
           right: 32,
           bottom: 80,
           child: FloatingActionButton(
             onPressed: () async {
-              final controller = CategoryModalController();
-              await controller.init();
-              showManagementMainModal(
-                barrierDismissible: false,
-                context: context,
-                controller: controller,
-                btnSaveTitle: "Guardar",
-                btnCancelTitle: "Cancelar",
-                title: "Crear Categoria",
-                typeManagement: CrudType.create,
-              );
+              setState(() {
+                _isOpeningProduct = true;
+              });
+
+              try {
+                controller.resetAllForm();
+                await controller.init();
+
+                if (!mounted) return;
+                showManagementForm(
+                  barrierDismissible: false,
+                  context: context,
+                  controller: controller,
+                  btnSaveTitle: "Guardar",
+                  btnCancelTitle: "Cancelar",
+                  title: "Crear Categoria",
+                  typeManagement: CrudType.create,
+                );
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    _isOpeningProduct = false;
+                  });
+                }
+              }
             },
             child: const Icon(Icons.add),
+          ),
+        ),
+
+        // 🔥 LOADING OVERLAY
+        if (_isOpeningProduct)
+          Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.25),
+              child: const Center(child: CircularProgressIndicator()),
+            ),
+          ),
+      ],
+    );
+
+  }
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        20, // izquierda
+        16, // arriba
+        20, // derecha
+        12, // abajo
+      ),
+      color: Colors.white,
+      child: SearchFilterWidget(
+        controller: searchController,
+        config: configFilters,
+      ),
+    );
+  }
+
+  Widget _buildEmptyOrLoading() {
+    if (!_hasInitialLoadFinished && _isLoading) {
+      return const Center(child: PosLoadingView());
+    }
+
+    return ListView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      children: const [
+        SizedBox(
+          height: 600,
+          child: EmptyData(
+            icon: Icons.print_rounded,
+            title: 'Todavía no hay productos',
+            descriptionText: 'Aquí puedes verificar',
+            linkText: 'Más información',
           ),
         ),
       ],
     );
   }
+  Widget _buildBody() {
+    return Expanded(
+      child: RefreshIndicator(
+        onRefresh: _refreshAll,
+        child: _hasInitialLoadFinished && _hasData
+            ? ListView.separated(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
+          separatorBuilder: (_, __) {
+            final tokens = AppThemeTokens.of(context);
+            return Divider(height: 1, thickness: 1, color: tokens.border);
+          },
+          itemBuilder: (context, index) {
+            if (index >= _items.length) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20),
+                child: Center(child: PosLoadingView()),
+              );
+            }
+            final item = _items[index];
+            final itemDataRow = item.data ?? {};
+            return PsManagementRow(
+              image: item.image,
+              title: item.title,
+              subtitle: item.subtitle ?? "",
+              description: item.description ?? "",
+              state: itemDataRow['state'] == "ACTIVE"
+                  ? PsEntityState.active
+                  : PsEntityState.inactive,
+              chips: [
+                PsInfoChip(
+                  icon: Icons.category_outlined,
+                  label:
+                  "${itemDataRow["total_subcategories"] ?? 0} Subcategorías",
+                ),
+              ],
 
-  Widget _buildList() {
-    return RefreshIndicator(
-      onRefresh: _refreshAll,
-      child: ListView.separated(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          if (index >= _items.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: PosLoadingView()),
+              // trailing: const Icon(Icons.chevron_right),
+              onTap: () => _onTapItem(item),
             );
-          }
-
-          final item = _items[index];
-
-          return PsHeaderWithBadge(
-            title: item.title,
-            badgeCount: item.countData,
-            badgeText: "Artículos Prueba",
-            imageUrl: item.image,
-            onTap: () => _onTapItem(item),
-          );
-        },
+          },
+        )
+            : _buildEmptyOrLoading(),
       ),
     );
   }
-}
 
-Future<void> showManagementMainModal({
-  required BuildContext context,
-  required CategoryModalController controller,
-  required String title,
-  required String btnCancelTitle,
-  required String btnSaveTitle,
-  CrudType typeManagement = CrudType.update,
-  required bool barrierDismissible,
-}) async {
-  final content = AnimatedBuilder(
-    animation: controller,
-    builder: (_, __) {
-      return PsModalLayout(
-        isLoading: controller.isLoading,
-        useDialog: false,
-        title: title,
-        btnCancelTitle: btnCancelTitle,
-        btnSaveTitle: btnSaveTitle,
-        onSave: controller.canSubmit
-            ? () async {
-                if (controller.validateForm().success) {
-                  controller.setLoading(true);
-                  final resultSave = await controller.saveCategory(typeManagement);
-                  if (!context.mounted) return;
-                  if (resultSave.success) {
-                    bool allowClose = true;
-                    AlertService.success(context, message: resultSave.message);
-                    if (allowClose) {
-                      controller.setAllowReloadData(true);
-                      Navigator.pop(context, resultSave);
-                      controller.emit(ProductModalEvents.save, {
-                        "allowReload": true,
-                      });
-                    }
-                  } else {
-                    AlertService.error(context, message: resultSave.message);
-                  }
-                  controller.setLoading(false);
-                }
-              }
-            : null,
-        body: _buildManagerCategory(context, controller, typeManagement, title),
-      );
-    },
-  );
-
-  await Navigator.push(
-    context,
-    PageRouteBuilder(
-      transitionDuration: const Duration(milliseconds: 300),
-      pageBuilder: (_, __, ___) {
-        return content;
-      },
-      transitionsBuilder: (_, animation, __, child) {
-        return SlideTransition(
-          position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
-              .animate(
-                CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-              ),
-          child: child,
-        );
-      },
-    ),
-  );
-}
-
-Widget _buildManagerCategory(
-  BuildContext context,
-  CategoryModalController controller,
-  CrudType type,
-  String title,
-) {
-  return SingleChildScrollView(
-      child: Column(
-    children: [
-      AppSpacing.spaceBetweenSections,
-
-      PsSectionSplit(
-        leftFlex: 7,
-        rightFlex: 3,
-
-        left: PsSectionCard(
-          title: controller.titleCardInformation,
-          child: Column(
-            children: [
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsInput(
-                      label: controller.codeLabel,
-                      requiredField: true,
-                      value: controller.code,
-                      onChanged: controller.setCode,
-                      error: controller.codeError,
-                      isTouched: controller.codeTouched,
-                      isValid: controller.codeError == null,
-                    ),
-                  ),
-
-                  PsFieldItem(
-                    child: PsInput(
-                      label: controller.descriptionLabel,
-                      requiredField: true,
-                      value: controller.description,
-                      onChanged: controller.setDescription,
-                      error: controller.descriptionError,
-                      isTouched: controller.descriptionTouched,
-                      isValid: controller.descriptionError == null,
-                    ),
-                  ),
-                ],
-              ),
-
-              AppSpacing.spaceBetweenInputs,
-
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsInput(
-                      label: controller.nameLabel,
-                      requiredField: true,
-                      value: controller.name,
-                      onChanged: controller.setName,
-                      error: controller.nameError,
-                      isTouched: controller.nameTouched,
-                      isValid: controller.nameError == null,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-
-        right: PsSectionCard(
-          title: controller.imageLabel,
-          child: Center(
-            child: PsImagePicker(
-              image: controller.image,
-              error: controller.imageError,
-              requiredField: true,
-              isTouched: controller.imageTouched,
-              isValid: controller.image != null,
-              onPick: () async {
-                final mediaService = MediaPickerService();
-
-                final file = await showImageSourceSelector(
-                  context,
-                  mediaService.pickFromCamera,
-                  mediaService.pickFromGallery,
-                );
-
-                if (file != null) {
-                  controller.setImage(file);
-                }
-              },
-              onRemove: controller.removeImage,
-            ),
-          ),
-        ),
-      ),
-    ],
-  ));
 }

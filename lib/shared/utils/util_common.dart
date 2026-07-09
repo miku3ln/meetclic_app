@@ -1,5 +1,7 @@
 // lib/shared/utils/util_common.dart
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
@@ -287,6 +289,30 @@ class ControllerProvider {
           description:
           'Controller principal del Punto de Venta.',
         );
+    }
+  }
+}
+
+class SafeExecutor {
+  static Future<T> run<T>(
+      Future<T> Function() action,
+      T defaultValue, {
+        Duration timeout = const Duration(seconds: 35),
+      }) async {
+    try {
+      return await action().timeout(timeout);
+
+    } on SocketException {
+      return defaultValue;
+
+    } on TimeoutException {
+      return defaultValue;
+
+    } on http.ClientException {
+      return defaultValue;
+
+    } catch (_) {
+      return defaultValue;
     }
   }
 }
