@@ -1,7 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../../../widgets/toogle-manager.dart';
 import '../../state/pos_checkout_state.dart';
 import '../layouts/pos_main_controller.dart';
+
+
 
 class PosCheckoutActionToggle extends StatelessWidget {
   final PosMainController controller;
@@ -19,66 +22,36 @@ class PosCheckoutActionToggle extends StatelessWidget {
     final c = checkout.toggleColors;
     final i = checkout.toggleIcons;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 13,
-          ),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
+    return PsSegmentToggle<PosCheckoutAction>(
+      title: title,
+
+      value: checkout.checkoutAction,
+
+      borderColor: c.border,
+
+      thumbColor: checkout.isPaySelected
+          ? c.payActiveBg
+          : c.saveActiveBg,
+
+      inactiveForegroundColor: c.inactiveFg,
+
+      items: [
+        PsSegmentItem(
+          value: PosCheckoutAction.save,
+          activeIcon: i.save,
+          inactiveIcon: i.save,
+          activeColor: c.saveActiveFg,
         ),
-        const SizedBox(height: 8),
-        DecoratedBox(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: c.border),
-          ),
-          child: CupertinoSlidingSegmentedControl<PosCheckoutAction>(
-            groupValue: checkout.checkoutAction,
-            padding: const EdgeInsets.all(4),
-            thumbColor: checkout.isPaySelected
-                ? c.payActiveBg
-                : c.saveActiveBg,
-            children: {
-              PosCheckoutAction.save: _segIcon(
-                icon: i.save,
-                active: checkout.isSaveSelected,
-                activeFg: c.saveActiveFg,
-                inactiveFg: c.inactiveFg,
-              ),
-              PosCheckoutAction.pay: _segIcon(
-                icon: i.pay,
-                active: checkout.isPaySelected,
-                activeFg: c.payActiveFg,
-                inactiveFg: c.inactiveFg,
-              ),
-            },
-            onValueChanged: (v) {
-              if (v == null) return;
-              checkout.setCheckoutAction(v);
-            },
-          ),
+
+        PsSegmentItem(
+          value: PosCheckoutAction.pay,
+          activeIcon: i.pay,
+          inactiveIcon: i.pay,
+          activeColor: c.payActiveFg,
         ),
       ],
-    );
-  }
 
-  Widget _segIcon({
-    required IconData icon,
-    required bool active,
-    required Color activeFg,
-    required Color inactiveFg,
-  }) {
-    final fg = active ? activeFg : inactiveFg;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Icon(icon, size: 20, color: fg),
+      onChanged: checkout.setCheckoutAction,
     );
   }
 }

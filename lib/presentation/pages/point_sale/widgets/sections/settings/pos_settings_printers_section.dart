@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../../../shared/pagination_response.dart';
+import '../../../../../../shared/printer/models/printer_device.dart';
+import '../../../../../../shared/printer/printer_service.dart';
 import '../../../../../widgets/empty_data.dart';
-import '../../organisms/settings/pos_settings_content.dart';
 
 class PosSettingsPrintersSection extends StatefulWidget {
-  const PosSettingsPrintersSection({super.key});
+  final PrinterService printerService;
+
+  const PosSettingsPrintersSection({super.key,required this.printerService});
 
   @override
   State<PosSettingsPrintersSection> createState() =>
@@ -14,28 +17,12 @@ class PosSettingsPrintersSection extends StatefulWidget {
 class _PosSettingsPrintersSectionState
     extends State<PosSettingsPrintersSection> {
   final ScrollController _scrollController = ScrollController();
-
-  /// aquí decides el total simulado
-  int _simulatedTotal = 592;
-
-  late FakePrintersApi _api;
-
-  final List<GenericListItem<Map<String, dynamic>>> _items = [];
-
-  int _currentPage = 1;
-  final int _rowCount = 10;
-  int _total = 0;
-
-  bool _isLoading = false;
-  bool _hasInitialLoadFinished = false;
-
-  bool get _hasData => _items.isNotEmpty;
-  bool get _hasMore => _items.length < _total;
-
+  late PrinterService _printerService;
+  bool _isSearching = false;
+  List<PrinterDevice> _devices = [];
   @override
   void initState() {
     super.initState();
-    _api = FakePrintersApi(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
   }
@@ -45,62 +32,56 @@ class _PosSettingsPrintersSectionState
     _scrollController.dispose();
     super.dispose();
   }
-
-  Future<void> _loadInitial() async {
-    if (_isLoading) return;
+  Future<void> _searchDevices() async {
 
     setState(() {
-      _isLoading = true;
+      _isSearching = true;
+      _devices.clear();
     });
 
-    final response = await _api.fetchPage(
-      current: _currentPage,
-      rowCount: _rowCount,
-    );
+
+    try {
+
+      final devices =
+      await widget.printerService.scan();
+
+
+      if(!mounted) return;
+
+
+      setState(() {
+        _devices = devices;
+      });
+
+
+    } catch(e){
+
+      debugPrint(
+          "Error buscando impresoras: $e"
+      );
+
+    }
+
+
+    if(!mounted) return;
+
+
+    setState(() {
+      _isSearching = false;
+    });
+
+  }
+  Future<void> _loadInitial() async {
 
     if (!mounted) return;
 
-    setState(() {
-      _items.addAll(response.rows);
-      _total = response.total;
-      _hasInitialLoadFinished = true;
-      _isLoading = false;
-    });
   }
 
   Future<void> _loadMore() async {
-    if (_isLoading || !_hasMore) return;
-    setState(() {
-      _isLoading = true;
-    });
-    _currentPage++;
-    final response = await _api.fetchPage(
-      current: _currentPage,
-      rowCount: _rowCount,
-    );
 
-    if (!mounted) return;
-
-    setState(() {
-      _items.addAll(response.rows);
-      _total = response.total;
-      _isLoading = false;
-    });
   }
 
-  Future<void> _refreshAll() async {
-    if (_isLoading) return;
-    _api = FakePrintersApi(total: _simulatedTotal);
 
-    setState(() {
-      _currentPage = 1;
-      _items.clear();
-      _total = 0;
-      _hasInitialLoadFinished = false;
-    });
-
-    await _loadInitial();
-  }
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
@@ -112,137 +93,184 @@ class _PosSettingsPrintersSectionState
     }
   }
 
-  void _onTapItem(GenericListItem<Map<String, dynamic>> item) {
-    showDialog(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: Text(item.title),
-        content: Text(
-          'ID: ${item.id}\n'
-              'Subtitle: ${item.subtitle}\n'
-              'Description: ${item.description}',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cerrar'),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
+    return Column(
       children: [
-        if (!_hasInitialLoadFinished && _isLoading)
-          const Center(child: CircularProgressIndicator())
-        else if (!_hasData)
-          RefreshIndicator(
-            onRefresh: _refreshAll,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              children: const [
-                SizedBox(
-                  height: 600,
-                  child: EmptyData(
-                    icon: Icons.print_rounded,
-                    title: 'Todavía no hay impresoras',
-                    descriptionText:
-                    'Aquí puedes conectar tu impresora de recibos y de cocina.',
-                    linkText: 'Más información',
-                  ),
-                ),
-              ],
-            ),
-          )
-        else
-          _buildList(),
 
-        Positioned(
-          right: 32,
-          bottom: 80,
-          child: FloatingActionButton(
-            onPressed: () {
-              debugPrint('Agregar impresora');
-            },
-            child: const Icon(Icons.add),
-          ),
+        _buildPrinterTabs(),
+
+        Expanded(
+          child: _buildPrinterContent(),
         ),
+
       ],
     );
   }
 
-  Widget _buildList() {
-    return RefreshIndicator(
-      onRefresh: _refreshAll,
-      child: ListView.separated(
-        controller: _scrollController,
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
-        separatorBuilder: (_, __) => const Divider(height: 1),
-        itemBuilder: (context, index) {
-          if (index >= _items.length) {
-            return const Padding(
-              padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
 
-          final item = _items[index];
+  int _selectedPrinterTab = 0;
+  Widget _buildPrinterContent(){
 
-          return InkWell(
-            onTap: () => _onTapItem(item),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      shape: BoxShape.circle,
-                    ),
-                    child: item.image == null
-                        ? const Icon(Icons.print, color: Colors.grey)
-                        : null,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          item.title,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          item.subtitle,
-                          style: const TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
+    switch(_selectedPrinterTab){
+
+      case 0:
+
+       return _buildSearchDevices();
+
+
+      case 1:
+        return const EmptyData(
+          icon: Icons.bluetooth_connected,
+          title: 'Dispositivos conectados',
+          descriptionText:
+          'Aquí aparecerán las impresoras conectadas anteriormente.',
+          linkText: 'Más información',
+        );
+
+
+      case 2:
+        return const EmptyData(
+          icon: Icons.print,
+          title: 'Impresoras configuradas',
+          descriptionText:
+          'Aquí estarán tus impresoras del punto de venta.',
+          linkText: 'Más información',
+        );
+
+
+      default:
+        return Container();
+
+    }
+
+  }
+  Widget _buildPrinterTabs() {
+
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: ToggleButtons(
+        isSelected: [
+          _selectedPrinterTab == 0,
+          _selectedPrinterTab == 1,
+          _selectedPrinterTab == 2,
+        ],
+
+        onPressed: (index){
+
+          setState(() {
+            _selectedPrinterTab = index;
+          });
+
         },
+
+        children: const [
+
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            child: Text(
+              'Buscar',
+            ),
+          ),
+
+
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            child: Text(
+              'Conectadas',
+            ),
+          ),
+
+
+          Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: 16,
+            ),
+            child: Text(
+              'Impresoras',
+            ),
+          ),
+
+        ],
       ),
     );
+
+  }
+  Widget _buildSearchDevices(){
+
+    return Column(
+      children:[
+        ElevatedButton.icon(
+          onPressed:
+          _isSearching
+              ? null
+              : _searchDevices,
+          icon:
+          const Icon(
+            Icons.bluetooth_searching,
+          ),
+
+
+          label:
+          Text(
+            _isSearching
+                ? 'Buscando...'
+                : 'Buscar dispositivos',
+          ),
+
+        ),
+
+
+        Expanded(
+
+          child:
+
+          ListView.builder(
+
+            itemCount:_devices.length,
+
+
+            itemBuilder:(context,index){
+
+              final device =
+              _devices[index];
+
+
+              return ListTile(
+
+                leading:
+                const Icon(
+                  Icons.print,
+                ),
+
+
+                title:
+                Text(
+                  device.name,
+                ),
+
+
+                subtitle:
+                Text(
+                  device.address,
+                ),
+
+              );
+
+            },
+
+          ),
+
+        )
+
+      ],
+    );
+
   }
 }

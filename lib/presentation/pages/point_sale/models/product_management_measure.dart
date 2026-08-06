@@ -144,7 +144,33 @@ class MeasureCategoryModel {
     );
   }
 }
+class StateModel<T> {
+  final T id;
+  final String name;
+  final String description;
 
+  const StateModel({
+    required this.id,
+    required this.name,
+    required this.description,
+  });
+
+
+  @override
+  bool operator ==(Object other) {
+
+    if (identical(this, other)) {
+      return true;
+    }
+
+    return other is StateModel<T> &&
+        other.id == id;
+  }
+
+
+  @override
+  int get hashCode => id.hashCode;
+}
 class TaxCategoryModel {
   final int id;
   final String name;

@@ -116,8 +116,11 @@ class ProductListCard extends StatelessWidget {
 
     Color colorIconTax = colors.buttonPrimaryBackground;
     Color colorAmount = Colors.orange;
-
-
+    IconData iconAmount=Icons.inventory_2_outlined;
+    if (quantity < 0) {
+       colorAmount = Colors.redAccent;
+       iconAmount=Icons.warning_amber_rounded;
+    }
     if (details['product']['has_tax'] == 1) {
       colorIconTax = Colors.orange;
     }
@@ -126,20 +129,20 @@ class ProductListCard extends StatelessWidget {
     final configuration = MeasureTypeUtils.getConfiguration(
       typeMeasureId: typeMeasureId,
     );
-    Color managerTypeMeasureColor =configuration.borderColor;
-
+    Color managerTypeMeasureColor = configuration.borderColor;
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
       onTap: onTap,
       child: Container(
-
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: colors.cardBackground,
           borderRadius: BorderRadius.circular(20),
-          border: Border(left: BorderSide(color: configuration.borderColor, width: 6)),
+          border: Border(
+            left: BorderSide(color: configuration.borderColor, width: 6),
+          ),
           boxShadow: [
             BoxShadow(
               color: colors.shadow,
@@ -245,7 +248,7 @@ class ProductListCard extends StatelessWidget {
 
                 Expanded(
                   child: _InfoColumn(
-                    icon: Icons.inventory_2_outlined,
+                    icon: iconAmount,
                     title: "Cantidad",
                     value: "$quantity $unit",
                     colorIcon: colorAmount,

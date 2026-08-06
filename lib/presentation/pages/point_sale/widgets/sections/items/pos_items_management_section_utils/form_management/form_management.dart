@@ -13,6 +13,7 @@ import '../../../../../../../../shared/utils/util_common.dart';
 import '../../../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../../../shared/responsive/device_gesture_observer.dart';
 import '../../../../../../../widgets/cards/cards.dart';
+import '../../../../../../../widgets/toogle-manager.dart';
 import '../../../../../models/product_draft.dart';
 import '../../../../../models/product_management_measure.dart';
 import '../../../../../state/product_modal_controller.dart';
@@ -99,8 +100,6 @@ Future<void> showManagerProduct({
     },
   );
 
-
-
   await Navigator.push(
     context,
     PageRouteBuilder(
@@ -138,6 +137,19 @@ class ProductManagerFormWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final device = DeviceGestureObserver.snapshotOf(context);
+    final List<StateModel<String>> stateList = [
+      StateModel<String>(
+        id: 'ACTIVE',
+        name: 'Activo',
+        description: 'Registro disponible',
+      ),
+
+      StateModel<String>(
+        id: 'INACTIVE',
+        name: 'Inactivo',
+        description: 'Registro no disponible',
+      ),
+    ];
 
     switch (device.layoutType) {
       case LayoutType.mobilePortrait:
@@ -145,6 +157,7 @@ class ProductManagerFormWidget extends StatelessWidget {
           controller: controller,
           listMeasureCategory: listMeasureCategory,
           listTaxCategory: listTaxCategory,
+          listState: stateList,
           buildContextParent: buildContextParent,
         );
       case LayoutType.mobileLandscape:
@@ -152,6 +165,7 @@ class ProductManagerFormWidget extends StatelessWidget {
           controller: controller,
           listMeasureCategory: listMeasureCategory,
           listTaxCategory: listTaxCategory,
+          listState: stateList,
           buildContextParent: buildContextParent,
         );
 
@@ -160,6 +174,8 @@ class ProductManagerFormWidget extends StatelessWidget {
           controller: controller,
           listMeasureCategory: listMeasureCategory,
           listTaxCategory: listTaxCategory,
+          listState: stateList,
+
           buildContextParent: buildContextParent,
         );
 
@@ -168,6 +184,7 @@ class ProductManagerFormWidget extends StatelessWidget {
           controller: controller,
           listMeasureCategory: listMeasureCategory,
           listTaxCategory: listTaxCategory,
+          listState: stateList,
           buildContextParent: buildContextParent,
         );
     }
@@ -178,6 +195,8 @@ class LandProductWidget extends StatelessWidget {
   final ProductModalController controller;
   final List<MeasureCategoryModel> listMeasureCategory;
   final List<TaxCategoryModel> listTaxCategory;
+  final List<StateModel> listState;
+
   final BuildContext buildContextParent;
 
   const LandProductWidget({
@@ -185,6 +204,7 @@ class LandProductWidget extends StatelessWidget {
     required this.controller,
     required this.listMeasureCategory,
     required this.listTaxCategory,
+    required this.listState,
     required this.buildContextParent,
   });
 
@@ -194,6 +214,7 @@ class LandProductWidget extends StatelessWidget {
       controller,
       listMeasureCategory,
       listTaxCategory,
+      listState,
       context,
     );
   }
@@ -207,11 +228,119 @@ Widget _buildManagerProduct(
   ProductModalController controller,
   List<MeasureCategoryModel> listMeasureCategory,
   List<TaxCategoryModel> listTaxCategory,
+  List<StateModel> listState,
+
   BuildContext context,
 ) {
   return Column(
     children: [
       AppSpacing.spaceBetweenSections,
+      PsSectionCard(
+        //TODO
+        title: controller.titleCardConfigurationProduct, //oki
+        child: Column(
+          children: [
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  widthFactor: 0.25,
+                  child: PsDropdown<StateModel>(
+                    label: controller.stateLabel,
+                    items: listState,
+                    value: controller.selectedState,
+                    getLabel: (e) => '${e.name}',
+                    onChanged: controller.selectState,
+                  ),
+                ),
+                PsFieldItem(
+                  widthFactor: 0.25,
+                  child: PsSegmentToggle<bool>(
+                    enabled:controller.allowShopManagement,
+                    // NUEVOS PARAMETROS
+                    titleSpacing: 20,
+                    itemPadding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 8,
+                    ),
+                    padding: const EdgeInsets.all(3),
+                    iconSize: 18,
+                    spacing: 5,
+                    borderRadius: 10,
+                    height: 40,
+                    itemMinWidth: 45,
+                    title: 'Disponible para venta',
+                    titleStyle: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    value: controller.allowShop,
+                    items: [
+                      PsSegmentItem<bool>(
+                        value: true,
+                        label: 'Si',
+                        activeIcon: Icons.visibility,
+                        inactiveIcon: Icons.visibility_outlined,
+                        thumbColor: Colors.green,
+                        activeColor: Colors.white,
+                        inactiveColor: Colors.grey,
+                      ),
+                      PsSegmentItem<bool>(
+                        value: false,
+                        label: 'No',
+                        activeIcon: Icons.visibility_off,
+                        inactiveIcon: Icons.visibility_off_outlined,
+                        thumbColor: Colors.orange,
+                        activeColor: Colors.white,
+                        inactiveColor: Colors.grey,
+                      ),
+                    ],
+                    onChanged: controller.setViewAllowShop,
+                  ),
+                ),
+              ],
+            ),
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  child: _InventoryInfoHint(
+                    type: controller.sellType,
+                    listMeasureCategoryManagement:
+                        controller.listMeasureCategoryManagement,
+                  ),
+                ),
+              ],
+            ),
+
+            AppSpacing.spaceBetweenInputs,
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  child: PsToggleSelector<InventoryType>(
+                    enabled:
+                        controller.typeManagementProduct == CrudType.create,
+                    title: controller.inventoryTypeLabel,
+                    value: controller.inventoryType,
+                    items: InventoryType.values,
+                    onChanged: controller.setInventoryType,
+                  ),
+                ),
+                PsFieldItem(
+                  child: PsToggleSelector<MeasureType>(
+                    title: controller.sellTypeLabel,
+                    value: controller.sellType,
+                    items: MeasureType.values,
+                    enabled:
+                        controller.canManageSellType,
+                    onChanged: controller.setMeasureType,
+                  ),
+                ),
+              ],
+            ),
+
+            AppSpacing.spaceBetweenInputs,
+          ],
+        ),
+      ),
 
       /// =========================
       /// 📦 INFORMACIÓN
@@ -223,20 +352,6 @@ Widget _buildManagerProduct(
           title: labelCardInformationProduct(controller),
           child: Column(
             children: [
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsToggleSelector<InventoryType>(
-                      enabled:
-                          controller.typeManagementProduct == CrudType.create,
-                      title: controller.inventoryTypeLabel,
-                      value: controller.inventoryType,
-                      items: InventoryType.values,
-                      onChanged: controller.setInventoryType,
-                    ),
-                  ),
-                ],
-              ),
               AppSpacing.spaceBetweenInputs,
               PsFieldRow(
                 children: [
@@ -419,67 +534,44 @@ Widget _buildManagerProduct(
       PsSectionCard(
         //TODO
         title: controller.titleCardInventoryStockManagement, //oki
-        child: Column(children: [
-          PsFieldRow(
-            children: [
-              PsFieldItem(
-                child: PsInput(
-                  value: controller.lowStock?.toString() ?? '',
-                  requiredField: true,
-                  label: controller.lowStockLabel,
-                  keyboardType: TextInputType.number,
-                  onChanged: controller.setLowStock,
-                  error: controller.lowStockError,
-                  isTouched: controller.lowStockTouched,
-                  isValid: controller.lowStockError == null,
+        child: Column(
+          children: [
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  child: PsInput(
+                    value: controller.lowStock?.toString() ?? '',
+                    requiredField: true,
+                    label: controller.lowStockLabel,
+                    keyboardType: TextInputType.number,
+                    onChanged: controller.setLowStock,
+                    error: controller.lowStockError,
+                    isTouched: controller.lowStockTouched,
+                    isValid: controller.lowStockError == null,
+                  ),
                 ),
-              ),
-              PsFieldItem(
-                child: PsInput(
-                  value: controller.maxStock?.toString() ?? '',
-                  requiredField: true,
-                  label: controller.maxStockLabel,
-                  keyboardType: TextInputType.number,
-                  onChanged: controller.setMaxStock,
-                  error: controller.maxStockError,
-                  isTouched: controller.maxStockTouched,
-                  isValid: controller.maxStockError == null,
+                PsFieldItem(
+                  child: PsInput(
+                    value: controller.maxStock?.toString() ?? '',
+                    requiredField: true,
+                    label: controller.maxStockLabel,
+                    keyboardType: TextInputType.number,
+                    onChanged: controller.setMaxStock,
+                    error: controller.maxStockError,
+                    isTouched: controller.maxStockTouched,
+                    isValid: controller.maxStockError == null,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ]),
+              ],
+            ),
+          ],
+        ),
       ),
       PsSectionCard(
         //TODO
         title: controller.titleCardInventoryInitProduct, //oki
         child: Column(
           children: [
-            PsFieldRow(
-              children: [
-                PsFieldItem(
-                  child: _InventoryInfoHint(
-                    type: controller.sellType,
-                    listMeasureCategoryManagement:
-                        controller.listMeasureCategoryManagement,
-                  ),
-                ),
-              ],
-            ),
-            PsFieldRow(
-              children: [
-                PsFieldItem(
-                  child: PsToggleSelector<MeasureType>(
-                    title: controller.sellTypeLabel,
-                    value: controller.sellType,
-                    items: MeasureType.values,
-                    enabled:
-                        controller.typeManagementProduct == CrudType.create,
-                    onChanged: controller.setMeasureType,
-                  ),
-                ),
-              ],
-            ),
             AppSpacing.spaceBetweenInputs,
             PsFieldRow(
               children: [
@@ -508,7 +600,6 @@ Widget _buildManagerProduct(
               ],
             ),
             AppSpacing.spaceBetweenInputs,
-
           ],
         ),
       ),
@@ -525,6 +616,8 @@ class PortraitProductWidget extends StatelessWidget {
   final ProductModalController controller;
   final List<MeasureCategoryModel> listMeasureCategory;
   final List<TaxCategoryModel> listTaxCategory;
+  final List<StateModel> listState;
+
   final BuildContext buildContextParent;
 
   const PortraitProductWidget({
@@ -532,6 +625,8 @@ class PortraitProductWidget extends StatelessWidget {
     required this.controller,
     required this.listMeasureCategory,
     required this.listTaxCategory,
+    required this.listState,
+
     required this.buildContextParent,
   });
 
@@ -541,6 +636,7 @@ class PortraitProductWidget extends StatelessWidget {
       controller,
       listMeasureCategory,
       listTaxCategory,
+      listState,
       context,
     );
   }

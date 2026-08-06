@@ -4,6 +4,8 @@ import '../../shared/models/app_config.dart';
 import '../../domain/services/session_service.dart';
 import 'package:provider/single_child_widget.dart';
 
+import '../../shared/printer/mock_bluetooth.dart';
+import '../../shared/printer/printer_service.dart';
 import '../../shared/theme/configuration/app_theme_controller.dart';
 import '../router/controllers/app_controller.dart';
 import '../router/controllers/app_drawer_controller.dart';
@@ -45,6 +47,20 @@ List<SingleChildWidget> buildAppProviders(AppMode mode) {
     ChangeNotifierProxyProvider<AppController, AppDrawerController>(
       create: (context) => AppDrawerController(app: context.read<AppController>()),
       update: (context, app, drawer) => drawer ?? AppDrawerController(app: app),
+    ),
+    Provider<PrinterService>(
+      create: (_) {
+
+        return PrinterService(
+
+          bluetooth:
+          FlutterBluetoothPrinterService(),
+          driver:
+          MockPrinterDriver(),
+
+        );
+
+      },
     ),
   ];
 }

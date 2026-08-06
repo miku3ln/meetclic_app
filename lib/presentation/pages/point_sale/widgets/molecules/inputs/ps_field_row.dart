@@ -27,20 +27,31 @@ class PsFieldRow extends StatelessWidget {
     );
   }
 }
-
-
 class PsFieldItem extends StatelessWidget {
   final Widget child;
   final int flex;
+
+  /// Porcentaje del ancho disponible
+  /// Ejemplo: 0.25 = 25%
+  final double? widthFactor;
 
   const PsFieldItem({
     super.key,
     required this.child,
     this.flex = 1,
+    this.widthFactor,
   });
 
   @override
   Widget build(BuildContext context) {
+
+    if (widthFactor != null) {
+      return SizedBox(
+        width: MediaQuery.of(context).size.width * widthFactor!,
+        child: child,
+      );
+    }
+
     return Expanded(
       flex: flex,
       child: child,

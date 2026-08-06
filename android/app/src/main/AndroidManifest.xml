@@ -15,6 +15,13 @@
         android:name="android.hardware.camera.ar"
         android:required="false" />
     <meta-data android:name="com.google.ar.core" android:value="required" />
+    <uses-permission android:name="android.permission.BLUETOOTH"/>
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH_SCAN"
+        android:usesPermissionFlags="neverForLocation"/>
+
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
 
     <application
         android:label="@string/app_name"

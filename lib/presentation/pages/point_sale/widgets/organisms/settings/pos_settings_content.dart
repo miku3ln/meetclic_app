@@ -2,30 +2,35 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../../../shared/pagination_response.dart';
+import '../../../../../../shared/printer/printer_service.dart';
 import '../../../state/pos_settings_controller.dart';
 import '../../sections/settings/pos_settings_customer_screen_section.dart';
 import '../../sections/settings/pos_settings_general_section.dart';
 import '../../sections/settings/pos_settings_printers_section.dart';
 import '../../sections/settings/pos_settings_taxes_section.dart';
 import 'dart:async';
+
 class PosSettingsContent extends StatelessWidget {
   const PosSettingsContent({super.key});
+
   @override
   Widget build(BuildContext context) {
     final section = context.watch<PosSettingsController>().section;
     return Container(
       color: Colors.white,
       child: Column(
-        children: [
-          Expanded(child: _buildSection(section)),
-        ],
+        children: [Expanded(child: _buildSection(section, context))],
       ),
     );
   }
-  Widget _buildSection(PosSettingsSection s) {
+
+  Widget _buildSection(PosSettingsSection s, BuildContext context) {
     switch (s) {
       case PosSettingsSection.printers:
-        return const PosSettingsPrintersSection();
+        final printerService = context.read<PrinterService>();
+
+        return PosSettingsPrintersSection(printerService: printerService);
+
       case PosSettingsSection.customerScreen:
         return const PosSettingsCustomerScreenSection();
       case PosSettingsSection.taxes:
@@ -36,13 +41,10 @@ class PosSettingsContent extends StatelessWidget {
   }
 }
 
-
 class FakePrintersApi {
   final int total;
 
-  const FakePrintersApi({
-    required this.total,
-  });
+  const FakePrintersApi({required this.total});
 
   Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
     required int current,

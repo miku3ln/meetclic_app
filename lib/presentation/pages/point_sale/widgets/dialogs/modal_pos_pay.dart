@@ -159,6 +159,8 @@ class PosPaymentLayoutController extends ChangeNotifier {
 
   bool get isCompleted => _isCompleted;
 
+  bool get isAllowCupons => false;
+
   Future<Map<String, dynamic>> completePayment() async {
     try {
       final customer = main.selectedCustomer;
@@ -312,18 +314,23 @@ class PosPaymentLayout extends StatelessWidget {
           child: PosFloatingActionsColumn(
             position: PosFloatingPosition.bottomRight,
             actions: [
-              PosActionButton(
-                width: 100,
-                icon: Icons.confirmation_number,
-                label: 'Cupones',
-                backgroundColor: Colors.orange,
+              if (controller.isAllowCupons)
+                PosActionButton(
+                  width: 100,
+                  icon: Icons.confirmation_number,
+                  label: 'Cupones',
+                  backgroundColor: Colors.orange,
 
-                onPressed: mainController.canUseCoupons
-                    ? () {
-                        _openCouponsPanel(context, mainController, controller);
-                      }
-                    : null, // 🔥 deshabilita
-              ),
+                  onPressed: mainController.canUseCoupons
+                      ? () {
+                          _openCouponsPanel(
+                            context,
+                            mainController,
+                            controller,
+                          );
+                        }
+                      : null, // 🔥 deshabilita
+                ),
               PosActionButton(
                 width: 100,
                 // onPressed: controller.hasItems
@@ -493,7 +500,10 @@ class PosPaymentPanel extends StatelessWidget {
 
           /// 🔥 SWITCH ENTRE FORM Y SUCCESS
           child: controller.isCompleted
-              ? PosPaymentSuccess(controller: controller,mainController:mainController)
+              ? PosPaymentSuccess(
+                  controller: controller,
+                  mainController: mainController,
+                )
               : posPaymentManagement(context, controller, mainController),
         );
       },
@@ -736,7 +746,11 @@ class PosPaymentSuccess extends StatefulWidget {
   final PosPaymentLayoutController controller;
   final PosMainController mainController;
 
-  const PosPaymentSuccess({super.key, required this.controller,required this.mainController});
+  const PosPaymentSuccess({
+    super.key,
+    required this.controller,
+    required this.mainController,
+  });
 
   @override
   State<PosPaymentSuccess> createState() => _PosPaymentSuccessState();
@@ -787,7 +801,7 @@ class _PosPaymentSuccessState extends State<PosPaymentSuccess> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                               Text(widget.mainController.labels.totalPayment),
+                              Text(widget.mainController.labels.totalPayment),
                             ],
                           ),
                         ),
@@ -810,7 +824,7 @@ class _PosPaymentSuccessState extends State<PosPaymentSuccess> {
                                 ),
                               ),
                               const SizedBox(height: 4),
-                               Text(widget.mainController.labels.change),
+                              Text(widget.mainController.labels.change),
                             ],
                           ),
                         ),
@@ -936,9 +950,10 @@ class _Header extends StatelessWidget {
               items: [
                 HeaderItemData(
                   colorIcon: colors.white,
-                  label:mainController.labels.ticket,
+                  label: mainController.labels.ticket,
                   flex: 6,
-                  alignment: HeaderItemAlignment.left, // 🔥
+                  alignment: HeaderItemAlignment.left,
+                  // 🔥
                   onTap: () {},
                 ),
                 HeaderItemData(
@@ -993,7 +1008,8 @@ class _Header extends StatelessWidget {
                   icon: Icons.arrow_back,
                   flex: 3,
                   colorIcon: colors.white,
-                  alignment: HeaderItemAlignment.left, // 🔥
+                  alignment: HeaderItemAlignment.left,
+                  // 🔥
                   onTap: () {
                     if (controller.isCompleted) {
                       controller.reset();
@@ -1012,8 +1028,6 @@ class _Header extends StatelessWidget {
 }
 
 class HeaderItem extends StatelessWidget {
-
-
   final List<HeaderItemData> items;
   final HeaderSide side;
   final Color color;
@@ -1063,12 +1077,15 @@ Alignment _mapAlignment(HeaderItemAlignment alignment) {
 }
 
 Widget _buildContentItems(HeaderItemData item) {
-  if (item.icon != null && (item.label == null ||item.label == '')) {
-    return Icon(item.icon,color: item.colorIcon);
+  if (item.icon != null && (item.label == null || item.label == '')) {
+    return Icon(item.icon, color: item.colorIcon);
   }
 
   if (item.label != null && item.icon == null) {
-    return Text(item.label!,style:  TextStyle(color: item.colorIcon, fontWeight: FontWeight.w600));
+    return Text(
+      item.label!,
+      style: TextStyle(color: item.colorIcon, fontWeight: FontWeight.w600),
+    );
   }
 
   return Row(
@@ -1094,7 +1111,10 @@ Widget _wrapItem(HeaderItemData item) {
   if (isIconOnly) {
     return Align(
       alignment: _mapAlignment(item.alignment),
-      child: IconButton(icon: Icon(item.icon,color: item.colorIcon), onPressed: item.onTap),
+      child: IconButton(
+        icon: Icon(item.icon, color: item.colorIcon),
+        onPressed: item.onTap,
+      ),
     );
   }
 
@@ -1552,13 +1572,16 @@ class PosFloatingActionsColumn extends StatelessWidget {
 
 Widget _buildContent(PosActionButton action) {
   if (action.icon != null && action.label == null) {
-    return Icon(action.icon, size: 20,color:Colors.white); // 👈 más pequeño
+    return Icon(action.icon, size: 20, color: Colors.white); // 👈 más pequeño
   }
 
   if (action.label != null && action.icon == null) {
     return Text(
       action.label!,
-      style: const TextStyle(fontSize: 12,color: Colors.white), // 👈 más pequeño
+      style: const TextStyle(
+        fontSize: 12,
+        color: Colors.white,
+      ), // 👈 más pequeño
     );
   }
 
@@ -1566,9 +1589,12 @@ Widget _buildContent(PosActionButton action) {
     mainAxisAlignment: MainAxisAlignment.center,
     mainAxisSize: MainAxisSize.min, // 🔥 CLAVE
     children: [
-      Icon(action.icon, size: 20,color: Colors.white),
+      Icon(action.icon, size: 20, color: Colors.white),
       const SizedBox(height: 2), // 👈 reduce espacio
-      Text(action.label!, style: const TextStyle(fontSize: 11,color: Colors.white)),
+      Text(
+        action.label!,
+        style: const TextStyle(fontSize: 11, color: Colors.white),
+      ),
     ],
   );
 }

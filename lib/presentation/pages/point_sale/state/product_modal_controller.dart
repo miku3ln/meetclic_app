@@ -21,7 +21,6 @@ import 'dart:convert';
 
 import '../widgets/sections/items/pos_categories_management_section/models/models_management.dart';
 
-
 class ProductIngredientsController extends ChangeNotifier {
   final ProductModalController parent;
 
@@ -345,6 +344,8 @@ class ProductModalController extends BaseFormController {
   String categoriesLabel = 'Categoria';
   String subcategoriesLabel = 'Subcategoria';
   String taxsLabel = 'Impuesto';
+  String stateLabel = 'Estado';
+
   String imageLabel = 'Imagen';
   String sellTypeLabel = 'Tipos de Medida';
 
@@ -477,6 +478,28 @@ class ProductModalController extends BaseFormController {
   }
 
   TaxCategoryModel? selectedTax;
+  final List<StateModel<String>> states = [
+    const StateModel<String>(
+      id: 'ACTIVE',
+      name: 'Activo',
+      description: 'Registro activo',
+    ),
+    const StateModel<String>(
+      id: 'INACTIVE',
+      name: 'Inactivo',
+      description: 'Registro inactivo',
+    ),
+  ];
+  StateModel? selectedState = StateModel<String>(
+    id: 'ACTIVE',
+    name: 'Activo',
+    description: 'Registro activo',
+  );
+
+  void selectState(StateModel? selectData) {
+    selectedState = selectData;
+    notifyListeners();
+  }
 
   void selectTax(TaxCategoryModel? selectData) {
     taxTouched = true;
@@ -632,11 +655,37 @@ class ProductModalController extends BaseFormController {
   }
 
   MeasureType sellType = MeasureType.unit;
+
+  bool sellTypeAllowManagement = true; // viene de configuración o permiso
+
+  bool get canManageSellType =>
+      typeManagementProduct == CrudType.create && sellTypeAllowManagement;
+
   TypeDesgloce sellTypeDesgloce = TypeDesgloce.menuRecipe;
+  bool allowShopManagement = true;
+
+  bool allowManagementViewAllowShop() {
+    if (sellType.id == MeasureType.unit.id) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 
   void setMeasureType(MeasureType type) {
     sellType = type;
     selectedUnitMeasure = null;
+    allowShopManagement = allowManagementViewAllowShop();
+    if (sellType.id == MeasureType.unit.id) {
+      if (!allowShop) {
+        allowShop = true;
+      }
+    } else {
+      if (allowShop) {
+        allowShop = false;
+      }
+    }
+
     notifyListeners();
   }
 
@@ -644,6 +693,11 @@ class ProductModalController extends BaseFormController {
   String inventoryTypeLabel = 'Tipo de Producto';
   String nameLabel = 'Nombre';
   String titleCardInformationProduct = 'Informacion General';
+  String titleCardConfigurationProduct = 'Configuracion';
+
+  bool allowManagerMeasure = false;
+  bool allowShop = false;
+
   String titleCardCostPricesProduct = 'Costos y Precios';
   String titleCardInventoryInitProduct = 'Inventario Inicial';
   String titleCardInventoryStockManagement = 'Stock Gestion';
@@ -656,6 +710,30 @@ class ProductModalController extends BaseFormController {
 
   void setInventoryType(InventoryType type) {
     inventoryType = type;
+
+    if (inventoryType.id == InventoryType.raw.id) {
+      sellTypeAllowManagement=true;
+      lowStockField.value=null;
+      maxStockField.value=null;
+      stockField.value=null;
+    } else if (inventoryType.id == InventoryType.processed.id) {
+      sellTypeAllowManagement=true;
+      lowStockField.value=null;
+      maxStockField.value=null;
+      stockField.value=null;
+    } else if (inventoryType.id == InventoryType.forSale.id) {
+      sellTypeAllowManagement=false;
+      sellType=MeasureType.unit;
+      lowStockField.value=0;
+      maxStockField.value=0;
+      stockField.value=0;
+    }
+
+    notifyListeners();
+  }
+
+  void setViewAllowShop(bool value) {
+    allowShop = value;
     notifyListeners();
   }
 
@@ -1222,7 +1300,15 @@ class CategoriaModalController extends ChangeNotifier {
       throw Exception("Formulario inválido");
     }
 
-    return ProductCategoryDraft(name: name, image: "",description: "",id: -1,business_id: -1,code: '',subtitle: '');
+    return ProductCategoryDraft(
+      name: name,
+      image: "",
+      description: "",
+      id: -1,
+      business_id: -1,
+      code: '',
+      subtitle: '',
+    );
   }
 
   void _resetTouched() {
@@ -1535,7 +1621,3 @@ class CustomerModalController extends ChangeNotifier {
     }
   }
 }
-
-
-
-
