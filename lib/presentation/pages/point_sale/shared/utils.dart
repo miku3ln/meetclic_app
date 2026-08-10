@@ -3,11 +3,14 @@ class TypeService {
   final String label;
   final IconData icon;
   final String value;
+  final String key;
 
   TypeService({
     required this.label,
     required this.icon,
     required this.value,
+    required this.key,
+
   });
 }
 PopupMenuItem<String> BuildItemIconMenu({

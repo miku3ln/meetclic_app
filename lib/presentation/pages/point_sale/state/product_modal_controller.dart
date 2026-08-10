@@ -250,6 +250,10 @@ class ProductModalController extends BaseFormController {
         validators: [ValidatorsUtil.nonNegativeDouble("Stock maximo")],
       ),
     });
+
+    inventoryType = InventoryType.raw;
+    sellType = MeasureType.unit;
+    ingredientsController.ingredients=[];
   }
 
   ProductModalController() {
@@ -712,21 +716,21 @@ class ProductModalController extends BaseFormController {
     inventoryType = type;
 
     if (inventoryType.id == InventoryType.raw.id) {
-      sellTypeAllowManagement=true;
-      lowStockField.value=null;
-      maxStockField.value=null;
-      stockField.value=null;
+      sellTypeAllowManagement = true;
+      lowStockField.value = null;
+      maxStockField.value = null;
+      stockField.value = null;
     } else if (inventoryType.id == InventoryType.processed.id) {
-      sellTypeAllowManagement=true;
-      lowStockField.value=null;
-      maxStockField.value=null;
-      stockField.value=null;
+      sellTypeAllowManagement = true;
+      lowStockField.value = null;
+      maxStockField.value = null;
+      stockField.value = null;
     } else if (inventoryType.id == InventoryType.forSale.id) {
-      sellTypeAllowManagement=false;
-      sellType=MeasureType.unit;
-      lowStockField.value=0;
-      maxStockField.value=0;
-      stockField.value=0;
+      sellTypeAllowManagement = false;
+      sellType = MeasureType.unit;
+      lowStockField.value = 0;
+      maxStockField.value = 0;
+      stockField.value = 0;
     }
 
     notifyListeners();
@@ -760,10 +764,20 @@ class ProductModalController extends BaseFormController {
     costField.value = draft.cost;
     stockField.value = draft.stock;
 
+    String? stateCurrent = draft.state;
+    StateModel<String>? selectedStateResult = states.firstWhere(
+      (state) => state.id == stateCurrent,
+    );
+
+    selectedState = selectedStateResult;
     codeBarField.value = draft.code;
     inventoryType = draft.inventoryType;
     if (draft.detailsAll?.isNotEmpty == true) {
       final details = jsonDecode(draft.detailsAll!);
+    var product_sell_config=details['product_sell_config'];
+
+    var allowShopCurrent=product_sell_config["allow_shop"];
+      allowShop=allowShopCurrent==1;
       final productCurrent = details['product'];
       final productByStock = details['product_by_stock'];
       lowStockField.value = (productByStock['min'] ?? 0).toDouble();
@@ -1050,12 +1064,13 @@ class ProductModalController extends BaseFormController {
     );
     final product_measure_type_id = sellType.id;
     var stateCurrent = 'INACTIVE';
+    var product_type = sellType.id;
+    var inventory_type = inventoryType.id;
     if (type == CrudType.create) {
       stateCurrent = ingredientsController.ingredients.isNotEmpty
           ? 'ACTIVE'
           : 'INACTIVE';
 
-      var inventory_type = inventoryType.id;
       if (InventoryType.raw.id == inventory_type) {
         stateCurrent = 'ACTIVE';
       } else if (InventoryType.processed.id == inventory_type) {
@@ -1064,15 +1079,29 @@ class ProductModalController extends BaseFormController {
         stateCurrent = 'INACTIVE';
       }
     } else if (type == CrudType.update) {
-      stateCurrent = ingredientsController.ingredients.isNotEmpty
-          ? 'ACTIVE'
-          : 'INACTIVE';
+
+      if (InventoryType.raw.id == inventory_type) {
+        stateCurrent = selectedState?.id;
+      } else if (InventoryType.processed.id == inventory_type ||InventoryType.forSale.id == inventory_type ) {
+        stateCurrent = ingredientsController.ingredients.isNotEmpty
+            ? 'ACTIVE'
+            : 'INACTIVE';
+
+      }
+    }
+
+    if (InventoryType.raw.id == inventory_type) {
+      product_type = 'UNIT';
+    } else if (InventoryType.processed.id == inventory_type) {
+      product_type = 'MEASURABLE';
+    } else if (InventoryType.forSale.id == inventory_type) {
+      product_type = 'MIXED';
     }
 
     var product = {
       'code': codeBar,
       'name': name,
-      'product_type': 'MEASURABLE',
+      'product_type': product_type,
       'inventory_type': inventoryType.id,
       'state': stateCurrent,
       'product_trademark_id': 1,
@@ -1112,7 +1141,7 @@ class ProductModalController extends BaseFormController {
       },
       'product_sell_config': {
         'allow_pos': 1,
-        'allow_shop': 1,
+        'allow_shop':allowShop?1:0,
         'allow_delivery': 0,
         'visible': 1,
       },
@@ -1128,7 +1157,7 @@ class ProductModalController extends BaseFormController {
         'description': measureData["description"],
       },
     };
-    final jsonBody = jsonEncode(saveRegister);
+
     return saveRegister;
   }
 }

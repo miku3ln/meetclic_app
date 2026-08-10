@@ -107,55 +107,34 @@ class PosMainController extends ChangeNotifier {
       return;
     }
     final controller = PosPaymentLayoutController(main: this);
-    if (true) //TYPE VIEW POS SALE
-      Navigator.push(
-        context,
-        PageRouteBuilder(
-          transitionDuration: const Duration(milliseconds: 300),
-          pageBuilder: (_, __, ___) {
-            return Scaffold(
-              body: AnimatedBuilder(
-                animation: Listenable.merge([this, controller]),
-                builder: (_, __) {
-                  return buildPaymentModal(main: this, controller: controller);
-                },
-              ),
-            );
-          },
-          transitionsBuilder: (_, animation, __, child) {
-            return SlideTransition(
-              position:
-                  Tween<Offset>(
-                    begin: const Offset(1, 0), // 👉 entra desde derecha
-                    end: Offset.zero,
-                  ).animate(
-                    CurvedAnimation(parent: animation, curve: Curves.easeInOut),
-                  ),
-              child: child,
-            );
-          },
-        ),
-      );
-    if (false)
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) {
-          return AnimatedBuilder(
-            animation: Listenable.merge([this, controller]),
-            // animation: this, // 🔥 ESCUCHA CAMBIOS DEL MAIN
-            builder: (_, __) {
-              return Dialog(
-                child: SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height,
-                  child: buildPaymentModal(main: this, controller: controller),
-                ),
-              );
-            },
+    Navigator.push(
+      context,
+      PageRouteBuilder(
+        transitionDuration: const Duration(milliseconds: 300),
+        pageBuilder: (_, __, ___) {
+          return Scaffold(
+            body: AnimatedBuilder(
+              animation: Listenable.merge([this, controller]),
+              builder: (_, __) {
+                return buildPaymentModal(main: this, controller: controller);
+              },
+            ),
           );
         },
-      );
+        transitionsBuilder: (_, animation, __, child) {
+          return SlideTransition(
+            position:
+                Tween<Offset>(
+                  begin: const Offset(1, 0), // 👉 entra desde derecha
+                  end: Offset.zero,
+                ).animate(
+                  CurvedAnimation(parent: animation, curve: Curves.easeInOut),
+                ),
+            child: child,
+          );
+        },
+      ),
+    );
   }
 
   void onPrimaryCheckoutTap(BuildContext context) {
@@ -211,16 +190,19 @@ class PosMainController extends ChangeNotifier {
       label: 'Para servirse',
       icon: Icons.restaurant,
       value: 'servirse',
+      key: "DINE_IN",
     ),
     TypeService(
       label: 'Para llevar',
       icon: Icons.shopping_bag,
       value: 'llevar',
+      key: "TAKEAWAY",
     ),
     TypeService(
       label: 'A domicilio',
       icon: Icons.delivery_dining,
       value: 'domicilio',
+      key: "DELIVERY",
     ),
   ];
 

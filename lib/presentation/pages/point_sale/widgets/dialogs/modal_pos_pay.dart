@@ -320,7 +320,6 @@ class PosPaymentLayout extends StatelessWidget {
                   icon: Icons.confirmation_number,
                   label: 'Cupones',
                   backgroundColor: Colors.orange,
-
                   onPressed: mainController.canUseCoupons
                       ? () {
                           _openCouponsPanel(
@@ -329,7 +328,7 @@ class PosPaymentLayout extends StatelessWidget {
                             controller,
                           );
                         }
-                      : null, // 🔥 deshabilita
+                      : null,
                 ),
               PosActionButton(
                 width: 100,

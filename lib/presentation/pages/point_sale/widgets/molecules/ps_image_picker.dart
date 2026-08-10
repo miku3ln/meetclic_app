@@ -180,10 +180,13 @@ class PsImagePicker extends StatelessWidget {
     }
   }
 
+
   @override
   Widget build(BuildContext context) {
     final c = AppThemeTokens.of(context);
+
     final provider = _resolveImageProvider();
+
     final showError = isTouched && error != null;
     final showSuccess = isTouched && error == null && isValid;
 
@@ -198,134 +201,173 @@ class PsImagePicker extends StatelessWidget {
       labelColor = Colors.green;
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        /// 🔥 LABEL + REQUIRED
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    const double imageSize = 130;
+    const double actionSize = 42;
+    const double componentWidth = 170;
+
+    return Center(
+      child: SizedBox(
+        width: componentWidth,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              label,
-              style: AppTextStyles.bodySecondary(context).copyWith(
-                color: labelColor,
+
+            /// LABEL
+            Align(
+              alignment: Alignment.centerLeft,
+              child: RichText(
+                text: TextSpan(
+                  style: AppTextStyles.bodySecondary(context).copyWith(
+                    color: labelColor,
+                  ),
+                  children: [
+                    TextSpan(text: label),
+                    if (requiredField)
+                      TextSpan(
+                        text: " *",
+                        style: TextStyle(color: c.error),
+                      ),
+                  ],
+                ),
               ),
             ),
-            if (requiredField)
+
+            AppSpacing.spaceBetweenInputs,
+
+            GestureDetector(
+              onTap: onPick,
+              child: Column(
+                children: [
+
+                  Stack(
+                    clipBehavior: Clip.none,
+                    alignment: Alignment.center,
+                    children: [
+
+                      /// FOTO
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        width: imageSize,
+                        height: imageSize,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: c.surface,
+                          border: Border.all(
+                            color: borderColor,
+                            width: 2,
+                          ),
+                        ),
+                        child: provider == null
+                            ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+
+                            Icon(
+                              Icons.camera_alt_outlined,
+                              size: 42,
+                              color: c.textSecondary,
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            Text(
+                              "Agregar",
+                              style: AppTextStyles.bodySmall.copyWith(
+                                color: c.textSecondary,
+                              ),
+                            ),
+                          ],
+                        )
+                            : ClipOval(
+                          child: Image(
+                            image: provider,
+                            fit: BoxFit.cover,
+                            width: imageSize,
+                            height: imageSize,
+                          ),
+                        ),
+                      ),
+
+                      /// ELIMINAR
+                      if (provider != null)
+                        Positioned(
+                          top: -2,
+                          right: -2,
+                          child: Material(
+                            elevation: 4,
+                            color: c.error,
+                            shape: const CircleBorder(),
+                            child: InkWell(
+                              customBorder: const CircleBorder(),
+                              onTap: () => _confirmDelete(context),
+                              child: const SizedBox(
+                                width: 30,
+                                height: 30,
+                                child: Icon(
+                                  Icons.delete_outline,
+                                  color: Colors.white,
+                                  size: 16,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
+                      /// BOTON EDITAR
+                      Positioned(
+                        bottom: -8,
+                        child: Material(
+                          elevation: 6,
+                          color: c.primary,
+                          shape: const CircleBorder(),
+                          child: InkWell(
+                            customBorder: const CircleBorder(),
+                            onTap: onPick,
+                            child: SizedBox(
+                              width: actionSize,
+                              height: actionSize,
+                              child: Icon(
+                                provider == null
+                                    ? Icons.add
+                                    : Icons.edit,
+                                color: Colors.white,
+                                size: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+
+                ],
+              ),
+            ),
+
+            if (showError) ...[
+              const SizedBox(height: 10),
+
+              Icon(
+                Icons.error_outline,
+                color: c.error,
+                size: 18,
+              ),
+
+              const SizedBox(height: 4),
+
               Text(
-                "*",
+                error!,
+                textAlign: TextAlign.center,
                 style: TextStyle(
                   color: c.error,
                   fontSize: 12,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
+            ],
           ],
         ),
-
-        AppSpacing.spaceBetweenInputs,
-
-        /// 🔥 IMAGE PICKER
-        Center(
-          child: GestureDetector(
-            onTap: onPick,
-            child: Stack(
-              children: [
-                /// 🔲 CONTENEDOR
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    color: c.surface,
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: borderColor,
-                      width: 1.5,
-                    ),
-                  ),
-                  child: provider == null
-                      ? Icon(
-                    Icons.camera_alt_outlined,
-                    size: 40,
-                    color: c.textSecondary,
-                  )
-                      : ClipOval(
-                    child: Image(
-                      image: provider,
-                      fit: BoxFit.cover,
-                      width: 120,
-                      height: 120,
-                    ),
-                  ),
-                ),
-
-                /// ➕ BOTÓN AGREGAR
-                Positioned(
-                  bottom: 4,
-                  right: 4,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: c.primary,
-                      shape: BoxShape.circle,
-                    ),
-                    padding: const EdgeInsets.all(6),
-                    child: const Icon(
-                      Icons.add,
-                      size: 16,
-                      color: Colors.white,
-                    ),
-                  ),
-                ),
-
-                /// ❌ BOTÓN ELIMINAR (solo si hay imagen)
-                if (image != null)
-                  Positioned(
-                    top: 4,
-                    right: 4,
-                    child: GestureDetector(
-                      onTap: () => _confirmDelete(context),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: c.error,
-                          shape: BoxShape.circle,
-                        ),
-                        padding: const EdgeInsets.all(6),
-                        child: const Icon(
-                          Icons.close,
-                          size: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-
-                /// ✅ / ⚠️ ESTADO VISUAL
-                if (showError || showSuccess)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    child: Icon(
-                      showError
-                          ? Icons.error_outline
-                          : Icons.check_circle,
-                      color: showError ? c.error : Colors.green,
-                      size: 20,
-                    ),
-                  ),
-              ],
-            ),
-          ),
-        ),
-
-        /// 🔴 ERROR
-        if (showError) ...[
-          const SizedBox(height: 6),
-          Text(
-            error!,
-            style: TextStyle(color: c.error, fontSize: 12),
-          ),
-        ],
-      ],
+      ),
     );
   }
 }

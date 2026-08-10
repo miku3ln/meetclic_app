@@ -255,7 +255,7 @@ Widget _buildManagerProduct(
                 PsFieldItem(
                   widthFactor: 0.25,
                   child: PsSegmentToggle<bool>(
-                    enabled:controller.allowShopManagement,
+                    enabled: controller.allowShopManagement,
                     // NUEVOS PARAMETROS
                     titleSpacing: 20,
                     itemPadding: const EdgeInsets.symmetric(
@@ -297,6 +297,31 @@ Widget _buildManagerProduct(
                     onChanged: controller.setViewAllowShop,
                   ),
                 ),
+                PsFieldItem(
+
+                  child: Center(
+                    child: PsImagePicker(
+                      image: controller.image,
+                      error: controller.imageError,
+                      onPick: () async {
+                        final mediaService = MediaPickerService();
+                        final file = await showImageSourceSelector(
+                          context,
+                          mediaService.pickFromCamera,
+                          mediaService.pickFromGallery,
+                        );
+
+                        if (file != null) {
+                          controller.setImage(file);
+                        }
+                      },
+                      onRemove: controller.removeImage,
+                      requiredField: true,
+                      isTouched: controller.imageTouched,
+                      isValid: controller.image != null,
+                    ),
+                  ),
+                ),
               ],
             ),
             PsFieldRow(
@@ -329,8 +354,7 @@ Widget _buildManagerProduct(
                     title: controller.sellTypeLabel,
                     value: controller.sellType,
                     items: MeasureType.values,
-                    enabled:
-                        controller.canManageSellType,
+                    enabled: controller.canManageSellType,
                     onChanged: controller.setMeasureType,
                   ),
                 ),
@@ -341,6 +365,7 @@ Widget _buildManagerProduct(
           ],
         ),
       ),
+      AppSpacing.spaceBetweenSections,
 
       /// =========================
       /// 📦 INFORMACIÓN
@@ -352,83 +377,8 @@ Widget _buildManagerProduct(
           title: labelCardInformationProduct(controller),
           child: Column(
             children: [
-              AppSpacing.spaceBetweenInputs,
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    child: PsInput(
-                      requiredField: true,
-                      label: controller.codeBarLabel,
-                      value: controller.codeBar,
-                      keyboardType: TextInputType.text,
-                      onChanged: controller.setCodeBar,
-                      error: controller.codeBarError,
-                      isTouched: controller.codeBarTouched,
-                      isValid: controller.codeBarError == null,
-                    ),
-                  ),
-                  PsFieldItem(
-                    child: PsInput(
-                      requiredField: true,
-                      label: controller.descriptionLabel,
-                      value: controller.description,
-                      keyboardType: TextInputType.text,
-                      onChanged: controller.setDescription,
-                      error: controller.descriptionError,
-                      isTouched: controller.descriptionTouched,
-                      isValid: controller.descriptionError == null,
-                    ),
-                  ),
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
-              PsFieldRow(
-                children: [
-                  PsFieldItem(
-                    flex: 2,
-                    child: PsInput(
-                      label: controller.nameLabel,
-                      requiredField: true,
-                      value: controller.name,
-                      onChanged: controller.setName,
-                      error: controller.nameError,
-                      isTouched: controller.nameTouched,
-                      isValid:
-                          controller.nameError == null &&
-                          controller.name.isNotEmpty,
-                    ),
-                  ),
 
-                  PsFieldItem(
-                    flex: 2,
-                    child: Center(
-                      child: PsImagePicker(
-                        image: controller.image,
-                        error: controller.imageError,
-                        onPick: () async {
-                          final mediaService = MediaPickerService();
-                          final file = await showImageSourceSelector(
-                            context,
-                            mediaService.pickFromCamera,
-                            mediaService.pickFromGallery,
-                          );
 
-                          if (file != null) {
-                            controller.setImage(file);
-                          }
-                        },
-                        onRemove: controller.removeImage,
-                        requiredField: true,
-                        isTouched: controller.imageTouched,
-                        isValid: controller.image != null,
-                      ),
-                    ),
-                  ),
-
-                  /// 🔥 NOMBRE
-                ],
-              ),
-              AppSpacing.spaceBetweenInputs,
               PsFieldRow(
                 children: [
                   /// 🔥 CATEGORÍA
@@ -447,23 +397,74 @@ Widget _buildManagerProduct(
                   ),
                   PsFieldItem(
                     child:
-                        /// 🔥 SUBCATEGORÍA
-                        PsDropdown(
-                          label: controller.subcategoriesLabel,
-                          items: controller.subcategories,
-                          value: controller.selectedSubcategory,
-                          getLabel: (e) => e.value,
-                          onChanged: controller.selectSubcategory,
-                          error: controller.subcategoryError,
-                          requiredField: true,
-                          isTouched: controller.subcategoryTouched,
-                          isValid: controller.selectedSubcategory != null,
-                        ),
+                    /// 🔥 SUBCATEGORÍA
+                    PsDropdown(
+                      label: controller.subcategoriesLabel,
+                      items: controller.subcategories,
+                      value: controller.selectedSubcategory,
+                      getLabel: (e) => e.value,
+                      onChanged: controller.selectSubcategory,
+                      error: controller.subcategoryError,
+                      requiredField: true,
+                      isTouched: controller.subcategoryTouched,
+                      isValid: controller.selectedSubcategory != null,
+                    ),
                   ),
                 ],
               ),
-
               AppSpacing.spaceBetweenInputs,
+
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      requiredField: true,
+                      label: controller.codeBarLabel,
+                      value: controller.codeBar,
+                      keyboardType: TextInputType.text,
+                      onChanged: controller.setCodeBar,
+                      error: controller.codeBarError,
+                      isTouched: controller.codeBarTouched,
+                      isValid: controller.codeBarError == null,
+                    ),
+                  ),
+                  PsFieldItem(
+                    flex: 2,
+                    child: PsInput(
+                      label: controller.nameLabel,
+                      requiredField: true,
+                      value: controller.name,
+                      onChanged: controller.setName,
+                      error: controller.nameError,
+                      isTouched: controller.nameTouched,
+                      isValid:
+                          controller.nameError == null &&
+                          controller.name.isNotEmpty,
+                    ),
+                  ),
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+              PsFieldRow(
+                children: [
+                  PsFieldItem(
+                    child: PsInput(
+                      requiredField: true,
+                      label: controller.descriptionLabel,
+                      value: controller.description,
+                      keyboardType: TextInputType.text,
+                      onChanged: controller.setDescription,
+                      error: controller.descriptionError,
+                      isTouched: controller.descriptionTouched,
+                      isValid: controller.descriptionError == null,
+                    ),
+                  ),
+
+                  /// 🔥 NOMBRE
+                ],
+              ),
+              AppSpacing.spaceBetweenInputs,
+
             ],
           ),
         ),
@@ -567,6 +568,8 @@ Widget _buildManagerProduct(
           ],
         ),
       ),
+      AppSpacing.spaceBetweenSections,
+
       PsSectionCard(
         //TODO
         title: controller.titleCardInventoryInitProduct, //oki
@@ -605,9 +608,6 @@ Widget _buildManagerProduct(
       ),
       AppSpacing.spaceBetweenSections,
 
-      /// =========================
-      /// 📦 INVENTARIO
-      /// =========================
     ],
   );
 }

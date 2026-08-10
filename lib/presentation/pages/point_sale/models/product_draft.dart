@@ -12,6 +12,7 @@ class ProductDraft {
   final String name;
   final double price;
   final double cost;
+  final String? state;
 
   final ProductCategory category;
   final ProductSubcategory subcategory;
@@ -50,6 +51,7 @@ class ProductDraft {
     this.tax,
     this.selectedUnitMeasure,
     this.detailsAll,
+    this.state,
   });
 }
 
@@ -120,8 +122,9 @@ class ProductMapper {
       conversions: [],
     );
 
+    var selectedState= details["product"]["state"];
     return ProductDraft(
-      id: m['id'],
+      id: m['id'],state:selectedState ,
       name: m['name']?.toString() ?? '',
       detailsAll: details_all?.toString() ?? '',
       price: price,

@@ -13,6 +13,12 @@ class PsFieldRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    if(isMobile){
+      return Column(
+        children: children,
+      );
+    }
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: children
@@ -21,8 +27,7 @@ class PsFieldRow extends StatelessWidget {
           widget,
           const SizedBox(width: AppSpacing.m),
         ],
-      )
-          .toList()
+      ).toList()
         ..removeLast(),
     );
   }

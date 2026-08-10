@@ -405,7 +405,9 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
                       color: Colors.grey,
                     ),
                     const SizedBox(width: 16),
+
                     Expanded(
+                      flex: 2,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -427,16 +429,24 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
                         ],
                       ),
                     ),
+
                     const SizedBox(width: 12),
-                    Text(
-                      item.description,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.grey,
+
+                    Expanded(
+                      flex: 1,
+                      child: Text(
+                        item.description,
+                        textAlign: TextAlign.right,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey,
+                        ),
                       ),
                     ),
                   ],
-                ),
+                )
               ),
             ),
           );
@@ -475,93 +485,5 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     final month = months[date.month - 1];
 
     return '$weekday, ${date.day} de $month de ${date.year}';
-  }
-}
-class FakeReceiptsApi {
-  final List<GenericListItem<Map<String, dynamic>>> _allData = List.generate(
-    120,
-        (index) {
-      final amount = (1.50 + (index % 5) * 0.50).toStringAsFixed(2);
-      final code = '#5-${37260 + index}';
-      final hour = '22:${(index % 60).toString().padLeft(2, '0')}';
-
-      return GenericListItem<Map<String, dynamic>>(
-        id: index + 1,
-        title: '\$$amount',
-        subtitle: hour,
-        description: code,
-        image: null,
-        data: {
-          'receiptNumber': '05-${647 + index}',
-          'employee': 'Trece',
-          'tpv': 'TPV 1',
-          'orderType': 'Para Servirse',
-          'productName': 'Mixto ${index + 1}',
-          'quantity': 1,
-          'unitPrice': double.parse(amount),
-          'lineTotal': double.parse(amount),
-          'total': double.parse(amount),
-          'paymentMethod': 'Efectivo',
-          'paymentAmount': double.parse(amount),
-          'code': code,
-          'hour': hour,
-          'date': DateTime(2026, 3, 12),
-        },
-      );
-    },
-  );
-
-  Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>> fetchPage({
-    required int current,
-    required int rowCount,
-    String? searchCode,
-    DateTime? date,
-  }) async {
-    await Future.delayed(const Duration(milliseconds: 500));
-
-    Iterable<GenericListItem<Map<String, dynamic>>> filtered = _allData;
-
-    if (searchCode != null && searchCode.trim().isNotEmpty) {
-      final query = searchCode.toLowerCase();
-      filtered = filtered.where((item) {
-        final code = (item.data?['code'] ?? '').toString().toLowerCase();
-        return code.contains(query);
-      });
-    }
-
-    if (date != null) {
-      filtered = filtered.where((item) {
-        final itemDate = item.data?['date'] as DateTime?;
-        if (itemDate == null) return false;
-
-        return itemDate.year == date.year &&
-            itemDate.month == date.month &&
-            itemDate.day == date.day;
-      });
-    }
-
-    final list = filtered.toList();
-    final start = (current - 1) * rowCount;
-    var end = start + rowCount;
-
-    if (start >= list.length) {
-      return PaginatedResponse(
-        current: current,
-        rowCount: rowCount,
-        rows: [],
-        total: list.length,
-      );
-    }
-
-    if (end > list.length) {
-      end = list.length;
-    }
-
-    return PaginatedResponse(
-      current: current,
-      rowCount: rowCount,
-      rows: list.sublist(start, end),
-      total: list.length,
-    );
   }
 }
