@@ -4,8 +4,6 @@ import '../../../../../../shared/services/media_picker_service.dart';
 import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
 import '../../../../../widgets/empty_data.dart';
-
-import '../../../models/product_draft.dart';
 import '../../../models/sections_data.dart';
 import '../../../state/pos_items_controller.dart';
 import '../../../state/product_modal_controller.dart';

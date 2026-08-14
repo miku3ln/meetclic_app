@@ -79,3 +79,19 @@ class PosThreeSectionLayout extends StatelessWidget {
     );
   }
 }
+
+
+class PosSectionController<T> extends ChangeNotifier {
+  T _section;
+
+  PosSectionController(this._section);
+
+  T get section => _section;
+
+  void setSection(T value) {
+    if (_section == value) return;
+
+    _section = value;
+    notifyListeners();
+  }
+}

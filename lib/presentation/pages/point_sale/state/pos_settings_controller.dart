@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+
+import '../widgets/sections/pos_layouts_utils.dart';
 
 enum PosSettingsSection {
   printers,
@@ -7,18 +8,11 @@ enum PosSettingsSection {
   general,
 }
 
-class PosSettingsController extends ChangeNotifier {
-  PosSettingsSection _section = PosSettingsSection.printers;
-  PosSettingsSection get section => _section;
-
-  void setSection(PosSettingsSection value) {
-    if (_section == value) return;
-    _section = value;
-    notifyListeners();
-  }
-
+class PosSettingsController    extends PosSectionController<PosSettingsSection> {
+  PosSettingsController()
+      : super(PosSettingsSection.printers);
   String get sectionTitle {
-    switch (_section) {
+    switch (section) {
       case PosSettingsSection.printers:
         return 'Impresoras';
       case PosSettingsSection.customerScreen:

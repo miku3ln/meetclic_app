@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/cupertino.dart';
-
 import '../../../../../../../../domain/services/session_service.dart';
 import '../../../../../../../../shared/models/api_response.dart';
 import '../../../../../../../../shared/pagination_response.dart';

@@ -1,20 +1,17 @@
 import 'package:flutter/foundation.dart';
 
+import '../widgets/sections/pos_layouts_utils.dart';
+
 enum PosLoyaltySection { dashboard, cupon, gamification, tracking }
 
-class PosLoyaltyController extends ChangeNotifier {
-  PosLoyaltySection _section = PosLoyaltySection.dashboard;
+class PosLoyaltyController
+    extends PosSectionController<PosLoyaltySection> {
+  PosLoyaltyController()
+      : super(PosLoyaltySection.dashboard);
 
-  PosLoyaltySection get section => _section;
-
-  void setSection(PosLoyaltySection value) {
-    if (_section == value) return;
-    _section = value;
-    notifyListeners();
-  }
 
   String get sectionTitle {
-    switch (_section) {
+    switch (section) {
       case PosLoyaltySection.dashboard:
         return 'Dashboard';
       case PosLoyaltySection.cupon:

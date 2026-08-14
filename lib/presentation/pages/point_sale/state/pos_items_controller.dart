@@ -1,25 +1,16 @@
-import 'package:flutter/foundation.dart';
 
+import '../widgets/sections/pos_layouts_utils.dart';
 enum PosItemsSection { items, categories, modifiers, discounts, subcategories }
 
-class PosItemsController extends ChangeNotifier {
-  PosItemsSection _section = PosItemsSection.items;
-
-  PosItemsSection get section => _section;
-
-  void setSection(PosItemsSection value) {
-    if (_section == value) return;
-    _section = value;
-    notifyListeners();
-  }
+class PosItemsController extends PosSectionController<PosItemsSection> {
+  PosItemsController() : super(PosItemsSection.items);
 
   String get sectionTitle {
-    switch (_section) {
+    switch (section) {
       case PosItemsSection.items:
         return 'Artículos';
       case PosItemsSection.categories:
         return 'Categorías';
-
       case PosItemsSection.modifiers:
         return 'Modificadores';
       case PosItemsSection.discounts:
