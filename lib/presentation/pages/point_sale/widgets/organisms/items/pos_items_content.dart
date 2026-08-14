@@ -305,21 +305,14 @@ class PosTicketManagementApi {
             return {
               'id': detail['id'],
               'productId': detail['product_id'],
-
-              // Datos para mostrar
               'name': detail['name']?.toString() ?? 'Producto',
               'code': detail['code']?.toString() ?? '',
               'quantity': quantity,
               'unitPrice': unitPrice,
               'total': total,
-
-              // API
               'productType': productType,
-
               // Datos traducidos
               'productTypeName': productType == 'UNIT' ? 'Unidad' : productType,
-
-              // Mantener información original
               'all': detail,
             };
           }).toList();
@@ -385,11 +378,11 @@ class PosTicketManagementApi {
 
             // Ejemplo:
             // $0,25
-            title: NumberFormat.currency(
-              locale: 'es_EC',
-              symbol: r'$',
+            title: '\$${NumberFormat.currency(
+              locale: 'en_US',
+              symbol: '',
               decimalDigits: 2,
-            ).format(total),
+            ).format(total).trim()}',
 
             subtitle: dateInvoiceString,
 

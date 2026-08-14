@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../../../../app/router/controllers/app_controller.dart';
-import '../../../../../../domain/services/session_service.dart';
-
-
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../../../widgets/empty_data.dart';
@@ -31,31 +27,41 @@ class PosReceiptsLayout extends StatelessWidget {
 }
 class _PosReceiptsView extends StatelessWidget {
   const _PosReceiptsView();
+
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
     final scaffoldKey = GlobalKey<ScaffoldState>();
-    final sectionTitle = context.watch<PosReceiptsController>().section;
 
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: colors.background,
       drawer: const PosAppDrawer(),
-      appBar: PosSettingsAppBar(
-        titlePrimary: "Recibos",
-        titleSecondary:sectionTitle,
-        onMenuTap: () {
-          scaffoldKey.currentState?.openDrawer();
-        },
-        style: PosSettingsAppBarStyle(
-          topBackgroundColor: colors.primary,
-          bottomBackgroundColor: colors.primary,
-          primaryTitleColor: colors.textInverse,
-          secondaryTitleColor: colors.textInverse,
-          menuIconColor: colors.textInverse,
-          primaryIndicatorColor: Colors.transparent,
-          secondaryIndicatorColor: Colors.transparent,
-          dividerColor: colors.divider,
+      // Usamos Selector envuelto en PreferredSize para aislar los re-builds
+      // únicamente al AppBar, dejando el body intacto.
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: Selector<PosReceiptsController, String>(
+          selector: (_, controller) => controller.section,
+          builder: (context, sectionTitle, _) {
+            return PosSettingsAppBar(
+              titlePrimary: "Recibos",
+              titleSecondary: sectionTitle,
+              onMenuTap: () {
+                scaffoldKey.currentState?.openDrawer();
+              },
+              style: PosSettingsAppBarStyle(
+                topBackgroundColor: colors.primary,
+                bottomBackgroundColor: colors.primary,
+                primaryTitleColor: colors.textInverse,
+                secondaryTitleColor: colors.textInverse,
+                menuIconColor: colors.textInverse,
+                primaryIndicatorColor: Colors.transparent,
+                secondaryIndicatorColor: Colors.transparent,
+                dividerColor: colors.divider,
+              ),
+            );
+          },
         ),
       ),
       body: const Row(
@@ -74,15 +80,11 @@ class _PosReceiptsView extends StatelessWidget {
   }
 }
 
-
-
 class PosReceiptsRegisters extends StatefulWidget {
   const PosReceiptsRegisters({super.key});
-
   @override
   State<PosReceiptsRegisters> createState() => _PosReceiptsRegistersState();
 }
-
 class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -94,15 +96,24 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   bool _isLoading = false;
   bool _hasInitialLoadFinished = false;
   String _searchCode = '';
+
+
   DateTime? _selectedDate;
   bool get _hasData => _items.isNotEmpty;
   bool get _hasMore => _items.length < _total;
   int _simulatedTotal = 592;
+
+
   @override
   void initState() {
     super.initState();
+
     _api = PosTicketManagementApi(total: _simulatedTotal);
-    _loadInitial();
+
+
+      _loadInitial();
+
+
     _scrollController.addListener(_onScroll);
   }
 
@@ -112,7 +123,6 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     _searchController.dispose();
     super.dispose();
   }
-
   Future<void> _loadInitial() async {
     if (_isLoading) return;
 
@@ -130,14 +140,19 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     if (!mounted) return;
 
     final controller = context.read<PosReceiptsController>();
+    final rows = response.rows;
+
     setState(() {
-      _items.addAll(response.rows);
+      _items.addAll(rows);
       _total = response.total;
       _hasInitialLoadFinished = true;
       _isLoading = false;
+
+
     });
-    if (_items.isNotEmpty && controller.selectedReceipt == null) {
-      controller.setSelectedReceipt(_items.first);
+
+    if (rows.isNotEmpty) {
+    controller.setSelectedReceipt(rows.first);
     }
   }
 
@@ -169,14 +184,15 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   Future<void> _refreshAll() async {
     if (_isLoading) return;
     _api = PosTicketManagementApi(total: _simulatedTotal);
-
+    final controller = context.read<PosReceiptsController>();
     setState(() {
       _currentPage = 1;
       _items.clear();
       _total = 0;
       _hasInitialLoadFinished = false;
-    });
 
+    });
+    controller.clearSelection();
     await _loadInitial();
   }
 
@@ -190,6 +206,7 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
       _items.clear();
       _total = 0;
       _hasInitialLoadFinished = false;
+
     });
 
     controller.clearSelection();
@@ -237,15 +254,10 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     await _applyFilters();
   }
 
-  void _onTapItem(GenericListItem<Map<String, dynamic>> item) {
-    context.read<PosReceiptsController>().setSelectedReceipt(item);
-  }
 
   @override
   Widget build(BuildContext context) {
-    final settings = context.watch<PosReceiptsController>();
-    final app = context.read<AppController>();
-    final session = context.watch<SessionService>();
+
 
     return Container(
       decoration: PosSettingsMenuStyles.containerDecoration(context),
@@ -367,9 +379,6 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   }
 
   Widget _buildList() {
-    final receiptsController = context.watch<PosReceiptsController>();
-    final selectedId = receiptsController.selectedReceipt?.id;
-
     return RefreshIndicator(
       onRefresh: _refreshAll,
       child: ListView.separated(
@@ -381,74 +390,15 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
           if (index >= _items.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(child: CircularProgressIndicator()),
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
             );
           }
 
-          final item = _items[index];
-          final isSelected = item.id == selectedId;
-
-          return Material(
-            color: isSelected ? Colors.grey.shade200 : Colors.transparent,
-            child: InkWell(
-              onTap: () => _onTapItem(item),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 18,
-                ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.payments_outlined,
-                      size: 32,
-                      color: Colors.grey,
-                    ),
-                    const SizedBox(width: 16),
-
-                    Expanded(
-                      flex: 2,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            item.title,
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            item.subtitle,
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      flex: 1,
-                      child: Text(
-                        item.description,
-                        textAlign: TextAlign.right,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey,
-                        ),
-                      ),
-                    ),
-                  ],
-                )
-              ),
-            ),
+          return _ReceiptListItem(
+            key: ValueKey(_items[index].id),
+            item: _items[index],
           );
         },
       ),
@@ -485,5 +435,100 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     final month = months[date.month - 1];
 
     return '$weekday, ${date.day} de $month de ${date.year}';
+  }
+}
+
+class _ReceiptListItem extends StatelessWidget {
+  final GenericListItem<Map<String, dynamic>> item;
+
+  const _ReceiptListItem({
+    super.key,
+    required this.item,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final isSelected = context.select<PosReceiptsController, bool>(
+          (controller) => controller.selectedReceipt?.id == item.id,
+    );
+
+    final data = item.data ?? {};
+    final ticketCode = data['ticketCode']?.toString() ?? '';
+
+    return Material(
+      color: isSelected
+          ? Colors.grey.shade200
+          : Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          final controller = context.read<PosReceiptsController>();
+
+          if (controller.selectedReceipt?.id == item.id) {
+            return;
+          }
+
+          controller.setSelectedReceipt(item);
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 18,
+          ),
+          child: Row(
+            children: [
+              const Icon(
+                Icons.payments_outlined,
+                size: 32,
+                color: Colors.grey,
+              ),
+
+              const SizedBox(width: 16),
+
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      item.title,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    Text(
+                      item.subtitle,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(width: 12),
+
+              Expanded(
+                flex: 1,
+                child: Text(
+                  ticketCode,
+                  textAlign: TextAlign.right,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
