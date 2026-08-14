@@ -50,12 +50,36 @@ class AppDrawerController extends ChangeNotifier {
       bool expanded,
       ) {
     if (expanded) {
-      _expandedIds.add(id);
+      // Solo un menú padre abierto a la vez.
+      _expandedIds
+        ..clear()
+        ..add(id);
     } else {
       _expandedIds.remove(id);
     }
 
     notifyListeners();
+  }
+  AppDrawerItem? _findItemByRoute(
+      List<AppDrawerItem> items,
+      String route,
+      ) {
+    for (final item in items) {
+      if (item.routeName == route) {
+        return item;
+      }
+
+      final child = _findItemByRoute(
+        item.children,
+        route,
+      );
+
+      if (child != null) {
+        return child;
+      }
+    }
+
+    return null;
   }
   AppDrawerItem? _findParentOfRoute(
       List<AppDrawerItem> items,
@@ -80,47 +104,40 @@ class AppDrawerController extends ChangeNotifier {
 
     return null;
   }
-  void _syncRoute2() {
-    final route = app.currentRouteName;
 
-    if (route == null) return;
-
-    // 🔥 SIEMPRE sincroniza correctamente
-    final match = items.where((i) => i.routeName == route).toList();
-
-    if (match.isEmpty) {
-      // fallback seguro → SALES
-      _selectedId = AppRoutes.salesKey;
-    } else {
-      _selectedId = match.first.id;
-    }
-    notifyListeners();
-  }
   void _syncRoute() {
     final route = app.currentRouteName;
 
-    if (route == null) return;
-
-    // Buscar item principal
-    final match = items.where(
-          (item) => item.routeName == route,
-    );
-
-    if (match.isNotEmpty) {
-      _selectedId = match.first.id;
-    } else {
-      _selectedId = AppRoutes.salesKey;
+    if (route == null) {
+      return;
     }
 
-    // Buscar padre del hijo actual
+    final item = _findItemByRoute(
+      items,
+      route,
+    );
+
+    if (item == null) {
+      _selectedId = AppRoutes.salesKey;
+      notifyListeners();
+      return;
+    }
+
+    // Selecciona el item real.
+    // Si es un child, selecciona el child,
+    // no el padre.
+    _selectedId = item.id;
+
+    // Buscar el padre del child actual.
     final parent = _findParentOfRoute(
       items,
       route,
     );
 
     if (parent != null) {
-      _expandedIds.add(parent.id);
-      _selectedId = parent.id;
+      _expandedIds
+        ..clear()
+        ..add(parent.id);
     }
 
     notifyListeners();
@@ -175,7 +192,7 @@ class AppDrawerController extends ChangeNotifier {
       navigationMode: DrawerNavigationMode.replace,
       children: [
         AppDrawerItem(
-          id: AppRoutes.itemsKey,
+          id: AppRoutes.productsKey,
           title: 'Productos',
           icon: Icons.inventory_2_outlined,
           routeName: AppRoutes.items,
@@ -290,21 +307,39 @@ class AppDrawerController extends ChangeNotifier {
   }
 
   /// ✅ Tap de item
-  void onItemTap(BuildContext context, AppDrawerItem item) {
+  void onItemTap(
+      BuildContext context,
+      AppDrawerItem item,
+      ) {
     if (item.requireLogin && !app.isLoggedIn) {
       Navigator.of(context).pop();
-      Future.microtask(app.goToGate);
+
+      Future.microtask(
+        app.goToGate,
+      );
+
       return;
     }
-    final isSameSelected = _selectedId == item.id;
-    final isSameRoute = app.currentRouteName == item.routeName;
-    if (isSameSelected || isSameRoute) {
+
+    final isSameRoute =
+        app.currentRouteName == item.routeName;
+
+    // Solo bloqueamos si realmente estamos
+    // en la misma ruta.
+    //
+    // NO usamos _selectedId porque puede
+    // corresponder al padre del child.
+    if (isSameRoute) {
       Navigator.of(context).pop();
       return;
     }
+
     Navigator.of(context).pop();
+
     Future.microtask(() {
-      app.goToModule(item.routeName);
+      app.goToModule(
+        item.routeName,
+      );
     });
   }
 

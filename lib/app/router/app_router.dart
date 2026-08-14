@@ -24,7 +24,6 @@ class AppRoutes {
 
   static const shift = '/shift';
   static const receipts = '/receipts';
-
   static const sales = '/sales';
 
   static const gateKey = 'gate';
@@ -34,9 +33,14 @@ class AppRoutes {
   static const receiptsKey = 'receipts';
   static const salesKey = 'sales';
 
-  //Articulos
-  static const itemsKey = 'items';
+  // =========================
+  // ARTÍCULOS
+  // =========================
   static const items = '/items';
+  static const itemsKey = 'items';
+
+  // NUEVO: ID exclusivo del child
+  static const productsKey = 'products';
 
   static const categories = '/categories';
   static const categoriesKey = 'categories';
@@ -44,9 +48,12 @@ class AppRoutes {
   static const subCategories = '/subCategories';
   static const subCategoriesKey = 'subCategories';
 
-  //FIDELIZACION
+  // =========================
+  // FIDELIZACIÓN
+  // =========================
   static const loyalty = '/loyalty';
   static const loyaltyKey = 'loyalty';
+
   static const dashboard = '/dashboard';
   static const dashboardKey = 'dashboard';
 
@@ -59,7 +66,9 @@ class AppRoutes {
   static const tracking = '/tracking';
   static const trackingKey = 'tracking';
 
-  //CONFIGURATION
+  // =========================
+  // CONFIGURATION
+  // =========================
   static const settingsKey = 'settings';
   static const settings = '/settings';
 
@@ -175,6 +184,12 @@ class AppRouter {
           settings: settings,
           builder: (_) =>
               PosLoyaltyLayout(section: PosLoyaltySection.gamification),
+        );
+      case AppRoutes.dashboard:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) =>
+              PosLoyaltyLayout(section: PosLoyaltySection.dashboard),
         );
       case AppRoutes.tracking:
         return MaterialPageRoute(
