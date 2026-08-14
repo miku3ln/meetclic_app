@@ -14,6 +14,9 @@ class AppDrawerItem {
   final DrawerNavigationMode navigationMode;
   final bool preventReloadIfSelected;
 
+  // NUEVO
+  final List<AppDrawerItem> children;
+
   const AppDrawerItem({
     required this.id,
     required this.title,
@@ -22,12 +25,62 @@ class AppDrawerItem {
     required this.routeName,
     this.requireLogin = false,
     this.navigationMode = DrawerNavigationMode.replace,
+    this.children = const [],
   });
+  bool get hasChildren => children.isNotEmpty;
 }
 
 class AppDrawerController extends ChangeNotifier {
   final AppController app;
-  void _syncRoute() {
+  final Set<String> _expandedIds = {};
+  bool isExpanded(String id) {
+    return _expandedIds.contains(id);
+  }
+  void toggleExpanded(String id) {
+    if (_expandedIds.contains(id)) {
+      _expandedIds.remove(id);
+    } else {
+      _expandedIds.add(id);
+    }
+
+    notifyListeners();
+  }
+  void setExpanded(
+      String id,
+      bool expanded,
+      ) {
+    if (expanded) {
+      _expandedIds.add(id);
+    } else {
+      _expandedIds.remove(id);
+    }
+
+    notifyListeners();
+  }
+  AppDrawerItem? _findParentOfRoute(
+      List<AppDrawerItem> items,
+      String route,
+      ) {
+    for (final item in items) {
+      for (final child in item.children) {
+        if (child.routeName == route) {
+          return item;
+        }
+
+        final parent = _findParentOfRoute(
+          child.children,
+          route,
+        );
+
+        if (parent != null) {
+          return parent;
+        }
+      }
+    }
+
+    return null;
+  }
+  void _syncRoute2() {
     final route = app.currentRouteName;
 
     if (route == null) return;
@@ -43,11 +96,39 @@ class AppDrawerController extends ChangeNotifier {
     }
     notifyListeners();
   }
-  AppDrawerController({
-    required this.app,
-  }) {
+  void _syncRoute() {
+    final route = app.currentRouteName;
+
+    if (route == null) return;
+
+    // Buscar item principal
+    final match = items.where(
+          (item) => item.routeName == route,
+    );
+
+    if (match.isNotEmpty) {
+      _selectedId = match.first.id;
+    } else {
+      _selectedId = AppRoutes.salesKey;
+    }
+
+    // Buscar padre del hijo actual
+    final parent = _findParentOfRoute(
+      items,
+      route,
+    );
+
+    if (parent != null) {
+      _expandedIds.add(parent.id);
+      _selectedId = parent.id;
+    }
+
+    notifyListeners();
+  }
+  AppDrawerController({required this.app}) {
     app.addListener(_syncRoute);
   }
+
   @override
   void dispose() {
     app.removeListener(_syncRoute);
@@ -75,7 +156,7 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.receipt_long_rounded,
       routeName: AppRoutes.receipts,
       requireLogin: true,
-        navigationMode: DrawerNavigationMode.replace,
+      navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: AppRoutes.shiftKey,
@@ -83,7 +164,7 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.access_time_rounded,
       routeName: AppRoutes.shift,
       requireLogin: true,
-        navigationMode: DrawerNavigationMode.replace,
+      navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: AppRoutes.itemsKey,
@@ -91,7 +172,32 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.format_list_bulleted_rounded,
       routeName: AppRoutes.items,
       requireLogin: true,
-        navigationMode: DrawerNavigationMode.replace,
+      navigationMode: DrawerNavigationMode.replace,
+      children: [
+        AppDrawerItem(
+          id: AppRoutes.itemsKey,
+          title: 'Productos',
+          icon: Icons.inventory_2_outlined,
+          routeName: AppRoutes.items,
+          requireLogin: true,
+        ),
+
+        AppDrawerItem(
+          id: 'categories',
+          title: 'Categorías',
+          icon: Icons.category_outlined,
+          routeName: AppRoutes.categories,
+          requireLogin: true,
+        ),
+
+        AppDrawerItem(
+          id: 'subcategories',
+          title: 'Subcategorias',
+          icon: Icons.warehouse_outlined,
+          routeName: AppRoutes.subCategories,
+          requireLogin: true,
+        ),
+      ],
     ),
     AppDrawerItem(
       id: AppRoutes.loyaltyKey,
@@ -99,7 +205,40 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.favorite,
       routeName: AppRoutes.loyalty,
       requireLogin: true,
-        navigationMode: DrawerNavigationMode.replace,
+      navigationMode: DrawerNavigationMode.replace,
+      children: [
+        AppDrawerItem(
+          id: AppRoutes.dashboardKey,
+          title: 'Dashboard',
+          icon: Icons.format_list_bulleted,
+          routeName: AppRoutes.dashboard,
+          requireLogin: true,
+        ),
+
+        AppDrawerItem(
+          id: AppRoutes.cuponKey,
+          title: 'Cupones',
+          icon: Icons.copy_rounded,
+          routeName: AppRoutes.cupon,
+          requireLogin: true,
+        ),
+
+        AppDrawerItem(
+          id: AppRoutes.gamificationKey,
+          title: 'Gamificacion',
+          icon: Icons.note_alt_outlined,
+          routeName: AppRoutes.gamification,
+          requireLogin: true,
+        ),
+        AppDrawerItem(
+          id: AppRoutes.trackingKey,
+          title: 'Canales',
+          icon: Icons.local_offer_outlined,
+          routeName: AppRoutes.tracking,
+          requireLogin: true,
+        ),
+      ],
+
     ),
     AppDrawerItem(
       id: AppRoutes.settingsKey,
@@ -107,7 +246,39 @@ class AppDrawerController extends ChangeNotifier {
       icon: Icons.settings,
       requireLogin: true,
       routeName: AppRoutes.settings,
-        navigationMode: DrawerNavigationMode.replace,
+      navigationMode: DrawerNavigationMode.replace,
+      children: [
+        AppDrawerItem(
+          id: AppRoutes.printersKey,
+          title: 'Impresoras',
+          icon: Icons.print,
+          routeName: AppRoutes.printers,
+          requireLogin: true,
+        ),
+
+        AppDrawerItem(
+          id: AppRoutes.customerScreenKey,
+          title: 'Pantalla para clientes',
+          icon: Icons.desktop_windows,
+          routeName: AppRoutes.customerScreen,
+          requireLogin: true,
+        ),
+
+        AppDrawerItem(
+          id: AppRoutes.taxesKey,
+          title: 'Impuestos',
+          icon: Icons.percent,
+          routeName: AppRoutes.taxes,
+          requireLogin: true,
+        ),
+        AppDrawerItem(
+          id: AppRoutes.generalKey,
+          title: 'General',
+          icon: Icons.settings,
+          routeName: AppRoutes.general,
+          requireLogin: true,
+        ),
+      ],
     ),
   ];
 

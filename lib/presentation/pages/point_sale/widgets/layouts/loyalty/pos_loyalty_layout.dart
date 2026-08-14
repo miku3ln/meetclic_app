@@ -1,40 +1,43 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../../../../../app/router/controllers/app_controller.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
-
 import '../../../state/pos_loyalty_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
-
 import '../../organisms/loyalty/pos_loyalty_content.dart';
-import '../../organisms/loyalty/pos_loyalty_menu.dart';
 import '../../organisms/pos_settings_app_bar.dart';
-
-
 class PosLoyaltyLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
-
+  final PosLoyaltySection section;
   const PosLoyaltyLayout({
     super.key,
-    this.onMenuTap,
+    this.onMenuTap,required this.section
   });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => PosLoyaltyController(),
-      child: const _PosLoyaltyView(),
+      child:  _PosLoyaltyView(section:section),
     );
   }
 }
 
 class _PosLoyaltyView extends StatelessWidget {
-  const _PosLoyaltyView();
+  final PosLoyaltySection section;
+  final VoidCallback? onMenuTap;
+  const _PosLoyaltyView({
+    super.key,
+    this.onMenuTap,
+    required this.section,
+});
 
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
     final scaffoldKey = GlobalKey<ScaffoldState>();
-    final sectionTitle = context.watch<PosLoyaltyController>().sectionTitle;
+    final sectionTitle = "gestion";
+    final app = context.read<AppController>();
 
     return Scaffold(
       key: scaffoldKey,
@@ -57,15 +60,12 @@ class _PosLoyaltyView extends StatelessWidget {
           dividerColor: colors.divider,
         ),
       ),
-      body: const Row(
+      body:  Row(
         children: [
+
           Expanded(
-            flex: 30,
-            child: PosLoyaltyMenu(),
-          ),
-          Expanded(
-            flex: 70,
-            child: PosLoyaltyContent(),
+            flex: 100,
+            child: PosLoyaltyContent(section: section),
           ),
         ],
       ),

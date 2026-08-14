@@ -1,33 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../state/pos_settings_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/pos_settings_app_bar.dart';
 import '../../organisms/settings/pos_settings_content.dart';
-import '../../organisms/settings/pos_settings_menu.dart';
-
 class PosSettingsLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
 
+  final PosSettingsSection section;
+
   const PosSettingsLayout({
     super.key,
-    this.onMenuTap,
+    this.onMenuTap,required this.section
   });
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
       create: (_) => PosSettingsController(),
-      child: const _PosSettingsView(),
+      child:  _PosSettingsView(section:section),
     );
   }
 }
 
 class _PosSettingsView extends StatelessWidget {
-  const _PosSettingsView();
-
+  final PosSettingsSection section;
+  final VoidCallback? onMenuTap;
+  const _PosSettingsView({
+    super.key,
+    this.onMenuTap,
+    required this.section,
+});
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
@@ -55,15 +59,12 @@ class _PosSettingsView extends StatelessWidget {
           dividerColor: colors.divider,
         ),
       ),
-      body: const Row(
+      body:  Row(
         children: [
+
           Expanded(
-            flex: 30,
-            child: PosSettingsMenu(),
-          ),
-          Expanded(
-            flex: 70,
-            child: PosSettingsContent(),
+            flex: 100,
+            child: PosSettingsContent(section: section),
           ),
         ],
       ),

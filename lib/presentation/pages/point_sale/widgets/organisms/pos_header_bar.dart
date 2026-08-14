@@ -7,7 +7,6 @@ import '../layouts/pos_main_controller.dart';
 import '../models/pos_product_item.dart';
 
 
-
 class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   // ✅ (1) Product categories (dropdown)
   final List<PosCategoryItem> productCategories;
@@ -17,12 +16,13 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   // top actions
   final VoidCallback onMenuTap;
   final void Function(BuildContext context, dynamic data) onUserTap;
-  final void Function(BuildContext context, dynamic data)  onMoreTap;
+  final void Function(BuildContext context, dynamic data) onMoreTap;
 
   // ✅ (3) search
   final ValueChanged<String>? onSearchChanged;
   final ValueChanged<String>? onSearchSubmitted;
   final PosMainController controllerMain;
+
   const PosHeaderBar({
     super.key,
     required this.productCategories,
@@ -33,7 +33,7 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onMoreTap,
     this.onSearchChanged,
     this.onSearchSubmitted,
-    required  this.controllerMain,
+    required this.controllerMain,
 
   });
 
@@ -43,20 +43,6 @@ class PosHeaderBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final showMobilePortraitHeader = PosResponsive.isMobile(context);
-
-    if (showMobilePortraitHeader) {
-      return PosHeaderMobilePortraitLayout(
-        productCategories: productCategories,
-        selectedProductCategoryId: selectedProductCategoryId,
-        onMenuTap: onMenuTap,
-        onProductCategoryChanged: onProductCategoryChanged,
-        onSearchChanged: onSearchChanged,
-        onSearchSubmitted: onSearchSubmitted,
-        onUserTap: onUserTap,
-        onMoreTap: onMoreTap,
-      );
-    }
-
     return PosHeaderDefaultLayout(
       controllerMain: controllerMain,
       productCategories: productCategories,

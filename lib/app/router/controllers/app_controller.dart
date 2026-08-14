@@ -7,10 +7,6 @@ import '../../../shared/models/app_config.dart';
 import '../../di/app_providers.dart';
 import '../app_router.dart';
 import 'app_drawer_controller.dart';
-
-/// 🔒 IMPORTANTE:
-/// - Por defecto NO obliga login (igual que tu app actual)
-/// - Por defecto Splash es la entrada
 enum AppStartPolicy {
   allowGuest,     // ✅ default: igual que ahora
   requireLogin,   // 🔁 nuevo proceso cuando lo actives
@@ -59,7 +55,13 @@ class AppController extends ChangeNotifier {
   }
 
   bool isCurrentDrawerItem(AppDrawerItem item) {
-    return item.routeName == _currentRouteName;
+    if (item.routeName == _currentRouteName) {
+      return true;
+    }
+
+    return item.children.any(
+          (child) => isCurrentDrawerItem(child),
+    );
   }
   final AppConfig config;
   final SessionService session;

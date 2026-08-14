@@ -11,11 +11,12 @@ import '../../sections/settings/pos_settings_taxes_section.dart';
 import 'dart:async';
 
 class PosSettingsContent extends StatelessWidget {
-  const PosSettingsContent({super.key});
+  final PosSettingsSection section;
+  const PosSettingsContent({super.key,required this.section});
 
   @override
   Widget build(BuildContext context) {
-    final section = context.watch<PosSettingsController>().section;
+
     return Container(
       color: Colors.white,
       child: Column(

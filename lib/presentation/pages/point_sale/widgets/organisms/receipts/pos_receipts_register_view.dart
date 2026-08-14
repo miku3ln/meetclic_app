@@ -1,13 +1,149 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/organisms/receipts/receipt_detail_card_buttons_manager.dart';
 import 'package:meetclic_app/shared/providers_session.dart';
 
 import '../../../../../../shared/pagination_response.dart';
 import '../../../shared/styles.dart';
 import '../../../state/pos_receipts_controller.dart';
+import 'package:share_plus/share_plus.dart';
 
 class PosReceiptsRegisterView extends StatelessWidget {
   const PosReceiptsRegisterView({super.key});
+
+  void _printReceipt(GenericListItem<Map<String, dynamic>>? receipt) {
+    debugPrint('Imprimir comprobante: ');
+  }
+
+  void _downloadReceiptPdf(GenericListItem<Map<String, dynamic>>? receipt) {
+    debugPrint('Descargar PDF: ');
+  }
+
+  String _buildWhatsAppReceipt(GenericListItem<Map<String, dynamic>>? receipt) {
+    final data = receipt?.data ?? {};
+
+    final products = data['products'] is List
+        ? List<Map<String, dynamic>>.from(
+            (data['products'] as List).map(
+              (item) => Map<String, dynamic>.from(item),
+            ),
+          )
+        : <Map<String, dynamic>>[];
+
+    final buffer = StringBuffer();
+
+    // Información del comprobante
+    final invoiceCode = data['invoice_code']?.toString() ?? '';
+    final dataAll = data['all'];
+    final customer = dataAll['customer'];
+    final people = customer?['people'] as Map<String, dynamic>?;
+    final identificationType =
+        customer?['identification_type'] as Map<String, dynamic>?;
+    final rucType = customer?['ruc_type'] as Map<String, dynamic>?;
+    final name = people?['name']?.toString() ?? '';
+    final lastName = people?['last_name']?.toString() ?? '';
+    final fullName = [
+      name,
+      lastName,
+    ].where((value) => value.trim().isNotEmpty).join(' ');
+    final document = customer?['identification_document']?.toString() ?? '';
+    final identificationName = identificationType?['name']?.toString() ?? '';
+    final rucTypeName = rucType?['name']?.toString() ?? '';
+
+    final customerName = fullName;
+    final subtotal = _parseDouble(data['subtotal']);
+
+    final discount = _parseDouble(data['discount']);
+
+    final tax = _parseDouble(data['tax']);
+
+    final total = _parseDouble(data['total']);
+
+    buffer.writeln('🧾 *RECIBO DE COMPRA*');
+
+    if (invoiceCode.isNotEmpty) {
+      buffer.writeln('Comprobante: $invoiceCode');
+    }
+
+    if (customerName.isNotEmpty) {
+      buffer.writeln('Cliente: $customerName');
+    }
+
+    buffer.writeln();
+    buffer.writeln('*PRODUCTOS*');
+    buffer.writeln('────────────────────');
+
+    for (final product in products) {
+      final name = product['name']?.toString() ?? 'Producto';
+
+      final code = product['code']?.toString() ?? '';
+
+      final productTypeName = product['productTypeName']?.toString() ?? '';
+
+      final quantity = _parseDouble(product['quantity']);
+
+      final unitPrice = _parseDouble(product['unitPrice']);
+
+      final productTotal = _parseDouble(product['total']);
+
+      buffer.writeln('*$name*');
+
+      if (code.isNotEmpty) {
+        buffer.writeln('Código: $code');
+      }
+
+      if (productTypeName.isNotEmpty) {
+        buffer.writeln('Tipo: $productTypeName');
+      }
+
+      buffer.writeln('Cantidad: ${_formatNumber(quantity)}');
+
+      buffer.writeln('Precio: \$${unitPrice.toStringAsFixed(2)}');
+
+      buffer.writeln('Total: \$${productTotal.toStringAsFixed(2)}');
+
+      buffer.writeln();
+    }
+
+    buffer.writeln('────────────────────');
+
+    if (subtotal > 0) {
+      buffer.writeln('Subtotal: \$${subtotal.toStringAsFixed(2)}');
+    }
+
+    if (discount > 0) {
+      buffer.writeln('Descuento: -\$${discount.toStringAsFixed(2)}');
+    }
+
+    if (tax > 0) {
+      buffer.writeln('Impuestos: \$${tax.toStringAsFixed(2)}');
+    }
+
+    buffer.writeln('*TOTAL: \$${total.toStringAsFixed(2)}*');
+
+    buffer.writeln();
+    buffer.writeln('Gracias por su compra. 🙌');
+
+    return buffer.toString();
+  }
+
+  void _sendReceiptToWhatsApp(
+    GenericListItem<Map<String, dynamic>>? receipt,
+  ) async {
+    debugPrint('Enviar comprobante por WhatsApp: ');
+    String message = _buildWhatsAppReceipt(receipt);
+    if (message.trim().isEmpty) {
+      return;
+    }
+
+    await Share.share(message, subject: 'Recibo de compra');
+  }
+
+  void _generateElectronicInvoice(
+    GenericListItem<Map<String, dynamic>>? receipt,
+  ) {
+    debugPrint('Facturar electrónicamente:');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -28,20 +164,63 @@ class PosReceiptsRegisterView extends StatelessWidget {
 
     return Container(
       decoration: PosSettingsMenuStyles.containerDecoration(context),
-      child: Scrollbar(
-        thumbVisibility: true,
-        child: ListView(
-          padding: const EdgeInsets.all(45),
-
-          children: [
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 780),
-                child: _ReceiptDetailCard(receipt: receipt),
+      child: Stack(
+        children: [
+          Positioned.fill(
+            child: Scrollbar(
+              thumbVisibility: true,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(
+                  45,
+                  150, // espacio para los botones superiores
+                  45,
+                  150, // espacio adicional para poder llegar al final
+                ),
+                children: [
+                  Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(
+                        maxWidth: 780,
+                      ),
+                      child: _ReceiptDetailCard(
+                        receipt: receipt,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+
+          Positioned(
+            top: 20,
+            left: 20,
+            right: 20,
+            child: Center(
+              child: Material(
+                elevation: 6,
+                borderRadius: BorderRadius.circular(14),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: ReceiptManagementActions(
+                    onPrint: () {
+                      _printReceipt(receipt);
+                    },
+                    onDownload: () {
+                      _downloadReceiptPdf(receipt);
+                    },
+                    onWhatsApp: () {
+                      _sendReceiptToWhatsApp(receipt);
+                    },
+                    onElectronicInvoice: () {
+                      _generateElectronicInvoice(receipt);
+                    },
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -335,31 +514,6 @@ class _InfoChip extends StatelessWidget {
   }
 }
 
-class _SecondaryInfo extends StatelessWidget {
-  final IconData icon;
-  final String label;
-
-  const _SecondaryInfo({required this.icon, required this.label});
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Icon(icon, size: 17, color: Colors.grey.shade600),
-        const SizedBox(width: 6),
-        Expanded(
-          child: Text(
-            label,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(fontSize: 12, color: Colors.grey.shade700),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
 String _currency(dynamic value) {
   final number = double.tryParse(value?.toString() ?? '0') ?? 0;
 
@@ -474,15 +628,10 @@ class _ProductItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final name = product['name']?.toString() ?? 'Producto';
-
     final code = product['code']?.toString() ?? '';
-
     final productTypeName = product['productTypeName']?.toString() ?? '';
-
     final quantity = _parseDouble(product['quantity']);
-
     final unitPrice = _parseDouble(product['unitPrice']);
-
     final total = _parseDouble(product['total']);
 
     return Container(
@@ -765,4 +914,14 @@ class _CustomerInfo extends StatelessWidget {
       ],
     );
   }
+}
+
+
+
+String _formatNumber(double value) {
+  if (value == value.truncateToDouble()) {
+    return value.toInt().toString();
+  }
+
+  return value.toString();
 }

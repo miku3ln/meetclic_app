@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_categories_management_section.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_discounts_management_section.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_modifiers_management_section.dart';
-import 'package:provider/provider.dart';
+
 import '../../../../../../shared/pagination_response.dart';
 
 import 'dart:async';
@@ -14,11 +13,12 @@ import '../../sections/loyalty/pos_cupons_management_section.dart';
 import '../../sections/loyalty/pos_dashboard_management_section.dart';
 
 class PosLoyaltyContent extends StatelessWidget {
-  const PosLoyaltyContent({super.key});
+  final PosLoyaltySection section;
+
+  const PosLoyaltyContent({super.key,required this.section});
 
   @override
   Widget build(BuildContext context) {
-    final section = context.watch<PosLoyaltyController>().section;
     return Container(
       color: Colors.white,
       child: Column(children: [Expanded(child: _buildSection(section))]),

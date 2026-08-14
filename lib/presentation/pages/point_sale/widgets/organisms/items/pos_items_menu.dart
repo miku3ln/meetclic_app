@@ -10,12 +10,14 @@ import '../../../shared/styles.dart';
 import '../../../state/pos_items_controller.dart';
 
 class PosItemsMenu extends StatelessWidget {//MENU MANAGEMENT PRODUCTS
-  const PosItemsMenu({super.key});
+  final PosItemsSection section;
+  const PosItemsMenu({super.key, required this.section});
 
   @override
   Widget build(BuildContext context) {
     final settings = context.watch<PosItemsController>();
     final app = context.read<AppController>();
+
     final session = context.watch<SessionService>();
     return Container(
       decoration: PosSettingsMenuStyles.containerDecoration(context),
@@ -30,7 +32,7 @@ class PosItemsMenu extends StatelessWidget {//MENU MANAGEMENT PRODUCTS
                   icon: Sections.getIconItems(PosItemsSection.categories),
                   title:Sections.getTitleItems(PosItemsSection.categories),
                   selected:
-                  settings.section == PosItemsSection.categories,
+                  section == PosItemsSection.categories,
                   onTap: () =>
                       settings.setSection(PosItemsSection.categories),
                 ),
@@ -38,7 +40,7 @@ class PosItemsMenu extends StatelessWidget {//MENU MANAGEMENT PRODUCTS
                   context,
                   icon: Sections.getIconItems(PosItemsSection.subcategories),
                   title:Sections.getTitleItems(PosItemsSection.subcategories),
-                  selected: settings.section == PosItemsSection.subcategories,
+                  selected: section == PosItemsSection.subcategories,
                   onTap: () => settings.setSection(PosItemsSection.subcategories),
                 ),
                /* menuItem(
@@ -53,7 +55,7 @@ class PosItemsMenu extends StatelessWidget {//MENU MANAGEMENT PRODUCTS
                   context,
                   icon: Sections.getIconItems(PosItemsSection.items),
                   title: Sections.getTitleItems(PosItemsSection.items),
-                  selected: settings.section == PosItemsSection.items,
+                  selected: section == PosItemsSection.items,
                   onTap: () => settings.setSection(PosItemsSection.items),
                 ),
                /* menuItem(
