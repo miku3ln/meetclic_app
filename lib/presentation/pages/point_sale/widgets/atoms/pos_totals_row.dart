@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 
+import '../../helpers/pos_responsive.dart';
 import '../../theme/pos_checkout_style.dart';
 
 class PosTotalsRow  extends StatelessWidget {
@@ -18,7 +19,24 @@ class PosTotalsRow  extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final s = PosCheckoutStyle.of(context);
-
+    final isMobile = PosResponsive.isMobile(context);
+    Widget setTotal= Text(
+      value,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+      style: valueStyle ?? s.totalsValueStyle,
+    );
+   if(isMobile){
+     setTotal= Flexible(
+       child: Text(
+         value,
+         maxLines: 1,
+         overflow: TextOverflow.ellipsis,
+         textAlign: TextAlign.end,
+         style: valueStyle ?? s.totalsValueStyle,
+       ),
+     );
+   }
     return Row(
       children: [
         Expanded(
@@ -30,12 +48,7 @@ class PosTotalsRow  extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          value,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-          style: valueStyle ?? s.totalsValueStyle,
-        ),
+        setTotal
       ],
     );
   }

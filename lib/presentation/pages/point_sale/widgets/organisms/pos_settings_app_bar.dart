@@ -53,6 +53,9 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String titleSecondary;
   final VoidCallback? onMenuTap;
   final PosSettingsAppBarStyle style;
+  final IconData? leadingIcon;
+  final String? leadingTitle;
+  final VoidCallback? onLeadingTap;
 
   const PosSettingsAppBar({
     super.key,
@@ -69,6 +72,9 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
       secondaryIndicatorColor: Color(0xFFBDBDBD),
       dividerColor: Color(0xFFFF6347),
     ),
+    this.leadingIcon,
+    this.leadingTitle,
+    this.onLeadingTap,
   });
 
   @override
@@ -101,6 +107,10 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                       iconColor: style.menuIconColor,
                       indicatorColor: style.primaryIndicatorColor,
                       indicatorHeight: style.indicatorHeight,
+
+                      leadingIcon: leadingIcon,
+                      leadingTitle: leadingTitle,
+                      onLeadingTap: onLeadingTap,
                     ),
                   ),
                   Container(
@@ -136,6 +146,9 @@ class _PrimarySection extends StatelessWidget {
   final Color iconColor;
   final Color indicatorColor;
   final double indicatorHeight;
+  final IconData? leadingIcon;
+  final String? leadingTitle;
+  final VoidCallback? onLeadingTap;
 
   const _PrimarySection({
     required this.title,
@@ -144,6 +157,9 @@ class _PrimarySection extends StatelessWidget {
     required this.iconColor,
     required this.indicatorColor,
     required this.indicatorHeight,
+    required this.leadingIcon,
+    required this.leadingTitle,
+    required this.onLeadingTap,
   });
 
   @override
@@ -156,8 +172,13 @@ class _PrimarySection extends StatelessWidget {
           Row(
             children: [
               IconButton(
-                onPressed: onMenuTap,
-                icon: Icon(Icons.menu, color: iconColor),
+                onPressed: leadingIcon != null
+                    ? onLeadingTap
+                    : onMenuTap,
+                icon: Icon(
+                  leadingIcon ?? Icons.menu,
+                  color: iconColor,
+                ),
               ),
               Expanded(
                 child: Text(

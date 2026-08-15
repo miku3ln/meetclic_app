@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../../../widgets/empty_data.dart';
+import '../../../helpers/pos_responsive.dart';
 import '../../../shared/styles.dart';
 
 import '../../../state/pos_receipts_controller.dart';
@@ -11,12 +12,12 @@ import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/items/pos_items_content.dart';
 import '../../organisms/pos_settings_app_bar.dart';
 import '../../organisms/receipts/pos_receipts_register_view.dart';
+
 class PosReceiptsLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
-  const PosReceiptsLayout({
-    super.key,
-    this.onMenuTap,
-  });
+
+  const PosReceiptsLayout({super.key, this.onMenuTap});
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -25,6 +26,7 @@ class PosReceiptsLayout extends StatelessWidget {
     );
   }
 }
+
 class _PosReceiptsView extends StatelessWidget {
   const _PosReceiptsView();
 
@@ -32,6 +34,27 @@ class _PosReceiptsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
     final scaffoldKey = GlobalKey<ScaffoldState>();
+    final flexRegister = 40;
+    final flexRegisterView = 60;
+    bool isMobile = PosResponsive.isMobile(context);
+    isMobile = true;
+    List<Widget> receiptChildren = [];
+    if (!isMobile) {
+      receiptChildren = [
+        Expanded(
+          flex: flexRegister,
+          child: PosReceiptsRegisters(isMobile: isMobile),
+        ),
+        Expanded(
+          flex: flexRegisterView,
+          child: PosReceiptsRegisterView(isMobile: isMobile),
+        ),
+      ];
+    } else {
+      receiptChildren = [
+        Expanded(flex: 100, child: PosReceiptsRegisters(isMobile: isMobile)),
+      ];
+    }
 
     return Scaffold(
       key: scaffoldKey,
@@ -45,7 +68,7 @@ class _PosReceiptsView extends StatelessWidget {
           selector: (_, controller) => controller.section,
           builder: (context, sectionTitle, _) {
             return PosSettingsAppBar(
-              titlePrimary: "Recibos",
+              titlePrimary: "Tickets",
               titleSecondary: sectionTitle,
               onMenuTap: () {
                 scaffoldKey.currentState?.openDrawer();
@@ -64,27 +87,20 @@ class _PosReceiptsView extends StatelessWidget {
           },
         ),
       ),
-      body: const Row(
-        children: [
-          Expanded(
-            flex: 30,
-            child: PosReceiptsRegisters(),
-          ),
-          Expanded(
-            flex: 70,
-            child: PosReceiptsRegisterView(),
-          ),
-        ],
-      ),
+      body: Row(children: receiptChildren),
     );
   }
 }
 
 class PosReceiptsRegisters extends StatefulWidget {
-  const PosReceiptsRegisters({super.key});
+  final bool isMobile;
+
+  const PosReceiptsRegisters({super.key, required this.isMobile});
+
   @override
   State<PosReceiptsRegisters> createState() => _PosReceiptsRegistersState();
 }
+
 class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   final ScrollController _scrollController = ScrollController();
   final TextEditingController _searchController = TextEditingController();
@@ -97,23 +113,18 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
   bool _hasInitialLoadFinished = false;
   String _searchCode = '';
 
-
   DateTime? _selectedDate;
+
   bool get _hasData => _items.isNotEmpty;
+
   bool get _hasMore => _items.length < _total;
   int _simulatedTotal = 592;
-
 
   @override
   void initState() {
     super.initState();
-
     _api = PosTicketManagementApi(total: _simulatedTotal);
-
-
-      _loadInitial();
-
-
+    _loadInitial();
     _scrollController.addListener(_onScroll);
   }
 
@@ -123,6 +134,7 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     _searchController.dispose();
     super.dispose();
   }
+
   Future<void> _loadInitial() async {
     if (_isLoading) return;
 
@@ -147,12 +159,10 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
       _total = response.total;
       _hasInitialLoadFinished = true;
       _isLoading = false;
-
-
     });
 
     if (rows.isNotEmpty) {
-    controller.setSelectedReceipt(rows.first);
+      controller.setSelectedReceipt(rows.first);
     }
   }
 
@@ -190,7 +200,6 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
       _items.clear();
       _total = 0;
       _hasInitialLoadFinished = false;
-
     });
     controller.clearSelection();
     await _loadInitial();
@@ -206,7 +215,6 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
       _items.clear();
       _total = 0;
       _hasInitialLoadFinished = false;
-
     });
 
     controller.clearSelection();
@@ -254,11 +262,8 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     await _applyFilters();
   }
 
-
   @override
   Widget build(BuildContext context) {
-
-
     return Container(
       decoration: PosSettingsMenuStyles.containerDecoration(context),
       child: Stack(
@@ -267,9 +272,7 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
             children: [
               _buildSearchBar(),
               _buildDateHeader(),
-              Expanded(
-                child: _buildBody(),
-              ),
+              Expanded(child: _buildBody(widget.isMobile)),
             ],
           ),
         ],
@@ -277,11 +280,9 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
     );
   }
 
-  Widget _buildBody() {
+  Widget _buildBody(bool isMobile) {
     if (!_hasInitialLoadFinished && _isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (!_hasData) {
@@ -304,7 +305,7 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
       );
     }
 
-    return _buildList();
+    return _buildList(isMobile);
   }
 
   Widget _buildSearchBar() {
@@ -319,20 +320,18 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
           prefixIcon: const Icon(Icons.search),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-            onPressed: () async {
-              _searchController.clear();
-              _searchCode = '';
-              await _applyFilters();
-            },
-            icon: const Icon(Icons.close),
-          )
+                  onPressed: () async {
+                    _searchController.clear();
+                    _searchCode = '';
+                    await _applyFilters();
+                  },
+                  icon: const Icon(Icons.close),
+                )
               : IconButton(
-            onPressed: _pickDate,
-            icon: const Icon(Icons.calendar_today_outlined),
-          ),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
+                  onPressed: _pickDate,
+                  icon: const Icon(Icons.calendar_today_outlined),
+                ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
           isDense: true,
         ),
         onChanged: (_) {
@@ -369,16 +368,13 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
             ),
           ),
           if (_selectedDate != null)
-            IconButton(
-              onPressed: _clearDate,
-              icon: const Icon(Icons.close),
-            ),
+            IconButton(onPressed: _clearDate, icon: const Icon(Icons.close)),
         ],
       ),
     );
   }
 
-  Widget _buildList() {
+  Widget _buildList(bool isMobile) {
     return RefreshIndicator(
       onRefresh: _refreshAll,
       child: ListView.separated(
@@ -390,15 +386,14 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
           if (index >= _items.length) {
             return const Padding(
               padding: EdgeInsets.symmetric(vertical: 20),
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
+              child: Center(child: CircularProgressIndicator()),
             );
           }
 
           return _ReceiptListItem(
             key: ValueKey(_items[index].id),
             item: _items[index],
+            isMobile: isMobile,
           );
         },
       ),
@@ -440,50 +435,50 @@ class _PosReceiptsRegistersState extends State<PosReceiptsRegisters> {
 
 class _ReceiptListItem extends StatelessWidget {
   final GenericListItem<Map<String, dynamic>> item;
+  final bool isMobile;
 
   const _ReceiptListItem({
     super.key,
     required this.item,
+    required this.isMobile,
   });
 
   @override
   Widget build(BuildContext context) {
     final isSelected = context.select<PosReceiptsController, bool>(
-          (controller) => controller.selectedReceipt?.id == item.id,
+      (controller) => controller.selectedReceipt?.id == item.id,
     );
-
     final data = item.data ?? {};
     final ticketCode = data['ticketCode']?.toString() ?? '';
 
     return Material(
-      color: isSelected
-          ? Colors.grey.shade200
-          : Colors.transparent,
+      color: isSelected ? Colors.grey.shade200 : Colors.transparent,
       child: InkWell(
         onTap: () {
           final controller = context.read<PosReceiptsController>();
-
-          if (controller.selectedReceipt?.id == item.id) {
-            return;
-          }
-
           controller.setSelectedReceipt(item);
+          if (isMobile) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ChangeNotifierProvider.value(
+                  value: controller,
+                  child: PosReceiptsRegisterView(isMobile: isMobile),
+                ),
+              ),
+            );
+          } else {
+            if (controller.selectedReceipt?.id == item.id) {
+              return;
+            }
+          }
         },
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 18,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
           child: Row(
             children: [
-              const Icon(
-                Icons.payments_outlined,
-                size: 32,
-                color: Colors.grey,
-              ),
-
+              const Icon(Icons.payments_outlined, size: 32, color: Colors.grey),
               const SizedBox(width: 16),
-
               Expanded(
                 flex: 2,
                 child: Column(
@@ -496,22 +491,16 @@ class _ReceiptListItem extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                       ),
                     ),
-
                     const SizedBox(height: 4),
-
                     Text(
                       item.subtitle,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey,
-                      ),
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ],
                 ),
               ),
 
               const SizedBox(width: 12),
-
               Expanded(
                 flex: 1,
                 child: Text(
@@ -519,12 +508,18 @@ class _ReceiptListItem extends StatelessWidget {
                   textAlign: TextAlign.right,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 16, color: Colors.grey),
                 ),
               ),
+
+              if (isMobile) ...[
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 28,
+                  color: Colors.grey.shade600,
+                ),
+              ],
             ],
           ),
         ),
