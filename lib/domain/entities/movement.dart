@@ -59,6 +59,17 @@ class MovementSummary {
 
     };
   }
+  Map<String, dynamic> toJsonBusiness() {
+    return {
+      'yapitas': yapitas.toJson(),
+      'yapitasPremium': yapitasPremium.toJson(),
+      'reputation': reputation.toJson(),
+      'trophies': trophies.toJson(),
+      'visits': visits.toJson(),
+      'rating': rating.toJson(),
+
+    };
+  }
 }
 
 class MovementAmount {

@@ -4,6 +4,7 @@ import 'package:meetclic_app/presentation/pages/point_sale/widgets/organisms/rec
 import 'package:meetclic_app/shared/providers_session.dart';
 import '../../../../../../shared/pagination_response.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+import '../../../helpers/pos_responsive.dart';
 import '../../../shared/styles.dart';
 import '../../../state/pos_receipts_controller.dart';
 import 'package:share_plus/share_plus.dart';
@@ -22,73 +23,119 @@ class PosReceiptsRegisterView extends StatelessWidget {
   void _downloadReceiptPdf(GenericListItem<Map<String, dynamic>>? receipt) {
     debugPrint('Descargar PDF: ');
   }
-
-  String _buildWhatsAppReceipt(GenericListItem<Map<String, dynamic>>? receipt) {
-    final data = receipt?.data ?? {};
-
-    final products = data['products'] is List
-        ? List<Map<String, dynamic>>.from(
-            (data['products'] as List).map(
-              (item) => Map<String, dynamic>.from(item),
-            ),
-          )
-        : <Map<String, dynamic>>[];
-
+  String _buildWhatsAppReceipt(
+      GenericListItem<Map<String, dynamic>>? receipt,
+      ) {
     final buffer = StringBuffer();
 
-    // Información del comprobante
-    final invoiceCode = data['invoice_code']?.toString() ?? '';
-    final dataAll = data['all'];
-    final customer = dataAll['customer'];
-    final people = customer?['people'] as Map<String, dynamic>?;
+    // ============================================================
+    // INFORMACIÓN DEL COMPROBANTE
+    // ============================================================
+
+    final invoiceCode = ReceiptUtils.invoiceCode(receipt);
+    final ticketCode = ReceiptUtils.ticketCode(receipt);
+    final date = ReceiptUtils.date(receipt);
+    final hour = ReceiptUtils.hour(receipt);
+    final status = ReceiptUtils.status(receipt);
+
+    // ============================================================
+    // CLIENTE
+    // ============================================================
+
+    final customerName = ReceiptUtils.customerName(receipt);
+    final customerDocument = ReceiptUtils.customerDocument(receipt);
     final identificationType =
-        customer?['identification_type'] as Map<String, dynamic>?;
-    final rucType = customer?['ruc_type'] as Map<String, dynamic>?;
-    final name = people?['name']?.toString() ?? '';
-    final lastName = people?['last_name']?.toString() ?? '';
-    final fullName = [
-      name,
-      lastName,
-    ].where((value) => value.trim().isNotEmpty).join(' ');
-    final document = customer?['identification_document']?.toString() ?? '';
-    final identificationName = identificationType?['name']?.toString() ?? '';
-    final rucTypeName = rucType?['name']?.toString() ?? '';
+    ReceiptUtils.customerIdentificationType(receipt);
 
-    final customerName = fullName;
-    final subtotal = _parseDouble(data['subtotal']);
+    // ============================================================
+    // PAGO
+    // ============================================================
 
-    final discount = _parseDouble(data['discount']);
+    final paymentMethod = ReceiptUtils.paymentMethod(receipt);
+    final paymentAmount = ReceiptUtils.paymentAmount(receipt);
 
-    final tax = _parseDouble(data['tax']);
+    // ============================================================
+    // TOTALES
+    // ============================================================
 
-    final total = _parseDouble(data['total']);
+    final subtotal = ReceiptUtils.subtotal(receipt);
+    final discount = ReceiptUtils.discount(receipt);
+    final taxes = ReceiptUtils.taxes(receipt);
+    final total = ReceiptUtils.total(receipt);
 
-    buffer.writeln('🧾 *RECIBO DE COMPRA*');
+    // ============================================================
+    // PRODUCTOS
+    // ============================================================
+
+    final products = ReceiptUtils.products(receipt);
+
+    // ============================================================
+    // ENCABEZADO
+    // ============================================================
+
+    buffer.writeln('🧾 *COMPROBANTE DE COMPRA*');
+    buffer.writeln('────────────────────');
 
     if (invoiceCode.isNotEmpty) {
-      buffer.writeln('Comprobante: $invoiceCode');
+      buffer.writeln('📄 *Factura:* $invoiceCode');
     }
 
-    if (customerName.isNotEmpty) {
-      buffer.writeln('Cliente: $customerName');
+    if (ticketCode.isNotEmpty) {
+      buffer.writeln('🎫 *Ticket:* $ticketCode');
     }
+
+    if (date.isNotEmpty) {
+      buffer.writeln('📅 *Fecha:* $date');
+    }
+
+    if (hour.isNotEmpty) {
+      buffer.writeln('🕐 *Hora:* $hour');
+    }
+
+    if (status.isNotEmpty) {
+      buffer.writeln('📌 *Estado:* $status');
+    }
+
+    // ============================================================
+    // CLIENTE
+    // ============================================================
+
+    if (customerName.isNotEmpty ||
+        customerDocument.isNotEmpty) {
+      buffer.writeln();
+      buffer.writeln('*CLIENTE*');
+
+      if (customerName.isNotEmpty) {
+        buffer.writeln('👤 $customerName');
+      }
+
+      if (customerDocument.isNotEmpty) {
+        final documentLabel = identificationType.isNotEmpty
+            ? identificationType
+            : 'Identificación';
+
+        buffer.writeln(
+          '🪪 $documentLabel: $customerDocument',
+        );
+      }
+    }
+
+    // ============================================================
+    // PRODUCTOS
+    // ============================================================
 
     buffer.writeln();
     buffer.writeln('*PRODUCTOS*');
     buffer.writeln('────────────────────');
 
     for (final product in products) {
-      final name = product['name']?.toString() ?? 'Producto';
+      final name = ReceiptUtils.productName(product);
+      final code = ReceiptUtils.productCode(product);
+      final productType = ReceiptUtils.productType(product);
 
-      final code = product['code']?.toString() ?? '';
-
-      final productTypeName = product['productTypeName']?.toString() ?? '';
-
-      final quantity = _parseDouble(product['quantity']);
-
-      final unitPrice = _parseDouble(product['unitPrice']);
-
-      final productTotal = _parseDouble(product['total']);
+      final quantity = ReceiptUtils.productQuantity(product);
+      final unitPrice = ReceiptUtils.productUnitPrice(product);
+      final productTotal = ReceiptUtils.productTotal(product);
 
       buffer.writeln('*$name*');
 
@@ -96,34 +143,73 @@ class PosReceiptsRegisterView extends StatelessWidget {
         buffer.writeln('Código: $code');
       }
 
-      if (productTypeName.isNotEmpty) {
-        buffer.writeln('Tipo: $productTypeName');
+      if (productType.isNotEmpty) {
+        buffer.writeln('Tipo: $productType');
       }
 
-      buffer.writeln('Cantidad: ${_formatNumber(quantity)}');
+      buffer.writeln(
+        'Cantidad: ${_formatNumber(quantity)}',
+      );
 
-      buffer.writeln('Precio: \$${unitPrice.toStringAsFixed(2)}');
+      buffer.writeln(
+        'Precio unitario: ${ReceiptUtils.currency(unitPrice)}',
+      );
 
-      buffer.writeln('Total: \$${productTotal.toStringAsFixed(2)}');
+      buffer.writeln(
+        'Total: ${ReceiptUtils.currency(productTotal)}',
+      );
 
       buffer.writeln();
     }
 
+    // ============================================================
+    // TOTALES
+    // ============================================================
+
     buffer.writeln('────────────────────');
 
-    if (subtotal > 0) {
-      buffer.writeln('Subtotal: \$${subtotal.toStringAsFixed(2)}');
-    }
+    buffer.writeln(
+      'Subtotal: ${ReceiptUtils.currency(subtotal)}',
+    );
 
     if (discount > 0) {
-      buffer.writeln('Descuento: -\$${discount.toStringAsFixed(2)}');
+      buffer.writeln(
+        'Descuento: -${ReceiptUtils.currency(discount)}',
+      );
     }
 
-    if (tax > 0) {
-      buffer.writeln('Impuestos: \$${tax.toStringAsFixed(2)}');
+    if (taxes > 0) {
+      buffer.writeln(
+        'Impuestos: ${ReceiptUtils.currency(taxes)}',
+      );
     }
 
-    buffer.writeln('*TOTAL: \$${total.toStringAsFixed(2)}*');
+    buffer.writeln(
+      '*TOTAL: ${ReceiptUtils.currency(total)}*',
+    );
+
+    // ============================================================
+    // FORMA DE PAGO
+    // ============================================================
+
+    if (paymentMethod.isNotEmpty || paymentAmount > 0) {
+      buffer.writeln();
+      buffer.writeln('*FORMA DE PAGO*');
+
+      if (paymentMethod.isNotEmpty) {
+        buffer.writeln('💳 Método: $paymentMethod');
+      }
+
+      if (paymentAmount > 0) {
+        buffer.writeln(
+          '💰 Pagado: ${ReceiptUtils.currency(paymentAmount)}',
+        );
+      }
+    }
+
+    // ============================================================
+    // PIE
+    // ============================================================
 
     buffer.writeln();
     buffer.writeln('Gracias por su compra. 🙌');
@@ -173,30 +259,28 @@ class PosReceiptsRegisterView extends StatelessWidget {
       45,
       150, // espacio adicional para poder llegar al final
     );
-    Positioned menuOptions = Positioned(
+    Positioned menuOptions =   Positioned(
       top: 20,
-      left: 20,
       right: 20,
-      child: Center(
-        child: Material(
-          elevation: 6,
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.all(8),
-            child: ReceiptManagementActions(
-              onPrint: () {
-                _printReceipt(receipt);
-              },
-              onDownload: () {
-                _downloadReceiptPdf(receipt);
-              },
-              onWhatsApp: () {
-                _sendReceiptToWhatsApp(receipt);
-              },
-              onElectronicInvoice: () {
-                _generateElectronicInvoice(receipt);
-              },
-            ),
+      child: Material(
+        elevation: 6,
+        borderRadius: BorderRadius.circular(14),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ReceiptManagementActions(
+            isVertical: true,
+            onPrint: () {
+              _printReceipt(receipt);
+            },
+            onDownload: () {
+              _downloadReceiptPdf(receipt);
+            },
+            onWhatsApp: () {
+              _sendReceiptToWhatsApp(receipt);
+            },
+            onElectronicInvoice: () {
+              _generateElectronicInvoice(receipt);
+            },
           ),
         ),
       ),
@@ -295,54 +379,33 @@ class _ReceiptDetailCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = receipt.data ?? {};
-    final dataAll = data['all'];
-    final customer = dataAll['customer'];
-    final employeeManager = dataAll['employee'];
-    final employeeCustomer = employeeManager['customer'];
+    final receiptNumber = ReceiptUtils.receiptNumber(receipt);
+    final invoiceCode = ReceiptUtils.invoiceCode(receipt);
+    final ticketCode = ReceiptUtils.ticketCode(receipt);
 
-    final String receiptNumber = data['receiptNumber']?.toString() ?? '';
+    final products = ReceiptUtils.products(receipt);
 
-    final String invoiceCode = data['invoiceCode']?.toString() ?? '';
+    final total = ReceiptUtils.currency(
+      ReceiptUtils.total(receipt),
+    );
 
-    final String ticketCode = data['ticketCode']?.toString() ?? '';
+    final paymentMethod = ReceiptUtils.paymentMethod(receipt);
 
-    final products = data['products'];
+    final orderType = ReceiptUtils.orderType(receipt);
+    final orderIcon = ReceiptUtils.orderIcon(receipt);
 
-    final String total = _currency(data['total']);
-    final String subtotal = _currency(data['subtotal']);
+    final date = ReceiptUtils.date(receipt);
+    final hour = ReceiptUtils.hour(receipt);
 
-    final String discount = _currency(data['discount']);
-
-    final String taxes = _currency(data['taxes']);
-
-    final String paymentAmount = _currency(data['paymentAmount']);
-
-    final String paymentMethod =
-        data['paymentMethod']?.toString() ?? 'Sin información';
-
-    final String paymentProvider = data['paymentProvider']?.toString() ?? '';
-
-    final String paymentReference = data['paymentReference']?.toString() ?? '';
-
-    final String tpv = data['tpv']?.toString() ?? '';
-
-    final String serviceType = data['serviceType']?.toString() ?? '';
-
-    final String orderType = data['orderType']?.toString() ?? '';
-
-    final orderIcon = data['orderIcon'];
-    final String date = data['dateString']?.toString() ?? '';
-
-    final String hour = data['hour']?.toString() ?? '';
-
-    final String status = data['statusName']?.toString() ?? 'Sin estado';
+    final status = ReceiptUtils.statusName(receipt);
 
     return Card(
       elevation: 2,
       margin: const EdgeInsets.only(bottom: 12),
       clipBehavior: Clip.antiAlias,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
       child: InkWell(
         onTap: () {
           // Abrir detalle
@@ -355,6 +418,7 @@ class _ReceiptDetailCard extends StatelessWidget {
               // =====================================================
               // HEADER
               // =====================================================
+
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -366,22 +430,35 @@ class _ReceiptDetailCard extends StatelessWidget {
                           receiptNumber.isNotEmpty
                               ? 'Comprobante #$receiptNumber'
                               : 'Comprobante',
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(fontWeight: FontWeight.w700),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleMedium
+                              ?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
 
                         const SizedBox(height: 4),
 
                         Text(
-                          _buildDocumentCode(invoiceCode, ticketCode),
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(color: Colors.grey.shade600),
+                          _buildDocumentCode(
+                            invoiceCode,
+                            ticketCode,
+                          ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
                         ),
                       ],
                     ),
                   ),
 
-                  _StatusBadge(status: status),
+                  _StatusBadge(
+                    status: status,
+                  ),
                 ],
               ),
 
@@ -390,12 +467,16 @@ class _ReceiptDetailCard extends StatelessWidget {
               // =====================================================
               // INFORMACIÓN RÁPIDA
               // =====================================================
+
               Wrap(
                 spacing: 8,
                 runSpacing: 8,
                 children: [
                   if (orderType.isNotEmpty)
-                    _InfoChip(icon: orderIcon, label: orderType),
+                    _InfoChip(
+                      icon: orderIcon,
+                      label: orderType,
+                    ),
 
                   if (paymentMethod.isNotEmpty)
                     _InfoChip(
@@ -404,21 +485,28 @@ class _ReceiptDetailCard extends StatelessWidget {
                     ),
                 ],
               ),
+
               const SizedBox(height: 16),
+
+              // =====================================================
+              // CLIENTE / EMPLEADO
+              // =====================================================
+
               Row(
                 children: [
                   Expanded(
                     child: _buildCustomerSection(
                       context,
-                      customer as Map<String, dynamic>?,
+                      ReceiptUtils.customer(receipt),
                       Icons.person_outline,
                       'Cliente',
                     ),
                   ),
+
                   Expanded(
                     child: _buildCustomerSection(
                       context,
-                      employeeCustomer as Map<String, dynamic>?,
+                      ReceiptUtils.employeeCustomer(receipt),
                       Icons.badge_outlined,
                       'Empleado',
                     ),
@@ -431,6 +519,7 @@ class _ReceiptDetailCard extends StatelessWidget {
               // =====================================================
               // TOTAL
               // =====================================================
+
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(
@@ -449,23 +538,27 @@ class _ReceiptDetailCard extends StatelessWidget {
                         children: [
                           Text(
                             'TOTAL',
-                            style: Theme.of(context).textTheme.labelSmall
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelSmall
                                 ?.copyWith(
-                                  fontWeight: FontWeight.w700,
-                                  letterSpacing: .8,
-                                  color: Colors.grey.shade600,
-                                ),
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: .8,
+                              color: Colors.grey.shade600,
+                            ),
                           ),
 
                           const SizedBox(height: 2),
 
                           Text(
                             total,
-                            style: Theme.of(context).textTheme.headlineSmall
+                            style: Theme.of(context)
+                                .textTheme
+                                .headlineSmall
                                 ?.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  color: _getStatusColor(status),
-                                ),
+                              fontWeight: FontWeight.w800,
+                              color: _getStatusColor(status),
+                            ),
                           ),
                         ],
                       ),
@@ -476,16 +569,24 @@ class _ReceiptDetailCard extends StatelessWidget {
                       children: [
                         Text(
                           date,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(fontWeight: FontWeight.w600),
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodySmall
+                              ?.copyWith(
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
 
                         if (hour.isNotEmpty) ...[
                           const SizedBox(height: 3),
                           Text(
                             hour,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: Colors.grey.shade600),
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                              color: Colors.grey.shade600,
+                            ),
                           ),
                         ],
                       ],
@@ -495,12 +596,15 @@ class _ReceiptDetailCard extends StatelessWidget {
               ),
 
               const SizedBox(height: 16),
-              _buildProductsSection(context, products),
-              const SizedBox(height: 16),
 
               // =====================================================
-              // EMPLEADO / TPV
+              // PRODUCTOS
               // =====================================================
+
+              _buildProductsSection(
+                context,
+                products,
+              ),
             ],
           ),
         ),

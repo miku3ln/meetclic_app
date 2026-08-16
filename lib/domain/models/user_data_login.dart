@@ -29,6 +29,8 @@ class UserDataLogin {
   final int? age;
   final int? gender;
   final String accessToken;
+  final Map<String, dynamic> allData;
+
   MovementSummaryModel? summary;
   UserDataLogin({
     required this.userId,
@@ -58,6 +60,8 @@ class UserDataLogin {
     this.gender,
     this.summary,
     required this.accessToken,
+    required this.allData,
+
   });
 
   factory UserDataLogin.fromJson(Map<String, dynamic> json) {
@@ -123,12 +127,15 @@ class UserDataLogin {
       summary: userData['summary'] != null
           ? MovementSummaryModel.fromJson(userData['summary'])
           : MovementSummaryModel.fromJson(jsonDataSummary),
+
+      allData: Map<String, dynamic>.from(userData),
     );
     return  result;
   }
 
   Map<String, dynamic> toJson() {
     return {
+      ...allData,
       'user_id': userId,
       'user_name': userName,
       'email': email,

@@ -1,9 +1,6 @@
 import 'package:flutter/foundation.dart';
 
-
-
-
-class PosShiftManagementController extends ChangeNotifier {
+class BusinessManagerManagementController extends ChangeNotifier {
   bool _isClosingShift = false;
 
   bool get isClosingShift => _isClosingShift;

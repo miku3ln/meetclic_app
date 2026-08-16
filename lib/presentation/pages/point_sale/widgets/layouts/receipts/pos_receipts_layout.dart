@@ -37,7 +37,6 @@ class _PosReceiptsView extends StatelessWidget {
     final flexRegister = 40;
     final flexRegisterView = 60;
     bool isMobile = PosResponsive.isMobile(context);
-    isMobile = true;
     List<Widget> receiptChildren = [];
     if (!isMobile) {
       receiptChildren = [
@@ -70,6 +69,9 @@ class _PosReceiptsView extends StatelessWidget {
             return PosSettingsAppBar(
               titlePrimary: "Tickets",
               titleSecondary: sectionTitle,
+              primaryFlex: flexRegister,
+              secondaryFlex: flexRegisterView,
+
               onMenuTap: () {
                 scaffoldKey.currentState?.openDrawer();
               },

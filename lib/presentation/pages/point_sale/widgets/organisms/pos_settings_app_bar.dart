@@ -56,7 +56,8 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
   final IconData? leadingIcon;
   final String? leadingTitle;
   final VoidCallback? onLeadingTap;
-
+  final int primaryFlex;
+  final int secondaryFlex;
   const PosSettingsAppBar({
     super.key,
     required this.titlePrimary,
@@ -75,6 +76,8 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
     this.leadingIcon,
     this.leadingTitle,
     this.onLeadingTap,
+    this.primaryFlex = 30,
+    this.secondaryFlex = 70,
   });
 
   @override
@@ -99,7 +102,7 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 30,
+                    flex: primaryFlex,
                     child: _PrimarySection(
                       title: titlePrimary,
                       onMenuTap: onMenuTap,
@@ -119,7 +122,7 @@ class PosSettingsAppBar extends StatelessWidget implements PreferredSizeWidget {
                     color: style.dividerColor,
                   ),
                   Expanded(
-                    flex: 70,
+                    flex: secondaryFlex,
                     child: _SecondarySection(
                       title: titleSecondary,
                       titleColor: style.secondaryTitleColor,

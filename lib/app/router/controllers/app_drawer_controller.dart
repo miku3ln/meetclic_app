@@ -40,7 +40,9 @@ class AppDrawerController extends ChangeNotifier {
     if (_expandedIds.contains(id)) {
       _expandedIds.remove(id);
     } else {
-      _expandedIds.add(id);
+      _expandedIds
+        ..clear()
+        ..add(id);
     }
 
     notifyListeners();
@@ -50,7 +52,6 @@ class AppDrawerController extends ChangeNotifier {
       bool expanded,
       ) {
     if (expanded) {
-      // Solo un menú padre abierto a la vez.
       _expandedIds
         ..clear()
         ..add(id);
@@ -58,7 +59,26 @@ class AppDrawerController extends ChangeNotifier {
       _expandedIds.remove(id);
     }
 
-    notifyListeners();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!hasListeners) return;
+
+      _notifyAfterBuild();
+    });
+  }
+  bool _notifyScheduled = false;
+
+  void _notifyAfterBuild() {
+    if (_notifyScheduled) return;
+
+    _notifyScheduled = true;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _notifyScheduled = false;
+
+      if (!hasListeners) return;
+
+      notifyListeners();
+    });
   }
   AppDrawerItem? _findItemByRoute(
       List<AppDrawerItem> items,
@@ -156,8 +176,9 @@ class AppDrawerController extends ChangeNotifier {
 
   String get selectedId => _selectedId;
 
-  // items (config central)
+  // MENU INIT ONE
   late final List<AppDrawerItem> items = [
+
     AppDrawerItem(
       id: AppRoutes.salesKey,
       title: 'Punto de Venta',
@@ -166,6 +187,14 @@ class AppDrawerController extends ChangeNotifier {
       requireLogin: true,
       navigationMode: DrawerNavigationMode.restoreIfExists,
       preventReloadIfSelected: true,
+    ),
+    AppDrawerItem(
+      id: AppRoutes.businessManagerKey,
+      title: 'Empresa',
+      icon: Icons.business_rounded,
+      routeName: AppRoutes.businessManager,
+      requireLogin: true,
+      navigationMode: DrawerNavigationMode.replace,
     ),
     AppDrawerItem(
       id: AppRoutes.receiptsKey,

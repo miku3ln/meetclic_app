@@ -5,6 +5,7 @@ import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/point_sale/state/pos_items_controller.dart';
 import '../../presentation/pages/point_sale/state/pos_loyalty_controller.dart';
 import '../../presentation/pages/point_sale/state/pos_settings_controller.dart';
+import '../../presentation/pages/point_sale/widgets/layouts/business_manager/business_manager.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/loyalty/pos_loyalty_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/receipts/pos_receipts_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/settings/pos_settings_layout.dart';
@@ -33,6 +34,8 @@ class AppRoutes {
   static const receiptsKey = 'receipts';
   static const salesKey = 'sales';
 
+  static const businessManager = '/businessManager';
+  static const businessManagerKey = 'businessManager';
   // =========================
   // ARTÍCULOS
   // =========================
@@ -86,7 +89,7 @@ class AppRoutes {
 }
 
 class AppRouter {
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  static Route<dynamic> onGenerateRoute(RouteSettings settings) {//MENU INIT-2
     switch (settings.name) {
       case AppRoutes.gate:
         return MaterialPageRoute(
@@ -102,6 +105,12 @@ class AppRouter {
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const PointSaleScope(),
+        );
+
+      case AppRoutes.businessManager:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => const BusinessManagerManagementLayout(),
         );
       case AppRoutes.settings:
         final args = settings.arguments as PosSettingsLayoutArgs?;

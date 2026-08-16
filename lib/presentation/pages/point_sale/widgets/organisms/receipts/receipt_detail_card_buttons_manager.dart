@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+
 class ReceiptManagementActions extends StatelessWidget {
   final VoidCallback onPrint;
   final VoidCallback onDownload;
@@ -19,6 +21,7 @@ class ReceiptManagementActions extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     final actions = [
       _ReceiptActionButton(
         icon: Icons.print_outlined,
@@ -82,6 +85,7 @@ class ReceiptManagementActions extends StatelessWidget {
 }
 
 class _ReceiptActionButton extends StatelessWidget {
+
   final IconData icon;
   final String label;
   final VoidCallback onPressed;
@@ -96,6 +100,7 @@ class _ReceiptActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppThemeTokens.of(context);
     if (isVertical) {
       return Tooltip(
         message: label,
@@ -107,13 +112,15 @@ class _ReceiptActionButton extends StatelessWidget {
             icon: Icon(
               icon,
               size: 21,
+              color: colors.primary,
             ),
             style: IconButton.styleFrom(
+              backgroundColor: colors.surface,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
               side: BorderSide(
-                color: Colors.grey.shade300,
+                color: colors.primary,
               ),
             ),
           ),
@@ -123,9 +130,24 @@ class _ReceiptActionButton extends StatelessWidget {
 
     return OutlinedButton.icon(
       onPressed: onPressed,
-      icon: Icon(icon),
-      label: Text(label),
+      icon: Icon(
+        icon,
+        color: colors.primary,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: colors.primary,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
       style: OutlinedButton.styleFrom(
+        foregroundColor: colors.primary,
+        backgroundColor: colors.surface,
+        side: BorderSide(
+          color: colors.primary,
+          width: 1.2,
+        ),
         padding: const EdgeInsets.symmetric(
           horizontal: 16,
           vertical: 12,

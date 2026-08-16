@@ -50,15 +50,17 @@ class PosMainController extends ChangeNotifier {
     initDataConfig();
     _bindStates();
   }
+  Future<void> initDataConfig() async {
+    final customer = await configRepository.getFinalConsumer();
 
-  void initDataConfig() async {
-    /// 🔥 CARGAR CONFIG
-    dataCustomerFinal = await configRepository.getFinalConsumer();
+    if (_isDisposed) return;
+
+    dataCustomerFinal = customer;
+
     if (dataCustomerFinal != null) {
       setCustomerTicket(dataCustomerFinal);
     }
   }
-
   void _bindStates() {
     shift.addListener(notifyListeners);
     browser.addListener(notifyListeners);
@@ -77,12 +79,16 @@ class PosMainController extends ChangeNotifier {
   }) async {
     await shift.init();
 
+    if (_isDisposed) return;
+
     browser.init(
       initialProducts: initialProducts,
       initialProductCategories: initialProductCategories,
       initialMenuCategories: initialMenuCategories,
-      initialSelectedProductCategoryId: initialSelectedProductCategoryId,
-      initialSelectedMenuCategoryId: initialSelectedMenuCategoryId,
+      initialSelectedProductCategoryId:
+      initialSelectedProductCategoryId,
+      initialSelectedMenuCategoryId:
+      initialSelectedMenuCategoryId,
     );
   }
 
@@ -144,41 +150,62 @@ class PosMainController extends ChangeNotifier {
       onSave();
     }
   }
+  bool _isDisposed = false;
+  Future<void> initDataPointOfSales() async {
+    if (_isDisposed) return;
+
+    browser.setLoadingData(true);
+
+    try {
+      final products =
+      await PosTabletLandscapeFixtures.getProductsData();
+
+      if (_isDisposed) return;
+
+      browser.allProducts = products;
+
+      await init(
+        initialProducts: products,
+        initialProductCategories:
+        PosTabletLandscapeFixtures.getCategoriesData(products),
+        initialMenuCategories:
+        PosTabletLandscapeFixtures.getMenuCategoriesData(products),
+        initialSelectedProductCategoryId: 'all',
+        initialSelectedMenuCategoryId: 'all',
+      );
+
+      if (_isDisposed) return;
+
+      browser.setLoadingData(false);
+
+      notifyListeners();
+    } catch (e, stackTrace) {
+      if (_isDisposed) return;
+
+      browser.setLoadingData(false);
+
+      debugPrint('Error initDataPointOfSales: $e');
+      debugPrintStack(stackTrace: stackTrace);
+    }
+  }
 
   @override
   void dispose() {
+    _isDisposed = true;
+
     shift.removeListener(notifyListeners);
     browser.removeListener(notifyListeners);
     ticket.removeListener(notifyListeners);
     payment.removeListener(notifyListeners);
     checkout.removeListener(notifyListeners);
     ui.removeListener(notifyListeners);
+
     ui.isSummaryExpanded.dispose();
+
     super.dispose();
   }
-
   CustomerModelPosCurrent? selectedCustomer;
   CustomerModelPosCurrent? dataCustomerFinal;
-
-  Future<void> initDataPointOfSales() async {
-    browser.setLoadingData(true);
-    final products = await PosTabletLandscapeFixtures.getProductsData();
-
-    browser.allProducts = products;
-    init(
-      initialProducts: products,
-      initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(
-        products,
-      ),
-      initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(
-        products,
-      ),
-      initialSelectedProductCategoryId: 'all',
-      initialSelectedMenuCategoryId: 'all',
-    );
-    browser.setLoadingData(false);
-    notifyListeners();
-  }
 
   void setCustomerTicket(CustomerModelPosCurrent? selectedCustomerCurrent) {
     selectedCustomer = selectedCustomerCurrent;

@@ -81,8 +81,6 @@ class _LoginPageState extends State<LoginPage> {
         email: email,
         password: pass,
       );
-
-
       _showAlert(
         message: userDataLogin.message,
         icon: Icons.check_circle_outline,
