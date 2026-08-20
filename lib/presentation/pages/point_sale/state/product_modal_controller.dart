@@ -253,7 +253,7 @@ class ProductModalController extends BaseFormController {
 
     inventoryType = InventoryType.raw;
     sellType = MeasureType.unit;
-    ingredientsController.ingredients=[];
+    ingredientsController.ingredients = [];
   }
 
   ProductModalController() {
@@ -545,7 +545,7 @@ class ProductModalController extends BaseFormController {
     categoryError = selectedCategory == null
         ? "Selecciona una categoría"
         : null;
-
+    taxCategoryError = selectedTax == null ? "Seleccione el Iva" : null;
     subcategoryError = selectedSubcategory == null
         ? "Selecciona una subcategoría"
         : null;
@@ -563,6 +563,7 @@ class ProductModalController extends BaseFormController {
       'category': categoryError,
       'subcategory': subcategoryError,
       'image': imageError,
+      'iva': taxCategoryError,
     };
     final hasErrors = errors.values.any((e) => e != null);
     notifyListeners();
@@ -593,7 +594,8 @@ class ProductModalController extends BaseFormController {
         codeBarTouched &&
         imageTouched &&
         categoryTouched &&
-        subcategoryTouched;
+        subcategoryTouched &&
+        taxTouched;
   }
 
   bool get isFormValid {
@@ -608,6 +610,7 @@ class ProductModalController extends BaseFormController {
       codeBarError,
       categoryError,
       subcategoryError,
+      taxCategoryError,
       imageError,
     ].every((e) => e == null);
   }
@@ -774,10 +777,10 @@ class ProductModalController extends BaseFormController {
     inventoryType = draft.inventoryType;
     if (draft.detailsAll?.isNotEmpty == true) {
       final details = jsonDecode(draft.detailsAll!);
-    var product_sell_config=details['product_sell_config'];
+      var product_sell_config = details['product_sell_config'];
 
-    var allowShopCurrent=product_sell_config["allow_shop"];
-      allowShop=allowShopCurrent==1;
+      var allowShopCurrent = product_sell_config["allow_shop"];
+      allowShop = allowShopCurrent == 1;
       final productCurrent = details['product'];
       final productByStock = details['product_by_stock'];
       lowStockField.value = (productByStock['min'] ?? 0).toDouble();
@@ -1079,14 +1082,13 @@ class ProductModalController extends BaseFormController {
         stateCurrent = 'INACTIVE';
       }
     } else if (type == CrudType.update) {
-
       if (InventoryType.raw.id == inventory_type) {
         stateCurrent = selectedState?.id;
-      } else if (InventoryType.processed.id == inventory_type ||InventoryType.forSale.id == inventory_type ) {
+      } else if (InventoryType.processed.id == inventory_type ||
+          InventoryType.forSale.id == inventory_type) {
         stateCurrent = ingredientsController.ingredients.isNotEmpty
             ? 'ACTIVE'
             : 'INACTIVE';
-
       }
     }
 
@@ -1141,7 +1143,7 @@ class ProductModalController extends BaseFormController {
       },
       'product_sell_config': {
         'allow_pos': 1,
-        'allow_shop':allowShop?1:0,
+        'allow_shop': allowShop ? 1 : 0,
         'allow_delivery': 0,
         'visible': 1,
       },

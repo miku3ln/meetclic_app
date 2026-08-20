@@ -182,11 +182,8 @@ class PsSegmentToggle<T extends Object> extends StatelessWidget {
           Text(
             title!,
             style:
-            titleStyle ??
-                const TextStyle(
-                  fontWeight: FontWeight.w700,
-                  fontSize: 13,
-                ),
+                titleStyle ??
+                const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
           ),
           SizedBox(height: titleSpacing),
         ],
@@ -196,35 +193,31 @@ class PsSegmentToggle<T extends Object> extends StatelessWidget {
             color: backgroundColor,
             borderRadius: BorderRadius.circular(borderRadius),
             border:
-            customBorder ??
+                customBorder ??
                 (showBorder
-                    ? Border.all(
-                  color: borderColor ?? Colors.grey.shade300,
-                )
+                    ? Border.all(color: borderColor ?? Colors.grey.shade300)
                     : null),
           ),
 
           child: enabled
               ? CupertinoSlidingSegmentedControl<T>(
-            groupValue: value,
-            padding: padding,
-            thumbColor: currentThumbColor,
-            children: {
-              for (final item in items)
-                item.value: _buildItem(item),
-            },
-            onValueChanged: (v) {
-              if (v != null) {
-                onChanged?.call(v);
-              }
-            },
-          )
+                  groupValue: value,
+                  padding: padding,
+                  thumbColor: currentThumbColor,
+                  children: {
+                    for (final item in items) item.value: _buildItem(item),
+                  },
+                  onValueChanged: (v) {
+                    if (v != null) {
+                      onChanged?.call(v);
+                    }
+                  },
+                )
               : _buildDisabledSegment(),
         ),
       ],
     );
   }
-
   Widget _buildItem(PsSegmentItem<T> item) {
     final active = item.value == value;
 
@@ -234,35 +227,128 @@ class PsSegmentToggle<T extends Object> extends StatelessWidget {
         ? (item.activeColor ?? activeForegroundColor)
         : (item.inactiveColor ?? inactiveForegroundColor);
 
-    return Padding(
-      padding: itemPadding,
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            active ? item.activeIcon : item.inactiveIcon,
-            size: iconSize,
-            color: color,
-          ),
+    return Builder(
+      builder: (context) {
+        final isPortrait =
+            MediaQuery.orientationOf(context) == Orientation.portrait;
 
-          if (item.label != null) ...[
-            SizedBox(width: spacing),
-
-            Text(
-              item.label!,
-              style:
-                  itemTextStyle ??
-                  TextStyle(
-                    color: color,
-                    fontWeight: itemFontWeight,
-                    fontSize: itemFontSize,
-                  ),
+        if (isPortrait) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 6,
+              vertical: 8,
             ),
-          ],
-        ],
-      ),
+            child: Icon(
+              active ? item.activeIcon : item.inactiveIcon,
+              size: 18,
+              color: color,
+            ),
+          );
+        }
+
+        return Padding(
+          padding: itemPadding,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                active ? item.activeIcon : item.inactiveIcon,
+                size: iconSize,
+                color: color,
+              ),
+
+              if (item.label != null) ...[
+                SizedBox(width: spacing),
+                Text(
+                  item.label!,
+                  maxLines: 1,
+                  style: itemTextStyle ??
+                      TextStyle(
+                        color: color,
+                        fontWeight: itemFontWeight,
+                        fontSize: itemFontSize,
+                      ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
     );
   }
+  Widget _buildItem2(PsSegmentItem<T> item) {
+    final active = item.value == value;
+    final color = !enabled
+        ? Colors.grey.shade400
+        : active
+        ? (item.activeColor ?? activeForegroundColor)
+        : (item.inactiveColor ?? inactiveForegroundColor);
+
+    bool isPortrait = false;
+    Widget result = SizedBox.shrink();
+    if (isPortrait) {
+      result = Padding(
+        padding: itemPadding,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              active ? item.activeIcon : item.inactiveIcon,
+              size: iconSize,
+              color: color,
+            ),
+
+            if (item.label != null) ...[
+              SizedBox(width: spacing),
+
+              Text(
+                item.label!,
+                style:
+                    itemTextStyle ??
+                    TextStyle(
+                      color: color,
+                      fontWeight: itemFontWeight,
+                      fontSize: itemFontSize,
+                    ),
+              ),
+            ],
+          ],
+        ),
+      );
+    } else {
+      result = Padding(
+        padding: itemPadding,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              active ? item.activeIcon : item.inactiveIcon,
+              size: iconSize,
+              color: color,
+            ),
+
+            if (item.label != null) ...[
+              SizedBox(width: spacing),
+
+              Text(
+                item.label!,
+                style:
+                    itemTextStyle ??
+                    TextStyle(
+                      color: color,
+                      fontWeight: itemFontWeight,
+                      fontSize: itemFontSize,
+                    ),
+              ),
+            ],
+          ],
+        ),
+      );
+    }
+
+    return result;
+  }
+
   Widget _buildDisabledSegment() {
     return Container(
       padding: padding,
@@ -273,35 +359,23 @@ class PsSegmentToggle<T extends Object> extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: items.map((item) {
-
           final active = item.value == value;
 
           return Container(
-            constraints: BoxConstraints(
-              minWidth: itemMinWidth ?? 0,
-            ),
+            constraints: BoxConstraints(minWidth: itemMinWidth ?? 0),
             padding: itemPadding,
             decoration: BoxDecoration(
-              color: active
-                  ? Colors.grey.shade300
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(
-                borderRadius - 4,
-              ),
+              color: active ? Colors.grey.shade300 : Colors.transparent,
+              borderRadius: BorderRadius.circular(borderRadius - 4),
             ),
 
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-
                 Icon(
-                  active
-                      ? item.activeIcon
-                      : item.inactiveIcon,
+                  active ? item.activeIcon : item.inactiveIcon,
                   size: iconSize,
-                  color: active
-                      ? Colors.grey.shade700
-                      : Colors.grey.shade400,
+                  color: active ? Colors.grey.shade700 : Colors.grey.shade400,
                 ),
 
                 if (item.label != null) ...[
@@ -309,7 +383,8 @@ class PsSegmentToggle<T extends Object> extends StatelessWidget {
 
                   Text(
                     item.label!,
-                    style: itemTextStyle ??
+                    style:
+                        itemTextStyle ??
                         TextStyle(
                           color: active
                               ? Colors.grey.shade700

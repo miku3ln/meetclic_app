@@ -99,21 +99,16 @@ class ProductListCard extends StatelessWidget {
 
     final stock = data['stock'] ?? {};
     final classification = data['classification'] ?? {};
-
     final quantity = stock['quantity'] ?? 0;
     final unit = stock['unit'] ?? '';
-
     final category = data['category'] ?? '';
     final subcategory = data['subcategory'] ?? '';
-
     final taxData = data['tax'];
     final tax = (taxData['value_percentage'].toString() ?? '');
     final measure_type_management = data["measure_type_management"];
     final measureType = measure_type_management["value"] ?? '';
-
     final inventoryType = classification['inventory_type'] ?? '';
     final details = jsonDecode(data['details_all']);
-
     Color colorIconTax = colors.buttonPrimaryBackground;
     Color colorAmount = Colors.orange;
     IconData iconAmount=Icons.inventory_2_outlined;

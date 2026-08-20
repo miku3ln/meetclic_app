@@ -32,7 +32,7 @@ class ServerConfig {
       case Environment.local:
       //  return 'http://192.168.0.68:4949/meetclic-manager/api'; //PC WORK RED
        //return 'http://192.168.100.68:4949/meetclic-manager/api';//RED HOUSE
-     return 'http://192.168.0.100:4949/meetclic-manager/api';
+     return 'http://192.168.0.102:4949/meetclic-manager/api';
 
     }
   }

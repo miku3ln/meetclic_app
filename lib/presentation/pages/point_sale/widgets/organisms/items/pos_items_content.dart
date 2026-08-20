@@ -12,13 +12,10 @@ import '../../../../../../shared/utils/util_common.dart';
 import '../../../state/pos_items_controller.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
-
 import '../../sections/items/pos_items_management_section.dart';
-
 class PosItemsContent extends StatelessWidget {
   final PosItemsSection section;
   const PosItemsContent({super.key,required this.section});
-
   @override
   Widget build(BuildContext context) {
 
