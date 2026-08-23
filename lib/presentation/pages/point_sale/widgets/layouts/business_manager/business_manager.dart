@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+import '../../../../../shared/responsive/device_gesture_observer.dart';
 import '../../../../../widgets/empty_data.dart';
 import '../../../helpers/pos_responsive.dart';
 import '../../../shared/styles.dart';
 import '../../../state/business_manager_management_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/pos_settings_app_bar.dart';
+import '../../sections/product/ps_section_card.dart';
 import '/../../../shared/providers_session.dart';
 
 class BusinessManagerManagementService {
@@ -195,7 +198,7 @@ class _BusinessManagerViewState extends State<_BusinessManagerView> {
   }
 }
 
-class BusinessManagerRegister extends StatelessWidget {
+class BusinessManagerRegister extends StatefulWidget {
   final BusinessManagerSummaryModel? summary;
   final bool isLoading;
   final String? errorMessage;
@@ -210,63 +213,242 @@ class BusinessManagerRegister extends StatelessWidget {
   });
 
   @override
+  State<BusinessManagerRegister> createState() =>
+      _BusinessManagerRegisterState();
+}
+
+class _BusinessManagerRegisterState
+    extends State<BusinessManagerRegister> {
+
+  final ScrollController _businessInfoScrollController =
+  ScrollController();
+
+  final ScrollController _schedulesScrollController =
+  ScrollController();
+
+  BusinessManagerSummaryModel? get summary => widget.summary;
+
+  bool get isLoading => widget.isLoading;
+
+  String? get errorMessage => widget.errorMessage;
+
+  Future<void> onReload() => widget.onReload();
+
+  @override
+  void dispose() {
+    _businessInfoScrollController.dispose();
+    _schedulesScrollController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final controller =
     context.watch<BusinessManagerManagementController>();
 
+    final deviceInformation =
+    DeviceGestureObserver.snapshotOf(context);
+
     return Container(
-      decoration: PosSettingsMenuStyles.containerDecoration(context),
-      child: _buildBody(context, controller),
+      decoration:
+      PosSettingsMenuStyles.containerDecoration(context),
+      child: _buildBody(
+        context,
+        controller,
+        deviceInformation,
+      ),
     );
   }
+
 
   // ============================================================
   // INFORMACIÓN DE LA EMPRESA
   // ============================================================
+  Future<void> openGoogleMaps(
+      double? latitude,
+      double? longitude,
+      ) async {
+    if (latitude == null || longitude == null) return;
 
-  Widget _buildBusinessInformation() {
+    final googleMapsUri = Uri.parse(
+      'google.navigation:q=$latitude,$longitude',
+    );
+
+    final webUri = Uri.parse(
+      'https://www.google.com/maps/search/?api=1'
+          '&query=$latitude,$longitude',
+    );
+
+    if (await canLaunchUrl(googleMapsUri)) {
+      await launchUrl(
+        googleMapsUri,
+        mode: LaunchMode.externalApplication,
+      );
+      return;
+    }
+
+    await launchUrl(
+      webUri,
+      mode: LaunchMode.externalApplication,
+    );
+  }
+
+
+  Widget _buildBusinessInformation(DeviceSnapshot deviceInformation) {
+    final business = summary?.business;
+
     return RefreshIndicator(
       onRefresh: onReload,
       child: Scrollbar(
         thumbVisibility: true,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            150,
+          ),
           children: [
-            Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 1030,
-                ),
-                child: Card(
-                  elevation: 3,
-                  child: Padding(
-                    padding: const EdgeInsets.all(36),
-                    child: Column(
-                      crossAxisAlignment:
-                      CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          summary?.business?.title ?? '',
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        Text(
-                          summary?.business?.email ?? '',
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        Text(
-                          summary?.business?.phoneValue ?? '',
-                        ),
-                      ],
-                    ),
+            // INFORMACIÓN GENERAL
+            PsSectionCard(
+              title: 'Información general',
+              child: Column(
+                children: [
+                  infoRow(
+                    Icons.check_circle_outline,
+                    business?.status,
+                    label: 'Estado',
                   ),
-                ),
+                  infoRow(
+                    Icons.star_outline,
+                    business?.qualification != null
+                        ? business!.qualification!.toStringAsFixed(1)
+                        : null,
+                    label: 'Calificación',
+                  ),
+                  infoRow(
+                    Icons.business_outlined,
+                    business?.title,
+                    label: 'Empresa',
+                  ),
+                  infoRow(
+                    Icons.description_outlined,
+                    business?.description,
+                    label: 'Descripción',
+                  ),
+                  infoRow(
+                    Icons.category_outlined,
+                    business?.businessCategories,
+                    label: 'Categoría',
+                  ),
+                  infoRow(
+                    Icons.account_tree_outlined,
+                    business?.businessSubcategories,
+                    label: 'Subcategoría',
+                  ),
+                ],
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            // CONTACTO
+            PsSectionCard(
+              title: 'Contacto',
+              child: Column(
+                children: [
+                  infoRow(
+                    Icons.email_outlined,
+                    business?.email,
+                    label: 'Correo electrónico',
+                    onTap: () {
+                      // abrir cliente de correo
+                    },
+                    trailing: const Icon(
+                      Icons.open_in_new,
+                      size: 18,
+                    ),
+                  ),
+                  infoRow(
+                    Icons.phone_outlined,
+                    business?.phoneValue,
+                    label: 'Teléfono',
+                    onTap: () {
+                      // llamar
+                    },
+                    trailing: const Icon(
+                      Icons.call_outlined,
+                      size: 18,
+                    ),
+                  ),
+                  infoRow(
+                    Icons.language_outlined,
+                    business?.pageUrl,
+                    label: 'Página web',
+                    onTap: () {
+                      // abrir navegador
+                    },
+                    trailing: const Icon(
+                      Icons.open_in_new,
+                      size: 18,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 16),
+
+            // UBICACIÓN
+            PsSectionCard(
+              title: 'Ubicación',
+              child: Column(
+                children: [
+                  infoRow(
+                    Icons.location_on_outlined,
+                    business?.street1,
+                    label: 'Dirección',
+                    onTap: () {
+                      openGoogleMaps(
+                        business?.streetLat,
+                        business?.streetLng,
+                      );
+                    },
+                    trailing: const Icon(
+                      Icons.directions_outlined,
+                      size: 18,
+                    ),
+                  ),
+                  infoRow(
+                    Icons.add_road_outlined,
+                    business?.street2,
+                    label: 'Referencia',
+                  ),
+                  infoRow(
+                    Icons.location_city_outlined,
+                    business?.city,
+                    label: 'Ciudad',
+                  ),
+                  infoRow(
+                    Icons.map_outlined,
+                    business?.province,
+                    label: 'Provincia',
+                  ),
+                  infoRow(
+                    Icons.public_outlined,
+                    business?.countries,
+                    label: 'País',
+                  ),
+                  infoRow(
+                    Icons.place_outlined,
+                    business?.zone,
+                    label: 'Zona',
+                  ),
+                ],
+              ),
+            ),
+
           ],
         ),
       ),
@@ -276,35 +458,26 @@ class BusinessManagerRegister extends StatelessWidget {
   Widget _buildScheduleStatus({
     required bool isOpenNow,
     required bool isActive,
-    required BuildContext context
+    required BuildContext context,
   }) {
     final colorScheme = Theme.of(context).colorScheme;
 
     if (!isActive) {
       return Container(
-        padding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 5,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         decoration: BoxDecoration(
           color: colorScheme.surfaceContainerHighest,
           borderRadius: BorderRadius.circular(20),
         ),
         child: const Text(
           'NO DISPONIBLE',
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-          ),
+          style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700),
         ),
       );
     }
 
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 10,
-        vertical: 5,
-      ),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: isOpenNow
             ? Colors.green.withOpacity(0.12)
@@ -318,39 +491,34 @@ class BusinessManagerRegister extends StatelessWidget {
             width: 7,
             height: 7,
             decoration: BoxDecoration(
-              color: isOpenNow
-                  ? Colors.green
-                  : Colors.orange,
+              color: isOpenNow ? Colors.green : Colors.orange,
               shape: BoxShape.circle,
             ),
           ),
           const SizedBox(width: 6),
           Text(
-            isOpenNow
-                ? 'ABIERTO AHORA'
-                : 'FUERA DE HORARIO',
+            isOpenNow ? 'ABIERTO AHORA' : 'FUERA DE HORARIO',
             style: TextStyle(
               fontSize: 11,
               fontWeight: FontWeight.w700,
-              color: isOpenNow
-                  ? Colors.green.shade700
-                  : Colors.orange.shade700,
+              color: isOpenNow ? Colors.green.shade700 : Colors.orange.shade700,
             ),
           ),
         ],
       ),
     );
   }
+
   // ============================================================
   // HORARIOS
   // ============================================================
   Widget _buildScheduleItem(
       BusinessScheduleModel schedule,
-      BuildContext context,
-      ) {
+      BuildContext context, {
+        bool vertical = false,
+      }) {
     final now = DateTime.now();
 
-    // Tu weight_day:
     // 0 = Lunes
     // 1 = Martes
     // ...
@@ -359,12 +527,27 @@ class BusinessManagerRegister extends StatelessWidget {
 
     final isToday = schedule.weightDay == currentDay;
 
-    final isActive =
-        schedule.status?.toUpperCase() == 'ACTIVE';
+    final isActive = schedule.status?.toUpperCase() == 'ACTIVE';
 
     final isOpenNow = isToday && isActive;
 
     final colorScheme = Theme.of(context).colorScheme;
+
+    final dayWidget = Text(
+      schedule.text ?? schedule.name ?? '',
+      style: TextStyle(
+        fontWeight: FontWeight.w700,
+        color: isToday
+            ? colorScheme.primary
+            : colorScheme.onSurface,
+      ),
+    );
+
+    final statusWidget = _buildScheduleStatus(
+      isOpenNow: isOpenNow,
+      isActive: isActive,
+      context: context,
+    );
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -386,7 +569,6 @@ class BusinessManagerRegister extends StatelessWidget {
             horizontal: 18,
             vertical: 6,
           ),
-
           childrenPadding: const EdgeInsets.fromLTRB(
             18,
             0,
@@ -419,25 +601,21 @@ class BusinessManagerRegister extends StatelessWidget {
           // ======================================================
           // DÍA + ESTADO
           // ======================================================
-          title: Row(
+          title: vertical
+              ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              dayWidget,
+              const SizedBox(height: 6),
+              statusWidget,
+            ],
+          )
+              : Row(
             children: [
               Expanded(
-                child: Text(
-                  schedule.text ?? schedule.name ?? '',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    color: isToday
-                        ? colorScheme.primary
-                        : colorScheme.onSurface,
-                  ),
-                ),
+                child: dayWidget,
               ),
-
-              _buildScheduleStatus(
-                isOpenNow: isOpenNow,
-                isActive: isActive,
-                context: context,
-              ),
+              statusWidget,
             ],
           ),
 
@@ -454,95 +632,17 @@ class BusinessManagerRegister extends StatelessWidget {
       ),
     );
   }
-  bool _hasIntervals(BusinessScheduleModel schedule) {
-    return schedule.type == 1 &&
-        schedule.configTypeSchedule?.type == true &&
-        (schedule.configTypeSchedule?.data.isNotEmpty ?? false);
-  }
+
   bool _is24Hours(BusinessScheduleModel schedule) {
-    return schedule.type == 0 &&
-        schedule.configTypeSchedule?.type == false;
+    return schedule.type == 0 && schedule.configTypeSchedule?.type == false;
   }
-  bool _isOpenNow(
-      BusinessScheduleModel schedule,
-      ) {
-    final now = DateTime.now();
 
-    final currentDay = now.weekday - 1;
 
-    final isToday = schedule.weightDay == currentDay;
 
-    final isActive =
-        schedule.status?.toUpperCase() == 'ACTIVE';
-
-    if (!isToday || !isActive) {
-      return false;
-    }
-
-    // ============================================================
-    // 24 HORAS
-    // ============================================================
-    if (_is24Hours(schedule)) {
-      return true;
-    }
-
-    // ============================================================
-    // HORARIO POR INTERVALOS
-    // ============================================================
-    if (_hasIntervals(schedule)) {
-      final currentMinutes =
-          now.hour * 60 + now.minute;
-
-      for (final interval
-      in schedule.configTypeSchedule!.data) {
-
-        final start =
-        _timeToMinutes(
-          interval.startTime?.modelBreakdown,
-        );
-
-        final end =
-        _timeToMinutes(
-          interval.endTime?.modelBreakdown,
-        );
-
-        if (start == null || end == null) {
-          continue;
-        }
-
-        if (currentMinutes >= start &&
-            currentMinutes <= end) {
-          return true;
-        }
-      }
-    }
-
-    return false;
-  }
-  int? _timeToMinutes(String? value) {
-    if (value == null || value.isEmpty) {
-      return null;
-    }
-
-    final parts = value.split(':');
-
-    if (parts.length < 2) {
-      return null;
-    }
-
-    final hour = int.tryParse(parts[0]);
-    final minute = int.tryParse(parts[1]);
-
-    if (hour == null || minute == null) {
-      return null;
-    }
-
-    return hour * 60 + minute;
-  }
   Widget _buildScheduleIntervals(
-      BusinessScheduleModel schedule,
-      BuildContext context,
-      ) {
+    BusinessScheduleModel schedule,
+    BuildContext context,
+  ) {
     final colorScheme = Theme.of(context).colorScheme;
 
     // ============================================================
@@ -551,21 +651,14 @@ class BusinessManagerRegister extends StatelessWidget {
     if (_is24Hours(schedule)) {
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(
-          horizontal: 14,
-          vertical: 12,
-        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
         decoration: BoxDecoration(
           color: colorScheme.primary.withOpacity(0.08),
           borderRadius: BorderRadius.circular(9),
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.all_inclusive,
-              size: 19,
-              color: colorScheme.primary,
-            ),
+            Icon(Icons.all_inclusive, size: 19, color: colorScheme.primary),
 
             const SizedBox(width: 10),
 
@@ -585,15 +678,12 @@ class BusinessManagerRegister extends StatelessWidget {
     // ============================================================
     // INTERVALOS
     // ============================================================
-    final intervals =
-        schedule.configTypeSchedule?.data ?? [];
+    final intervals = schedule.configTypeSchedule?.data ?? [];
 
     if (intervals.isEmpty) {
       return Text(
         'Sin intervalos configurados',
-        style: TextStyle(
-          color: colorScheme.onSurfaceVariant,
-        ),
+        style: TextStyle(color: colorScheme.onSurfaceVariant),
       );
     }
 
@@ -611,156 +701,44 @@ class BusinessManagerRegister extends StatelessWidget {
 
         const SizedBox(height: 10),
 
-        ...intervals.map(
-              (interval) {
-            final start =
-            _formatTime(
-              interval.startTime?.modelBreakdown,
-            );
+        ...intervals.map((interval) {
+          final start = _formatTime(interval.startTime?.modelBreakdown);
 
-            final end =
-            _formatTime(
-              interval.endTime?.modelBreakdown,
-            );
+          final end = _formatTime(interval.endTime?.modelBreakdown);
 
-            return Container(
-              width: double.infinity,
-              margin: const EdgeInsets.only(bottom: 8),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 11,
-              ),
-              decoration: BoxDecoration(
-                color: colorScheme
-                    .surfaceContainerHighest
-                    .withOpacity(0.55),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.access_time_outlined,
-                    size: 18,
-                    color: colorScheme.primary,
+          return Container(
+            width: double.infinity,
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
+            decoration: BoxDecoration(
+              color: colorScheme.surfaceContainerHighest.withOpacity(0.55),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  Icons.access_time_outlined,
+                  size: 18,
+                  color: colorScheme.primary,
+                ),
+
+                const SizedBox(width: 10),
+
+                Text(
+                  '$start - $end',
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
                   ),
-
-                  const SizedBox(width: 10),
-
-                  Text(
-                    '$start - $end',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+                ),
+              ],
+            ),
+          );
+        }),
       ],
     );
   }
-  Widget _buildScheduleIntervals2(
-      BusinessScheduleModel schedule,
-      BuildContext context,
-      ) {
-    final colorScheme = Theme.of(context).colorScheme;
 
-    final intervals =
-        schedule.configTypeSchedule?.data ?? [];
-
-    // ============================================================
-    // SIN INTERVALOS
-    // ============================================================
-    if (intervals.isEmpty) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Text(
-          'Sin intervalos configurados',
-          style: TextStyle(
-            fontSize: 13,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-      );
-    }
-
-    // ============================================================
-    // INTERVALOS
-    // ============================================================
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Intervalos',
-          style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-            color: colorScheme.onSurfaceVariant,
-          ),
-        ),
-
-        const SizedBox(height: 10),
-
-        ...intervals.asMap().entries.map(
-              (entry) {
-            final index = entry.key;
-            final interval = entry.value;
-
-            final start =
-                interval.startTime?.modelBreakdown;
-
-            final end =
-                interval.endTime?.modelBreakdown;
-
-            return Container(
-              width: double.infinity,
-              margin: EdgeInsets.only(
-                bottom: index == intervals.length - 1
-                    ? 0
-                    : 8,
-              ),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 11,
-              ),
-              decoration: BoxDecoration(
-                color: colorScheme
-                    .surfaceContainerHighest
-                    .withOpacity(0.55),
-                borderRadius: BorderRadius.circular(9),
-              ),
-              child: Row(
-                children: [
-                  Icon(
-                    Icons.access_time_outlined,
-                    size: 18,
-                    color: colorScheme.primary,
-                  ),
-
-                  const SizedBox(width: 10),
-
-                  Text(
-                    '${_formatTime(start)} - ${_formatTime(end)}',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
-      ],
-    );
-  }
   String _formatTime(String? value) {
     if (value == null || value.isEmpty) {
       return '--:--';
@@ -774,21 +752,28 @@ class BusinessManagerRegister extends StatelessWidget {
 
     return '${parts[0]}:${parts[1]}';
   }
-  Widget _buildSchedules(BuildContext context) {
+
+  Widget _buildSchedules(BuildContext context,DeviceSnapshot deviceInformation) {
     final schedules = summary?.schedules ?? [];
     return RefreshIndicator(
       onRefresh: onReload,
       child: Scrollbar(
+        controller: _schedulesScrollController,
         thumbVisibility: true,
         child: ListView(
+          controller: _schedulesScrollController,
+          primary: false,
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            150,
+          ),
           children: [
             Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 1030,
-                ),
+                constraints: const BoxConstraints(maxWidth: 1030),
                 child: Card(
                   elevation: 3,
                   child: Padding(
@@ -806,11 +791,9 @@ class BusinessManagerRegister extends StatelessWidget {
 
                         const SizedBox(height: 24),
 
-                        ...schedules.map(
-                              (schedule) {
-                            return _buildScheduleItem(schedule,context);
-                          },
-                        ),
+                        ...schedules.map((schedule) {
+                          return _buildScheduleItem(schedule, context,vertical:deviceInformation.isTablet);
+                        }),
                       ],
                     ),
                   ),
@@ -828,13 +811,13 @@ class BusinessManagerRegister extends StatelessWidget {
   // ============================================================
 
   Widget _buildBody(
-      BuildContext context,
-      BusinessManagerManagementController controller,
-      ) {
+    BuildContext context,
+    BusinessManagerManagementController controller,
+   DeviceSnapshot deviceInformation,
+
+  ) {
     if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (summary == null) {
@@ -888,27 +871,17 @@ class BusinessManagerRegister extends StatelessWidget {
             child: const TabBar(
               tabs: [
                 Tab(
-                  icon: Icon(
-                    Icons.business_outlined,
-                  ),
+                  icon: Icon(Icons.business_outlined),
                   text: 'Información de la empresa',
                 ),
-                Tab(
-                  icon: Icon(
-                    Icons.schedule_outlined,
-                  ),
-                  text: 'Horarios',
-                ),
+                Tab(icon: Icon(Icons.schedule_outlined), text: 'Horarios'),
               ],
             ),
           ),
 
           Expanded(
             child: TabBarView(
-              children: [
-                _buildBusinessInformation(),
-                _buildSchedules(context),
-              ],
+              children: [_buildBusinessInformation(deviceInformation), _buildSchedules(context,deviceInformation)],
             ),
           ),
         ],

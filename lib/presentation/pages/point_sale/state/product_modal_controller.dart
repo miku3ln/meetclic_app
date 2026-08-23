@@ -796,50 +796,24 @@ class ProductModalController extends BaseFormController {
       selectedTax = listTaxCategoryManagement.firstWhere((e) => e.id == taxId);
       //selectedUnitMeasure=draft.selectedUnitMeasure;
       if (draft.sellType.id == MeasureType.unit.id) {
-      } else {
-        final resultData = getDataSubMeasureByMeasure(
-          listMeasureCategoryManagement,
-          draft.sellType,
-        );
+      } else {}
+      final resultData = getDataSubMeasureByMeasure(
+        listMeasureCategoryManagement,
+        draft.sellType,
+      );
 
-        final unitsWithConversions = resultData.units.firstWhere(
-          (unit) => unit.id == draft.selectedUnitMeasure?.id,
-        );
+      final unitsWithConversionsCurrent = getDataUnitsMeasure(
+        resultData,
+        draft.sellType,
+      );
+      final unitsWithConversions = unitsWithConversionsCurrent.firstWhere(
+        (unit) => unit.id == draft.selectedUnitMeasure?.id,
+      );
 
-        if (unitsWithConversions.id > 0) {
-          selectedUnitMeasure = unitsWithConversions;
-        }
+      if (unitsWithConversions.id > 0) {
+        selectedUnitMeasure = unitsWithConversions;
       }
 
-      if (false) {
-        selectedTax = TaxCategoryModel(
-          id: taxData['id'],
-          name: taxData['value'],
-          description: '',
-          priority: 0,
-          taxPercentage: taxData['percentage'],
-        );
-        if (unitMeasureId != null) {
-          for (final category in listMeasureCategoryData) {
-            try {
-              selectedUnitMeasure = category.units.firstWhere(
-                (e) => e.id == unitMeasureId,
-              );
-              break;
-            } catch (_) {}
-          }
-        }
-
-        /// MEASURE TYPE
-        final measureTypeId = details['product_measure_type']?['id'];
-
-        if (measureTypeId != null) {
-          sellType = MeasureType.values.firstWhere(
-            (e) => e.id == measureTypeId.toString(),
-            orElse: () => MeasureType.unit,
-          );
-        }
-      }
     }
 
     if (draft.category.id > 0) {
@@ -1009,23 +983,13 @@ class ProductModalController extends BaseFormController {
     final category = listMeasureCategory.firstWhere(
       (e) => e.id.toString() == measureType.id,
     );
-
     final baseUnit = category.baseUnit;
-
     double quantity = stock;
     int? unitMeasureId = selectedUnitMeasure?.id;
     double conversionFactor = 1;
     int? unit_input_id = 1;
-
     switch (measureType) {
       case MeasureType.unit:
-        quantity = stock;
-        unitMeasureId = baseUnit.id;
-        unit_input_id = unitMeasureId;
-
-        conversionFactor = 1;
-        break;
-
       case MeasureType.mass:
       case MeasureType.volume:
       case MeasureType.length:
@@ -1035,6 +999,14 @@ class ProductModalController extends BaseFormController {
         unitMeasureId = baseUnit.id;
         unit_input_id = selectedUnitMeasure?.id;
         break;
+      /*case MeasureType.unit:
+        quantity = stock;
+        unitMeasureId = baseUnit.id;
+        unit_input_id = unitMeasureId;
+
+        conversionFactor = 1;
+        break;
+*/
     }
 
     return {

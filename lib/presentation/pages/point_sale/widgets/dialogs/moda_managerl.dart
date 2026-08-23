@@ -312,10 +312,10 @@ class CustomerDetailView extends StatelessWidget {
           title: "Información",
           child: Column(
             children: [
-              _infoRow(Icons.email, c.email),
-              _infoRow(Icons.phone, c.phone),
-              _infoRow(Icons.location_on, c.city),
-              _infoRow(Icons.badge, c.id),
+              infoRow(Icons.email, c.email),
+              infoRow(Icons.phone, c.phone),
+              infoRow(Icons.location_on, c.city),
+              infoRow(Icons.badge, c.id),
             ],
           ),
         ),
@@ -326,9 +326,9 @@ class CustomerDetailView extends StatelessWidget {
           title: "Actividad",
           child: Column(
             children: [
-              _infoRow(Icons.star, "0.00 Puntos"),
-              _infoRow(Icons.shopping_bag, "0 Visitas"),
-              _infoRow(Icons.calendar_today, "Última visita: -"),
+              infoRow(Icons.star, "0.00 Puntos"),
+              infoRow(Icons.shopping_bag, "0 Visitas"),
+              infoRow(Icons.calendar_today, "Última visita: -"),
             ],
           ),
         ),
@@ -336,20 +336,7 @@ class CustomerDetailView extends StatelessWidget {
     );
   }
 
-  Widget _infoRow(IconData icon, String? text) {
-    if (text == null || text.isEmpty) return const SizedBox();
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Icon(icon, size: 18, color: Colors.grey),
-          const SizedBox(width: 8),
-          Expanded(child: Text(text)),
-        ],
-      ),
-    );
-  }
 }
 
 class CustomerCreateView extends StatelessWidget {

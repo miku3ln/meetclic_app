@@ -122,9 +122,10 @@ class ProductMapper {
       conversions: [],
     );
 
-    var selectedState= details["product"]["state"];
+    var selectedState = details["product"]["state"];
     return ProductDraft(
-      id: m['id'],state:selectedState ,
+      id: m['id'],
+      state: selectedState,
       name: m['name']?.toString() ?? '',
       detailsAll: details_all?.toString() ?? '',
       price: price,
@@ -165,6 +166,23 @@ class MeasureDataResult {
   final List<UnitMeasureModel> units;
 
   MeasureDataResult({required this.measureCategory, required this.units});
+}
+
+List<UnitMeasureModel>  getDataUnitsMeasure(MeasureDataResult resultData, MeasureType type) {
+  final category = resultData.measureCategory;
+
+  List<UnitMeasureModel> units = [...resultData.units];
+
+  if (type == MeasureType.unit && category.baseUnit.isBase) {
+    final existsBase = units.any((unit) => unit.id == category.baseUnit.id);
+
+    if (!existsBase) {
+      units.insert(0, category.baseUnit);
+    }
+  }
+
+  final unitsWithConversions = units;
+  return unitsWithConversions;
 }
 
 MeasureDataResult getDataSubMeasureByMeasure(

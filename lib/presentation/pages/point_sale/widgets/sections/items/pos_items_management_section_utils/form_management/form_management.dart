@@ -978,6 +978,7 @@ Widget _buildTabRecipe(
                                           listMeasureCategory,
                                           controller,
                                           context,
+                                            deviceInformation
                                         ),
                                       );
                                     })
@@ -1006,11 +1007,15 @@ Widget _buildMeasureWidget(
   ProductModalController controller,
 ) {
   if (type == MeasureType.unit) {
-    return const SizedBox.shrink();
+    //return const SizedBox.shrink();
   }
-  final resultData = getDataSubMeasureByMeasure(listMeasureCategory, type);
-  final resultSet = resultData.measureCategory;
-  final unitsWithConversions = resultData.units;
+  final resultData = getDataSubMeasureByMeasure(
+    listMeasureCategory,
+    type,
+  );
+
+  final unitsWithConversions= getDataUnitsMeasure( resultData,  type);
+
   return PsDropdown<UnitMeasureModel>(
     label: "Medida",
     items: unitsWithConversions,
@@ -1334,6 +1339,8 @@ Widget _buildRecipeItemRow(
   List<MeasureCategoryModel> listMeasureCategory,
   ProductModalController controller,
   BuildContext context,
+    DeviceSnapshot deviceInformation,
+
 ) {
   //CREATE  item.recipeId==0
   //UPDATE item.recipeId>0
@@ -1369,7 +1376,9 @@ Widget _buildRecipeItemRow(
 
   List<UnitMeasureModel> itemsInformation = getUnits(item, listMeasureCategory);
   int i = 0;
+
   return PsRecipeRowItem<UnitMeasureModel>(
+    deviceSnapshot: deviceInformation,
     data: PsRecipeRowData<UnitMeasureModel>(
       leftBorderColor: borderColor,
       title: informationProduct,
@@ -1465,14 +1474,15 @@ class _InventoryInfoHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final allowView = type.id == MeasureType.unit.id ? false : true;
+    final allowView =  true;
     if (allowView) {
       final resultData = getDataSubMeasureByMeasure(
         listMeasureCategoryManagement,
         type,
       );
+      final unitsWithConversions= getDataUnitsMeasure( resultData,  type);
       final baseUnit = resultData.measureCategory.baseUnit;
-      final units = resultData.units;
+      final units = unitsWithConversions;
       final exampleValue = 10;
       final exampleUnit = units.firstWhere(
         (u) => !u.isBase,

@@ -47,14 +47,17 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   bool _isLoading = false;
   bool _hasInitialLoadFinished = false;
   String _searchCode = '';
+
   bool get _hasData => _items.isNotEmpty;
+
   bool get _hasMore => _items.length < _total;
 
   /// aquí decides el total simulado
   int _simulatedTotal = 592;
-  final searchController = SearchFilterController();//TODO SEARCH
+  final searchController = SearchFilterController(); //TODO SEARCH
   StreamSubscription? _searchSub; //TODO SEARCH
-  void _listenSearchEvents() {//TODO SEARCH
+  void _listenSearchEvents() {
+    //TODO SEARCH
     _searchSub?.cancel();
     _searchSub = searchController.events.listen((event) {
       switch (event.type) {
@@ -80,13 +83,14 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       }
     });
   }
+
   @override
   void initState() {
     super.initState();
     _api = PosItemsManagementRepository(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
-    _listenSearchEvents();//TODO SEARCH
+    _listenSearchEvents(); //TODO SEARCH
   }
 
   @override
@@ -96,8 +100,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     _modalSub?.cancel();
     _modalActions?.cancel();
 
-    _searchSub?.cancel();//TODO SEARCH
-    searchController.dispose();//TODO SEARCH
+    _searchSub?.cancel(); //TODO SEARCH
+    searchController.dispose(); //TODO SEARCH
     super.dispose();
   }
 
@@ -169,6 +173,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   StreamSubscription? _modalSub;
   StreamSubscription? _modalActions;
+
   void _listenModalEvents(ProductModalController controller) {
     _modalSub?.cancel();
     _modalActions?.cancel();
@@ -254,18 +259,14 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 
   final controller = ProductModalController();
+
   @override
   Widget build(BuildContext context) {
     return Stack(
       children: [
         IgnorePointer(
           ignoring: _isOpeningProduct,
-          child: Column(
-            children: [
-              _buildHeader(),
-              _buildBody(),
-            ],
-          ),
+          child: Column(children: [_buildHeader(), _buildBody()]),
         ),
 
         // 🔥 FAB (overlay layer)
@@ -292,8 +293,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                   btnCancelTitle: "Cancelar",
                   title: "Crear Producto",
                   typeManagement: CrudType.create,
-                  listMeasureCategory:
-                  controller.listMeasureCategoryManagement,
+                  listMeasureCategory: controller.listMeasureCategoryManagement,
                   listTaxCategory: controller.listTaxCategoryManagement,
                 );
               } finally {
@@ -319,6 +319,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       ],
     );
   }
+
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.fromLTRB(
@@ -334,31 +335,33 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       ),
     );
   }
+
   Widget _buildBody() {
     return Expanded(
       child: RefreshIndicator(
         onRefresh: _refreshAll,
         child: _hasInitialLoadFinished && _hasData
             ? ListView.builder(
-          controller: _scrollController,
-          physics: const AlwaysScrollableScrollPhysics(),
-          itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
-          itemBuilder: (context, index) {
-            if (index >= _items.length) {
-              return const Center(child: PosLoadingView());
-            }
+                controller: _scrollController,
+                physics: const AlwaysScrollableScrollPhysics(),
+                itemCount: _items.length + (_hasMore || _isLoading ? 1 : 0),
+                itemBuilder: (context, index) {
+                  if (index >= _items.length) {
+                    return const Center(child: PosLoadingView());
+                  }
 
-            final item = _items[index];
-            return ProductListCard(
-              item: item,
-              onTap: () => _onTapItem(item),
-            );
-          },
-        )
+                  final item = _items[index];
+                  return ProductListCard(
+                    item: item,
+                    onTap: () => _onTapItem(item),
+                  );
+                },
+              )
             : _buildEmptyOrLoading(),
       ),
     );
   }
+
   Widget _buildEmptyOrLoading() {
     if (!_hasInitialLoadFinished && _isLoading) {
       return const Center(child: PosLoadingView());

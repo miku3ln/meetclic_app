@@ -42,19 +42,120 @@ class PsSectionSplit extends StatelessWidget {
     );
   }
 }
+Widget infoRow(
+    IconData icon,
+    String? text, {
+      String? label,
+      VoidCallback? onTap,
+      Widget? trailing,
+      String? tooltip,
+    }) {
+  if (text == null || text.trim().isEmpty) {
+    return const SizedBox.shrink();
+  }
+
+  final hasLabel = label != null && label.trim().isNotEmpty;
+  final isInteractive = onTap != null;
+
+  final content = Padding(
+    padding: const EdgeInsets.symmetric(
+      horizontal: 8,
+      vertical: 10,
+    ),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        Icon(
+          icon,
+          size: 20,
+          color: isInteractive ? null : Colors.grey,
+        ),
+
+        const SizedBox(width: 12),
+
+        Expanded(
+          child: hasLabel
+              ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label!,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                text,
+                style: TextStyle(
+                  fontWeight:
+                  isInteractive ? FontWeight.w500 : FontWeight.normal,
+                ),
+              ),
+            ],
+          )
+              : Text(
+            text,
+            style: TextStyle(
+              fontWeight:
+              isInteractive ? FontWeight.w500 : FontWeight.normal,
+            ),
+          ),
+        ),
+
+        if (trailing != null) ...[
+          const SizedBox(width: 8),
+          trailing,
+        ] else if (isInteractive) ...[
+          const SizedBox(width: 8),
+          const Icon(
+            Icons.chevron_right,
+            size: 18,
+            color: Colors.grey,
+          ),
+        ],
+      ],
+    ),
+  );
+
+  if (!isInteractive) {
+    return content;
+  }
+
+  final tappable = Material(
+    color: Colors.transparent,
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(8),
+      child: content,
+    ),
+  );
+
+  if (tooltip != null && tooltip.trim().isNotEmpty) {
+    return Tooltip(
+      message: tooltip,
+      child: tappable,
+    );
+  }
+
+  return tappable;
+}
 class PsSectionCard extends StatelessWidget {
-  final String title;
+  final String? title;
   final Widget child;
 
   const PsSectionCard({
     super.key,
-    required this.title,
+    this.title,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
     final c = AppThemeTokens.of(context);
+
+    final hasTitle = title != null && title!.trim().isNotEmpty;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.m),
@@ -66,8 +167,13 @@ class PsSectionCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: AppTextStyles.title(context)),
-          AppSpacing.spaceBetweenSections,
+          if (hasTitle) ...[
+            Text(
+              title!,
+              style: AppTextStyles.title(context),
+            ),
+            AppSpacing.spaceBetweenSections,
+          ],
           child,
         ],
       ),
