@@ -13,7 +13,7 @@ abstract class Config {
 
 class ServerConfig {
 
-  static Environment currentEnv = Environment.local;
+  static Environment currentEnv = Environment.production;
   static String get getSocketServer {
     //return 'ws://${Config.socket}:${Config.port}/audio';
     //   return 'ws://${Config.socket}/socketMigu3ln/audio';
@@ -28,7 +28,7 @@ class ServerConfig {
       case Environment.developer:
         return 'http://192.168.0.101/meetclickmanager/api';
       case Environment.test:
-        return 'http://192.168.137.1/meetclickmanager/api';
+        return 'http:/ipco192.168.137.1/meetclickmanager/api';
       case Environment.local:
       //  return 'http://192.168.0.68:4949/meetclic-manager/api'; //PC WORK RED
        //return 'http://192.168.100.68:4949/meetclic-manager/api';//RED HOUSE

@@ -629,6 +629,125 @@ class PosMockData {
 
     return null;
   }
+  static Future<ApiResponse<Map<String, dynamic>>> getProductRecipeYield({
+    required int productId,
+  }) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    return SafeExecutor.run(() async {
+
+      final uri = Uri.parse(
+        '${ServerConfig.baseUrl}/pointsales/product-recipe-yield-get',
+      );
+
+      final body = {
+        'business_id': businessId,
+        'product_id': productId,
+      };
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Authorization': 'Bearer ${token!}',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(body),
+      );
+
+      /**
+       * Error HTTP.
+       */
+      if (response.statusCode != 200) {
+        return ApiResponse<Map<String, dynamic>>.error(
+          'Error al obtener el rendimiento de la receta.',
+        );
+      }
+
+      final json =
+      jsonDecode(response.body);
+
+      /**
+       * El producto todavía NO tiene
+       * rendimiento configurado.
+       */
+      if (json['success'] != true) {
+
+        return ApiResponse<Map<String, dynamic>>.error(
+          json['msj'] ??
+              'No existe rendimiento configurado.',
+        );
+      }
+
+      /**
+       * Existe configuración.
+       */
+      final data =
+      Map<String, dynamic>.from(
+        json['data'] ?? {},
+      );
+
+      return ApiResponse<Map<String, dynamic>>.success(
+        message:
+        json['msj'] ?? '',
+
+        data:
+        data,
+      );
+
+    }, ApiResponse<Map<String, dynamic>>.error(
+      'Error al obtener el rendimiento de la receta.',
+    ));
+  }
+  static Future<ApiResponse<Map<String, dynamic>>> saveProductRecipeYield({
+    required int productId,
+    required double yieldQuantity,
+  }) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    final uri = Uri.parse(
+      '${ServerConfig.baseUrl}/pointsales/product-recipe-yield-save',
+    );
+    final body = {
+      'business_id': businessId,
+      'product_id': productId,
+      'yield_quantity': yieldQuantity,
+    };
+
+    final response = await http.post(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    final json =
+    jsonDecode(response.body);
+
+    if (
+    response.statusCode == 200 &&
+        json['success'] == true
+    ) {
+
+      return ApiResponse<Map<String, dynamic>>.success(
+        message:
+        json['msj'] ?? '',
+
+        data:
+        Map<String, dynamic>.from(
+          json['model'] ?? {},
+        ),
+      );
+    }
+
+    return ApiResponse<Map<String, dynamic>>.error(
+      json['msj'] ??
+          'Error al guardar el rendimiento.',
+    );
+  }
 
   static Future<ApiResponse<Map<String, dynamic>>> saveProductRecipe({
     required int recipeId,

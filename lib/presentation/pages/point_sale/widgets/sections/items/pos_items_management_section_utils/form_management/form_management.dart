@@ -387,7 +387,7 @@ Widget _buildManagerProduct(
             ),
             AppSpacing.spaceBetweenInputs,
 
-            PsFieldRow(
+           /* PsFieldRow( TODO COST
               children: [
                 PsFieldItem(
                   child: PsInput(
@@ -402,7 +402,7 @@ Widget _buildManagerProduct(
                   ),
                 ),
               ],
-            ),
+            ),*/
           ],
         ),
       ),
@@ -545,7 +545,7 @@ Widget _buildManagerProduct(
               ),
               AppSpacing.spaceBetweenInputs,
 
-              PsFieldRow(
+           /*   PsFieldRow( TODO COST
                 children: [
                   PsFieldItem(
                     child: PsInput(
@@ -560,7 +560,7 @@ Widget _buildManagerProduct(
                     ),
                   ),
                 ],
-              ),
+              ),*/
             ],
           ),
         ),
@@ -882,6 +882,35 @@ Widget _buildTabRecipe(
                             AppSpacing.spaceBetweenSections,
                             PsFieldRow(
                               children: [
+                                PsFieldItem(
+                                  flex: 2,
+                                  child: PsInput(
+                                    value: controller.amountRecipe?.toString() ?? '',
+                                    requiredField: true,
+                                    label: controller.amountRecipeLabel,
+                                    keyboardType: TextInputType.number,
+                                    onChanged: controller.setAmountRecipe,
+                                    error: controller.amountRecipeError,
+                                    isTouched: controller.amountRecipeTouched,
+                                    isValid: controller.amountRecipeError == null,
+
+                                    loading:
+                                    controller.savingAmountRecipe,
+                                  ),
+                                ),
+
+                                // 90%
+                                const Spacer(
+                                  flex: 8,
+                                ),
+                              ],
+                            ),
+                            AppSpacing.spaceBetweenSections,
+
+                            PsFieldRow(
+                              children: [
+
+
                                 /// 🔥 CATEGORÍA
                                 PsFieldItem(
                                   child:
@@ -1258,7 +1287,11 @@ class _ProductTabsViewState extends State<ProductTabsView>
 
         if (recipeEnabled && widget.controller.idManagementProduct > 0) {
           recipeLoaded = true;
-          widget.controller.ingredientsController.loadRecipe();
+          widget.controller.ingredientsController.loadRecipe();//LOAD TODO
+          widget.controller.ingredientsController.loadRecipeYield();//LOAD TODO
+
+
+
         } else {}
       } else {
         recipeLoaded = false;

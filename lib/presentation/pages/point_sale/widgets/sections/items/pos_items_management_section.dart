@@ -5,16 +5,26 @@ import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/item
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/form_management/form_management.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/pos_items_controller.dart';
 import '../../../../../../shared/pagination_response.dart';
+import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/utils/validators/validators.dart';
+import '../../../../../../shared/widgets/modals/manager-process-micro/ManagerProcessMicroConfig.dart';
+import '../../../../../../shared/widgets/modals/manager-process-micro/ManagerProcessMicroResult.dart';
+import '../../../../../../shared/widgets/modals/manager-process-micro/show_manager_process_micro.dart';
 import '../../../../../../shared/widgets/search_filter/controller/search_filter_controller.dart';
 import '../../../../../../shared/widgets/search_filter/controller/search_filter_events.dart';
 import '../../../../../../shared/widgets/search_filter/models/search_filter_result.dart';
 import '../../../../../../shared/widgets/search_filter/search_filter_widget.dart';
+import '../../../../../widgets/cards/cards.dart';
 import '../../../../../widgets/empty_data.dart';
 import '../../../../../widgets/loading_manager.dart';
+import '../../../../../widgets/toogle-manager.dart';
 import '../../../models/product_draft.dart';
 import '../../../state/product_modal_controller.dart';
+import '../../molecules/inputs/ps_dropdown.dart';
+import '../../molecules/inputs/ps_field_row.dart';
+import '../../molecules/inputs/ps_input.dart';
 import '../../organisms/items/pos_items_content.dart';
+import '../product/ps_section_card.dart';
 
 class ProductModalEvents {
   static const save = 'save';
@@ -87,6 +97,11 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   @override
   void initState() {
     super.initState();
+    debugPrint(
+      '🟢 INIT PosItemsManagementSection '
+      '${identityHashCode(this)}',
+    );
+
     _api = PosItemsManagementRepository(total: _simulatedTotal);
     _loadInitial();
     _scrollController.addListener(_onScroll);
@@ -95,6 +110,11 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   @override
   void dispose() {
+    debugPrint(
+      '⚫ DISPOSE PosItemsManagementSection '
+      '${identityHashCode(this)}',
+    );
+
     _scrollController.dispose();
     _searchController.dispose();
     _modalSub?.cancel();
@@ -106,6 +126,7 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 
   Future<void> _loadInitial() async {
+    debugPrint('🟠 LOAD INITIAL ${identityHashCode(this)}');
     if (_isLoading) return;
     setState(() {
       _isLoading = true;
@@ -150,6 +171,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   }
 
   Future<void> _refreshAll() async {
+    debugPrint('🔴🔴🔴 REFRESH ALL');
+
     if (_isLoading) return;
     _api = PosItemsManagementRepository(total: _simulatedTotal);
 
@@ -225,6 +248,83 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
     });
   }
 
+  Future<void> _onTypeManagement(
+    GenericListItem<Map<String, dynamic>> item,
+    int type,
+  ) async {
+    if (type == 0) {
+      await _onTapItem(item);
+    } else if (type == 1) {
+    } else if (type == 2) {
+      final controller = InventoryMovementMicroController();
+
+      final result = await showManagerProcessMicro<Map<String, dynamic>>(
+        context: context,
+
+        config: const ManagerProcessMicroConfig(
+          title: 'Movimiento de inventario',
+          description: 'Registra un ingreso o egreso del producto.',
+          icon: Icons.inventory_2_outlined,
+          submitText: 'Guardar',
+          cancelText: 'Cancelar',
+        ),
+
+        form: ProductManagementMicroForm(
+          controller: controller,
+          itemProduct: item,
+        ),
+
+        listenable: controller,
+
+        canSubmit: () {
+          return controller.areAllFieldsTouched && controller.isValid;
+        },
+
+        onSubmit: () async {
+          final validation = controller.validateFields();
+
+          if (!validation.success) {
+            return ManagerProcessMicroResult<Map<String, dynamic>>(
+              success: false,
+              data: validation.errors,
+              message: validation.message,
+              type: 'validation',
+            );
+          }
+
+          return ManagerProcessMicroResult<Map<String, dynamic>>(
+            success: true,
+            data: controller.toPayload(),
+            message: 'Movimiento registrado correctamente.',
+            type: 'save',
+          );
+        },
+      );
+      controller.dispose();
+
+      if (!result.success) {
+        return;
+      }
+
+      switch (result.type) {
+        case 'save':
+          debugPrint(result.data.toString());
+          await _refreshAll();
+          break;
+
+        case 'close':
+          debugPrint('Cerrar SIN reload');
+          break;
+
+        case 'cancel':
+          debugPrint('Cancelar SIN reload');
+          break;
+      }
+
+      return;
+    } else if (type == 3) {}
+  }
+
   Future<void> _onTapItem(GenericListItem<Map<String, dynamic>> item) async {
     if (item.data == null) return;
 
@@ -262,6 +362,8 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
   @override
   Widget build(BuildContext context) {
+    debugPrint('🟡 BUILD ${identityHashCode(this)}');
+
     return Stack(
       children: [
         IgnorePointer(
@@ -339,7 +441,10 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
   Widget _buildBody() {
     return Expanded(
       child: RefreshIndicator(
-        onRefresh: _refreshAll,
+        onRefresh: () async {
+          debugPrint('🔥 REFRESH INDICATOR ACTIVADO');
+          await _refreshAll();
+        },
         child: _hasInitialLoadFinished && _hasData
             ? ListView.builder(
                 controller: _scrollController,
@@ -353,7 +458,10 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
                   final item = _items[index];
                   return ProductListCard(
                     item: item,
-                    onTap: () => _onTapItem(item),
+                    onTap: () => _onTypeManagement(item, 0),
+                    onEdit: () => _onTypeManagement(item, 0),
+                    onManage: () => _onTypeManagement(item, 2),
+                    onReport: () => _onTypeManagement(item, 3),
                   );
                 },
               )
@@ -380,6 +488,266 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
           ),
         ),
       ],
+    );
+  }
+}
+
+class DialogResult<T> {
+  final bool success;
+  final T? data;
+  final String message;
+  final String type;
+
+  const DialogResult({
+    required this.success,
+    this.data,
+    this.message = '',
+    required this.type,
+  });
+}
+
+class InventoryMovementMicroController extends BaseFormController {
+  static const String movementTypeIncome = 'INCOME';
+  static const String movementTypeOutcome = 'OUTCOME';
+
+  late final FormFieldController<String> movementTypeField;
+  late final FormFieldController<double> amountField;
+
+  InventoryMovementMicroController() {
+    movementTypeField = FormFieldController<String>(
+      label: 'Tipo de movimiento',
+      value: movementTypeIncome,
+      validators: [
+        ValidatorsUtil.required('Tipo de movimiento'),
+      ],
+    );
+
+    amountField = FormFieldController<double>(
+      label: 'Cantidad',
+      validators: [
+        ValidatorsUtil.positiveDouble('Cantidad'),
+      ],
+    );
+
+    fields.addAll({
+      'movementType': movementTypeField,
+      'amount': amountField,
+    });
+  }
+
+  String? get movementType => movementTypeField.value;
+
+  double? get amount => amountField.value;
+
+  String get movementTypeLabel => movementTypeField.label;
+
+  String get amountLabel => amountField.label;
+
+  String? get movementTypeError => movementTypeField.error;
+
+  String? get amountError => amountField.error;
+
+  bool get movementTypeTouched => movementTypeField.touched;
+
+  bool get amountTouched => amountField.touched;
+
+  void setMovementType(String? value) {
+    debugPrint('MOVEMENT BEFORE: ${movementTypeField.value}');
+    debugPrint('MOVEMENT NEW: $value');
+
+    movementTypeField.setValue(value);
+
+    debugPrint('MOVEMENT AFTER: ${movementTypeField.value}');
+
+    notifyListeners();
+  }
+
+  void setAmount(String value) {
+    amountField.setValue(
+      double.tryParse(value),
+    );
+
+    notifyListeners();
+  }
+
+  Map<String, dynamic> toPayload() {
+    return {
+      'type_movement': movementType,
+      'amount': amount,
+    };
+  }
+}
+class ProductManagementMicroForm extends StatelessWidget {
+  final InventoryMovementMicroController controller;
+  final GenericListItem<Map<String, dynamic>> itemProduct;
+
+  const ProductManagementMicroForm({
+    super.key,
+    required this.controller,
+    required this.itemProduct,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final bool showMovementForm = true;
+
+    return ListenableBuilder(
+      listenable: controller,
+      builder: (context, _) {
+
+        /// IMPORTANTE:
+        /// Se construye dentro del ListenableBuilder.
+        final List<Widget> movementFields =
+        showMovementForm
+            ? [
+          PsFieldRow(
+            children: [
+              PsFieldItem(
+                child: PsSegmentToggle<String>(
+                  title: controller.movementTypeLabel,
+
+                  value: controller.movementType!,
+
+                  titleSpacing: 20,
+                  itemPadding:
+                  const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 8,
+                  ),
+                  padding:
+                  const EdgeInsets.all(3),
+                  iconSize: 18,
+                  spacing: 5,
+                  borderRadius: 10,
+                  height: 40,
+                  itemMinWidth: 70,
+
+                  titleStyle:
+                  const TextStyle(
+                    fontSize: 15,
+                    fontWeight:
+                    FontWeight.w400,
+                  ),
+
+                  items: const [
+                    PsSegmentItem<String>(
+                      value:
+                      InventoryMovementMicroController
+                          .movementTypeIncome,
+                      label: 'Ingreso',
+                      activeIcon:
+                      Icons.add_circle,
+                      inactiveIcon:
+                      Icons.add_circle_outline,
+                      thumbColor:
+                      Colors.green,
+                      activeColor:
+                      Colors.white,
+                      inactiveColor:
+                      Colors.grey,
+                    ),
+
+                    PsSegmentItem<String>(
+                      value:
+                      InventoryMovementMicroController
+                          .movementTypeOutcome,
+                      label: 'Egreso',
+                      activeIcon:
+                      Icons.remove_circle,
+                      inactiveIcon:
+                      Icons.remove_circle_outline,
+                      thumbColor:
+                      Colors.orange,
+                      activeColor:
+                      Colors.white,
+                      inactiveColor:
+                      Colors.grey,
+                    ),
+                  ],
+
+                  onChanged:
+                  controller.setMovementType,
+                ),
+              ),
+            ],
+          ),
+
+          AppSpacing.spaceBetweenInputs,
+
+          PsFieldRow(
+            children: [
+              PsFieldItem(
+                child: PsInput(
+                  label:
+                  controller.amountLabel,
+                  value: formatInput(
+                    controller.amount,
+                  ),
+                  requiredField: true,
+                  keyboardType:
+                  const TextInputType
+                      .numberWithOptions(
+                    decimal: true,
+                  ),
+                  onChanged:
+                  controller.setAmount,
+                  error:
+                  controller.amountError,
+                  isTouched:
+                  controller.amountTouched,
+                  isValid:
+                  controller.amountError ==
+                      null,
+                ),
+              ),
+            ],
+          ),
+        ]
+            : [
+          Center(
+            child: PsInfoCard(
+              widthPercent: 100,
+              type:
+              PsInfoCardType.simple,
+              config: warningCard,
+              icon:
+              Icons.info_outline,
+              title: 'Atención',
+              description:
+              'No existe configuración de yield',
+              onClose: () {
+                debugPrint('cerrar');
+              },
+            ),
+          ),
+        ];
+
+        return PsSectionCard(
+          title: 'Movimiento de inventario',
+          child: Column(
+            children: [
+              Center(
+                child: PsInfoCard(
+                  widthPercent: 100,
+                  type: PsInfoCardType.simple,
+                  config: warningCard,
+                  icon: Icons.info_outline,
+                  title: 'Atención',
+                  description:
+                  'Disponible únicamente para productos que se agregan a recetas.',
+                  onClose: () {
+                    debugPrint('cerrar');
+                  },
+                ),
+              ),
+
+              AppSpacing.spaceBetweenInputs,
+
+              ...movementFields,
+            ],
+          ),
+        );
+      },
     );
   }
 }

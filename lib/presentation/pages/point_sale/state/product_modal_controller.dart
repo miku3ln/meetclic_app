@@ -38,6 +38,29 @@ class ProductIngredientsController extends ChangeNotifier {
     updateProcess();
   }
 
+  Future<void> loadRecipeYield() async {
+    parent.setLoadingDataRecipe(true);
+    final productRecipeYield = await PosMockData.getProductRecipeYield(
+      productId: parent.idManagementProduct,
+    );
+
+    parent.setLoadingDataRecipe(false);
+    if (productRecipeYield.success) {
+      final yieldQuantity = double.tryParse(
+        productRecipeYield.data?['yield_quantity']?.toString() ?? '',
+      );
+
+      if (yieldQuantity != null) {
+        parent._amountRecipeSaved = yieldQuantity;
+
+        parent.amountRecipeField.value = yieldQuantity;
+        parent. amountRecipeField.error = null;
+        parent.amountRecipeField.touched = false;
+      }
+    }
+    updateProcess();
+  }
+
   late List<RecipeIngredientItem> ingredients = [];
 
   /// =========================
@@ -249,6 +272,10 @@ class ProductModalController extends BaseFormController {
         label: 'Stock Maximo',
         validators: [ValidatorsUtil.nonNegativeDouble("Stock maximo")],
       ),
+      'amountRecipe': FormFieldController<double>(
+        label: amountRecipeLabel,
+        validators: [ValidatorsUtil.nonNegativeDouble('Cantidad resultante')],
+      ),
     });
 
     inventoryType = InventoryType.raw;
@@ -272,6 +299,10 @@ class ProductModalController extends BaseFormController {
   FormFieldController<double> get priceField =>
       field<FormFieldController<double>>('price');
 
+  FormFieldController<double> get amountRecipeField =>
+      field<FormFieldController<double>>('amountRecipe');
+  double? _amountRecipeSaved;
+
   FormFieldController<double> get costField =>
       field<FormFieldController<double>>('cost');
 
@@ -292,6 +323,8 @@ class ProductModalController extends BaseFormController {
 
   double? get price => priceField.value;
 
+  double? get amountRecipe => amountRecipeField.value;
+
   double? get cost => costField.value;
 
   double? get stock => stockField.value;
@@ -307,6 +340,8 @@ class ProductModalController extends BaseFormController {
   String? get codeBarError => codeBarField.error;
 
   String? get priceError => priceField.error;
+
+  String? get amountRecipeError => amountRecipeField.error;
 
   String? get costError => costField.error;
 
@@ -324,6 +359,8 @@ class ProductModalController extends BaseFormController {
 
   bool get priceTouched => priceField.touched;
 
+  bool get amountRecipeTouched => amountRecipeField.touched;
+
   bool get costTouched => costField.touched;
 
   bool get stockTouched => stockField.touched;
@@ -337,6 +374,8 @@ class ProductModalController extends BaseFormController {
   /// =========================
 
   String priceLabel = 'Precio Venta';
+  String amountRecipeLabel = '¿Cuántas unidades salen?';
+
   String costLabel = 'Precio Compra';
   String costProductionLabel = 'Precio Costo';
   String stockLabel = 'Stock';
@@ -403,10 +442,77 @@ class ProductModalController extends BaseFormController {
 
     notifyListeners();
   }
+  bool _savingAmountRecipe = false;
 
+  bool get savingAmountRecipe => _savingAmountRecipe;
   void setPrice(String value) {
     priceField.setValue(value.isEmpty ? null : double.tryParse(value));
     notifyListeners();
+  }
+  Future<void> setAmountRecipe(String value) async {
+    final double? newValue = value.trim().isEmpty
+        ? null
+        : double.tryParse(value.trim());
+
+    /**
+     * Actualiza y valida.
+     */
+    amountRecipeField.setValue(newValue);
+
+    notifyListeners();
+
+    /**
+     * No guardar si es inválido.
+     */
+    if (!amountRecipeField.isValid) {
+      return;
+    }
+
+    if (newValue == null) {
+      return;
+    }
+
+    /**
+     * No guardar si no cambió.
+     */
+    if (_amountRecipeSaved == newValue) {
+      return;
+    }
+
+    /**
+     * Evitar doble guardado.
+     */
+    if (_savingAmountRecipe) {
+      return;
+    }
+
+    /**
+     * ACTIVAR LOADING
+     */
+    _savingAmountRecipe = true;
+    notifyListeners();
+
+    try {
+      final response =
+      await PosMockData.saveProductRecipeYield(
+        productId: idManagementProduct,
+        yieldQuantity: newValue,
+      );
+
+      if (response.success) {
+        /**
+         * Ahora este es el último valor
+         * confirmado por el servidor.
+         */
+        _amountRecipeSaved = newValue;
+      }
+    } finally {
+      /**
+       * DESACTIVAR LOADING
+       */
+      _savingAmountRecipe = false;
+      notifyListeners();
+    }
   }
 
   void setCost(String value) {
@@ -554,7 +660,7 @@ class ProductModalController extends BaseFormController {
     final errors = {
       'name': nameError,
       'price': priceError,
-      'cost': costError,
+      // 'cost': costError,
       'stock': stockError,
       'lowStock': lowStockError,
       'maxStock': maxStockError,
@@ -583,10 +689,12 @@ class ProductModalController extends BaseFormController {
     if (mode == CrudType.update) {
       return validateForm().success;
     }
+
+
     return isFormValid &&
         nameTouched &&
         priceTouched &&
-        costTouched &&
+        //costTouched &&
         stockTouched &&
         lowStockTouched &&
         maxStockTouched &&
@@ -594,6 +702,7 @@ class ProductModalController extends BaseFormController {
         codeBarTouched &&
         imageTouched &&
         categoryTouched &&
+        measureCategoryTouched&&
         subcategoryTouched &&
         taxTouched;
   }
@@ -602,7 +711,7 @@ class ProductModalController extends BaseFormController {
     return [
       nameError,
       priceError,
-      costError,
+      //  costError,
       stockError,
       lowStockError,
       maxStockError,
@@ -612,6 +721,7 @@ class ProductModalController extends BaseFormController {
       subcategoryError,
       taxCategoryError,
       imageError,
+      measureCategoryError
     ].every((e) => e == null);
   }
 
@@ -649,7 +759,7 @@ class ProductModalController extends BaseFormController {
     } else if (InventoryType.processed == inventoryType) {
       return costProductionLabel;
     }
-    return costProductionLabel + "d";
+    return costProductionLabel + "";
   }
 
   bool allowCloseModalBySave() {
@@ -705,7 +815,7 @@ class ProductModalController extends BaseFormController {
   bool allowManagerMeasure = false;
   bool allowShop = false;
 
-  String titleCardCostPricesProduct = 'Costos y Precios';
+  String titleCardCostPricesProduct = 'Precios';
   String titleCardInventoryInitProduct = 'Inventario Inicial';
   String titleCardInventoryStockManagement = 'Stock Gestion';
 
@@ -813,7 +923,6 @@ class ProductModalController extends BaseFormController {
       if (unitsWithConversions.id > 0) {
         selectedUnitMeasure = unitsWithConversions;
       }
-
     }
 
     if (draft.category.id > 0) {
@@ -1094,13 +1203,14 @@ class ProductModalController extends BaseFormController {
     if (type == CrudType.update) {
       product['id'] = productId;
     }
+
     var saveRegister = {
       'product': product,
       'business_by_products': {'business_id': businessId},
       'product_by_stock': {"min": lowStock, "max": maxStock},
       'product_inventory': {
         'business_id': businessId,
-        'avarage_kardex_value': cost,
+        'avarage_kardex_value': price, // cost,
         'tax': hasTax ? 'SI' : 'NO',
         'quantity_units': stock,
         'sale_price': price,
@@ -1111,7 +1221,7 @@ class ProductModalController extends BaseFormController {
         'note': 'descrip',
         'sale_price2': price,
         'sale_price3': price,
-        'sale_price4': cost,
+        'sale_price4': price, //cost,
       },
       'product_sell_config': {
         'allow_pos': 1,

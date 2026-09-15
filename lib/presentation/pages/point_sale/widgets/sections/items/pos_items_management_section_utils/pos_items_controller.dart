@@ -88,8 +88,11 @@ class PosItemsController extends ChangeNotifier {
 class ProductListCard extends StatelessWidget {
   final GenericListItem<Map<String, dynamic>> item;
   final VoidCallback onTap;
+  final VoidCallback onEdit;
+  final VoidCallback onManage;
+  final VoidCallback onReport;
 
-  const ProductListCard({super.key, required this.item, required this.onTap});
+  const ProductListCard({super.key, required this.item, required this.onReport, required this.onTap, required this.onEdit, required this.onManage});
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +131,6 @@ class ProductListCard extends StatelessWidget {
 
     return InkWell(
       borderRadius: BorderRadius.circular(20),
-      onTap: onTap,
       child: Container(
         margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
         padding: const EdgeInsets.all(16),
@@ -147,8 +149,53 @@ class ProductListCard extends StatelessWidget {
           ],
         ),
         child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            /// HEADER
+            Row(
+              children: [
+                // 70%
+                const Expanded(
+                  flex: 8,
+                  child: SizedBox(),
+                ),
+
+                // 10%
+                Expanded(
+                  flex: 1,
+                  child: Center(
+                    child: _ProcessActionButton(
+                      icon: Icons.edit_outlined,
+                      color: colors.primary,
+                      onPressed: onEdit,
+                    ),
+                  ),
+                ),
+
+                // 10%
+                Expanded(
+                  flex: 1,
+                  child: Center(
+                    child: _ProcessActionButton(
+                      icon: Icons.inventory_2_outlined,
+                      color: colors.primary,
+                      onPressed: onManage,
+                    ),
+                  ),
+                ),
+
+                // 10%
+                Expanded(
+                  flex: 1,
+                  child: Center(
+                    child: _ProcessActionButton(
+                      icon: Icons.bar_chart_outlined,
+                      color: colors.primary,
+                      onPressed: onReport,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             Row(
               children: [
                 _buildAvatar(context, item.image),
@@ -436,6 +483,35 @@ class _InfoColumn extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+class _ProcessActionButton extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final VoidCallback onPressed;
+
+  const _ProcessActionButton({
+    required this.icon,
+    required this.color,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      padding: EdgeInsets.zero,
+      constraints: const BoxConstraints(
+        minWidth: 32,
+        minHeight: 32,
+      ),
+      visualDensity: VisualDensity.compact,
+      icon: Icon(
+        icon,
+        size: 20,
+        color: color,
+      ),
     );
   }
 }

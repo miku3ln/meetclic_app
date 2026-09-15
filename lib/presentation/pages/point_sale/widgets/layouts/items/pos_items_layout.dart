@@ -22,31 +22,40 @@ class PosItemsLayout extends StatelessWidget {
     );
   }
 }
-
-class _PosItemsView extends StatelessWidget {
+class _PosItemsView extends StatefulWidget {
   final PosItemsSection section;
   final VoidCallback? onMenuTap;
+
   const _PosItemsView({
     super.key,
     this.onMenuTap,
     required this.section,
   });
+
+  @override
+  State<_PosItemsView> createState() => _PosItemsViewState();
+}
+
+class _PosItemsViewState extends State<_PosItemsView> {
+  final GlobalKey<ScaffoldState> _scaffoldKey =
+  GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
-    final scaffoldKey = GlobalKey<ScaffoldState>();
-    final sectionTitle = "gestion";
-    final app = context.read<AppController>();
+    final sectionTitle = '';
 
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
       backgroundColor: colors.background,
       drawer: const PosAppDrawer(),
       appBar: PosSettingsAppBar(
-        titlePrimary: Sections.getTitleItems(PosItemsSection.items),
+        titlePrimary: Sections.getTitleItems(
+          PosItemsSection.items,
+        ),
         titleSecondary: sectionTitle,
         onMenuTap: () {
-          scaffoldKey.currentState?.openDrawer();
+          _scaffoldKey.currentState?.openDrawer();
         },
         style: PosSettingsAppBarStyle(
           topBackgroundColor: colors.primary,
@@ -61,7 +70,12 @@ class _PosItemsView extends StatelessWidget {
       ),
       body: Row(
         children: [
-          Expanded(flex: 100, child: PosItemsContent(section: section)),
+          Expanded(
+            flex: 100,
+            child: PosItemsContent(
+              section: widget.section,
+            ),
+          ),
         ],
       ),
     );
