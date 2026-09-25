@@ -103,6 +103,9 @@ class ProductListCard extends StatelessWidget {
     final stock = data['stock'] ?? {};
     final classification = data['classification'] ?? {};
     final quantity = stock['quantity'] ?? 0;
+
+
+
     final unit = stock['unit'] ?? '';
     final category = data['category'] ?? '';
     final subcategory = data['subcategory'] ?? '';
@@ -112,10 +115,14 @@ class ProductListCard extends StatelessWidget {
     final measureType = measure_type_management["value"] ?? '';
     final inventoryType = classification['inventory_type'] ?? '';
     final details = jsonDecode(data['details_all']);
+    final product_stock=details["product_stock"];
+    final quantityStock=product_stock["quantity"];
+    final quantityBaseStock=product_stock["quantity_base"];
+    final unitMeasureStock=product_stock["unit_measure_id"];
     Color colorIconTax = colors.buttonPrimaryBackground;
     Color colorAmount = Colors.orange;
     IconData iconAmount=Icons.inventory_2_outlined;
-    if (quantity < 0) {
+    if (quantityBaseStock < 0) {
        colorAmount = Colors.redAccent;
        iconAmount=Icons.warning_amber_rounded;
     }
@@ -292,7 +299,7 @@ class ProductListCard extends StatelessWidget {
                   child: _InfoColumn(
                     icon: iconAmount,
                     title: "Cantidad",
-                    value: "$quantity $unit",
+                    value: "$quantityBaseStock $unit",
                     colorIcon: colorAmount,
                     backgroundIcon: AppColors.shade(colorAmount, 90),
                   ),

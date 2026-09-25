@@ -5,7 +5,7 @@ import '../../../theme/configuration/app_theme_tokens.dart';
 import 'ManagerProcessMicroConfig.dart';
 import 'ManagerProcessMicroResult.dart';
 
-class ManagerProcessMicro<T> extends StatelessWidget {
+class ManagerProcessMicro<T> extends StatefulWidget {
   final ManagerProcessMicroConfig config;
 
   final Widget form;
@@ -22,72 +22,236 @@ class ManagerProcessMicro<T> extends StatelessWidget {
     this.onCancel,
     this.listenable,
     this.canSubmit,
-
   });
 
   @override
-  Widget build(BuildContext context) {
-    final tokens = AppThemeTokens.of(context);
-    final size = MediaQuery.of(context).size;
+  State<ManagerProcessMicro<T>> createState() =>
+      _ManagerProcessMicroState<T>();
+}
 
-    final drawerWidth = size.width > 500
-        ? config.maxWidth
+class _ManagerProcessMicroState<T>
+    extends State<ManagerProcessMicro<T>> {
+
+  bool _isLoading = false;
+
+  // ================================================================
+  // SUBMIT
+  // ================================================================
+
+  Future<void> _handleSubmit() async {
+    if (_isLoading) return;
+
+    final submitEnabled =
+        widget.canSubmit?.call() ?? true;
+
+    if (!submitEnabled) return;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final result =
+      await widget.onSubmit();
+
+      if (!mounted) return;
+
+      // ============================================================
+      // ÉXITO
+      // ============================================================
+
+      if (result.success) {
+        Navigator.of(context).pop(result);
+        return;
+      }
+
+      // ============================================================
+      // ERROR
+      // El formulario permanece abierto.
+      // ============================================================
+
+      setState(() {
+        _isLoading = false;
+      });
+
+    } catch (e) {
+
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  // ================================================================
+  // BUILD
+  // ================================================================
+
+  @override
+  Widget build(BuildContext context) {
+    final tokens =
+    AppThemeTokens.of(context);
+
+    final mediaQuery =
+    MediaQuery.of(context);
+
+    final size =
+        mediaQuery.size;
+
+    final keyboardHeight =
+        mediaQuery.viewInsets.bottom;
+
+    final drawerWidth =
+    size.width > 500
+        ? widget.config.maxWidth
         : size.width * .92;
 
-    return SafeArea(
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Material(
-          color: Colors.transparent,
-          child: Container(
-            width: drawerWidth,
-            height: size.height,
-            decoration: BoxDecoration(
-              color: tokens.surface,
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(28),
-                bottomLeft: Radius.circular(28),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: tokens.shadow,
-                  blurRadius: 30,
-                  offset: const Offset(-8, 0),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(28),
-                bottomLeft: Radius.circular(28),
-              ),
-              child: Column(
-                children: [
-                  _buildHeader(context),
+    return PopScope(
 
-                  Divider(
-                    height: 1,
-                    color: tokens.border,
-                  ),
+      // No permite regresar mientras está guardando.
+      canPop: !_isLoading,
 
-                  Expanded(
-                    child: Container(
-                      color: tokens.background,
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(20),
-                        child: form,
+      child: SafeArea(
+        child: Align(
+          alignment: Alignment.centerRight,
+          child: Material(
+            color: Colors.transparent,
+
+            // ======================================================
+            // STACK
+            // ======================================================
+
+            child: Stack(
+              children: [
+
+                // ==================================================
+                // CONTENIDO NORMAL
+                // ==================================================
+
+                AbsorbPointer(
+                  absorbing: _isLoading,
+
+                  child: Container(
+                    width: drawerWidth,
+                    height: size.height,
+                    decoration: BoxDecoration(
+                      color: tokens.surface,
+                      borderRadius:
+                      const BorderRadius.only(
+                        topLeft:
+                        Radius.circular(28),
+                        bottomLeft:
+                        Radius.circular(28),
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: tokens.shadow,
+                          blurRadius: 30,
+                          offset:
+                          const Offset(-8, 0),
+                        ),
+                      ],
+                    ),
+
+                    child: ClipRRect(
+                      borderRadius:
+                      const BorderRadius.only(
+                        topLeft:
+                        Radius.circular(28),
+                        bottomLeft:
+                        Radius.circular(28),
+                      ),
+
+                      child: Column(
+                        children: [
+
+                          _buildHeader(context),
+
+                          Divider(
+                            height: 1,
+                            color: tokens.border,
+                          ),
+
+                          Expanded(
+                            child: Container(
+                              color:
+                              tokens.background,
+
+                              child:
+                              SingleChildScrollView(
+                                keyboardDismissBehavior:
+                                ScrollViewKeyboardDismissBehavior
+                                    .onDrag,
+
+                                padding:
+                                EdgeInsets.fromLTRB(
+                                  20,
+                                  20,
+                                  20,
+                                  20 +
+                                      keyboardHeight,
+                                ),
+
+                                child:
+                                widget.form,
+                              ),
+                            ),
+                          ),
+
+                          Divider(
+                            height: 1,
+                            color: tokens.border,
+                          ),
+
+                          _buildFooter(context),
+                        ],
                       ),
                     ),
                   ),
+                ),
 
-                  Divider(
-                    height: 1,
-                    color: tokens.border,
+                // ==================================================
+                // LOADING OVERLAY
+                // ==================================================
+
+                if (_isLoading)
+                  Positioned.fill(
+                    child: Container(
+                      width: drawerWidth,
+                      color: Colors.black
+                          .withValues(
+                        alpha: 0.30,
+                      ),
+
+                      child: const Center(
+                        child: Column(
+                          mainAxisSize:
+                          MainAxisSize.min,
+                          children: [
+
+                            CircularProgressIndicator(),
+
+                            SizedBox(
+                              height: 16,
+                            ),
+
+                            Text(
+                              'Procesando...',
+                              style: TextStyle(
+                                color:
+                                Colors.white,
+                                fontSize: 15,
+                                fontWeight:
+                                FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
-
-                  _buildFooter(context),
-                ],
-              ),
+              ],
             ),
           ),
         ),
@@ -95,45 +259,69 @@ class ManagerProcessMicro<T> extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context) {
-    final tokens = AppThemeTokens.of(context);
+  // ================================================================
+  // HEADER
+  // ================================================================
+
+  Widget _buildHeader(
+      BuildContext context,
+      ) {
+    final tokens =
+    AppThemeTokens.of(context);
 
     return Container(
-      padding: const EdgeInsets.fromLTRB(
+      padding:
+      const EdgeInsets.fromLTRB(
         24,
         24,
         20,
         20,
       ),
+
       child: Row(
         children: [
+
           Icon(
-            config.icon,
+            widget.config.icon,
             color: tokens.primary,
           ),
 
-          const SizedBox(width: 16),
+          const SizedBox(
+            width: 16,
+          ),
 
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+              CrossAxisAlignment.start,
+
               children: [
+
                 Text(
-                  config.title,
+                  widget.config.title,
                   style: TextStyle(
                     fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: tokens.textPrimary,
+                    fontWeight:
+                    FontWeight.w700,
+                    color:
+                    tokens.textPrimary,
                   ),
                 ),
 
-                if (config.description != null) ...[
-                  const SizedBox(height: 4),
+                if (widget.config.description !=
+                    null) ...[
+
+                  const SizedBox(
+                    height: 4,
+                  ),
+
                   Text(
-                    config.description!,
+                    widget
+                        .config.description!,
                     style: TextStyle(
                       fontSize: 13,
-                      color: tokens.textSecondary,
+                      color:
+                      tokens.textSecondary,
                     ),
                   ),
                 ],
@@ -142,16 +330,21 @@ class ManagerProcessMicro<T> extends StatelessWidget {
           ),
 
           IconButton(
-            onPressed: () {
+            onPressed: _isLoading
+                ? null
+                : () {
+
               Navigator.of(context).pop(
                 ManagerProcessMicroResult<T>(
                   success: true,
                   data: null,
-                  message: 'Proceso cerrado',
+                  message:
+                  'Proceso cerrado',
                   type: 'close',
                 ),
               );
             },
+
             icon: const Icon(
               Icons.close_rounded,
             ),
@@ -161,87 +354,129 @@ class ManagerProcessMicro<T> extends StatelessWidget {
     );
   }
 
+  // ================================================================
+  // FOOTER
+  // ================================================================
 
-  Widget _buildFooter(BuildContext context) {
-    if (listenable == null) {
-      return _buildFooterContent(context);
+  Widget _buildFooter(
+      BuildContext context,
+      ) {
+
+    if (widget.listenable == null) {
+      return _buildFooterContent(
+        context,
+      );
     }
 
     return ListenableBuilder(
-      listenable: listenable!,
-      builder: (context, _) {
-        return _buildFooterContent(context);
+      listenable:
+      widget.listenable!,
+
+      builder: (
+          context,
+          _,
+          ) {
+        return _buildFooterContent(
+          context,
+        );
       },
     );
   }
 
-  Widget _buildFooterContent(BuildContext context) {
-    final tokens = AppThemeTokens.of(context);
+  // ================================================================
+  // FOOTER CONTENT
+  // ================================================================
+
+  Widget _buildFooterContent(
+      BuildContext context,
+      ) {
+
+    final tokens =
+    AppThemeTokens.of(context);
 
     final submitEnabled =
-        canSubmit?.call() ?? true;
+        widget.canSubmit?.call() ??
+            true;
 
     return SafeArea(
       top: false,
+
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
+        padding:
+        const EdgeInsets.fromLTRB(
           24,
           20,
           24,
           24,
         ),
+
         child: Row(
           children: [
+
+            // ======================================================
+            // CANCELAR
+            // ======================================================
+
             Expanded(
               child: TextButton(
-                onPressed: () {
-                  onCancel?.call();
+                onPressed: _isLoading
+                    ? null
+                    : () {
 
-                  Navigator.of(context).pop(
+                  widget.onCancel
+                      ?.call();
+
+                  Navigator.of(context)
+                      .pop(
                     ManagerProcessMicroResult<T>(
                       success: true,
                       data: null,
-                      message: 'Proceso cancelado',
-                      type: 'cancel',
+                      message:
+                      'Proceso cancelado',
+                      type:
+                      'cancel',
                     ),
                   );
                 },
+
                 child: Text(
-                  config.cancelText,
+                  widget
+                      .config.cancelText,
                 ),
               ),
             ),
 
-            const SizedBox(width: 12),
+            const SizedBox(
+              width: 12,
+            ),
+
+            // ======================================================
+            // GUARDAR
+            // ======================================================
 
             Expanded(
               child: FilledButton(
-                style: FilledButton.styleFrom(
+                style:
+                FilledButton.styleFrom(
                   backgroundColor:
-                  tokens.buttonPrimaryBackground,
+                  tokens
+                      .buttonPrimaryBackground,
                   foregroundColor:
-                  tokens.buttonPrimaryForeground,
+                  tokens
+                      .buttonPrimaryForeground,
                 ),
 
-                // 🔥 null = botón deshabilitado
-                onPressed: !submitEnabled
+                onPressed:
+                !submitEnabled ||
+                    _isLoading
                     ? null
-                    : () async {
-                  final result =
-                  await onSubmit();
-
-                  if (!context.mounted) {
-                    return;
-                  }
-
-                  if (result.success) {
-                    Navigator.of(context)
-                        .pop(result);
-                  }
-                },
+                    : _handleSubmit,
 
                 child: Text(
-                  config.submitText,
+                  _isLoading
+                      ? 'Procesando...'
+                      : widget
+                      .config.submitText,
                 ),
               ),
             ),

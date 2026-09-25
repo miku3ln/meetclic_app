@@ -115,9 +115,9 @@ class _PointSalePageState extends State<PointSalePage> {
     );
   }
 
-  Future<void> _showOpenShiftModal() async {
+  Future<void> _showOpenShiftModal() async {//INIT DATA CASH
     final controller = context.read<PosMainController>();
-
+//ALLOW POINT SALES
     final opened = await showDialog<bool>(
       context: context,
       barrierDismissible: true,

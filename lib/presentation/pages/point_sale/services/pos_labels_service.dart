@@ -8,10 +8,10 @@ class PosLabelsService {
 
 
   //MENU ITEMS RIGHT-MANAGER TICKET Shift
-  final String shiftClosedTitle = 'El turno está cerrado';
+  final String shiftClosedTitle = 'Inicia tu turno de caja';
 
   final String shiftClosedDescription =
-      'Abra el turno para realizar ventas';
+      'Registra el efectivo inicial para comenzar a gestionar la caja y realizar ventas.';
 
   final String openShiftButton = 'ABRIR TURNO';
 

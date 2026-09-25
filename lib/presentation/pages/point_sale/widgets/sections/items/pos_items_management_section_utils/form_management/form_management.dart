@@ -893,7 +893,6 @@ Widget _buildTabRecipe(
                                     error: controller.amountRecipeError,
                                     isTouched: controller.amountRecipeTouched,
                                     isValid: controller.amountRecipeError == null,
-
                                     loading:
                                     controller.savingAmountRecipe,
                                   ),

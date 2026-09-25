@@ -95,7 +95,6 @@ class PosTabletLandscapeFixtures {
   // -------------------------
   static Future<List<PosProductItem>> getProductsData() async {
     return PosMockData.getProductsData();
-
   }
 
   static List<PosCoupon> getCouponsData() {
@@ -502,6 +501,168 @@ class ProductController extends ChangeNotifier {
   }
 }
 
+class UtilServicesCash {
+  static Future<ApiResponse<Map<String, dynamic>>> allowManagerCash() async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+    final userId = SessionService().currentSession?.userId;
+
+    return SafeExecutor.run(
+      () async {
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/get-user-point-of-sale-cash',
+        );
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token!}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({'user_id': userId, 'business_id': businessId}),
+        );
+
+        if (response.statusCode != 200) {
+          return ApiResponse<Map<String, dynamic>>.error(
+            'Error HTTP ${response.statusCode}',
+          );
+        }
+
+        final json = jsonDecode(response.body);
+        final bool success = json['success'] ?? false;
+        // Tu backend utiliza "msj", no "message"
+        final String message = json['msj']?.toString() ?? '';
+        if (!success) {
+          return ApiResponse<Map<String, dynamic>>.error(message);
+        }
+
+        final Map<String, dynamic> data = json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : <String, dynamic>{};
+
+        return ApiResponse<Map<String, dynamic>>.success(
+          message: message,
+          data: data,
+        );
+      },
+      ApiResponse<Map<String, dynamic>>.error(
+        'No fue posible consultar la caja.',
+      ),
+    );
+  }
+  static Future<ApiResponse<Map<String, dynamic>>> getPointOfSaleCashCloseSummary(
+  ) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+    final userId = SessionService().currentSession?.userId;
+
+    return SafeExecutor.run(
+          () async {
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/get-point-of-sale-cash-close-summary',
+        );
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token!}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({
+            'user_id': userId,
+            'business_id': businessId
+          }),
+        );
+
+        if (response.statusCode != 200) {
+          return ApiResponse<Map<String, dynamic>>.error(
+            'Error HTTP ${response.statusCode}',
+          );
+        }
+
+        final json = jsonDecode(response.body);
+        final bool success = json['success'] ?? false;
+        // Tu backend utiliza "msj", no "message"
+        final String message = json['msj']?.toString() ?? '';
+        if (!success) {
+          return ApiResponse<Map<String, dynamic>>.error(message);
+        }
+
+        final Map<String, dynamic> data = json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : <String, dynamic>{};
+
+        return ApiResponse<Map<String, dynamic>>.success(
+          message: message,
+          data: data,
+        );
+      },
+      ApiResponse<Map<String, dynamic>>.error(
+        'No fue posible cargar la caja.',
+      ),
+    );
+  }
+  static Future<ApiResponse<Map<String, dynamic>>> openCash({
+    required double openingAmount,
+    String openingDetails = "Apertura de Caja",
+  }) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+    final userId = SessionService().currentSession?.userId;
+
+    return SafeExecutor.run(
+      () async {
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/open-point-of-sale-cash',
+        );
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token!}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({
+            'user_id': userId,
+            'business_id': businessId,
+            'opening_amount': openingAmount,
+            'opening_details': openingDetails,
+          }),
+        );
+
+        if (response.statusCode != 200) {
+          return ApiResponse<Map<String, dynamic>>.error(
+            'Error HTTP ${response.statusCode}',
+          );
+        }
+
+        final json = jsonDecode(response.body);
+        final bool success = json['success'] ?? false;
+        // Tu backend utiliza "msj", no "message"
+        final String message = json['msj']?.toString() ?? '';
+        if (!success) {
+          return ApiResponse<Map<String, dynamic>>.error(message);
+        }
+
+        final Map<String, dynamic> data = json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : <String, dynamic>{};
+
+        return ApiResponse<Map<String, dynamic>>.success(
+          message: message,
+          data: data,
+        );
+      },
+      ApiResponse<Map<String, dynamic>>.error(
+        'No fue posible guardar la caja.',
+      ),
+    );
+  }
+}
+
 class PosMockData {
   static Future<List<GenericListItem<Map<String, dynamic>>>>
   getProductsRecipeSearch({
@@ -556,19 +717,18 @@ class PosMockData {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
     return SafeExecutor.run(() async {
-
       final uri =
-      Uri.parse(
-        '${ServerConfig.baseUrl}/pointsales/products-sales',
-      ) //POS-PRODUCTS -INIT-ONE
-          .replace(
-        queryParameters: {
-          'current': '1',
-          'rowCount': '-1',
-          'searchPhrase': '',
-          'business_id': businessId,
-        },
-      );
+          Uri.parse(
+                '${ServerConfig.baseUrl}/pointsales/products-sales',
+              ) //POS-PRODUCTS -INIT-ONE
+              .replace(
+                queryParameters: {
+                  'current': '1',
+                  'rowCount': '-1',
+                  'searchPhrase': '',
+                  'business_id': businessId,
+                },
+              );
       final response = await http.get(
         uri,
         headers: {
@@ -599,7 +759,7 @@ class PosMockData {
           type: json['type'].toString(),
           code: json['code'].toString(),
           taxPercentage:
-          double.tryParse(taxData['value_percentage']?.toString() ?? '0') ??
+              double.tryParse(taxData['value_percentage']?.toString() ?? '0') ??
               0,
           unitPrice: double.tryParse(priceData['pv']?.toString() ?? '0') ?? 0,
           // 👉 si agregas estos campos al modelo
@@ -607,7 +767,6 @@ class PosMockData {
           unit: stock['unit'] ?? 'u',
         );
       }).toList();
-
     }, <PosProductItem>[]);
   }
 
@@ -629,76 +788,121 @@ class PosMockData {
 
     return null;
   }
+
   static Future<ApiResponse<Map<String, dynamic>>> getProductRecipeYield({
     required int productId,
   }) async {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
 
-    return SafeExecutor.run(() async {
-
-      final uri = Uri.parse(
-        '${ServerConfig.baseUrl}/pointsales/product-recipe-yield-get',
-      );
-
-      final body = {
-        'business_id': businessId,
-        'product_id': productId,
-      };
-
-      final response = await http.post(
-        uri,
-        headers: {
-          'Authorization': 'Bearer ${token!}',
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode(body),
-      );
-
-      /**
-       * Error HTTP.
-       */
-      if (response.statusCode != 200) {
-        return ApiResponse<Map<String, dynamic>>.error(
-          'Error al obtener el rendimiento de la receta.',
+    return SafeExecutor.run(
+      () async {
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/product-recipe-yield-get',
         );
-      }
 
-      final json =
-      jsonDecode(response.body);
+        final body = {'business_id': businessId, 'product_id': productId};
 
-      /**
-       * El producto todavía NO tiene
-       * rendimiento configurado.
-       */
-      if (json['success'] != true) {
-
-        return ApiResponse<Map<String, dynamic>>.error(
-          json['msj'] ??
-              'No existe rendimiento configurado.',
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token!}',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(body),
         );
-      }
 
-      /**
-       * Existe configuración.
-       */
-      final data =
-      Map<String, dynamic>.from(
-        json['data'] ?? {},
-      );
+        /**
+         * Error HTTP.
+         */
+        if (response.statusCode != 200) {
+          return ApiResponse<Map<String, dynamic>>.error(
+            'Error al obtener el rendimiento de la receta.',
+          );
+        }
 
-      return ApiResponse<Map<String, dynamic>>.success(
-        message:
-        json['msj'] ?? '',
+        final json = jsonDecode(response.body);
 
-        data:
-        data,
-      );
+        /**
+         * El producto todavía NO tiene
+         * rendimiento configurado.
+         */
+        if (json['success'] != true) {
+          return ApiResponse<Map<String, dynamic>>.error(
+            json['msj'] ?? 'No existe rendimiento configurado.',
+          );
+        }
 
-    }, ApiResponse<Map<String, dynamic>>.error(
-      'Error al obtener el rendimiento de la receta.',
-    ));
+        /**
+         * Existe configuración.
+         */
+        final data = Map<String, dynamic>.from(json['data'] ?? {});
+
+        return ApiResponse<Map<String, dynamic>>.success(
+          message: json['msj'] ?? '',
+
+          data: data,
+        );
+      },
+      ApiResponse<Map<String, dynamic>>.error(
+        'Error al obtener el rendimiento de la receta.',
+      ),
+    );
   }
+
+  static Future<ApiResponse<Map<String, dynamic>>> generateMovementProduct({
+    required int productId,
+    required int typeMovement,
+    required double amount,
+    required int amountYield,
+    required int unitMeasureId,
+  }) async {
+    return SafeExecutor.run<ApiResponse<Map<String, dynamic>>>(
+      () async {
+        final token = SessionService().apiToken;
+        final businessId = SessionService().businessId;
+
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/generate-movement-product',
+        );
+
+        final body = {
+          'business_id': businessId,
+          'product_id': productId,
+          'type_movement': typeMovement,
+          'amount': amount,
+          'amount_yield': amountYield,
+          'unit_measure_id': unitMeasureId,
+        };
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer $token',
+            'Content-Type': 'application/json',
+          },
+          body: jsonEncode(body),
+        );
+
+        final json = jsonDecode(response.body);
+
+        if (response.statusCode == 200 && json['success'] == true) {
+          return ApiResponse<Map<String, dynamic>>.success(
+            message: json['msj'] ?? '',
+            data: Map<String, dynamic>.from(json['data'] ?? {}),
+          );
+        }
+
+        return ApiResponse<Map<String, dynamic>>.error(
+          json['msj'] ?? 'No se pudo generar el movimiento.',
+        );
+      },
+      ApiResponse<Map<String, dynamic>>.error(
+        'No se pudo conectar con el servidor.',
+      ),
+    );
+  }
+
   static Future<ApiResponse<Map<String, dynamic>>> saveProductRecipeYield({
     required int productId,
     required double yieldQuantity,
@@ -724,28 +928,18 @@ class PosMockData {
       body: jsonEncode(body),
     );
 
-    final json =
-    jsonDecode(response.body);
+    final json = jsonDecode(response.body);
 
-    if (
-    response.statusCode == 200 &&
-        json['success'] == true
-    ) {
-
+    if (response.statusCode == 200 && json['success'] == true) {
       return ApiResponse<Map<String, dynamic>>.success(
-        message:
-        json['msj'] ?? '',
+        message: json['msj'] ?? '',
 
-        data:
-        Map<String, dynamic>.from(
-          json['model'] ?? {},
-        ),
+        data: Map<String, dynamic>.from(json['model'] ?? {}),
       );
     }
 
     return ApiResponse<Map<String, dynamic>>.error(
-      json['msj'] ??
-          'Error al guardar el rendimiento.',
+      json['msj'] ?? 'Error al guardar el rendimiento.',
     );
   }
 
@@ -993,8 +1187,7 @@ class ProductDataUtil {
       // Payload como JSON
       request.fields['payload'] = jsonEncode(payload);
       if (image == null) {
-
-      }else{
+      } else {
         request.files.add(
           await http.MultipartFile.fromPath('image', image.path),
         );
@@ -1051,8 +1244,7 @@ class ProductDataUtil {
       // Payload como JSON
       request.fields['payload'] = jsonEncode(payload);
       if (image == null) {
-
-      }else{
+      } else {
         request.files.add(
           await http.MultipartFile.fromPath('image', image.path),
         );

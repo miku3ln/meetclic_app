@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/sections/items/pos_items_management_section_utils/filters/filters_management_main.dart';
@@ -20,10 +21,12 @@ import '../../../../../widgets/loading_manager.dart';
 import '../../../../../widgets/toogle-manager.dart';
 import '../../../models/product_draft.dart';
 import '../../../state/product_modal_controller.dart';
+import '../../layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../../molecules/inputs/ps_dropdown.dart';
 import '../../molecules/inputs/ps_field_row.dart';
 import '../../molecules/inputs/ps_input.dart';
 import '../../organisms/items/pos_items_content.dart';
+import '../../organisms/ps_toogle_group.dart';
 import '../product/ps_section_card.dart';
 
 class ProductModalEvents {
@@ -256,13 +259,49 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
       await _onTapItem(item);
     } else if (type == 1) {
     } else if (type == 2) {
-      final controller = InventoryMovementMicroController();
+      final draft = ProductMapper.fromMap(item.data!);
+      final details = jsonDecode(draft.detailsAll!);
+      var product_sell_config = details['product_sell_config'];
+      var product_recipe_yield = details['product_recipe_yield'];
+      final selectedUnitMeasure = draft.selectedUnitMeasure;
+      final title = "Movimiento de inventario: ${draft.name}";
+      bool allowYield = allowYieldManager(draft.inventoryType);
 
+      String? titleYield = "";
+      String? titleAmount = "";
+      titleAmount = "Ingrese valores en ${selectedUnitMeasure?.symbol}";
+      int? unitMeasureId = -1;
+      if (product_recipe_yield == null && allowYield) {
+      } else {}
+      if (allowYield) {}
+
+      final controller = InventoryMovementMicroController(
+        allowYield: allowYield,
+        amountLabelText: titleAmount,
+        allowManagement: !(product_recipe_yield == null && allowYield),
+      );
+      if (draft.detailsAll?.isNotEmpty == true) {
+        var allowShopCurrent = product_sell_config["allow_shop"];
+        final allowShop = allowShopCurrent == 1;
+        final productCurrent = details['product'];
+        final productByStock = details['product_by_stock'];
+        final lowStockField = (productByStock['min'] ?? 0).toDouble();
+        final maxStockField = (productByStock['max'] ?? 0).toDouble();
+        final descriptionField = productCurrent['description'];
+
+        /// UNIT MEASURE
+        unitMeasureId = selectedUnitMeasure?.id;
+        final taxData = details['tax'];
+        final taxId = taxData['id'];
+        if (draft.sellType.id == MeasureType.unit.id) {
+        } else {}
+      }
+
+      if (draft.category.id > 0 && draft.subcategory.id > 0) {}
       final result = await showManagerProcessMicro<Map<String, dynamic>>(
         context: context,
-
-        config: const ManagerProcessMicroConfig(
-          title: 'Movimiento de inventario',
+        config: ManagerProcessMicroConfig(
+          title: title,
           description: 'Registra un ingreso o egreso del producto.',
           icon: Icons.inventory_2_outlined,
           submitText: 'Guardar',
@@ -276,13 +315,11 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
 
         listenable: controller,
 
-        canSubmit: () {
-          return controller.areAllFieldsTouched && controller.isValid;
-        },
-
+        canSubmit: () => controller.canSubmit,
         onSubmit: () async {
           final validation = controller.validateFields();
 
+          // 1. Validación local
           if (!validation.success) {
             return ManagerProcessMicroResult<Map<String, dynamic>>(
               success: false,
@@ -292,24 +329,74 @@ class _PosItemsManagementSectionState extends State<PosItemsManagementSection> {
             );
           }
 
+          // 2. Ejecutar movimiento en API
+          final response = await PosMockData.generateMovementProduct(
+            productId: draft.id!,
+            typeMovement: controller.movementTypeValue,
+            amount: controller.amountValue,
+            amountYield: controller.amountYieldValue,
+            unitMeasureId: unitMeasureId!,
+          );
+
+          // 3. API respondió con error
+          if (!response.success) {
+            return ManagerProcessMicroResult<Map<String, dynamic>>(
+              success: false,
+              data: response.data,
+              message: response.message,
+              type: 'error',
+            );
+          }
+
+          // 4. Movimiento realizado correctamente
           return ManagerProcessMicroResult<Map<String, dynamic>>(
             success: true,
-            data: controller.toPayload(),
-            message: 'Movimiento registrado correctamente.',
+            data: response.data,
+            message: response.message,
             type: 'save',
           );
         },
       );
       controller.dispose();
+      if (!context.mounted) {
+        return;
+      }
+
+      // ============================================================
+      // ERROR
+      // ============================================================
 
       if (!result.success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result.message.isNotEmpty
+                  ? result.message
+                  : 'No se pudo realizar el movimiento.',
+            ),
+          ),
+        );
+
         return;
       }
 
       switch (result.type) {
         case 'save':
-          debugPrint(result.data.toString());
           await _refreshAll();
+          if (!context.mounted) {
+            return;
+          }
+
+          // Mensaje después de terminar TODO
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                result.message.isNotEmpty
+                    ? result.message
+                    : 'Movimiento de inventario realizado correctamente.',
+              ),
+            ),
+          );
           break;
 
         case 'close':
@@ -510,63 +597,89 @@ class InventoryMovementMicroController extends BaseFormController {
   static const String movementTypeIncome = 'INCOME';
   static const String movementTypeOutcome = 'OUTCOME';
 
+  final bool allowYield;
+  final bool allowManagement;
+  final String allowManagementMessage;
+
   late final FormFieldController<String> movementTypeField;
   late final FormFieldController<double> amountField;
+  FormFieldController<double>? amountYieldField;
+  final String movementTypeLabelText;
+  final String amountLabelText;
+  final String amountYieldLabelText;
 
-  InventoryMovementMicroController() {
+  InventoryMovementMicroController({
+    this.allowYield = false,
+    this.allowManagement = false,
+    this.allowManagementMessage = "",
+    this.movementTypeLabelText = 'Tipo de movimiento',
+    this.amountLabelText = 'Cantidad',
+    this.amountYieldLabelText = 'Cantidad que genera en unidades',
+  }) {
     movementTypeField = FormFieldController<String>(
-      label: 'Tipo de movimiento',
+      label: movementTypeLabelText,
       value: movementTypeIncome,
-      validators: [
-        ValidatorsUtil.required('Tipo de movimiento'),
-      ],
+      validators: [ValidatorsUtil.required(movementTypeLabelText)],
     );
 
     amountField = FormFieldController<double>(
-      label: 'Cantidad',
-      validators: [
-        ValidatorsUtil.positiveDouble('Cantidad'),
-      ],
+      label: amountLabelText,
+      validators: [ValidatorsUtil.positiveDouble(amountLabelText)],
     );
 
-    fields.addAll({
-      'movementType': movementTypeField,
-      'amount': amountField,
-    });
+    fields.addAll({'movementType': movementTypeField, 'amount': amountField});
+
+    if (allowYield) {
+      amountYieldField = FormFieldController<double>(
+        label: amountYieldLabelText,
+        validators: [ValidatorsUtil.positiveDouble(amountYieldLabelText)],
+      );
+
+      fields['amountYield'] = amountYieldField!;
+    }
   }
 
   String? get movementType => movementTypeField.value;
 
   double? get amount => amountField.value;
 
+  double? get amountYield => amountYieldField?.value;
+
   String get movementTypeLabel => movementTypeField.label;
 
   String get amountLabel => amountField.label;
+
+  String get amountYieldLabel =>
+      amountYieldField?.label ?? 'Cantidad de rendimiento';
 
   String? get movementTypeError => movementTypeField.error;
 
   String? get amountError => amountField.error;
 
+  String? get amountYieldError => amountYieldField?.error;
+
   bool get movementTypeTouched => movementTypeField.touched;
 
   bool get amountTouched => amountField.touched;
 
+  bool get amountYieldTouched => amountYieldField?.touched ?? false;
+
   void setMovementType(String? value) {
-    debugPrint('MOVEMENT BEFORE: ${movementTypeField.value}');
-    debugPrint('MOVEMENT NEW: $value');
-
     movementTypeField.setValue(value);
-
-    debugPrint('MOVEMENT AFTER: ${movementTypeField.value}');
-
     notifyListeners();
   }
 
   void setAmount(String value) {
-    amountField.setValue(
-      double.tryParse(value),
-    );
+    amountField.setValue(double.tryParse(value));
+    notifyListeners();
+  }
 
+  void setAmountYield(String value) {
+    if (!allowYield || amountYieldField == null) {
+      return;
+    }
+
+    amountYieldField!.setValue(double.tryParse(value));
     notifyListeners();
   }
 
@@ -574,9 +687,51 @@ class InventoryMovementMicroController extends BaseFormController {
     return {
       'type_movement': movementType,
       'amount': amount,
+      if (allowYield) 'amount_yield': amountYield,
     };
   }
+
+  int get movementTypeValue {
+    return movementType == movementTypeIncome ? 1 : 0;
+  }
+
+  double get amountValue {
+    return amount ?? 0;
+  }
+
+  int get amountYieldValue {
+    return amountYield?.toInt() ?? 1;
+  }
+
+  bool get canSubmit {
+    if (!allowManagement) {
+      return false;
+    }
+
+    for (final field in fields.values) {
+      if (field is FormFieldController) {
+        if (!field.isValid) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
 }
+
+bool allowYieldManager(InventoryType inventoryType) {
+  bool allowYield = false;
+  if (InventoryType.raw.id == inventoryType.id) {
+  } else if (InventoryType.processed.id == inventoryType.id) {
+    allowYield = true;
+  } else if (InventoryType.forSale.id == inventoryType.id) {
+    allowYield = true;
+  }
+
+  return allowYield;
+}
+
 class ProductManagementMicroForm extends StatelessWidget {
   final InventoryMovementMicroController controller;
   final GenericListItem<Map<String, dynamic>> itemProduct;
@@ -589,84 +744,58 @@ class ProductManagementMicroForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool showMovementForm = true;
+    final draft = ProductMapper.fromMap(itemProduct.data!);
 
     return ListenableBuilder(
       listenable: controller,
       builder: (context, _) {
+        final bool showMovementForm = controller.allowManagement;
 
-        /// IMPORTANTE:
-        /// Se construye dentro del ListenableBuilder.
-        final List<Widget> movementFields =
-        showMovementForm
-            ? [
+        final List<Widget> listForms = [
           PsFieldRow(
             children: [
               PsFieldItem(
                 child: PsSegmentToggle<String>(
                   title: controller.movementTypeLabel,
-
                   value: controller.movementType!,
-
                   titleSpacing: 20,
-                  itemPadding:
-                  const EdgeInsets.symmetric(
+                  itemPadding: const EdgeInsets.symmetric(
                     horizontal: 14,
                     vertical: 8,
                   ),
-                  padding:
-                  const EdgeInsets.all(3),
+                  padding: const EdgeInsets.all(3),
                   iconSize: 18,
                   spacing: 5,
                   borderRadius: 10,
                   height: 40,
                   itemMinWidth: 70,
-
-                  titleStyle:
-                  const TextStyle(
+                  titleStyle: const TextStyle(
                     fontSize: 15,
-                    fontWeight:
-                    FontWeight.w400,
+                    fontWeight: FontWeight.w400,
                   ),
-
                   items: const [
                     PsSegmentItem<String>(
                       value:
-                      InventoryMovementMicroController
-                          .movementTypeIncome,
+                          InventoryMovementMicroController.movementTypeIncome,
                       label: 'Ingreso',
-                      activeIcon:
-                      Icons.add_circle,
-                      inactiveIcon:
-                      Icons.add_circle_outline,
-                      thumbColor:
-                      Colors.green,
-                      activeColor:
-                      Colors.white,
-                      inactiveColor:
-                      Colors.grey,
+                      activeIcon: Icons.add_circle,
+                      inactiveIcon: Icons.add_circle_outline,
+                      thumbColor: Colors.green,
+                      activeColor: Colors.white,
+                      inactiveColor: Colors.grey,
                     ),
-
                     PsSegmentItem<String>(
                       value:
-                      InventoryMovementMicroController
-                          .movementTypeOutcome,
+                          InventoryMovementMicroController.movementTypeOutcome,
                       label: 'Egreso',
-                      activeIcon:
-                      Icons.remove_circle,
-                      inactiveIcon:
-                      Icons.remove_circle_outline,
-                      thumbColor:
-                      Colors.orange,
-                      activeColor:
-                      Colors.white,
-                      inactiveColor:
-                      Colors.grey,
+                      activeIcon: Icons.remove_circle,
+                      inactiveIcon: Icons.remove_circle_outline,
+                      thumbColor: Colors.orange,
+                      activeColor: Colors.white,
+                      inactiveColor: Colors.grey,
                     ),
                   ],
-
-                  onChanged:
-                  controller.setMovementType,
+                  onChanged: controller.setMovementType,
                 ),
               ),
             ],
@@ -678,69 +807,70 @@ class ProductManagementMicroForm extends StatelessWidget {
             children: [
               PsFieldItem(
                 child: PsInput(
-                  label:
-                  controller.amountLabel,
-                  value: formatInput(
-                    controller.amount,
-                  ),
+                  label: controller.amountLabel,
+                  value: formatInput(controller.amount),
                   requiredField: true,
-                  keyboardType:
-                  const TextInputType
-                      .numberWithOptions(
+                  keyboardType: const TextInputType.numberWithOptions(
                     decimal: true,
                   ),
-                  onChanged:
-                  controller.setAmount,
-                  error:
-                  controller.amountError,
-                  isTouched:
-                  controller.amountTouched,
-                  isValid:
-                  controller.amountError ==
-                      null,
+                  onChanged: controller.setAmount,
+                  error: controller.amountError,
+                  isTouched: controller.amountTouched,
+                  isValid: controller.amountError == null,
                 ),
               ),
             ],
           ),
-        ]
-            : [
-          Center(
-            child: PsInfoCard(
-              widthPercent: 100,
-              type:
-              PsInfoCardType.simple,
-              config: warningCard,
-              icon:
-              Icons.info_outline,
-              title: 'Atención',
-              description:
-              'No existe configuración de yield',
-              onClose: () {
-                debugPrint('cerrar');
-              },
-            ),
-          ),
         ];
+
+        if (controller.allowYield) {
+          listForms.add(AppSpacing.spaceBetweenInputs);
+
+          listForms.add(
+            PsFieldRow(
+              children: [
+                PsFieldItem(
+                  flex: 1,
+                  child: PsInput(
+                    value: formatInput(controller.amountYield),
+                    requiredField: true,
+                    label: controller.amountYieldLabel,
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    onChanged: controller.setAmountYield,
+                    error: controller.amountYieldError,
+                    isTouched: controller.amountYieldTouched,
+                    isValid: controller.amountYieldError == null,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+
+        final List<Widget> movementFields = showMovementForm
+            ? listForms
+            : [
+                Center(
+                  child: PsInfoCard(
+                    widthPercent: 100,
+                    type: PsInfoCardType.simple,
+                    config: warningCard,
+                    icon: Icons.info_outline,
+                    title: 'Atención',
+                    description: 'No existe configuración de unidades que genera la receta.!',
+                    onClose: () {
+                      debugPrint('cerrar');
+                    },
+                  ),
+                ),
+              ];
 
         return PsSectionCard(
           title: 'Movimiento de inventario',
           child: Column(
             children: [
-              Center(
-                child: PsInfoCard(
-                  widthPercent: 100,
-                  type: PsInfoCardType.simple,
-                  config: warningCard,
-                  icon: Icons.info_outline,
-                  title: 'Atención',
-                  description:
-                  'Disponible únicamente para productos que se agregan a recetas.',
-                  onClose: () {
-                    debugPrint('cerrar');
-                  },
-                ),
-              ),
-
               AppSpacing.spaceBetweenInputs,
 
               ...movementFields,

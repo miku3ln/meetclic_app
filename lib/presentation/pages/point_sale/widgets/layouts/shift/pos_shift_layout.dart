@@ -6,94 +6,8 @@ import '../../../shared/styles.dart';
 import '../../../state/pos_shift_management_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/pos_settings_app_bar.dart';
+import '../tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
-class PosShiftSummaryModel {
-  final int closeNumber;
-  final String openedBy;
-  final String openedAt;
-
-  final double previousCashDrawer;
-  final double cashPayments;
-  final double cashRefunds;
-  final double deposited;
-  final double payouts;
-  final double theoreticalCash;
-
-  final double grossSales;
-  final double refunds;
-  final double discounts;
-  final double netSales;
-  final double taxes;
-
-  final double tenderedTotal;
-  final double cash;
-  final double cashRounding;
-  final double card;
-
-  const PosShiftSummaryModel({
-    required this.closeNumber,
-    required this.openedBy,
-    required this.openedAt,
-    required this.previousCashDrawer,
-    required this.cashPayments,
-    required this.cashRefunds,
-    required this.deposited,
-    required this.payouts,
-    required this.theoreticalCash,
-    required this.grossSales,
-    required this.refunds,
-    required this.discounts,
-    required this.netSales,
-    required this.taxes,
-    required this.tenderedTotal,
-    required this.cash,
-    required this.cashRounding,
-    required this.card,
-  });
-}
-
-class PosShiftManagementService {
-  final bool returnEmpty;
-  final bool throwError;
-
-  PosShiftManagementService({
-    this.returnEmpty = false,
-    this.throwError = false,
-  });
-
-  Future<PosShiftSummaryModel?> getShiftSummary() async {
-    await Future.delayed(const Duration(milliseconds: 900));
-
-    if (throwError) {
-      throw Exception('No se pudo obtener el resumen del turno');
-    }
-
-    if (returnEmpty) {
-      return null;
-    }
-
-    return const PosShiftSummaryModel(
-      closeNumber: 1,
-      openedBy: 'Trece',
-      openedAt: '17/2/26 20:35',
-      previousCashDrawer: 0.20,
-      cashPayments: 14.10,
-      cashRefunds: 0.00,
-      deposited: 15.00,
-      payouts: 15.00,
-      theoreticalCash: 14.30,
-      grossSales: 16.85,
-      refunds: 0.00,
-      discounts: 0.00,
-      netSales: 16.85,
-      taxes: 0.00,
-      tenderedTotal: 16.85,
-      cash: 14.10,
-      cashRounding: 0.00,
-      card: 2.75,
-    );
-  }
-}
 class PosShiftManagementLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
 
@@ -152,21 +66,18 @@ class PosShiftRegister extends StatefulWidget {
 }
 
 class _PosShiftRegisterState extends State<PosShiftRegister> {
-  late final PosShiftManagementService _service;
+
 
   bool _isLoading = false;
-  PosShiftSummaryModel? _summary;
   String? _errorMessage;
 
   @override
   void initState() {
     super.initState();
-    _service = PosShiftManagementService(
-      returnEmpty: false,
-      throwError: false,
-    );
+
     _loadData();
   }
+  Map<String, dynamic>? _dataManagerCash;
 
   Future<void> _loadData() async {
     if (_isLoading) return;
@@ -177,25 +88,61 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
     });
 
     try {
-      final data = await _service.getShiftSummary();
+      final response =
+      await UtilServicesCash.getPointOfSaleCashCloseSummary();
 
       if (!mounted) return;
 
+      /**
+       * Error enviado por el backend o por SafeExecutor.
+       */
+      if (!response.success) {
+        setState(() {
+          _dataManagerCash = null;
+          _errorMessage = response.message;
+          _isLoading = false;
+        });
+
+        return;
+      }
+
+      /**
+       * Data retornada por el backend.
+       */
+      final Map<String, dynamic>? data = response.data;
+
+      /**
+       * La petición fue correcta pero no existe información.
+       */
+      if (data == null || data.isEmpty) {
+        setState(() {
+          _dataManagerCash = null;
+          _errorMessage = null;
+          _isLoading = false;
+        });
+
+        return;
+      }
+
+      /**
+       * Guardamos directamente la estructura enviada
+       * por getPointOfSaleCashCloseSummary().
+       */
       setState(() {
-        _summary = data;
+        _dataManagerCash = data;
+        _errorMessage = null;
         _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
 
       setState(() {
-        _summary = null;
+        _dataManagerCash = null;
         _errorMessage = e.toString();
         _isLoading = false;
       });
     }
   }
-
   Future<void> _reloadAfterCloseShift() async {
     final controller = context.read<PosShiftManagementController>();
     final wasClosed = await controller.onCloseShiftTap();
@@ -218,13 +165,23 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
   }
 
   Widget _buildBody(PosShiftManagementController controller) {
+    /**
+     * ============================================================
+     * LOADING
+     * ============================================================
+     */
     if (_isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
       );
     }
 
-    if (_summary == null) {
+    /**
+     * ============================================================
+     * SIN INFORMACIÓN / ERROR
+     * ============================================================
+     */
+    if (_dataManagerCash == null) {
       return RefreshIndicator(
         onRefresh: _loadData,
         child: ListView(
@@ -245,15 +202,18 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
                           : 'No se pudo cargar el turno',
                       descriptionText: _errorMessage == null
                           ? 'Aquí podrás revisar el resumen del turno cuando exista información disponible.'
-                          : 'Ocurrió un problema al obtener los datos del turno.',
+                          : _errorMessage!,
                       linkText: 'Actualizar',
                     ),
                   ),
+
                   const SizedBox(height: 16),
+
                   ElevatedButton(
                     onPressed: _loadData,
                     child: const Text('Recargar'),
                   ),
+
                   const SizedBox(height: 24),
                 ],
               ),
@@ -263,23 +223,35 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
       );
     }
 
+    /**
+     * ============================================================
+     * RESUMEN DEL TURNO
+     * ============================================================
+     */
     return RefreshIndicator(
       onRefresh: _loadData,
       child: Scrollbar(
         thumbVisibility: true,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(
+            20,
+            20,
+            20,
+            100,
+          ),
           children: [
             Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 1030),
+                constraints: const BoxConstraints(
+                  maxWidth: 1030,
+                ),
                 child: Card(
                   elevation: 3,
                   child: Padding(
                     padding: const EdgeInsets.all(36),
                     child: _ShiftSummaryContent(
-                      summary: _summary!,
+                      data: _dataManagerCash!,
                       controller: controller,
                       onCloseShiftTap: _reloadAfterCloseShift,
                     ),
@@ -295,140 +267,340 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
 }
 
 class _ShiftSummaryContent extends StatelessWidget {
-  final PosShiftSummaryModel summary;
+  final Map<String, dynamic> data;
   final PosShiftManagementController controller;
   final Future<void> Function() onCloseShiftTap;
 
   const _ShiftSummaryContent({
-    required this.summary,
+    required this.data,
     required this.controller,
     required this.onCloseShiftTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    /**
+     * ============================================================
+     * DATA
+     * ============================================================
+     */
+
+    final Map<String, dynamic> cash = _map(data['cash']);
+    final Map<String, dynamic> session = _map(data['session']);
+    final Map<String, dynamic> movements = _map(data['movements']);
+    final Map<String, dynamic> payments = _map(data['payments']);
+    final Map<String, dynamic> closing = _map(data['closing']);
+
+    /**
+     * Listas dinámicas.
+     */
+    final List<Map<String, dynamic>> inputs = _list(
+      movements['inputs'],
+    );
+
+    final List<Map<String, dynamic>> outputs = _list(
+      movements['outputs'],
+    );
+
+    final List<Map<String, dynamic>> paymentItems = _list(
+      payments['items'],
+    );
+
+    /**
+     * ============================================================
+     * VIEW
+     * ============================================================
+     */
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        /**
+         * Acciones superiores.
+         */
         _ShiftTopActions(
           isClosingShift: controller.isClosingShift,
           onTreasuryTap: controller.onTreasuryTap,
           onCloseShiftTap: onCloseShiftTap,
         ),
+
         const SizedBox(height: 40),
-        _ShiftHeaderInfo(summary: summary),
+
+        /**
+         * Información de la caja / sesión.
+         */
+        _ShiftHeaderInfo(
+          cash: cash,
+          session: session,
+        ),
+
         const SizedBox(height: 24),
         const Divider(height: 1),
         const SizedBox(height: 28),
+
+        /**
+         * ========================================================
+         * CAJÓN DE EFECTIVO
+         * ========================================================
+         */
         _SectionBlock(
           title: 'Cajón de efectivo',
           titleColor: const Color(0xFF689F38),
           onTap: controller.onCashDrawerTap,
           children: [
             _MoneyRow(
-              label: 'Fondo de caja anterior',
-              value: _currency(summary.previousCashDrawer),
-              onTap: controller.onPreviousCashDrawerTap,
+              label: 'Efectivo de apertura',
+              value: _currency(
+                session['opening_amount'],
+              ),
             ),
+
             _MoneyRow(
-              label: 'Cobros en efectivo',
-              value: _currency(summary.cashPayments),
-              onTap: controller.onCashPaymentsTap,
+              label: 'Ingresos',
+              value: _currency(
+                movements['total_input'],
+              ),
             ),
+
             _MoneyRow(
-              label: 'Reembolsos en efectivo',
-              value: _currency(summary.cashRefunds),
-              onTap: controller.onCashRefundsTap,
+              label: 'Egresos',
+              value: _currency(
+                movements['total_output'],
+              ),
             ),
-            _MoneyRow(
-              label: 'Depositado',
-              value: _currency(summary.deposited),
-              onTap: controller.onDepositedTap,
-            ),
-            _MoneyRow(
-              label: 'Pagos/Salidas',
-              value: _currency(summary.payouts),
-              onTap: controller.onPayoutsTap,
-            ),
+
             const Divider(height: 32),
+
             _MoneyRow(
               label: 'Efectivo teórico en caja',
-              value: _currency(summary.theoreticalCash),
+              value: _currency(
+                closing['expected_amount'],
+              ),
               isBold: true,
               onTap: controller.onTheoreticalCashTap,
             ),
           ],
         ),
-        const SizedBox(height: 28),
-        _SectionBlock(
-          title: 'Resumen de ventas',
-          titleColor: const Color(0xFF689F38),
-          onTap: controller.onSalesSummaryTap,
-          children: [
-            _MoneyRow(
-              label: 'Ventas brutas',
-              value: _currency(summary.grossSales),
-              isBold: true,
-              onTap: controller.onGrossSalesTap,
-            ),
-            _MoneyRow(
-              label: 'Reembolsos',
-              value: _currency(summary.refunds),
-              onTap: controller.onRefundsTap,
-            ),
-            _MoneyRow(
-              label: 'Descuentos',
-              value: _currency(summary.discounts),
-              onTap: controller.onDiscountsTap,
-            ),
-            const Divider(height: 32),
-            _MoneyRow(
-              label: 'Ventas netas',
-              value: _currency(summary.netSales),
-              isBold: true,
-              onTap: controller.onNetSalesTap,
-            ),
-            _MoneyRow(
-              label: 'Impuestos',
-              value: _currency(summary.taxes),
-              onTap: controller.onTaxesTap,
-            ),
-          ],
-        ),
-        const SizedBox(height: 28),
-        _SectionBlock(
-          title: '',
-          onTap: controller.onPaymentsSummaryTap,
-          children: [
-            _MoneyRow(
-              label: 'Total licitado',
-              value: _currency(summary.tenderedTotal),
-              isBold: true,
-              onTap: controller.onTenderedTotalTap,
-            ),
-            _MoneyRow(
-              label: 'Efectivo',
-              value: _currency(summary.cash),
-              onTap: controller.onCashTap,
-            ),
-            _MoneyRow(
-              label: 'Redondeo de efectivo',
-              value: _currency(summary.cashRounding),
-              onTap: controller.onCashRoundingTap,
-            ),
-            _MoneyRow(
-              label: 'Por tarjeta',
-              value: _currency(summary.card),
-              onTap: controller.onCardTap,
-            ),
-          ],
-        ),
+
+        /**
+         * ========================================================
+         * INGRESOS
+         * ========================================================
+         */
+        if (inputs.isNotEmpty) ...[
+          const SizedBox(height: 28),
+
+          _SectionBlock(
+            title: 'Ingresos',
+            titleColor: const Color(0xFF689F38),
+            onTap: controller.onCashPaymentsTap,
+            children: [
+              /**
+               * Cada motivo de ingreso viene del backend.
+               */
+              ...inputs.map(
+                    (item) {
+                  final int count = _toInt(
+                    item['count'],
+                  );
+
+                  return _MoneyRow(
+                    label: _movementLabel(
+                      name: item['name'],
+                      count: count,
+                    ),
+                    value: _currency(
+                      item['amount'],
+                    ),
+                  );
+                },
+              ),
+
+              const Divider(height: 32),
+
+              _MoneyRow(
+                label:
+                'Total ingresos (${_toInt(movements['count_input'])} movimientos)',
+                value: _currency(
+                  movements['total_input'],
+                ),
+                isBold: true,
+              ),
+            ],
+          ),
+        ],
+
+        /**
+         * ========================================================
+         * EGRESOS
+         * ========================================================
+         */
+        if (outputs.isNotEmpty) ...[
+          const SizedBox(height: 28),
+
+          _SectionBlock(
+            title: 'Egresos',
+            titleColor: const Color(0xFF689F38),
+            onTap: controller.onPayoutsTap,
+            children: [
+              /**
+               * Cada motivo de egreso viene del backend.
+               */
+              ...outputs.map(
+                    (item) {
+                  final int count = _toInt(
+                    item['count'],
+                  );
+
+                  return _MoneyRow(
+                    label: _movementLabel(
+                      name: item['name'],
+                      count: count,
+                    ),
+                    value: _currency(
+                      item['amount'],
+                    ),
+                  );
+                },
+              ),
+
+              const Divider(height: 32),
+
+              _MoneyRow(
+                label:
+                'Total egresos (${_toInt(movements['count_output'])} movimientos)',
+                value: _currency(
+                  movements['total_output'],
+                ),
+                isBold: true,
+              ),
+            ],
+          ),
+        ],
+
+        /**
+         * ========================================================
+         * FORMAS DE PAGO
+         * ========================================================
+         *
+         * Por ahora el backend devuelve:
+         *
+         * payments: {
+         *   total: 0,
+         *   items: []
+         * }
+         *
+         * Cuando existan items se mostrarán automáticamente.
+         */
+        if (paymentItems.isNotEmpty) ...[
+          const SizedBox(height: 28),
+
+          _SectionBlock(
+            title: 'Formas de pago',
+            titleColor: const Color(0xFF689F38),
+            onTap: controller.onPaymentsSummaryTap,
+            children: [
+              ...paymentItems.map(
+                    (item) {
+                  return _MoneyRow(
+                    label: item['name']?.toString() ?? '',
+                    value: _currency(
+                      item['amount'],
+                    ),
+                  );
+                },
+              ),
+
+              const Divider(height: 32),
+
+              _MoneyRow(
+                label: 'Total',
+                value: _currency(
+                  payments['total'],
+                ),
+                isBold: true,
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
 
-  static String _currency(double value) {
-    return '\$${value.toStringAsFixed(2).replaceAll('.', ',')}';
+  /**
+   * ============================================================
+   * HELPERS
+   * ============================================================
+   */
+
+  static Map<String, dynamic> _map(dynamic value) {
+    if (value is Map<String, dynamic>) {
+      return value;
+    }
+
+    if (value is Map) {
+      return Map<String, dynamic>.from(value);
+    }
+
+    return <String, dynamic>{};
+  }
+
+  static List<Map<String, dynamic>> _list(dynamic value) {
+    if (value is! List) {
+      return <Map<String, dynamic>>[];
+    }
+
+    return value
+        .whereType<Map>()
+        .map(
+          (item) => Map<String, dynamic>.from(item),
+    )
+        .toList();
+  }
+
+  static int _toInt(dynamic value) {
+    if (value is int) {
+      return value;
+    }
+
+    if (value is num) {
+      return value.toInt();
+    }
+
+    return int.tryParse(
+      value?.toString() ?? '',
+    ) ??
+        0;
+  }
+
+  static double _toDouble(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+
+    return double.tryParse(
+      value?.toString() ?? '',
+    ) ??
+        0;
+  }
+
+  static String _currency(dynamic value) {
+    final double amount = _toDouble(value);
+
+    return '\$${amount.toStringAsFixed(2).replaceAll('.', ',')}';
+  }
+
+  static String _movementLabel({
+    required dynamic name,
+    required int count,
+  }) {
+    final String movementName = name?.toString() ?? '';
+
+    if (count <= 1) {
+      return movementName;
+    }
+
+    return '$movementName ($count)';
   }
 }
 
@@ -502,33 +674,82 @@ class _ShiftTopActions extends StatelessWidget {
 
 
 
-
-
 class _ShiftHeaderInfo extends StatelessWidget {
-  final PosShiftSummaryModel summary;
+  final Map<String, dynamic> cash;
+  final Map<String, dynamic> session;
 
   const _ShiftHeaderInfo({
-    required this.summary,
+    required this.cash,
+    required this.session,
   });
 
   @override
   Widget build(BuildContext context) {
+    final String cashName = cash['name']?.toString() ?? '';
+    final int sessionId = _toInt(session['id']);
+    final String sessionState = session['state']?.toString() ?? '';
+    final String openingDate = _formatDate(session['opening_date']);
+
     return Column(
       children: [
         _InfoRow(
-          left: 'Número de cierre de caja: ${summary.closeNumber}',
-          right: '',
+          left: cashName,
+          right: sessionState,
         ),
+
         const SizedBox(height: 24),
+
         _InfoRow(
-          left: 'Abierto: ${summary.openedBy}',
-          right: summary.openedAt,
+          left: 'Sesión de caja: #$sessionId',
+          right: openingDate,
         ),
       ],
     );
   }
-}
 
+  static int _toInt(dynamic value) {
+    if (value is int) {
+      return value;
+    }
+
+    if (value is num) {
+      return value.toInt();
+    }
+
+    return int.tryParse(
+      value?.toString() ?? '',
+    ) ??
+        0;
+  }
+
+  static String _formatDate(dynamic value) {
+    if (value == null) {
+      return '';
+    }
+
+    final String raw = value.toString().trim();
+
+    if (raw.isEmpty) {
+      return '';
+    }
+
+    final DateTime? date = DateTime.tryParse(raw);
+
+    if (date == null) {
+      return raw;
+    }
+
+    String twoDigits(int value) {
+      return value.toString().padLeft(2, '0');
+    }
+
+    return '${twoDigits(date.day)}/'
+        '${twoDigits(date.month)}/'
+        '${date.year} '
+        '${twoDigits(date.hour)}:'
+        '${twoDigits(date.minute)}';
+  }
+}
 
 class _InfoRow extends StatelessWidget {
   final String left;

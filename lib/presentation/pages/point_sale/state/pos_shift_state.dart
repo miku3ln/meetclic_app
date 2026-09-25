@@ -8,12 +8,15 @@ class PosShiftSession {
   final double openingAmount;
   final DateTime openedAt;
   final bool isShiftOpen;
+  final String typeOpen;
 
   const PosShiftSession({
     required this.userId,
     required this.openingAmount,
     required this.openedAt,
     required this.isShiftOpen,
+    required this.typeOpen,
+
   });
 
   Map<String, dynamic> toMap() {
@@ -27,7 +30,7 @@ class PosShiftSession {
 
   factory PosShiftSession.fromMap(Map<String, dynamic> map) {
     return PosShiftSession(
-      userId: map['userId'] as int,
+      userId: map['userId'] as int,typeOpen: "",
       openingAmount: (map['openingAmount'] as num).toDouble(),
       openedAt: DateTime.parse(map['openedAt'] as String),
       isShiftOpen: map['isShiftOpen'] as bool,
@@ -67,6 +70,7 @@ class PosShiftState extends ChangeNotifier {
   final AppController app;
   final PosShiftStorage storage;
   VoidCallback? onRequestOpenShift;
+  String typeOpen = "";
 
   bool isShiftOpen = false;
   double? initialCash;
@@ -74,19 +78,16 @@ class PosShiftState extends ChangeNotifier {
   DateTime? openedAt;
   PosShiftSession? currentSession;
 
-  PosShiftState({
-    required this.app,
-    required this.storage,
-  });
+  PosShiftState({required this.app, required this.storage});
 
   void onOpenShiftTap() => onRequestOpenShift?.call();
 
   bool get hasSavedOpenShift => currentSession != null && isShiftOpen;
+
   bool get canSell => isShiftOpen;
 
-  Future<void> init() async {
+  Future<void> initLocalStorage() async {
     final savedShift = await storage.getShift();
-
     if (savedShift != null && savedShift.isShiftOpen) {
       _applySession(savedShift);
     } else {
@@ -98,6 +99,9 @@ class PosShiftState extends ChangeNotifier {
 
   Future<Map<String, dynamic>> openShift({
     required double initialCash,
+    String messageSave = "",
+    String messageNotSave = "",
+
   }) async {
     final currentUser = app.currentUser;
 
@@ -111,6 +115,7 @@ class PosShiftState extends ChangeNotifier {
 
     try {
       final session = PosShiftSession(
+        typeOpen: "saveRegister",
         userId: currentUser.userId,
         openingAmount: initialCash,
         openedAt: DateTime.now(),
@@ -130,17 +135,68 @@ class PosShiftState extends ChangeNotifier {
           'openedByUserId': openedByUserId,
           'openedAt': openedAt?.toIso8601String(),
         },
-        'message': 'Caja abierta correctamente',
+        'message': messageSave == ""
+            ? 'Caja abierta correctamente'
+            : messageSave,
       };
     } catch (e) {
       return {
         'success': false,
         'data': null,
-        'message': 'No se pudo guardar la sesión del turno: $e',
+        'message':messageNotSave==""? 'No se pudo guardar la sesión del turno: $e':messageNotSave,
       };
     }
   }
+  Future<Map<String, dynamic>> openShiftPreload({
+    required double initialCash,
+    String messageSave = "",
+    String messageNotSave = "",
+    required  DateTime openedAt,
+  }) async {
+    final currentUser = app.currentUser;
 
+    if (currentUser == null) {
+      return {
+        'success': false,
+        'data': null,
+        'message': 'No existe un usuario en sesión',
+      };
+    }
+
+    try {
+      final session = PosShiftSession(
+        typeOpen: "preloadRegister",
+        userId: currentUser.userId,
+        openingAmount: initialCash,
+        openedAt:openedAt ,
+        isShiftOpen: true,
+      );
+
+      await storage.saveShift(session);
+      _applySession(session);
+
+      notifyListeners();
+
+      return {
+        'success': true,
+        'data': {
+          'isShiftOpen': true,
+          'initialCash': initialCash,
+          'openedByUserId': openedByUserId,
+          'openedAt': openedAt?.toIso8601String(),
+        },
+        'message': messageSave == ""
+            ? 'Caja abierta correctamente'
+            : messageSave,
+      };
+    } catch (e) {
+      return {
+        'success': false,
+        'data': null,
+        'message':messageNotSave==""? 'No se pudo guardar la sesión del turno: $e':messageNotSave,
+      };
+    }
+  }
   Future<Map<String, dynamic>> closeShift() async {
     try {
       await storage.clearShift();
@@ -176,5 +232,6 @@ class PosShiftState extends ChangeNotifier {
     initialCash = null;
     openedByUserId = null;
     openedAt = null;
+    typeOpen="";
   }
 }

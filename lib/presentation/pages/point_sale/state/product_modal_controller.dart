@@ -449,6 +449,9 @@ class ProductModalController extends BaseFormController {
     priceField.setValue(value.isEmpty ? null : double.tryParse(value));
     notifyListeners();
   }
+
+  Timer? _amountRecipeDebounce;
+
   Future<void> setAmountRecipe(String value) async {
     final double? newValue = value.trim().isEmpty
         ? null
@@ -462,6 +465,18 @@ class ProductModalController extends BaseFormController {
     notifyListeners();
 
     /**
+     * Cancelar cualquier guardado pendiente.
+     *
+     * Si escribió:
+     * 1
+     * 12
+     * 120
+     *
+     * solamente intentará guardar 120.
+     */
+    _amountRecipeDebounce?.cancel();
+
+    /**
      * No guardar si es inválido.
      */
     if (!amountRecipeField.isValid) {
@@ -469,6 +484,42 @@ class ProductModalController extends BaseFormController {
     }
 
     if (newValue == null) {
+      return;
+    }
+
+    /**
+     * No guardar si no cambió.
+     */
+    if (_amountRecipeSaved == newValue) {
+      return;
+    }
+
+    /**
+     * Esperar a que el usuario deje de escribir.
+     */
+    _amountRecipeDebounce = Timer(
+      const Duration(milliseconds: 700),
+          () async {
+        await _saveAmountRecipe(newValue);
+      },
+    );
+  }
+
+  Future<void> _saveAmountRecipe(double newValue) async {
+    /**
+     * El usuario pudo seguir escribiendo durante
+     * los 700 ms.
+     *
+     * No guardar un valor que ya quedó viejo.
+     */
+    if (amountRecipeField.value != newValue) {
+      return;
+    }
+
+    /**
+     * No guardar si dejó de ser válido.
+     */
+    if (!amountRecipeField.isValid) {
       return;
     }
 

@@ -77,7 +77,7 @@ class PosMainController extends ChangeNotifier {
     String? initialSelectedProductCategoryId,
     String? initialSelectedMenuCategoryId,
   }) async {
-    await shift.init();
+    await shift.initLocalStorage();//INIT DATA CASH
 
     if (_isDisposed) return;
 

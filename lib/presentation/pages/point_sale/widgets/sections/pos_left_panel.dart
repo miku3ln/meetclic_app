@@ -39,7 +39,7 @@ class PosLeftPanel extends StatelessWidget {
         children: [
           Expanded(
             child: !controller.shift.isShiftOpen
-                ? _ShiftClosedView(
+                ? _ShiftClosedView(//INIT DATA CASH
               controller: controller,
               onOpenTap: controller.shift.onOpenShiftTap,
             )
