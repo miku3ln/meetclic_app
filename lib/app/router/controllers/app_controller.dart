@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 
-
 import '../../../domain/models/user_data_login.dart';
 import '../../../domain/services/session_service.dart';
+import '../../../presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import '../../../shared/models/app_config.dart';
 import '../../di/app_providers.dart';
 import '../app_router.dart';
 import 'app_drawer_controller.dart';
+
 enum AppStartPolicy {
-  allowGuest,     // ✅ default: igual que ahora
-  requireLogin,   // 🔁 nuevo proceso cuando lo actives
+  allowGuest, // ✅ default: igual que ahora
+  requireLogin, // 🔁 nuevo proceso cuando lo actives
 }
+
 enum AppAfterLoginDestination { home, pointSale }
+
 class DrawerItemDef {
   final String id;
   final String title;
@@ -27,7 +30,35 @@ class DrawerItemDef {
 }
 
 class AppController extends ChangeNotifier {
-  void goToModule(String routeName) {
+  PosMainController? _posMainController;
+  PosMainController? get posMainController =>
+      _posMainController;
+
+  bool get hasPosMainController =>
+      _posMainController != null;
+
+  void attachPosMainController(
+      PosMainController controller,
+      ) {
+    if (identical(_posMainController, controller)) {
+      return;
+    }
+
+    _posMainController = controller;
+  }
+
+  void detachPosMainController(
+      PosMainController controller,
+      ) {
+    if (!identical(_posMainController, controller)) {
+      return;
+    }
+
+    _posMainController = null;
+  }
+
+
+  void goToModule(String routeName, {Object? arguments}) {
     final nav = navigatorKey.currentState;
     if (nav == null) return;
     // 🔥 1. si es la misma ruta → NO HACER NADA
@@ -43,11 +74,13 @@ class AppController extends ChangeNotifier {
     // 🔥 3. resto de módulos → reemplazan
     nav.pushNamedAndRemoveUntil(
       routeName,
-          (route) => route.settings.name == AppRoutes.sales,
+      (route) => route.settings.name == AppRoutes.sales,
+      arguments: arguments,
     );
 
     notifyListeners();
   }
+
   String? get currentRouteName => _currentRouteName;
 
   bool isCurrentRoute(String route) {
@@ -59,22 +92,21 @@ class AppController extends ChangeNotifier {
       return true;
     }
 
-    return item.children.any(
-          (child) => isCurrentDrawerItem(child),
-    );
+    return item.children.any((child) => isCurrentDrawerItem(child));
   }
+
   final AppConfig config;
   final SessionService session;
 
-  AppController({
-    required this.config,
-    required this.session,
-  });
+  AppController({required this.config, required this.session});
 
   // ✅ DEFAULT = comportamiento actual (NO login obligatorio)
   AppStartPolicy startPolicy = AppStartPolicy.allowGuest;
+
   // ✅ configurable: a dónde ir cuando hay login
-  AppAfterLoginDestination afterLoginDestination = AppAfterLoginDestination.home;
+  AppAfterLoginDestination afterLoginDestination =
+      AppAfterLoginDestination.home;
+
   // ✅ Menú por defecto como lo tienes
   bool enableDrawer = false;
   String drawerTitle = 'Unit Menu';
@@ -87,6 +119,7 @@ class AppController extends ChangeNotifier {
   // --- Helpers (solo lectura) ---
   bool get isLoggedIn => session.isLoggedIn;
   UserDataLogin? _currentUser;
+
   UserDataLogin? get currentUser => session.currentSession;
 
   /// ✅ Por defecto será FALSE (no obliga login)
@@ -128,7 +161,6 @@ class AppController extends ChangeNotifier {
     await session.clearSession();
     goToGate();
     notifyListeners();
-
   }
 
   // ✅ Navegación global (sin context)
@@ -147,6 +179,7 @@ class AppController extends ChangeNotifier {
     notifyListeners();
     nav.pushNamed(route, arguments: arguments);
   }
+
   /// (Opcional) si algún día necesitas limpiar sin navegar
   Future<void> logoutSilently() async {
     await session.clearSession();
@@ -155,17 +188,18 @@ class AppController extends ChangeNotifier {
 
   bool get isLoginRequired => startPolicy == AppStartPolicy.requireLogin;
 
-// si quieres el modo “alto nivel” para comparar fácil:
+  // si quieres el modo “alto nivel” para comparar fácil:
   AppMode get appMode =>
       (startPolicy == AppStartPolicy.requireLogin &&
           afterLoginDestination == AppAfterLoginDestination.pointSale)
-          ? AppMode.requireLoginPos
-          : AppMode.guestHome;
-
+      ? AppMode.requireLoginPos
+      : AppMode.guestHome;
 
   void closeDrawerIfOpen() {
-    navigatorKey.currentState?.maybePop();// si el drawer está abierto, esto lo cierra
+    navigatorKey.currentState
+        ?.maybePop(); // si el drawer está abierto, esto lo cierra
   }
+
   void goToNamedReplacement(String routeName, {Object? arguments}) {
     final nav = navigatorKey.currentState;
     if (nav == null) return;
@@ -173,22 +207,27 @@ class AppController extends ChangeNotifier {
     notifyListeners();
     nav.pushReplacementNamed(routeName, arguments: arguments);
   }
-  String? _currentRouteName=AppRoutes.sales;
- // String? get currentRouteName => _currentRouteName;
+
+  String? _currentRouteName = AppRoutes.sales;
+
+  // String? get currentRouteName => _currentRouteName;
   void setCurrentRoute(String routeName) {
     _currentRouteName = routeName;
     WidgetsBinding.instance.addPostFrameCallback((_) {
       notifyListeners();
     });
   }
+
   void goToNamedIfNotCurrent(String routeName, {Object? arguments}) {
     if (_currentRouteName == routeName) return;
     goToNamed(routeName, arguments: arguments);
   }
+
   void goToNamedReplacementIfNotCurrent(String routeName, {Object? arguments}) {
     if (_currentRouteName == routeName) return;
     goToNamedReplacement(routeName, arguments: arguments);
   }
+
   /// 🔥 IMPORTANTE:
   /// Si la ruta ya existe en el stack, vuelve a esa misma instancia.
   /// Si no existe, la abre nueva.
@@ -220,6 +259,7 @@ class AppController extends ChangeNotifier {
     nav.pushNamed(routeName, arguments: arguments);
   }
 }
+
 class AppRouteObserver extends NavigatorObserver {
   final AppController app;
 

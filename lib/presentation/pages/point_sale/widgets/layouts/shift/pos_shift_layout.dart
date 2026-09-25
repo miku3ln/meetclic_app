@@ -6,20 +6,19 @@ import '../../../shared/styles.dart';
 import '../../../state/pos_shift_management_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/pos_settings_app_bar.dart';
+import '../pos_main_controller.dart';
 import '../tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
 class PosShiftManagementLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
 
-  const PosShiftManagementLayout({
-    super.key,
-    this.onMenuTap,
-  });
+  const PosShiftManagementLayout({super.key, this.onMenuTap});
 
   @override
   Widget build(BuildContext context) {
+    final main = context.read<PosMainController>();
     return ChangeNotifierProvider(
-      create: (_) => PosShiftManagementController(),
+      create: (_) => PosShiftManagementController(main: main),
       child: const _PosShiftView(),
     );
   }
@@ -58,6 +57,7 @@ class _PosShiftView extends StatelessWidget {
     );
   }
 }
+
 class PosShiftRegister extends StatefulWidget {
   const PosShiftRegister({super.key});
 
@@ -66,8 +66,6 @@ class PosShiftRegister extends StatefulWidget {
 }
 
 class _PosShiftRegisterState extends State<PosShiftRegister> {
-
-
   bool _isLoading = false;
   String? _errorMessage;
 
@@ -77,6 +75,7 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
 
     _loadData();
   }
+
   Map<String, dynamic>? _dataManagerCash;
 
   Future<void> _loadData() async {
@@ -88,8 +87,7 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
     });
 
     try {
-      final response =
-      await UtilServicesCash.getPointOfSaleCashCloseSummary();
+      final response = await UtilServicesCash.getPointOfSaleCashCloseSummary();
 
       if (!mounted) return;
 
@@ -143,9 +141,10 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
       });
     }
   }
+
   Future<void> _reloadAfterCloseShift() async {
     final controller = context.read<PosShiftManagementController>();
-    final wasClosed = await controller.onCloseShiftTap();
+    final wasClosed = await controller.onCloseShiftTap(context);
 
     if (!mounted) return;
 
@@ -171,9 +170,7 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
      * ============================================================
      */
     if (_isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
+      return const Center(child: CircularProgressIndicator());
     }
 
     /**
@@ -234,18 +231,11 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
         thumbVisibility: true,
         child: ListView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(
-            20,
-            20,
-            20,
-            100,
-          ),
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
           children: [
             Center(
               child: ConstrainedBox(
-                constraints: const BoxConstraints(
-                  maxWidth: 1030,
-                ),
+                constraints: const BoxConstraints(maxWidth: 1030),
                 child: Card(
                   elevation: 3,
                   child: Padding(
@@ -294,17 +284,11 @@ class _ShiftSummaryContent extends StatelessWidget {
     /**
      * Listas dinámicas.
      */
-    final List<Map<String, dynamic>> inputs = _list(
-      movements['inputs'],
-    );
+    final List<Map<String, dynamic>> inputs = _list(movements['inputs']);
 
-    final List<Map<String, dynamic>> outputs = _list(
-      movements['outputs'],
-    );
+    final List<Map<String, dynamic>> outputs = _list(movements['outputs']);
 
-    final List<Map<String, dynamic>> paymentItems = _list(
-      payments['items'],
-    );
+    final List<Map<String, dynamic>> paymentItems = _list(payments['items']);
 
     /**
      * ============================================================
@@ -329,10 +313,7 @@ class _ShiftSummaryContent extends StatelessWidget {
         /**
          * Información de la caja / sesión.
          */
-        _ShiftHeaderInfo(
-          cash: cash,
-          session: session,
-        ),
+        _ShiftHeaderInfo(cash: cash, session: session),
 
         const SizedBox(height: 24),
         const Divider(height: 1),
@@ -350,32 +331,24 @@ class _ShiftSummaryContent extends StatelessWidget {
           children: [
             _MoneyRow(
               label: 'Efectivo de apertura',
-              value: _currency(
-                session['opening_amount'],
-              ),
+              value: _currency(session['opening_amount']),
             ),
 
             _MoneyRow(
               label: 'Ingresos',
-              value: _currency(
-                movements['total_input'],
-              ),
+              value: _currency(movements['total_input']),
             ),
 
             _MoneyRow(
               label: 'Egresos',
-              value: _currency(
-                movements['total_output'],
-              ),
+              value: _currency(movements['total_output']),
             ),
 
             const Divider(height: 32),
 
             _MoneyRow(
               label: 'Efectivo teórico en caja',
-              value: _currency(
-                closing['expected_amount'],
-              ),
+              value: _currency(closing['expected_amount']),
               isBold: true,
               onTap: controller.onTheoreticalCashTap,
             ),
@@ -398,32 +371,21 @@ class _ShiftSummaryContent extends StatelessWidget {
               /**
                * Cada motivo de ingreso viene del backend.
                */
-              ...inputs.map(
-                    (item) {
-                  final int count = _toInt(
-                    item['count'],
-                  );
+              ...inputs.map((item) {
+                final int count = _toInt(item['count']);
 
-                  return _MoneyRow(
-                    label: _movementLabel(
-                      name: item['name'],
-                      count: count,
-                    ),
-                    value: _currency(
-                      item['amount'],
-                    ),
-                  );
-                },
-              ),
+                return _MoneyRow(
+                  label: _movementLabel(name: item['name'], count: count),
+                  value: _currency(item['amount']),
+                );
+              }),
 
               const Divider(height: 32),
 
               _MoneyRow(
                 label:
-                'Total ingresos (${_toInt(movements['count_input'])} movimientos)',
-                value: _currency(
-                  movements['total_input'],
-                ),
+                    'Total ingresos (${_toInt(movements['count_input'])} movimientos)',
+                value: _currency(movements['total_input']),
                 isBold: true,
               ),
             ],
@@ -446,32 +408,21 @@ class _ShiftSummaryContent extends StatelessWidget {
               /**
                * Cada motivo de egreso viene del backend.
                */
-              ...outputs.map(
-                    (item) {
-                  final int count = _toInt(
-                    item['count'],
-                  );
+              ...outputs.map((item) {
+                final int count = _toInt(item['count']);
 
-                  return _MoneyRow(
-                    label: _movementLabel(
-                      name: item['name'],
-                      count: count,
-                    ),
-                    value: _currency(
-                      item['amount'],
-                    ),
-                  );
-                },
-              ),
+                return _MoneyRow(
+                  label: _movementLabel(name: item['name'], count: count),
+                  value: _currency(item['amount']),
+                );
+              }),
 
               const Divider(height: 32),
 
               _MoneyRow(
                 label:
-                'Total egresos (${_toInt(movements['count_output'])} movimientos)',
-                value: _currency(
-                  movements['total_output'],
-                ),
+                    'Total egresos (${_toInt(movements['count_output'])} movimientos)',
+                value: _currency(movements['total_output']),
                 isBold: true,
               ),
             ],
@@ -500,24 +451,18 @@ class _ShiftSummaryContent extends StatelessWidget {
             titleColor: const Color(0xFF689F38),
             onTap: controller.onPaymentsSummaryTap,
             children: [
-              ...paymentItems.map(
-                    (item) {
-                  return _MoneyRow(
-                    label: item['name']?.toString() ?? '',
-                    value: _currency(
-                      item['amount'],
-                    ),
-                  );
-                },
-              ),
+              ...paymentItems.map((item) {
+                return _MoneyRow(
+                  label: item['name']?.toString() ?? '',
+                  value: _currency(item['amount']),
+                );
+              }),
 
               const Divider(height: 32),
 
               _MoneyRow(
                 label: 'Total',
-                value: _currency(
-                  payments['total'],
-                ),
+                value: _currency(payments['total']),
                 isBold: true,
               ),
             ],
@@ -552,9 +497,7 @@ class _ShiftSummaryContent extends StatelessWidget {
 
     return value
         .whereType<Map>()
-        .map(
-          (item) => Map<String, dynamic>.from(item),
-    )
+        .map((item) => Map<String, dynamic>.from(item))
         .toList();
   }
 
@@ -567,10 +510,7 @@ class _ShiftSummaryContent extends StatelessWidget {
       return value.toInt();
     }
 
-    return int.tryParse(
-      value?.toString() ?? '',
-    ) ??
-        0;
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   static double _toDouble(dynamic value) {
@@ -578,10 +518,7 @@ class _ShiftSummaryContent extends StatelessWidget {
       return value.toDouble();
     }
 
-    return double.tryParse(
-      value?.toString() ?? '',
-    ) ??
-        0;
+    return double.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   static String _currency(dynamic value) {
@@ -590,10 +527,7 @@ class _ShiftSummaryContent extends StatelessWidget {
     return '\$${amount.toStringAsFixed(2).replaceAll('.', ',')}';
   }
 
-  static String _movementLabel({
-    required dynamic name,
-    required int count,
-  }) {
+  static String _movementLabel({required dynamic name, required int count}) {
     final String movementName = name?.toString() ?? '';
 
     if (count <= 1) {
@@ -603,7 +537,6 @@ class _ShiftSummaryContent extends StatelessWidget {
     return '$movementName ($count)';
   }
 }
-
 
 class _ShiftTopActions extends StatelessWidget {
   final bool isClosingShift;
@@ -653,18 +586,18 @@ class _ShiftTopActions extends StatelessWidget {
             ),
             child: isClosingShift
                 ? const SizedBox(
-              width: 22,
-              height: 22,
-              child: CircularProgressIndicator(strokeWidth: 2),
-            )
+                    width: 22,
+                    height: 22,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
                 : const Text(
-              'CERRAR EL TURNO',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF689F38),
-              ),
-            ),
+                    'CERRAR EL TURNO',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Color(0xFF689F38),
+                    ),
+                  ),
           ),
         ),
       ],
@@ -672,16 +605,11 @@ class _ShiftTopActions extends StatelessWidget {
   }
 }
 
-
-
 class _ShiftHeaderInfo extends StatelessWidget {
   final Map<String, dynamic> cash;
   final Map<String, dynamic> session;
 
-  const _ShiftHeaderInfo({
-    required this.cash,
-    required this.session,
-  });
+  const _ShiftHeaderInfo({required this.cash, required this.session});
 
   @override
   Widget build(BuildContext context) {
@@ -692,17 +620,11 @@ class _ShiftHeaderInfo extends StatelessWidget {
 
     return Column(
       children: [
-        _InfoRow(
-          left: cashName,
-          right: sessionState,
-        ),
+        _InfoRow(left: cashName, right: sessionState),
 
         const SizedBox(height: 24),
 
-        _InfoRow(
-          left: 'Sesión de caja: #$sessionId',
-          right: openingDate,
-        ),
+        _InfoRow(left: 'Sesión de caja: #$sessionId', right: openingDate),
       ],
     );
   }
@@ -716,10 +638,7 @@ class _ShiftHeaderInfo extends StatelessWidget {
       return value.toInt();
     }
 
-    return int.tryParse(
-      value?.toString() ?? '',
-    ) ??
-        0;
+    return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
   static String _formatDate(dynamic value) {
@@ -755,10 +674,7 @@ class _InfoRow extends StatelessWidget {
   final String left;
   final String right;
 
-  const _InfoRow({
-    required this.left,
-    required this.right,
-  });
+  const _InfoRow({required this.left, required this.right});
 
   @override
   Widget build(BuildContext context) {
@@ -767,19 +683,13 @@ class _InfoRow extends StatelessWidget {
         Expanded(
           child: Text(
             left,
-            style: const TextStyle(
-              fontSize: 22,
-              color: Color(0xFF2E2E2E),
-            ),
+            style: const TextStyle(fontSize: 22, color: Color(0xFF2E2E2E)),
           ),
         ),
         if (right.isNotEmpty)
           Text(
             right,
-            style: const TextStyle(
-              fontSize: 22,
-              color: Color(0xFF2E2E2E),
-            ),
+            style: const TextStyle(fontSize: 22, color: Color(0xFF2E2E2E)),
           ),
       ],
     );
@@ -824,7 +734,6 @@ class _SectionBlock extends StatelessWidget {
   }
 }
 
-
 class _MoneyRow extends StatelessWidget {
   final String label;
   final String value;
@@ -850,9 +759,7 @@ class _MoneyRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 26),
       child: Row(
         children: [
-          Expanded(
-            child: Text(label, style: style),
-          ),
+          Expanded(child: Text(label, style: style)),
           Text(value, style: style),
         ],
       ),
@@ -860,9 +767,6 @@ class _MoneyRow extends StatelessWidget {
 
     if (onTap == null) return child;
 
-    return InkWell(
-      onTap: onTap,
-      child: child,
-    );
+    return InkWell(onTap: onTap, child: child);
   }
 }

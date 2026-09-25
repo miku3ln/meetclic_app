@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import '../app_router.dart';
 import 'app_controller.dart';
 
@@ -352,7 +354,21 @@ class AppDrawerController extends ChangeNotifier {
 
     final isSameRoute =
         app.currentRouteName == item.routeName;
+    /**
+     * ============================================================
+     * ARGUMENTOS DE NAVEGACIÓN
+     * ============================================================
+     */
+    Object? arguments;
+    /**
+     * SHIFT necesita recibir la misma instancia
+     * de PosMainController que utiliza Punto de Venta.
+     */
+    if (item.routeName == AppRoutes.shift) {
+      final main = context.read<PosMainController>();
 
+      arguments = main;
+    }
     // Solo bloqueamos si realmente estamos
     // en la misma ruta.
     //
@@ -368,6 +384,7 @@ class AppDrawerController extends ChangeNotifier {
     Future.microtask(() {
       app.goToModule(
         item.routeName,
+        arguments: arguments,
       );
     });
   }

@@ -35,7 +35,7 @@ class _PosTabletLandscapeLayoutState extends State<PosTabletLandscapeLayout> {
   }
 
   Future<void> _initialize() async {
-    await controller.shift.init();
+    await controller.shift.initLocalStorage();
     await controller.initDataPointOfSales();
 
   }

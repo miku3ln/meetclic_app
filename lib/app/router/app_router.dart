@@ -1,23 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/items/pos_items_layout.dart';
-import 'package:meetclic_app/presentation/pages/point_sale/widgets/organisms/items/pos_items_content.dart';
 import '../../presentation/pages/home/home_page.dart';
 import '../../presentation/pages/point_sale/state/pos_items_controller.dart';
 import '../../presentation/pages/point_sale/state/pos_loyalty_controller.dart';
 import '../../presentation/pages/point_sale/state/pos_settings_controller.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/business_manager/business_manager.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/loyalty/pos_loyalty_layout.dart';
+import '../../presentation/pages/point_sale/widgets/layouts/pos_main_controller.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/receipts/pos_receipts_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/settings/pos_settings_layout.dart';
 import '../../presentation/pages/point_sale/widgets/layouts/shift/pos_shift_layout.dart';
 import '../../presentation/pages/point_sale_page.dart';
 import '../../shared/providers_session.dart';
 import '../app_gate.dart';
-import 'package:flutter/material.dart';
-import '../../presentation/pages/home/home_page.dart';
-import '../../presentation/pages/point_sale/widgets/layouts/settings/pos_settings_layout.dart';
-import '../../presentation/pages/point_sale_page.dart';
-import '../app_gate.dart';
+import 'package:provider/provider.dart';
+
+import 'controllers/app_controller.dart';
 
 class AppRoutes {
   static const gate = '/gate';
@@ -36,6 +34,7 @@ class AppRoutes {
 
   static const businessManager = '/businessManager';
   static const businessManagerKey = 'businessManager';
+
   // =========================
   // ARTÍCULOS
   // =========================
@@ -87,124 +86,337 @@ class AppRoutes {
   static const printersKey = 'printers';
   static const printers = '/printers';
 }
-
 class AppRouter {
-  static Route<dynamic> onGenerateRoute(RouteSettings settings) {//MENU INIT-2
+  /**
+   * Reutiliza la MISMA instancia de PosMainController
+   * creada por PointSaleScope.
+   *
+   * IMPORTANTE:
+   * ChangeNotifierProvider.value NO crea ni destruye
+   * el PosMainController.
+   */
+  static Widget _withPosMainController({
+    required BuildContext context,
+    required Widget child,
+  }) {
+    final app = context.read<AppController>();
+
+    final PosMainController? main =
+        app.posMainController;
+
+    if (main == null) {
+      return const Scaffold(
+        body: Center(
+          child: Text(
+            'No existe una instancia activa de PosMainController.',
+            textAlign: TextAlign.center,
+          ),
+        ),
+      );
+    }
+
+    return ChangeNotifierProvider<PosMainController>.value(
+      value: main,
+      child: child,
+    );
+  }
+
+  static Route<dynamic> onGenerateRoute(
+      RouteSettings settings,
+      ) {
     switch (settings.name) {
+    /**
+     * ============================================================
+     * APP
+     * ============================================================
+     */
+
       case AppRoutes.gate:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const AppGate(),
         );
+
       case AppRoutes.home:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => HomeScreenAllMenu(modules: const []),
+          builder: (_) =>
+              HomeScreenAllMenu(modules: const []),
         );
+
+    /**
+     * ============================================================
+     * POS PRINCIPAL
+     *
+     * Esta ruta CREA PosMainController.
+     * NO usar _withPosMainController aquí.
+     * ============================================================
+     */
+
       case AppRoutes.sales:
         return MaterialPageRoute(
           settings: settings,
           builder: (_) => const PointSaleScope(),
         );
 
+    /**
+     * ============================================================
+     * BUSINESS
+     * ============================================================
+     */
+
       case AppRoutes.businessManager:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => const BusinessManagerManagementLayout(),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child:
+              const BusinessManagerManagementLayout(),
+            );
+          },
         );
-      case AppRoutes.settings:
-        final args = settings.arguments as PosSettingsLayoutArgs?;
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) =>
-              PosSettingsLayout(section: PosSettingsSection.printers),
-        );
-      case AppRoutes.taxes:
-        final args = settings.arguments as PosSettingsLayoutArgs?;
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => PosSettingsLayout(section: PosSettingsSection.taxes),
-        );
-      case AppRoutes.customerScreen:
-        final args = settings.arguments as PosSettingsLayoutArgs?;
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) =>
-              PosSettingsLayout(section: PosSettingsSection.customerScreen),
-        );
-      case AppRoutes.printers:
-        final args = settings.arguments as PosSettingsLayoutArgs?;
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) =>
-              PosSettingsLayout(section: PosSettingsSection.printers),
-        );
-      case AppRoutes.general:
-        final args = settings.arguments as PosSettingsLayoutArgs?;
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) =>
-              PosSettingsLayout(section: PosSettingsSection.general),
-        );
-      case AppRoutes.receipts:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) => PosReceiptsLayout(),
-        );
+
+    /**
+     * ============================================================
+     * SHIFT
+     * ============================================================
+     */
 
       case AppRoutes.shift:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => PosShiftManagementLayout(),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child:
+              const PosShiftManagementLayout(),
+            );
+          },
         );
+
+    /**
+     * ============================================================
+     * RECEIPTS
+     * ============================================================
+     */
+
+      case AppRoutes.receipts:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosReceiptsLayout(),
+            );
+          },
+        );
+
+    /**
+     * ============================================================
+     * ITEMS
+     * ============================================================
+     */
+
       case AppRoutes.items:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => PosItemsLayout(section: PosItemsSection.items),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosItemsLayout(
+                section: PosItemsSection.items,
+              ),
+            );
+          },
         );
 
       case AppRoutes.categories:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => PosItemsLayout(section: PosItemsSection.categories),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosItemsLayout(
+                section:
+                PosItemsSection.categories,
+              ),
+            );
+          },
         );
+
       case AppRoutes.subCategories:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) =>
-              PosItemsLayout(section: PosItemsSection.subcategories),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosItemsLayout(
+                section:
+                PosItemsSection.subcategories,
+              ),
+            );
+          },
         );
+
+    /**
+     * ============================================================
+     * LOYALTY
+     * ============================================================
+     */
 
       case AppRoutes.loyalty:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) =>
-              PosLoyaltyLayout(section: PosLoyaltySection.dashboard),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosLoyaltyLayout(
+                section:
+                PosLoyaltySection.dashboard,
+              ),
+            );
+          },
+        );
+
+      case AppRoutes.dashboard:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosLoyaltyLayout(
+                section:
+                PosLoyaltySection.dashboard,
+              ),
+            );
+          },
         );
 
       case AppRoutes.cupon:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => PosLoyaltyLayout(section: PosLoyaltySection.cupon),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosLoyaltyLayout(
+                section:
+                PosLoyaltySection.cupon,
+              ),
+            );
+          },
         );
 
       case AppRoutes.gamification:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) =>
-              PosLoyaltyLayout(section: PosLoyaltySection.gamification),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosLoyaltyLayout(
+                section:
+                PosLoyaltySection.gamification,
+              ),
+            );
+          },
         );
-      case AppRoutes.dashboard:
-        return MaterialPageRoute(
-          settings: settings,
-          builder: (_) =>
-              PosLoyaltyLayout(section: PosLoyaltySection.dashboard),
-        );
+
       case AppRoutes.tracking:
         return MaterialPageRoute(
           settings: settings,
-          builder: (_) => PosLoyaltyLayout(section: PosLoyaltySection.tracking),
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosLoyaltyLayout(
+                section:
+                PosLoyaltySection.tracking,
+              ),
+            );
+          },
         );
+
+    /**
+     * ============================================================
+     * SETTINGS
+     * ============================================================
+     */
+
+      case AppRoutes.settings:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosSettingsLayout(
+                section:
+                PosSettingsSection.printers,
+              ),
+            );
+          },
+        );
+
+      case AppRoutes.general:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosSettingsLayout(
+                section:
+                PosSettingsSection.general,
+              ),
+            );
+          },
+        );
+
+      case AppRoutes.taxes:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosSettingsLayout(
+                section:
+                PosSettingsSection.taxes,
+              ),
+            );
+          },
+        );
+
+      case AppRoutes.customerScreen:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosSettingsLayout(
+                section:
+                PosSettingsSection.customerScreen,
+              ),
+            );
+          },
+        );
+
+      case AppRoutes.printers:
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (context) {
+            return _withPosMainController(
+              context: context,
+              child: PosSettingsLayout(
+                section:
+                PosSettingsSection.printers,
+              ),
+            );
+          },
+        );
+
+    /**
+     * ============================================================
+     * DEFAULT
+     * ============================================================
+     */
+
       default:
         return MaterialPageRoute(
           settings: settings,

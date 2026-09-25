@@ -17,7 +17,7 @@ import '../../state/pos_payment_state.dart';
 import '../../state/pos_checkout_state.dart';
 import '../../state/pos_ui_state.dart';
 
-class PosMainController extends ChangeNotifier {
+class PosMainController extends ChangeNotifier {//CONECTION
   final AppController app;
   final PosShiftState shift;
   final PosProductBrowserState browser;
@@ -39,6 +39,7 @@ class PosMainController extends ChangeNotifier {
     PosUiState? ui,
     PosLabelsService? labels,
   }) : app = app,
+
        shift = shift ?? PosShiftState(app: app, storage: PosShiftStorage()),
        browser = browser ?? PosProductBrowserState(),
        ticket = ticket ?? PosTicketState(),
@@ -91,7 +92,21 @@ class PosMainController extends ChangeNotifier {
       initialSelectedMenuCategoryId,
     );
   }
+  /**
+   * ============================================================
+   * SHIFT
+   * ============================================================
+   */
 
+  bool get isShiftOpen => shift.isShiftOpen;
+
+  double? get shiftOpeningAmount => shift.initialCash;
+
+  DateTime? get shiftOpenedAt => shift.openedAt;
+
+  int? get shiftOpenedByUserId => shift.openedByUserId;
+
+  PosShiftSession? get shiftSession => shift.currentSession;
   void onProductTap(PosProductItem product) {
     ticket.addProduct(product);
   }

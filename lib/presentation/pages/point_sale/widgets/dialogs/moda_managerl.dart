@@ -42,8 +42,8 @@ class ModalManagerLayout extends StatelessWidget {
     final c = AppThemeTokens.of(context);
     return Dialog(
       child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.5,
-        height: MediaQuery.of(context).size.height * 0.7,
+        width: MediaQuery.of(context).size.width * 0.95,
+        height: MediaQuery.of(context).size.height * 0.8,
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.m),
           child: Column(
@@ -369,18 +369,25 @@ class CustomerCreateView extends StatelessWidget {
           ),
 
           AppSpacing.spaceBetweenInputs,
-
           PsFieldRow(
             children: [
-              PsInput(
-                label: "Teléfono",
-                value: controller.phone,
-                onChanged: controller.setPhone,
+              Expanded(
+                child: PsInput(
+                  label: "Teléfono",
+                  value: controller.phone,
+                  onChanged: controller.setPhone,
+
+                ),
               ),
-              PsInput(
-                label: "Ciudad",
-                value: controller.city,
-                onChanged: controller.setCity,
+
+              const SizedBox(width: AppSpacing.s),
+
+              Expanded(
+                child: PsInput(
+                  label: "Ciudad",
+                  value: controller.city,
+                  onChanged: controller.setCity,
+                ),
               ),
             ],
           ),
