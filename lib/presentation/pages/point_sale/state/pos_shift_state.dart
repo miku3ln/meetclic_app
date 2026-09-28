@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../app/router/controllers/app_controller.dart';
+import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
 class PosShiftSession {
   final int userId;
@@ -66,42 +67,184 @@ class PosShiftStorage {
   }
 }
 
+
+
 class PosShiftState extends ChangeNotifier {
   final AppController app;
-  final PosShiftStorage storage;
-  VoidCallback? onRequestOpenShift;
-  String typeOpen = "";
 
-  bool isShiftOpen = false;
-  double? initialCash;
-  int? openedByUserId;
-  DateTime? openedAt;
+  VoidCallback? onRequestOpenShift;
+
+  /**
+   * ============================================================
+   * CURRENT SESSION
+   * ============================================================
+   *
+   * ÚNICA FUENTE DE VERDAD DEL ESTADO DE CAJA EN FLUTTER.
+   */
   PosShiftSession? currentSession;
 
-  PosShiftState({required this.app, required this.storage});
+  PosShiftState({
+    required this.app,
+  });
 
-  void onOpenShiftTap() => onRequestOpenShift?.call();
+  /**
+   * ============================================================
+   * GETTERS
+   * ============================================================
+   */
 
-  bool get hasSavedOpenShift => currentSession != null && isShiftOpen;
+  bool get isShiftOpen =>
+      currentSession?.isShiftOpen ?? false;
+
+  double? get initialCash =>
+      currentSession?.openingAmount;
+
+  int? get openedByUserId =>
+      currentSession?.userId;
+
+  DateTime? get openedAt =>
+      currentSession?.openedAt;
+
+  String get typeOpen =>
+      currentSession?.typeOpen ?? '';
+
+  bool get hasSavedOpenShift =>
+      currentSession != null && isShiftOpen;
 
   bool get canSell => isShiftOpen;
 
-  Future<void> initLocalStorage() async {
-    final savedShift = await storage.getShift();
-    if (savedShift != null && savedShift.isShiftOpen) {
-      _applySession(savedShift);
-    } else {
+  /**
+   * ============================================================
+   * READ
+   * ============================================================
+   *
+   * Laravel es la fuente persistente de verdad.
+   *
+   * Al iniciar el POS consultamos el estado actual
+   * de la caja y actualizamos currentSession.
+   */
+  Future<void> loadData() async {
+    final response =
+    await UtilServicesCash.allowManagerCash();
+
+    /**
+     * Si no podemos consultar el servidor,
+     * no asumimos que existe una caja abierta.
+     */
+    if (!response.success) {
       _clearLocalState();
+      return;
     }
 
-    notifyListeners();
+    final data = response.data;
+
+    if (data == null) {
+      _clearLocalState();
+      return;
+    }
+
+    /**
+     * ============================================================
+     * SESSION
+     * ============================================================
+     */
+
+    final sessionData = data['session'];
+
+    if (sessionData is! Map<String, dynamic>) {
+      _clearLocalState();
+      return;
+    }
+
+    final bool isOpen =
+        sessionData['is_open'] == true;
+
+    /**
+     * Laravel confirma que no existe
+     * una sesión abierta.
+     */
+    if (!isOpen) {
+      _clearLocalState();
+      return;
+    }
+
+    /**
+     * ============================================================
+     * ASSIGNMENT
+     * ============================================================
+     */
+
+    final assignmentData = data['assignment'];
+
+    if (assignmentData is! Map<String, dynamic>) {
+      _clearLocalState();
+      return;
+    }
+
+    final int? userId =
+    (assignmentData['user_id'] as num?)
+        ?.toInt();
+
+    final double? openingAmount =
+    (sessionData['opening_amount'] as num?)
+        ?.toDouble();
+
+    final DateTime? openingDate =
+    _parseServerDate(
+      sessionData['opening_date']?.toString(),
+    );
+
+    /**
+     * No creamos una sesión incompleta.
+     */
+    if (userId == null ||
+        openingAmount == null ||
+        openingDate == null) {
+      _clearLocalState();
+      return;
+    }
+
+    /**
+     * ============================================================
+     * APPLY SERVER SESSION
+     * ============================================================
+     */
+
+    final session = PosShiftSession(
+      typeOpen: 'preloadRegister',
+      userId: userId,
+      openingAmount: openingAmount,
+      openedAt: openingDate,
+      isShiftOpen: true,
+    );
+
+    _applySession(session);
   }
 
+  /**
+   * ============================================================
+   * OPEN SHIFT TAP
+   * ============================================================
+   */
+
+  void onOpenShiftTap() {
+    onRequestOpenShift?.call();
+  }
+
+  /**
+   * ============================================================
+   * CREATE / UPDATE
+   * ============================================================
+   *
+   * Se llama después de que Laravel confirme
+   * correctamente la apertura de caja.
+   *
+   * Actualiza la sesión compartida en memoria.
+   */
   Future<Map<String, dynamic>> openShift({
     required double initialCash,
     String messageSave = "",
     String messageNotSave = "",
-
   }) async {
     final currentUser = app.currentUser;
 
@@ -115,27 +258,23 @@ class PosShiftState extends ChangeNotifier {
 
     try {
       final session = PosShiftSession(
-        typeOpen: "saveRegister",
+        typeOpen: 'saveRegister',
         userId: currentUser.userId,
         openingAmount: initialCash,
         openedAt: DateTime.now(),
         isShiftOpen: true,
       );
 
-      await storage.saveShift(session);
+      /**
+       * Actualizamos la única sesión
+       * compartida en memoria.
+       */
       _applySession(session);
-
-      notifyListeners();
 
       return {
         'success': true,
-        'data': {
-          'isShiftOpen': isShiftOpen,
-          'initialCash': this.initialCash,
-          'openedByUserId': openedByUserId,
-          'openedAt': openedAt?.toIso8601String(),
-        },
-        'message': messageSave == ""
+        'data': _currentData(),
+        'message': messageSave.isEmpty
             ? 'Caja abierta correctamente'
             : messageSave,
       };
@@ -143,15 +282,26 @@ class PosShiftState extends ChangeNotifier {
       return {
         'success': false,
         'data': null,
-        'message':messageNotSave==""? 'No se pudo guardar la sesión del turno: $e':messageNotSave,
+        'message': messageNotSave.isEmpty
+            ? 'No se pudo actualizar la sesión del turno: $e'
+            : messageNotSave,
       };
     }
   }
+
+  /**
+   * ============================================================
+   * CREATE / UPDATE PRELOAD
+   * ============================================================
+   *
+   * Permite establecer en memoria una caja
+   * que ya se encontraba abierta.
+   */
   Future<Map<String, dynamic>> openShiftPreload({
     required double initialCash,
+    required DateTime openedAt,
     String messageSave = "",
     String messageNotSave = "",
-    required  DateTime openedAt,
   }) async {
     final currentUser = app.currentUser;
 
@@ -165,44 +315,48 @@ class PosShiftState extends ChangeNotifier {
 
     try {
       final session = PosShiftSession(
-        typeOpen: "preloadRegister",
+        typeOpen: 'preloadRegister',
         userId: currentUser.userId,
         openingAmount: initialCash,
-        openedAt:openedAt ,
+        openedAt: openedAt,
         isShiftOpen: true,
       );
 
-      await storage.saveShift(session);
+      /**
+       * Actualizamos la única sesión
+       * compartida en memoria.
+       */
       _applySession(session);
-
-      notifyListeners();
 
       return {
         'success': true,
-        'data': {
-          'isShiftOpen': true,
-          'initialCash': initialCash,
-          'openedByUserId': openedByUserId,
-          'openedAt': openedAt?.toIso8601String(),
-        },
-        'message': messageSave == ""
-            ? 'Caja abierta correctamente'
+        'data': _currentData(),
+        'message': messageSave.isEmpty
+            ? 'Caja cargada correctamente'
             : messageSave,
       };
     } catch (e) {
       return {
         'success': false,
         'data': null,
-        'message':messageNotSave==""? 'No se pudo guardar la sesión del turno: $e':messageNotSave,
+        'message': messageNotSave.isEmpty
+            ? 'No se pudo actualizar la sesión del turno: $e'
+            : messageNotSave,
       };
     }
   }
+
+  /**
+   * ============================================================
+   * DELETE / CLOSE
+   * ============================================================
+   *
+   * Debe ejecutarse después de que Laravel
+   * confirme correctamente el cierre de caja.
+   */
   Future<Map<String, dynamic>> closeShift() async {
     try {
-      await storage.clearShift();
       _clearLocalState();
-
-      notifyListeners();
 
       return {
         'success': true,
@@ -218,20 +372,75 @@ class PosShiftState extends ChangeNotifier {
     }
   }
 
-  void _applySession(PosShiftSession session) {
-    currentSession = session;
-    isShiftOpen = session.isShiftOpen;
-    initialCash = session.openingAmount;
-    openedByUserId = session.userId;
-    openedAt = session.openedAt;
+  /**
+   * ============================================================
+   * CURRENT DATA
+   * ============================================================
+   *
+   * Retorna los valores actuales de la caja.
+   */
+  Map<String, dynamic> getCurrentData() {
+    return _currentData();
   }
 
+  Map<String, dynamic> _currentData() {
+    return {
+      'isShiftOpen': isShiftOpen,
+      'initialCash': initialCash,
+      'openedByUserId': openedByUserId,
+      'openedAt': openedAt?.toIso8601String(),
+      'typeOpen': typeOpen,
+    };
+  }
+
+  /**
+   * ============================================================
+   * APPLY SESSION
+   * ============================================================
+   *
+   * Punto central para CREATE / UPDATE
+   * del estado en memoria.
+   */
+  void _applySession(
+      PosShiftSession session,
+      ) {
+    currentSession = session;
+
+    notifyListeners();
+  }
+
+  /**
+   * ============================================================
+   * CLEAR SESSION
+   * ============================================================
+   *
+   * Punto central para DELETE
+   * del estado en memoria.
+   */
   void _clearLocalState() {
     currentSession = null;
-    isShiftOpen = false;
-    initialCash = null;
-    openedByUserId = null;
-    openedAt = null;
-    typeOpen="";
+
+    notifyListeners();
+  }
+
+  /**
+   * ============================================================
+   * PARSE SERVER DATE
+   * ============================================================
+   */
+
+  DateTime? _parseServerDate(
+      String? value,
+      ) {
+    if (value == null ||
+        value.trim().isEmpty) {
+      return null;
+    }
+
+    return DateTime.tryParse(
+      value
+          .trim()
+          .replaceFirst(' ', 'T'),
+    );
   }
 }

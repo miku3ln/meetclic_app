@@ -1,323 +1,336 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-
+import '../../../../shared/theme/configuration/app_theme_tokens.dart';
+import '../../../../shared/widgets/modals/manager-process-micro/ManagerProcessMicroConfig.dart';
+import '../../../../shared/widgets/modals/manager-process-micro/ManagerProcessMicroResult.dart';
+import '../../../../shared/widgets/modals/manager-process-micro/show_manager_process_micro.dart';
 import '../widgets/layouts/pos_main_controller.dart';
-
-
-
+import '../widgets/layouts/shift/manager/admin/shift-summary-content.dart';
+import '../widgets/layouts/shift/manager/admin/shift_close_modal.dart';
+import '../widgets/layouts/shift/manager/cash-movement/cash-movement-micro-controller.dart';
+import '../widgets/layouts/shift/manager/cash-movement/cash-movement-micro-form.dart';
+import '../widgets/layouts/shift/manager/util.dart';
+import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
 class PosShiftManagementController extends ChangeNotifier {
+  Map<String, dynamic>? _dataManagerCash;
+
+  bool _allowManager = false;
+
+  String _messageManager = '';
+
+  Map<String, dynamic>? get dataManagerCash => _dataManagerCash;
+
+  bool get allowManager => _allowManager;
+
+  String get messageManager => _messageManager;
+
+  /**
+   * Actualiza la información general de administración
+   * de la caja.
+   */
+  void setCashManagerData({
+    required bool allowManager,
+    required String messageManager,
+    Map<String, dynamic>? data,
+  }) {
+    _allowManager = allowManager;
+    _messageManager = messageManager;
+    _dataManagerCash = data;
+
+    notifyListeners();
+  }
+
+  /*
+ * ============================================================
+ * RELOAD CASH SUMMARY
+ * ============================================================
+ */
+
+  bool _reloadCashSummary = false;
+
+  bool get reloadCashSummary => _reloadCashSummary;
+
+  void requestCashSummaryReload() {
+    _reloadCashSummary = true;
+    notifyListeners();
+  }
+
+  void clearCashSummaryReload() {
+    _reloadCashSummary = false;
+  }
+
   final PosMainController main;
-  PosShiftManagementController({
-    required this.main,
-  });
+
+  PosShiftManagementController({required this.main});
 
   bool _isClosingShift = false;
 
   bool get isClosingShift => _isClosingShift;
+
   bool get isShiftOpen => main.shift.isShiftOpen;
+
   double? get initialCash => main.shift.initialCash;
-  Future<bool>  onTreasuryTap() async{
+
+  Future<bool> onTreasuryTap(BuildContext context) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
     return true;
   }
 
-  Future<bool> onCloseShiftTap(BuildContext context) async {
-    /**
-     * Validar turno abierto.
-     */
-    if (!isShiftOpen) {
-      debugPrint('No existe un turno abierto');
+  Future<bool> onManagementMovement(BuildContext context) async {
+    /*
+   * ============================================================
+   * CONTROLLER
+   * ============================================================
+   */
+    final controller = CashMovementMicroController();
 
+    /*
+   * ============================================================
+   * MODAL
+   * ============================================================
+   */
+
+    final result = await showManagerProcessMicro<Map<String, dynamic>>(
+      context: context,
+
+      config: ManagerProcessMicroConfig(
+        title: 'Gestión de movimiento',
+        description: 'Registra un ingreso o egreso.',
+        icon: Icons.account_balance_wallet_outlined,
+        submitText: 'Guardar',
+        cancelText: 'Cancelar',
+      ),
+
+      /*
+     * ==========================================================
+     * FORMULARIO
+     * ==========================================================
+     */
+      form: CashMovementMicroForm(controller: controller),
+
+      /*
+     * ==========================================================
+     * LISTENABLE
+     * ==========================================================
+     */
+      listenable: controller,
+
+      /*
+     * ==========================================================
+     * CAN SUBMIT
+     * ==========================================================
+     */
+      canSubmit: () => controller.canSubmit,
+
+      /*
+     * ==========================================================
+     * GUARDAR
+     * ==========================================================
+     */
+      onSubmit: () async {
+        /*
+       * ========================================================
+       * 1. VALIDACIÓN
+       * ========================================================
+       */
+
+        final validation = controller.validateFields();
+
+        if (!validation.success) {
+          return ManagerProcessMicroResult<Map<String, dynamic>>(
+            success: false,
+            data: validation.errors,
+            message: validation.message,
+            type: 'validation',
+          );
+        }
+
+        /*
+       * ========================================================
+       * 2. DATOS DEL FORMULARIO
+       * ========================================================
+       */
+        /*
+       * ========================================================
+       * 3. GENERAR MOVIMIENTO DE CAJA
+       * ========================================================
+       */
+
+        final responseSave = await UtilServicesCash.generateMovementCash(
+          rode: controller.amount!,
+          movementType: controller.movementTypeValue,
+          cashReasonId: controller.cashReasonId!,
+          details: controller.detailsValue,
+          typesPaymentsId: controller.paymentTypeId!,
+        );
+
+        /*
+       * ========================================================
+       * 4. ERROR DEL SERVIDOR
+       * ========================================================
+       */
+
+        if (!responseSave.success) {
+          return ManagerProcessMicroResult<Map<String, dynamic>>(
+            success: false,
+            data: responseSave.data,
+            message: responseSave.message.isNotEmpty
+                ? responseSave.message
+                : 'No se pudo registrar el movimiento.',
+            type: 'save',
+          );
+        }
+
+        /*
+       * ========================================================
+       * 5. MOVIMIENTO REGISTRADO
+       * ========================================================
+       */
+
+        return ManagerProcessMicroResult<Map<String, dynamic>>(
+          success: true,
+          data: responseSave.data,
+          message: responseSave.message.isNotEmpty
+              ? responseSave.message
+              : 'Movimiento registrado correctamente.',
+          type: 'save',
+        );
+      },
+    );
+
+    /*
+   * ============================================================
+   * DISPOSE
+   * ============================================================
+   */
+
+    controller.dispose();
+
+    /*
+   * ============================================================
+   * CONTEXT
+   * ============================================================
+   */
+
+    if (!context.mounted) {
+      return false;
+    }
+
+    /*
+   * ============================================================
+   * ERROR
+   * ============================================================
+   */
+
+    if (!result.success) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('No existe un turno abierto'),
+        SnackBar(
+          content: Text(
+            result.message.isNotEmpty
+                ? result.message
+                : 'No se pudo realizar el movimiento.',
+          ),
         ),
       );
 
       return false;
     }
 
-    /**
-     * Evitar doble ejecución.
-     */
-    if (_isClosingShift) {
-      return false;
-    }
+    /*
+   * ============================================================
+   * RESULTADO
+   * ============================================================
+   */
 
-    /**
-     * Mostrar ventana desde abajo hacia arriba.
-     */
-    final bool? confirm = await showModalBottomSheet<bool>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black54,
-      builder: (modalContext) {
-        return SafeArea(
-          top: false,
-          child: Container(
-            width: double.infinity,
-            padding: const EdgeInsets.fromLTRB(
-              20,
-              12,
-              20,
-              24,
-            ),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                /**
-                 * Barra superior.
-                 */
-                Container(
-                  width: 42,
-                  height: 4,
-                  decoration: BoxDecoration(
-                    color: Colors.black26,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
+    switch (result.type) {
+      case 'save':
+        /*
+       * Aquí puedes refrescar la información de caja.
+       *
+       * await _refreshAll();
+       */
 
-                const SizedBox(height: 20),
+        if (!context.mounted) {
+          return false;
+        }
 
-                /**
-                 * Título.
-                 */
-                const Row(
-                  children: [
-                    Icon(
-                      Icons.lock_clock_rounded,
-                      size: 28,
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        'Cerrar turno',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 8),
-
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'Revise la información antes de cerrar el turno.',
-                    style: TextStyle(
-                      color: Colors.black54,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 24),
-
-                /**
-                 * Estado.
-                 */
-                _buildShiftInfoRow(
-                  label: 'Estado',
-                  value: isShiftOpen
-                      ? 'Turno abierto'
-                      : 'Turno cerrado',
-                ),
-
-                /**
-                 * Efectivo inicial.
-                 */
-                _buildShiftInfoRow(
-                  label: 'Efectivo inicial',
-                  value:
-                  '\$ ${(initialCash ?? 0).toStringAsFixed(2)}',
-                ),
-
-                /**
-                 * Usuario.
-                 */
-                _buildShiftInfoRow(
-                  label: 'Usuario',
-                  value:
-                  '${main.shift.openedByUserId ?? '-'}',
-                ),
-
-                /**
-                 * Fecha apertura.
-                 */
-                _buildShiftInfoRow(
-                  label: 'Fecha de apertura',
-                  value: main.shift.openedAt != null
-                      ? _formatDateTime(
-                    main.shift.openedAt!,
-                  )
-                      : '-',
-                ),
-
-                /**
-                 * Tipo apertura.
-                 */
-                _buildShiftInfoRow(
-                  label: 'Tipo de apertura',
-                  value: main.shift.typeOpen.isNotEmpty
-                      ? main.shift.typeOpen
-                      : '-',
-                ),
-
-                const SizedBox(height: 24),
-
-                const Divider(),
-
-                const SizedBox(height: 16),
-
-                /**
-                 * Acciones.
-                 */
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          Navigator.of(modalContext).pop(false);
-                        },
-                        child: const Text('CANCELAR'),
-                      ),
-                    ),
-
-                    const SizedBox(width: 12),
-
-                    Expanded(
-                      child: FilledButton(
-                        onPressed: () {
-                          Navigator.of(modalContext).pop(true);
-                        },
-                        child: const Text(
-                          'CERRAR TURNO',
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              result.message.isNotEmpty
+                  ? result.message
+                  : 'Movimiento realizado correctamente.',
             ),
           ),
         );
-      },
-    );
 
-    /**
-     * Cerró el modal o presionó cancelar.
-     */
-    if (confirm != true) {
-      return false;
-    }
+        requestCashSummaryReload();
 
-    /**
-     * Desde aquí realmente comienza
-     * el proceso de cierre.
-     */
-    _isClosingShift = true;
-    notifyListeners();
+        return true;
 
-    try {
-      debugPrint('Click: Cerrar el turno');
-
-      /**
-       * TODO:
-       * Aquí irá primero el cierre en Laravel.
-       */
-      await Future.delayed(
-        const Duration(milliseconds: 500),
-      );
-
-      /**
-       * Cerrar estado local.
-       */
-      final result =
-      await main.shift.closeShift();
-
-      final bool success =
-          result['success'] == true;
-
-      if (!success) {
-        debugPrint(
-          result['message']?.toString() ??
-              'No se pudo cerrar el turno',
-        );
-
+      case 'close':
+        debugPrint('Cerrar SIN reload');
         return false;
-      }
 
-      debugPrint(
-        'Turno cerrado correctamente',
-      );
+      case 'cancel':
+        debugPrint('Cancelar SIN reload');
+        return false;
 
-      return true;
-    } catch (e) {
-      debugPrint(
-        'Error al cerrar el turno: $e',
-      );
-
-      return false;
-    } finally {
-      _isClosingShift = false;
-      notifyListeners();
+      default:
+        return false;
     }
   }
-  Widget _buildShiftInfoRow({
-    required String label,
-    required String value,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        vertical: 8,
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(
-                color: Colors.black54,
-              ),
-            ),
-          ),
 
-          const SizedBox(width: 16),
+  Future<bool> onCloseShiftTap(BuildContext context) async {
+    final ShiftCloseModalResult result = await ShiftCloseModal.show(
+      context: context,
+      dataManagerCash: dataManagerCash!,
+      onCashDrawerTap: onCashDrawerTap,
+      onTheoreticalCashTap: onTheoreticalCashTap,
+      onSubmit:
+          ({
+            required double closingAmount,
+            required String closingDetails,
+          }) async {
+            final response = await UtilServicesCash.closeCash(
+              amount: closingAmount,
+              details: closingDetails,
+            );
 
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ],
-      ),
+            final bool success = response.success == true;
+
+            if (!success) {
+              return ShiftCloseModalResult(
+                success: false,
+                message: response.message ?? 'No se pudo cerrar el turno.',
+                type: ShiftCloseModal.error,
+                data: response.data is Map<String, dynamic>
+                    ? response.data as Map<String, dynamic>
+                    : null,
+              );
+            }
+            return ShiftCloseModalResult(
+              success: true,
+              message:
+                  response.message.toString() ,
+              type: ShiftCloseModal.confirmed,
+              data: response.data,
+            );
+          },
     );
-  }
-
-  String _formatDateTime(DateTime date) {
-    String two(int value) {
-      return value.toString().padLeft(2, '0');
+    if (!result.success) {
+      debugPrint(result.message);
+      return false;
     }
-
-    return '${two(date.day)}/'
-        '${two(date.month)}/'
-        '${date.year} '
-        '${two(date.hour)}:'
-        '${two(date.minute)}';
+    if (result.type != ShiftCloseModal.confirmed) {
+      return false;
+    }
+    return result.success;
   }
+
   void onCashDrawerTap() {
     debugPrint('Click: Cajón de efectivo');
   }

@@ -40,7 +40,7 @@ class PosMainController extends ChangeNotifier {//CONECTION
     PosLabelsService? labels,
   }) : app = app,
 
-       shift = shift ?? PosShiftState(app: app, storage: PosShiftStorage()),
+       shift = shift ?? PosShiftState(app: app),
        browser = browser ?? PosProductBrowserState(),
        ticket = ticket ?? PosTicketState(),
        payment = payment ?? PosPaymentState(),
@@ -78,7 +78,7 @@ class PosMainController extends ChangeNotifier {//CONECTION
     String? initialSelectedProductCategoryId,
     String? initialSelectedMenuCategoryId,
   }) async {
-    await shift.initLocalStorage();//INIT DATA CASH
+    //await shift.initLocalStorage();//INIT DATA CASH
 
     if (_isDisposed) return;
 
@@ -172,6 +172,25 @@ class PosMainController extends ChangeNotifier {//CONECTION
     browser.setLoadingData(true);
 
     try {
+
+      /**
+       * ============================================================
+       * INIT CASH / SHIFT
+       * ============================================================
+       *
+       * Inicializar estado de caja una sola vez al ingresar al POS.
+       *
+       * Aquí PosShiftState se encargará de:
+       * - consultar cache
+       * - consultar servicio
+       * - determinar si existe caja
+       * - determinar si existe sesión abierta
+       * - asignar sus valores internos
+       */
+      await shift.loadData();
+
+      if (_isDisposed) return;
+
       final products =
       await PosTabletLandscapeFixtures.getProductsData();
 

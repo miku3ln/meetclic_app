@@ -132,8 +132,7 @@ class PaginatedApiService {
   }
 }
 
-class PsApiTypeAhead<T> extends StatelessWidget {
-
+class PsApiTypeAhead<T> extends StatefulWidget {
   final String label;
 
   final T? value;
@@ -158,7 +157,6 @@ class PsApiTypeAhead<T> extends StatelessWidget {
     required this.searchApi,
     required this.getLabel,
     required this.onSelected,
-
     this.value,
     this.error,
     this.requiredField = false,
@@ -167,56 +165,249 @@ class PsApiTypeAhead<T> extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  State<PsApiTypeAhead<T>> createState() =>
+      _PsApiTypeAheadState<T>();
+}
 
+class _PsApiTypeAheadState<T>
+    extends State<PsApiTypeAhead<T>> {
+
+  /**
+   * Evita que seleccionar un elemento
+   * vuelva a disparar una búsqueda.
+   */
+  bool _isSelecting = false;
+
+  /**
+   * Texto correspondiente al elemento seleccionado.
+   */
+  String? _selectedLabel;
+
+  /**
+   * Indica que realmente se ejecutó una consulta.
+   */
+  bool _hasSearch = false;
+
+  @override
+  Widget build(BuildContext context) {
     return TypeAheadField<T>(
+      /**
+       * ============================================================
+       * CONFIGURACIÓN
+       * ============================================================
+       */
 
       debounceDuration: const Duration(
         milliseconds: 500,
       ),
 
-      suggestionsCallback: (search) async {
+      /**
+       * IMPORTANTE:
+       *
+       * Al recibir focus abre las sugerencias.
+       *
+       * Esto hace que suggestionsCallback sea ejecutado
+       * incluso cuando el texto está vacío.
+       */
+      showOnFocus: true,
 
-        return await searchApi(
-          search,
+      /**
+       * ============================================================
+       * BÚSQUEDA
+       * ============================================================
+       */
+      suggestionsCallback: (search) async {
+        final currentSearch = search.trim();
+
+        /**
+         * Si estamos seleccionando un elemento,
+         * NO ejecutar otra consulta.
+         */
+        if (_isSelecting) {
+          return <T>[];
+        }
+
+        /**
+         * Si el texto corresponde exactamente
+         * al elemento seleccionado,
+         * NO volver a consultar.
+         */
+        if (_selectedLabel != null &&
+            currentSearch == _selectedLabel) {
+          return <T>[];
+        }
+
+        /**
+         * IMPORTANTE:
+         *
+         * Aquí NO bloqueamos:
+         *
+         * currentSearch.isEmpty
+         *
+         * porque queremos:
+         *
+         * focus
+         *   ↓
+         * searchApi('')
+         *
+         * para traer los primeros elementos.
+         */
+        _hasSearch = true;
+
+        final results = await widget.searchApi(
+          currentSearch,
         );
 
+        return results;
       },
 
-      itemBuilder: (context, item) {
+      /**
+       * ============================================================
+       * SIN RESULTADOS
+       * ============================================================
+       */
+      emptyBuilder: (context) {
+        /**
+         * No mostrar mensaje si no hubo
+         * una búsqueda real.
+         */
+        if (!_hasSearch) {
+          return const SizedBox.shrink();
+        }
 
-        return ListTile(
-          title: Text(
-            getLabel(item),
+        return const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            'No se encontraron resultados.',
           ),
         );
-
       },
 
+      /**
+       * ============================================================
+       * ITEM
+       * ============================================================
+       */
+      itemBuilder: (context, item) {
+        return ListTile(
+          title: Text(
+            widget.getLabel(item),
+          ),
+        );
+      },
+
+      /**
+       * ============================================================
+       * SELECCIÓN
+       * ============================================================
+       */
       onSelected: (item) {
+        /**
+         * Bloqueamos cualquier búsqueda provocada
+         * por el cambio automático del texto.
+         */
+        _isSelecting = true;
 
-        onSelected(item);
+        /**
+         * Guardamos el label seleccionado.
+         */
+        _selectedLabel =
+            widget.getLabel(item).trim();
 
+        /**
+         * Ya no queremos mostrar
+         * "No se encontraron resultados".
+         */
+        _hasSearch = false;
+
+        /**
+         * Notificamos al formulario.
+         */
+        widget.onSelected(item);
+
+        /**
+         * Liberamos el bloqueo después
+         * de terminar este frame.
+         */
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) {
+            return;
+          }
+
+          _isSelecting = false;
+        });
       },
 
+      /**
+       * ============================================================
+       * CAMPO
+       * ============================================================
+       */
       builder: (
           context,
           textController,
           focusNode,
           ) {
-
-        if (value != null &&
+        /**
+         * Cargar valor inicial.
+         */
+        if (widget.value != null &&
             textController.text.isEmpty) {
 
-          textController.text =
-              getLabel(value as T);
+          final initialLabel = widget
+              .getLabel(
+            widget.value as T,
+          )
+              .trim();
+
+          _selectedLabel = initialLabel;
+
+          textController.value = TextEditingValue(
+            text: initialLabel,
+            selection: TextSelection.collapsed(
+              offset: initialLabel.length,
+            ),
+          );
         }
 
         return TextField(
           controller: textController,
           focusNode: focusNode,
+
+          /**
+           * ========================================================
+           * CAMBIO DE TEXTO
+           * ========================================================
+           */
+          onChanged: (text) {
+            final currentText = text.trim();
+
+            /**
+             * Si el usuario modifica el texto seleccionado,
+             * significa que quiere hacer una nueva búsqueda.
+             */
+            if (_selectedLabel != null &&
+                currentText != _selectedLabel) {
+              _selectedLabel = null;
+            }
+
+            /**
+             * TypeAheadField detectará el cambio
+             * y ejecutará suggestionsCallback.
+             *
+             * NO llamamos searchApi aquí porque
+             * duplicaríamos la consulta.
+             */
+          },
+
           decoration: InputDecoration(
-            labelText: label,
+            labelText: widget.label,
+
+            errorText:
+            widget.isTouched &&
+                widget.error != null
+                ? widget.error
+                : null,
           ),
         );
       },

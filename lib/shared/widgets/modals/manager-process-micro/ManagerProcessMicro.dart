@@ -31,7 +31,6 @@ class ManagerProcessMicro<T> extends StatefulWidget {
 
 class _ManagerProcessMicroState<T>
     extends State<ManagerProcessMicro<T>> {
-
   bool _isLoading = false;
 
   // ================================================================
@@ -45,6 +44,11 @@ class _ManagerProcessMicroState<T>
         widget.canSubmit?.call() ?? true;
 
     if (!submitEnabled) return;
+
+    /*
+     * Cerrar teclado antes de procesar.
+     */
+    FocusScope.of(context).unfocus();
 
     setState(() {
       _isLoading = true;
@@ -73,9 +77,7 @@ class _ManagerProcessMicroState<T>
       setState(() {
         _isLoading = false;
       });
-
     } catch (e) {
-
       if (!mounted) return;
 
       setState(() {
@@ -102,19 +104,27 @@ class _ManagerProcessMicroState<T>
     final keyboardHeight =
         mediaQuery.viewInsets.bottom;
 
+    /*
+     * Saber si el teclado está visible.
+     */
+    final bool keyboardVisible =
+        keyboardHeight > 0;
+
     final drawerWidth =
     size.width > 500
         ? widget.config.maxWidth
         : size.width * .92;
 
     return PopScope(
-
-      // No permite regresar mientras está guardando.
+      /*
+       * No permite regresar mientras está guardando.
+       */
       canPop: !_isLoading,
 
       child: SafeArea(
         child: Align(
           alignment: Alignment.centerRight,
+
           child: Material(
             color: Colors.transparent,
 
@@ -124,7 +134,6 @@ class _ManagerProcessMicroState<T>
 
             child: Stack(
               children: [
-
                 // ==================================================
                 // CONTENIDO NORMAL
                 // ==================================================
@@ -134,9 +143,19 @@ class _ManagerProcessMicroState<T>
 
                   child: Container(
                     width: drawerWidth,
+
+                    /*
+                     * El modal ocupa la altura disponible.
+                     *
+                     * NO restamos manualmente keyboardHeight.
+                     * El contenido interno manejará el teclado
+                     * mediante scroll.
+                     */
                     height: size.height,
+
                     decoration: BoxDecoration(
                       color: tokens.surface,
+
                       borderRadius:
                       const BorderRadius.only(
                         topLeft:
@@ -144,6 +163,7 @@ class _ManagerProcessMicroState<T>
                         bottomLeft:
                         Radius.circular(28),
                       ),
+
                       boxShadow: [
                         BoxShadow(
                           color: tokens.shadow,
@@ -165,6 +185,9 @@ class _ManagerProcessMicroState<T>
 
                       child: Column(
                         children: [
+                          // =========================================
+                          // HEADER
+                          // =========================================
 
                           _buildHeader(context),
 
@@ -172,6 +195,10 @@ class _ManagerProcessMicroState<T>
                             height: 1,
                             color: tokens.border,
                           ),
+
+                          // =========================================
+                          // FORMULARIO
+                          // =========================================
 
                           Expanded(
                             child: Container(
@@ -184,13 +211,18 @@ class _ManagerProcessMicroState<T>
                                 ScrollViewKeyboardDismissBehavior
                                     .onDrag,
 
+                                /*
+                                 * Ya NO sumamos keyboardHeight.
+                                 *
+                                 * El teclado no debe convertirse
+                                 * en padding interno del formulario.
+                                 */
                                 padding:
-                                EdgeInsets.fromLTRB(
+                                const EdgeInsets.fromLTRB(
                                   20,
                                   20,
                                   20,
-                                  20 +
-                                      keyboardHeight,
+                                  30,
                                 ),
 
                                 child:
@@ -199,12 +231,21 @@ class _ManagerProcessMicroState<T>
                             ),
                           ),
 
-                          Divider(
-                            height: 1,
-                            color: tokens.border,
-                          ),
+                          // =========================================
+                          // FOOTER
+                          //
+                          // Mientras está abierto el teclado
+                          // lo ocultamos para dar espacio al form.
+                          // =========================================
 
-                          _buildFooter(context),
+                          if (!keyboardVisible) ...[
+                            Divider(
+                              height: 1,
+                              color: tokens.border,
+                            ),
+
+                            _buildFooter(context),
+                          ],
                         ],
                       ),
                     ),
@@ -219,8 +260,8 @@ class _ManagerProcessMicroState<T>
                   Positioned.fill(
                     child: Container(
                       width: drawerWidth,
-                      color: Colors.black
-                          .withValues(
+
+                      color: Colors.black.withValues(
                         alpha: 0.30,
                       ),
 
@@ -228,8 +269,8 @@ class _ManagerProcessMicroState<T>
                         child: Column(
                           mainAxisSize:
                           MainAxisSize.min,
-                          children: [
 
+                          children: [
                             CircularProgressIndicator(),
 
                             SizedBox(
@@ -280,7 +321,6 @@ class _ManagerProcessMicroState<T>
 
       child: Row(
         children: [
-
           Icon(
             widget.config.icon,
             color: tokens.primary,
@@ -296,7 +336,6 @@ class _ManagerProcessMicroState<T>
               CrossAxisAlignment.start,
 
               children: [
-
                 Text(
                   widget.config.title,
                   style: TextStyle(
@@ -310,7 +349,6 @@ class _ManagerProcessMicroState<T>
 
                 if (widget.config.description !=
                     null) ...[
-
                   const SizedBox(
                     height: 4,
                   ),
@@ -330,9 +368,12 @@ class _ManagerProcessMicroState<T>
           ),
 
           IconButton(
-            onPressed: _isLoading
+            onPressed:
+            _isLoading
                 ? null
                 : () {
+              FocusScope.of(context)
+                  .unfocus();
 
               Navigator.of(context).pop(
                 ManagerProcessMicroResult<T>(
@@ -361,7 +402,6 @@ class _ManagerProcessMicroState<T>
   Widget _buildFooter(
       BuildContext context,
       ) {
-
     if (widget.listenable == null) {
       return _buildFooterContent(
         context,
@@ -390,7 +430,6 @@ class _ManagerProcessMicroState<T>
   Widget _buildFooterContent(
       BuildContext context,
       ) {
-
     final tokens =
     AppThemeTokens.of(context);
 
@@ -412,16 +451,18 @@ class _ManagerProcessMicroState<T>
 
         child: Row(
           children: [
-
             // ======================================================
             // CANCELAR
             // ======================================================
 
             Expanded(
               child: TextButton(
-                onPressed: _isLoading
+                onPressed:
+                _isLoading
                     ? null
                     : () {
+                  FocusScope.of(context)
+                      .unfocus();
 
                   widget.onCancel
                       ?.call();

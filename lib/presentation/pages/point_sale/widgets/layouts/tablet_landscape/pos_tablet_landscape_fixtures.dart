@@ -502,6 +502,56 @@ class ProductController extends ChangeNotifier {
 }
 
 class UtilServicesCash {
+  static Future<List<GenericListItem<Map<String, dynamic>>>>
+  getCashReasonsSearch({required String searchPhrase}) async {
+    final token = SessionService().apiToken;
+
+    return SafeExecutor.run(() async {
+      final uri =
+          Uri.parse(
+            '${ServerConfig.baseUrl}/pointsales/cash-reasons-search',
+          ).replace(
+            queryParameters: {
+              'filters[search_value][term]': searchPhrase,
+            },
+          );
+
+      final response = await http.get(
+        uri,
+        headers: {
+          'Authorization': 'Bearer ${token!}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        return <GenericListItem<Map<String, dynamic>>>[];
+      }
+
+      final data = jsonDecode(response.body);
+
+      if (data is! List) {
+        return <GenericListItem<Map<String, dynamic>>>[];
+      }
+
+      return data.map<GenericListItem<Map<String, dynamic>>>((item) {
+        final json = Map<String, dynamic>.from(item);
+
+        return GenericListItem<Map<String, dynamic>>(
+          id: json['id'],
+          title: json['text']?.toString() ?? '',
+
+          // El endpoint no devuelve estos datos.
+          subtitle: '',
+          description: '',
+
+          data: json,
+        );
+      }).toList();
+    }, <GenericListItem<Map<String, dynamic>>>[]);
+  }
+
   static Future<ApiResponse<Map<String, dynamic>>> allowManagerCash() async {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
@@ -551,59 +601,53 @@ class UtilServicesCash {
       ),
     );
   }
-  static Future<ApiResponse<Map<String, dynamic>>> getPointOfSaleCashCloseSummary(
-  ) async {
+
+  static Future<ApiResponse<Map<String, dynamic>>>
+  getPointOfSaleCashCloseSummary() async {
     final token = SessionService().apiToken;
     final businessId = SessionService().businessId;
     final userId = SessionService().currentSession?.userId;
 
-    return SafeExecutor.run(
-          () async {
-        final uri = Uri.parse(
-          '${ServerConfig.baseUrl}/pointsales/get-point-of-sale-cash-close-summary',
+    return SafeExecutor.run(() async {
+      final uri = Uri.parse(
+        '${ServerConfig.baseUrl}/pointsales/get-point-of-sale-cash-close-summary',
+      );
+
+      final response = await http.post(
+        uri,
+        headers: {
+          'Authorization': 'Bearer ${token!}',
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: jsonEncode({'user_id': userId, 'business_id': businessId}),
+      );
+
+      if (response.statusCode != 200) {
+        return ApiResponse<Map<String, dynamic>>.error(
+          'Error HTTP ${response.statusCode}',
         );
+      }
 
-        final response = await http.post(
-          uri,
-          headers: {
-            'Authorization': 'Bearer ${token!}',
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-          },
-          body: jsonEncode({
-            'user_id': userId,
-            'business_id': businessId
-          }),
-        );
+      final json = jsonDecode(response.body);
+      final bool success = json['success'] ?? false;
+      // Tu backend utiliza "msj", no "message"
+      final String message = json['msj']?.toString() ?? '';
+      if (!success) {
+        return ApiResponse<Map<String, dynamic>>.error(message);
+      }
 
-        if (response.statusCode != 200) {
-          return ApiResponse<Map<String, dynamic>>.error(
-            'Error HTTP ${response.statusCode}',
-          );
-        }
+      final Map<String, dynamic> data = json['data'] is Map<String, dynamic>
+          ? json['data'] as Map<String, dynamic>
+          : <String, dynamic>{};
 
-        final json = jsonDecode(response.body);
-        final bool success = json['success'] ?? false;
-        // Tu backend utiliza "msj", no "message"
-        final String message = json['msj']?.toString() ?? '';
-        if (!success) {
-          return ApiResponse<Map<String, dynamic>>.error(message);
-        }
-
-        final Map<String, dynamic> data = json['data'] is Map<String, dynamic>
-            ? json['data'] as Map<String, dynamic>
-            : <String, dynamic>{};
-
-        return ApiResponse<Map<String, dynamic>>.success(
-          message: message,
-          data: data,
-        );
-      },
-      ApiResponse<Map<String, dynamic>>.error(
-        'No fue posible cargar la caja.',
-      ),
-    );
+      return ApiResponse<Map<String, dynamic>>.success(
+        message: message,
+        data: data,
+      );
+    }, ApiResponse<Map<String, dynamic>>.error('No fue posible cargar la caja.'));
   }
+
   static Future<ApiResponse<Map<String, dynamic>>> openCash({
     required double openingAmount,
     String openingDetails = "Apertura de Caja",
@@ -658,6 +702,128 @@ class UtilServicesCash {
       },
       ApiResponse<Map<String, dynamic>>.error(
         'No fue posible guardar la caja.',
+      ),
+    );
+  }
+
+  static Future<ApiResponse<Map<String, dynamic>>> closeCash({
+    required double amount,
+    String details = "Cierre de Caja",
+  }) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+    final userId = SessionService().currentSession?.userId;
+
+    return SafeExecutor.run(
+      () async {
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/close-point-of-sale-cash',
+        );
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token!}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({
+            'user_id': userId,
+            'business_id': businessId,
+            'closing_amount': amount,
+            'closing_details': details,
+          }),
+        );
+
+        if (response.statusCode != 200) {
+          return ApiResponse<Map<String, dynamic>>.error(
+            'Error HTTP ${response.statusCode}',
+          );
+        }
+
+        final json = jsonDecode(response.body);
+        final bool success = json['success'] ?? false;
+        final String message = json['msj']?.toString() ?? '';
+        if (!success) {
+          return ApiResponse<Map<String, dynamic>>.error(message);
+        }
+
+        final Map<String, dynamic> data = json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : <String, dynamic>{};
+
+        return ApiResponse<Map<String, dynamic>>.success(
+          message: message,
+          data: data,
+        );
+      },
+      ApiResponse<Map<String, dynamic>>.error(
+        'No fue posible guardar el cierre de caja.',
+      ),
+    );
+  }
+
+  static Future<ApiResponse<Map<String, dynamic>>> generateMovementCash({
+    required double rode,
+    String details = "Movimiento registrado",
+    required int movementType,
+    required int cashReasonId,
+    required int typesPaymentsId,
+  }) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+    final userId = SessionService().currentSession?.userId;
+
+    return SafeExecutor.run(
+      () async {
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/generate-movement-cash',
+        );
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token!}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode({
+            'user_id': userId,
+            'business_id': businessId,
+            "movement_type": movementType,
+            "cash_reason_id": cashReasonId,
+            "accounting_account_id": 1,
+            "details": details,
+            "rode": rode,
+            "transaction_type": 1,
+            "types_payments_id": typesPaymentsId,
+          }),
+        );
+
+        if (response.statusCode != 200) {
+          return ApiResponse<Map<String, dynamic>>.error(
+            'Error HTTP ${response.statusCode}',
+          );
+        }
+
+        final json = jsonDecode(response.body);
+        final bool success = json['success'] ?? false;
+        final String message = json['msj']?.toString() ?? '';
+        if (!success) {
+          return ApiResponse<Map<String, dynamic>>.error(message);
+        }
+
+        final Map<String, dynamic> data = json['data'] is Map<String, dynamic>
+            ? json['data'] as Map<String, dynamic>
+            : <String, dynamic>{};
+
+        return ApiResponse<Map<String, dynamic>>.success(
+          message: message,
+          data: data,
+        );
+      },
+      ApiResponse<Map<String, dynamic>>.error(
+        'No fue posible guardar el cierre de caja.',
       ),
     );
   }

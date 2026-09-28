@@ -17,7 +17,19 @@ class ValidationResult {
 }
 class ValidatorsUtil {
   ValidatorsUtil._();
+  static Validator<int?> requiredInt([String field = "Campo"]) {
+    return (value) {
+      if (value == null) {
+        return "$field requerido";
+      }
 
+      if (value <= 0) {
+        return "$field requerido";
+      }
+
+      return null;
+    };
+  }
   /// =========================
   /// 🔴 REQUIRED (STRING)
   /// =========================
