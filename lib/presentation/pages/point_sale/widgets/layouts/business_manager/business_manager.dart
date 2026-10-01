@@ -173,6 +173,7 @@ class _BusinessManagerViewState extends State<_BusinessManagerView> {
       appBar: PosSettingsAppBar(
         titlePrimary: titlePrimary,
         titleSecondary: '',
+        showDivider: false,
         onMenuTap: () {
           scaffoldKey.currentState?.openDrawer();
         },

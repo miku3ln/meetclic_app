@@ -54,6 +54,8 @@ class _PosItemsViewState extends State<_PosItemsView> {
           PosItemsSection.items,
         ),
         titleSecondary: sectionTitle,
+        showDivider: false,
+
         onMenuTap: () {
           _scaffoldKey.currentState?.openDrawer();
         },

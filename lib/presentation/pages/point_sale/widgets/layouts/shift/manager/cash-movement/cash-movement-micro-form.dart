@@ -81,6 +81,70 @@ class CashMovementMicroForm extends StatelessWidget {
           AppSpacing.spaceBetweenInputs,
 
           /*
+           * ============================================================
+           * MOTIVO DEL MOVIMIENTO
+           *
+           * Backend -> cash_reason_id
+           * ============================================================
+           */
+          PsFieldRow(
+            children: [
+              PsFieldItem(
+                child: PsApiTypeAhead<GenericListItem<Map<String, dynamic>>>(
+                  label: controller.cashReasonLabel,
+                  value: controller.selectedCashReason,
+
+                  /*
+                   * ====================================================
+                   * CONSULTAR RAZONES
+                   * ====================================================
+                   */
+                  searchApi: (search) async {
+                    return await UtilServicesCash.getCashReasonsSearch(
+                      searchPhrase: search,
+                    );
+                  },
+
+                  /*
+                   * ====================================================
+                   * TEXTO QUE VE EL USUARIO
+                   * ====================================================
+                   */
+                  getLabel: (item) {
+                    return item.title ?? '';
+                  },
+
+                  /*
+                   * ====================================================
+                   * SELECCIÓN
+                   * ====================================================
+                   */
+                  onSelected: (item) {
+                    controller.setCashReason(item);
+                  },
+
+                  /*
+                   * ====================================================
+                   * VALIDACIÓN
+                   * ====================================================
+                   */
+                  requiredField: true,
+
+                  error: controller.cashReasonError,
+
+                  isTouched: controller.cashReasonTouched,
+
+                  isValid:
+                  controller.cashReasonError == null &&
+                      controller.cashReasonId != null &&
+                      controller.cashReasonId! > 0,
+                ),
+              ),
+            ],
+          ),
+          AppSpacing.spaceBetweenInputs,
+
+          /*
  * ============================================================
  * FORMA DE PAGO
  *
@@ -255,70 +319,7 @@ class CashMovementMicroForm extends StatelessWidget {
 
           AppSpacing.spaceBetweenInputs,
 
-          /*
-           * ============================================================
-           * MOTIVO DEL MOVIMIENTO
-           *
-           * Backend -> cash_reason_id
-           * ============================================================
-           */
-          PsFieldRow(
-            children: [
-              PsFieldItem(
-                child: PsApiTypeAhead<GenericListItem<Map<String, dynamic>>>(
-                  label: controller.cashReasonLabel,
-                  value: controller.selectedCashReason,
 
-                  /*
-                   * ====================================================
-                   * CONSULTAR RAZONES
-                   * ====================================================
-                   */
-                  searchApi: (search) async {
-                    return await UtilServicesCash.getCashReasonsSearch(
-                      searchPhrase: search,
-                    );
-                  },
-
-                  /*
-                   * ====================================================
-                   * TEXTO QUE VE EL USUARIO
-                   * ====================================================
-                   */
-                  getLabel: (item) {
-                    return item.title ?? '';
-                  },
-
-                  /*
-                   * ====================================================
-                   * SELECCIÓN
-                   * ====================================================
-                   */
-                  onSelected: (item) {
-                    controller.setCashReason(item);
-                  },
-
-                  /*
-                   * ====================================================
-                   * VALIDACIÓN
-                   * ====================================================
-                   */
-                  requiredField: true,
-
-                  error: controller.cashReasonError,
-
-                  isTouched: controller.cashReasonTouched,
-
-                  isValid:
-                  controller.cashReasonError == null &&
-                      controller.cashReasonId != null &&
-                      controller.cashReasonId! > 0,
-                ),
-              ),
-            ],
-          ),
-
-          AppSpacing.spaceBetweenInputs,
 
           /*
            * ============================================================

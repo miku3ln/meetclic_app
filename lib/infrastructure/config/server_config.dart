@@ -7,13 +7,14 @@ enum Environment { production, developer, test, local }
 
 abstract class Config {
   static const socket = '185.28.23.139';
+
   //static const socket = '10.143.10.83';
   static const port = 8081;
 }
 
 class ServerConfig {
+  static Environment currentEnv = Environment.production;
 
-  static Environment currentEnv = Environment.local;
   static String get getSocketServer {
     //return 'ws://${Config.socket}:${Config.port}/audio';
     //   return 'ws://${Config.socket}/socketMigu3ln/audio';
@@ -25,15 +26,14 @@ class ServerConfig {
     switch (currentEnv) {
       case Environment.production:
         return 'https://meetclic.com/api';
-      case Environment.developer:
-        return 'http://192.168.0.101/meetclickmanager/api';
-      case Environment.test:
-        return 'http:/192.168.137.1/meetclickmanager/api';
       case Environment.local:
-      //  return 'http://192.168.0.68:4949/meetclic-manager/api'; //PC WORK RED
-       //return 'http://192.168.100.68:4949/meetclic-manager/api';//RED HOUSE
-     return 'http://10.0.2.2:8080/meetclic-manager/api';
-
+        return 'http://10.0.2.2:8080/meetclic-manager/api';
+      case Environment.developer:
+        // TODO: Handle this case.
+        throw UnimplementedError();
+      case Environment.test:
+        // TODO: Handle this case.
+        throw UnimplementedError();
     }
   }
 }

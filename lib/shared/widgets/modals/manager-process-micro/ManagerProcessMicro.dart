@@ -92,38 +92,38 @@ class _ManagerProcessMicroState<T>
 
   @override
   Widget build(BuildContext context) {
-    final tokens =
-    AppThemeTokens.of(context);
+    final tokens = AppThemeTokens.of(context);
 
-    final mediaQuery =
-    MediaQuery.of(context);
+    final mediaQuery = MediaQuery.of(context);
 
-    final size =
-        mediaQuery.size;
+    final size = mediaQuery.size;
 
-    final keyboardHeight =
-        mediaQuery.viewInsets.bottom;
+    final keyboardHeight = mediaQuery.viewInsets.bottom;
 
     /*
-     * Saber si el teclado está visible.
-     */
-    final bool keyboardVisible =
-        keyboardHeight > 0;
+   * Saber si el teclado está visible.
+   */
+    final bool keyboardVisible = keyboardHeight > 0;
 
-    final drawerWidth =
-    size.width > 500
+    final drawerWidth = size.width > 500
         ? widget.config.maxWidth
         : size.width * .92;
 
     return PopScope(
       /*
-       * No permite regresar mientras está guardando.
-       */
+     * No permite regresar mientras está guardando.
+     */
       canPop: !_isLoading,
 
       child: SafeArea(
         child: Align(
-          alignment: Alignment.centerRight,
+          /*
+         * Cuando aparece el teclado alineamos el modal
+         * arriba para aprovechar todo el espacio visible.
+         */
+          alignment: keyboardVisible
+              ? Alignment.topRight
+              : Alignment.centerRight,
 
           child: Material(
             color: Colors.transparent,
@@ -141,35 +141,48 @@ class _ManagerProcessMicroState<T>
                 AbsorbPointer(
                   absorbing: _isLoading,
 
-                  child: Container(
+                  child: AnimatedContainer(
+                    /*
+                   * Animación cuando aparece/desaparece
+                   * el teclado.
+                   */
+                    duration: const Duration(
+                      milliseconds: 220,
+                    ),
+
+                    curve: Curves.easeOutCubic,
+
                     width: drawerWidth,
 
                     /*
-                     * El modal ocupa la altura disponible.
-                     *
-                     * NO restamos manualmente keyboardHeight.
-                     * El contenido interno manejará el teclado
-                     * mediante scroll.
-                     */
-                    height: size.height,
+                   * IMPORTANTE:
+                   *
+                   * NO usamos:
+                   *
+                   * height: size.height
+                   *
+                   * porque eso obliga al modal a mantener
+                   * la altura física completa de la pantalla.
+                   *
+                   * double.infinity hace que utilice la altura
+                   * realmente disponible para el Dialog.
+                   */
+                    height: double.infinity,
 
                     decoration: BoxDecoration(
                       color: tokens.surface,
 
                       borderRadius:
                       const BorderRadius.only(
-                        topLeft:
-                        Radius.circular(28),
-                        bottomLeft:
-                        Radius.circular(28),
+                        topLeft: Radius.circular(28),
+                        bottomLeft: Radius.circular(28),
                       ),
 
                       boxShadow: [
                         BoxShadow(
                           color: tokens.shadow,
                           blurRadius: 30,
-                          offset:
-                          const Offset(-8, 0),
+                          offset: const Offset(-8, 0),
                         ),
                       ],
                     ),
@@ -177,10 +190,8 @@ class _ManagerProcessMicroState<T>
                     child: ClipRRect(
                       borderRadius:
                       const BorderRadius.only(
-                        topLeft:
-                        Radius.circular(28),
-                        bottomLeft:
-                        Radius.circular(28),
+                        topLeft: Radius.circular(28),
+                        bottomLeft: Radius.circular(28),
                       ),
 
                       child: Column(
@@ -202,21 +213,24 @@ class _ManagerProcessMicroState<T>
 
                           Expanded(
                             child: Container(
-                              color:
-                              tokens.background,
+                              color: tokens.background,
 
-                              child:
-                              SingleChildScrollView(
+                              child: SingleChildScrollView(
+                                /*
+                               * Si el usuario arrastra el formulario
+                               * hacia abajo/arriba puede cerrar
+                               * el teclado.
+                               */
                                 keyboardDismissBehavior:
                                 ScrollViewKeyboardDismissBehavior
                                     .onDrag,
 
                                 /*
-                                 * Ya NO sumamos keyboardHeight.
-                                 *
-                                 * El teclado no debe convertirse
-                                 * en padding interno del formulario.
-                                 */
+                               * El teclado NO se agrega como padding.
+                               *
+                               * El Dialog ya recibe el espacio
+                               * disponible cuando aparece el teclado.
+                               */
                                 padding:
                                 const EdgeInsets.fromLTRB(
                                   20,
@@ -225,8 +239,7 @@ class _ManagerProcessMicroState<T>
                                   30,
                                 ),
 
-                                child:
-                                widget.form,
+                                child: widget.form,
                               ),
                             ),
                           ),
@@ -234,8 +247,9 @@ class _ManagerProcessMicroState<T>
                           // =========================================
                           // FOOTER
                           //
-                          // Mientras está abierto el teclado
-                          // lo ocultamos para dar espacio al form.
+                          // Mientras el teclado está abierto
+                          // ocultamos Cancelar / Guardar para
+                          // darle más espacio al formulario.
                           // =========================================
 
                           if (!keyboardVisible) ...[
@@ -267,8 +281,7 @@ class _ManagerProcessMicroState<T>
 
                       child: const Center(
                         child: Column(
-                          mainAxisSize:
-                          MainAxisSize.min,
+                          mainAxisSize: MainAxisSize.min,
 
                           children: [
                             CircularProgressIndicator(),
@@ -280,11 +293,9 @@ class _ManagerProcessMicroState<T>
                             Text(
                               'Procesando...',
                               style: TextStyle(
-                                color:
-                                Colors.white,
+                                color: Colors.white,
                                 fontSize: 15,
-                                fontWeight:
-                                FontWeight.w600,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],

@@ -1,16 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import '../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../../../shared/widgets/modals/manager-process-micro/ManagerProcessMicroConfig.dart';
 import '../../../../shared/widgets/modals/manager-process-micro/ManagerProcessMicroResult.dart';
 import '../../../../shared/widgets/modals/manager-process-micro/show_manager_process_micro.dart';
 import '../widgets/layouts/pos_main_controller.dart';
-import '../widgets/layouts/shift/manager/admin/shift-summary-content.dart';
 import '../widgets/layouts/shift/manager/admin/shift_close_modal.dart';
 import '../widgets/layouts/shift/manager/cash-movement/cash-movement-micro-controller.dart';
 import '../widgets/layouts/shift/manager/cash-movement/cash-movement-micro-form.dart';
-import '../widgets/layouts/shift/manager/util.dart';
 import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 
 class PosShiftManagementController extends ChangeNotifier {
@@ -402,4 +399,19 @@ class PosShiftManagementController extends ChangeNotifier {
   void onCardTap() {
     debugPrint('Click: Por tarjeta');
   }
+
+
+
+  Future<void> closeShift(BuildContext context) async {
+    final wasClosed = await onCloseShiftTap(context);
+    if (!wasClosed) {
+      return;
+    }
+    // Actualiza el estado principal del POS.
+    await main.shift.closeShift();
+    // Solicita al PosShiftRegister que vuelva a consultar el resumen.
+    _reloadCashSummary = true;
+    notifyListeners();
+  }
+
 }

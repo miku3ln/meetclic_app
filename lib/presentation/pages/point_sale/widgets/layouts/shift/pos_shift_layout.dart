@@ -25,24 +25,123 @@ class PosShiftManagementLayout extends StatelessWidget {
   }
 }
 
-class _PosShiftView extends StatelessWidget {
+class _PosShiftView extends StatefulWidget {
   const _PosShiftView();
+
+  @override
+  State<_PosShiftView> createState() => _PosShiftViewState();
+}
+
+class _PosShiftViewState extends State<_PosShiftView> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
-    final scaffoldKey = GlobalKey<ScaffoldState>();
+    // Solo reconstruye esta vista cuando allowManager cambie.
+    final allowManagerButtons = context
+        .select<PosShiftManagementController, bool>(
+          (controller) => controller.allowManager,
+        );
 
     return Scaffold(
-      key: scaffoldKey,
+      key: _scaffoldKey,
       backgroundColor: colors.background,
       drawer: const PosAppDrawer(),
-      appBar: PosSettingsAppBar(
+      appBar: PosSettingsAppBar<String>(
         titlePrimary: 'Turno',
         titleSecondary: '',
+        showDivider: false,
         onMenuTap: () {
-          scaffoldKey.currentState?.openDrawer();
+          _scaffoldKey.currentState?.openDrawer();
         },
+        /*
+         * ==========================================================
+         * REGISTRAR MOVIMIENTO
+         * ==========================================================
+         */
+        firstActionIcon: allowManagerButtons
+            ? Icons.add_circle_outline_rounded
+            : null,
+
+        firstActionTooltip: allowManagerButtons
+            ? 'Registrar Movimientos'
+            : null,
+
+        onFirstActionTap: allowManagerButtons
+            ? () async {
+                await context
+                    .read<PosShiftManagementController>()
+                    .onManagementMovement(context);
+              }
+            : null,
+
+        /*
+         * ==========================================================
+         * CERRAR TURNO
+         * ==========================================================
+         */
+        secondActionIcon: allowManagerButtons
+            ? Icons.lock_clock_outlined
+            : null,
+
+        secondActionTooltip: allowManagerButtons ? 'Cerrar Turno' : null,
+
+        onSecondActionTap: allowManagerButtons
+            ? () async {
+                await context.read<PosShiftManagementController>().closeShift(
+                  context,
+                );
+              }
+            : null,
+
+        popupMenuItems: const [
+          PosAppBarMenuItem<String>(
+            value: 'settings',
+            label: 'Configuración',
+            icon: Icons.settings_outlined,
+          ),
+          PosAppBarMenuItem<String>(
+            value: 'refresh',
+            label: 'Actualizar',
+            icon: Icons.refresh,
+          ),
+          PosAppBarMenuItem<String>(
+            value: 'help',
+            label: 'Ayuda',
+            icon: Icons.help_outline,
+          ),
+          PosAppBarMenuItem<String>(
+            value: 'logout',
+            label: 'Cerrar sesión',
+            icon: Icons.logout,
+          ),
+        ],
+
+        onPopupMenuSelected: (value) {
+          if (!mounted) return;
+
+          switch (value) {
+            case 'settings':
+              debugPrint('Configuración');
+              break;
+
+            case 'refresh':
+              context
+                  .read<PosShiftManagementController>()
+                  .requestCashSummaryReload();
+              break;
+
+            case 'help':
+              debugPrint('Ayuda');
+              break;
+
+            case 'logout':
+              debugPrint('Cerrar sesión');
+              break;
+          }
+        },
+
         style: PosSettingsAppBarStyle(
           topBackgroundColor: colors.primary,
           bottomBackgroundColor: colors.primary,
@@ -54,6 +153,7 @@ class _PosShiftView extends StatelessWidget {
           dividerColor: colors.divider,
         ),
       ),
+
       body: const PosShiftRegister(),
     );
   }
@@ -260,18 +360,8 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
       );
     }
 
-    /**
-     * ============================================================
-     * RESUMEN DEL TURNO
-     * ============================================================
-     */
     return Stack(
       children: [
-        /*
-     * ============================================================
-     * CONTENIDO CON SCROLL
-     * ============================================================
-     */
         Positioned.fill(
           child: RefreshIndicator(
             onRefresh: _loadData,
@@ -316,20 +406,6 @@ class _PosShiftRegisterState extends State<PosShiftRegister> {
      * NO hacen scroll.
      * ============================================================
      */
-        if (allowManager)
-          Positioned(
-            bottom: 150,
-            left: 20,
-            child: ShiftTopActions(
-              isClosingShift: controller.isClosingShift,
-
-              onTreasuryTap: () => controller.onTreasuryTap(context),
-
-              onMovementManagerTap: () =>
-                  controller.onManagementMovement(context),
-              onCloseShiftTap: _reloadAfterCloseShift,
-            ),
-          ),
       ],
     );
   }

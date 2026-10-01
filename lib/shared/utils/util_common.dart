@@ -132,6 +132,7 @@ class PaginatedApiService {
   }
 }
 
+
 class PsApiTypeAhead<T> extends StatefulWidget {
   final String label;
 
@@ -193,10 +194,23 @@ class _PsApiTypeAheadState<T>
     return TypeAheadField<T>(
       /**
        * ============================================================
+       * DIRECCIÓN DEL LISTADO
+       * ============================================================
+       *
+       * IMPORTANTE:
+       *
+       * Las sugerencias se muestran ENCIMA del input.
+       *
+       * Esto evita que cuando el teclado esté abierto
+       * el listado quede oculto detrás del teclado.
+       */
+      direction: VerticalDirection.up,
+
+      /**
+       * ============================================================
        * CONFIGURACIÓN
        * ============================================================
        */
-
       debounceDuration: const Duration(
         milliseconds: 500,
       ),

@@ -436,19 +436,13 @@ class ShiftSummaryContent extends StatelessWidget {
             ),
 
             const SizedBox(height: 18),
-
-            /**
-             * ----------------------------------------------------
-             * DATO PRINCIPAL DEL CAJÓN
-             * ----------------------------------------------------
-             */
             MoneyRow(
-              label: 'Efectivo teórico en caja',
+              label: 'Saldo teórico de caja',//CASH VERIFY
               value: UtilCashCommon.currency(
                 closing['expected_amount'],
               ),
               isBold: true,
-              icon: Icons.point_of_sale_rounded,
+              icon: Icons.account_balance_wallet_rounded,
               iconColor: tokens.primary,
               labelColor: tokens.textPrimary,
               valueColor: tokens.primary,
@@ -463,6 +457,40 @@ class ShiftSummaryContent extends StatelessWidget {
               ),
               onTap: controller.onTheoreticalCashTap,
             ),
+
+            const SizedBox(height: 12),
+
+            /*
+     * =========================================================
+     * EFECTIVO ESPERADO AL CIERRE
+     * =========================================================
+     *
+     * Dinero físico que debería entregar
+     * el empleado al cerrar la caja.
+     *
+     */
+            MoneyRow(
+              label: 'Efectivo esperado al cierre',
+              value: UtilCashCommon.currency(
+                closing['expected_cash_amount'],
+              ),
+              isBold: true,
+              icon: Icons.payments_rounded,
+              iconColor: tokens.primary,
+              labelColor: tokens.textPrimary,
+              valueColor: tokens.primary,
+              backgroundColor: tokens.selectedBackground,
+              labelFontSize: 17,
+              valueFontSize: 24,
+              labelFontWeight: FontWeight.w700,
+              valueFontWeight: FontWeight.w700,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
+            ),
+
+
           ],
         ),
 
@@ -755,7 +783,7 @@ class ShiftTopActions extends StatelessWidget {
              * ======================================================
              */
             ShiftManagementAction(
-              icon: Icons.add_circle_outline_rounded,
+              icon: Icons.add_circle_outline_rounded,//TODO RETURN
               label: 'Registrar movimiento',
               enabled: !isClosingShift,
               onTap: onMovementManagerTap,

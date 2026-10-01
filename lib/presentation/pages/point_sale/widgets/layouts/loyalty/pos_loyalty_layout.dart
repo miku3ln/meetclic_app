@@ -36,7 +36,7 @@ class _PosLoyaltyView extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
     final scaffoldKey = GlobalKey<ScaffoldState>();
-    final sectionTitle = "gestion";
+    final sectionTitle = "";
     final app = context.read<AppController>();
 
     return Scaffold(
@@ -46,6 +46,7 @@ class _PosLoyaltyView extends StatelessWidget {
       appBar: PosSettingsAppBar(
         titlePrimary:"Fidelización",
         titleSecondary:sectionTitle,
+        showDivider: false,
         onMenuTap: () {
           scaffoldKey.currentState?.openDrawer();
         },
