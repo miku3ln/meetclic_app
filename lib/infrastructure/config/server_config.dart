@@ -27,13 +27,9 @@ class ServerConfig {
       case Environment.production:
         return 'https://meetclic.com/api';
       case Environment.local:
-        return 'http://10.0.2.2:8080/meetclic-manager/api';
       case Environment.developer:
-        // TODO: Handle this case.
-        throw UnimplementedError();
       case Environment.test:
-        // TODO: Handle this case.
-        throw UnimplementedError();
+        return 'http://10.0.2.2:8080/meetclic-manager/api';
     }
   }
 }

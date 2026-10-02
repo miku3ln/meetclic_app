@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../../app/router/controllers/app_controller.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+import '../../../../../../shared/utils/screen_utils.dart';
 import '../../../state/pos_loyalty_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/loyalty/pos_loyalty_content.dart';
 import '../../organisms/pos_settings_app_bar.dart';
+import '../pos_main_controller.dart';
 class PosLoyaltyLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
   final PosLoyaltySection section;
@@ -39,6 +41,20 @@ class _PosLoyaltyView extends StatelessWidget {
     final sectionTitle = "";
     final app = context.read<AppController>();
 
+    final main =
+    context.watch<PosMainController>();
+
+    // =========================================================
+    // DEVICE STATE
+    // =========================================================
+
+    final device = main.device;
+    final appBarConfig = ScreenUtils.appBarConfigTitle(
+      width: device.width,
+      height: device.height,
+      isLandscape: device.isLandscape,
+      isTablet: device.isTablet,
+    );
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: colors.background,
@@ -47,6 +63,9 @@ class _PosLoyaltyView extends StatelessWidget {
         titlePrimary:"Fidelización",
         titleSecondary:sectionTitle,
         showDivider: false,
+        secondaryFlex: appBarConfig.primaryFlex,
+        primaryFlex: appBarConfig.secondaryFlex,
+
         onMenuTap: () {
           scaffoldKey.currentState?.openDrawer();
         },

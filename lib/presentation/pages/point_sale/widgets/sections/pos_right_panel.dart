@@ -15,7 +15,6 @@ class PosRightPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final app = context.watch<AppController>(); // ✅ lee modo global
     final bool isLoginMode = app.isLoginRequired;
     final double heightPostTicket=isLoginMode?170:200;
@@ -33,7 +32,7 @@ class PosRightPanel extends StatelessWidget {
           child: controller.shift. isShiftOpen
               ? Column(
             children: [
-              PosTicketHeader(title: 'Ticketss', itemsCount: items.length,controllerMain:controller),
+              PosTicketHeader(title: 'Tickets', itemsCount: items.length,controllerMain:controller),
               const SizedBox(height: 50), // ✅ antes 50
               const Divider(height: 0),
               // ✅ Lista ocupa todo menos checkout

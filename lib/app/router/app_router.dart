@@ -87,14 +87,7 @@ class AppRoutes {
   static const printers = '/printers';
 }
 class AppRouter {
-  /**
-   * Reutiliza la MISMA instancia de PosMainController
-   * creada por PointSaleScope.
-   *
-   * IMPORTANTE:
-   * ChangeNotifierProvider.value NO crea ni destruye
-   * el PosMainController.
-   */
+
   static Widget _withPosMainController({
     required BuildContext context,
     required Widget child,

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+import '../../../../../../shared/utils/screen_utils.dart';
 import '../../../../../shared/responsive/device_gesture_observer.dart';
 import '../../../../../widgets/empty_data.dart';
 import '../../../helpers/pos_responsive.dart';
@@ -10,6 +11,7 @@ import '../../../state/business_manager_management_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/pos_settings_app_bar.dart';
 import '../../sections/product/ps_section_card.dart';
+import '../pos_main_controller.dart';
 import '/../../../shared/providers_session.dart';
 
 class BusinessManagerManagementService {
@@ -164,7 +166,14 @@ class _BusinessManagerViewState extends State<_BusinessManagerView> {
     final scaffoldKey = GlobalKey<ScaffoldState>();
 
     final titlePrimary = _summary?.business?.title ?? '';
-
+    final main = context.watch<PosMainController>();
+    final device = main.device;
+    final appBarConfig = ScreenUtils.appBarConfigTitle(
+      width: device.width,
+      height: device.height,
+      isLandscape: device.isLandscape,
+      isTablet: device.isTablet,
+    );
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: colors.background,
@@ -174,6 +183,9 @@ class _BusinessManagerViewState extends State<_BusinessManagerView> {
         titlePrimary: titlePrimary,
         titleSecondary: '',
         showDivider: false,
+        secondaryFlex: appBarConfig.secondaryFlex,
+        primaryFlex: appBarConfig.primaryFlex,
+
         onMenuTap: () {
           scaffoldKey.currentState?.openDrawer();
         },

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
+import '../../../../../../shared/utils/screen_utils.dart';
 import '../../../../../widgets/empty_data.dart';
 import '../../../shared/styles.dart';
 import '../../../state/pos_shift_management_controller.dart';
@@ -37,8 +38,15 @@ class _PosShiftViewState extends State<_PosShiftView> {
 
   @override
   Widget build(BuildContext context) {
+    final main = context.watch<PosMainController>();
+    final device = main.device;
+    final appBarConfig = ScreenUtils.appBarConfigTitle(
+      width: device.width,
+      height: device.height,
+      isLandscape: device.isLandscape,
+      isTablet: device.isTablet,
+    );
     final colors = AppThemeTokens.of(context);
-    // Solo reconstruye esta vista cuando allowManager cambie.
     final allowManagerButtons = context
         .select<PosShiftManagementController, bool>(
           (controller) => controller.allowManager,
@@ -52,6 +60,8 @@ class _PosShiftViewState extends State<_PosShiftView> {
         titlePrimary: 'Turno',
         titleSecondary: '',
         showDivider: false,
+        primaryFlex: appBarConfig.primaryFlex,
+        secondaryFlex: appBarConfig.secondaryFlex,
         onMenuTap: () {
           _scaffoldKey.currentState?.openDrawer();
         },

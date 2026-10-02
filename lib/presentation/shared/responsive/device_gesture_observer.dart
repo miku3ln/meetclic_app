@@ -304,3 +304,94 @@ class _DeviceGestureObserverState extends State<DeviceGestureObserver>
     );
   }
 }
+
+class DeviceState extends ChangeNotifier {
+  DeviceSnapshot? _snapshot;
+
+  DeviceSnapshot? get snapshot => _snapshot;
+
+  // ============================================================
+  // STATE
+  // ============================================================
+
+  bool get isInitialized => _snapshot != null;
+
+  // ============================================================
+  // SIZE
+  // ============================================================
+
+  double get width => _snapshot?.width ?? 0;
+
+  double get height => _snapshot?.height ?? 0;
+
+  double get shortestSide => _snapshot?.shortestSide ?? 0;
+
+  Size get size => Size(width, height);
+
+  // ============================================================
+  // ORIENTATION
+  // ============================================================
+
+  Orientation get orientation =>
+      _snapshot?.orientation ?? Orientation.portrait;
+
+  bool get isPortrait =>
+      orientation == Orientation.portrait;
+
+  bool get isLandscape =>
+      orientation == Orientation.landscape;
+
+  // ============================================================
+  // DEVICE
+  // ============================================================
+
+  bool get isTablet =>
+      _snapshot?.isTablet ?? false;
+
+  bool get isMobile =>
+      !isTablet;
+
+  // ============================================================
+  // LAYOUT
+  // ============================================================
+
+  LayoutType get layoutType =>
+      _snapshot?.layoutType ??
+          LayoutType.mobilePortrait;
+
+  bool get isMobilePortrait =>
+      layoutType == LayoutType.mobilePortrait;
+
+  bool get isMobileLandscape =>
+      layoutType == LayoutType.mobileLandscape;
+
+  bool get isTabletPortrait =>
+      layoutType == LayoutType.tabletPortrait;
+
+  bool get isTabletLandscape =>
+      layoutType == LayoutType.tabletLandscape;
+
+  // ============================================================
+  // UPDATE
+  // ============================================================
+
+  void update(DeviceSnapshot snapshot) {
+    final previous = _snapshot;
+
+    final hasChanged =
+        previous == null ||
+            previous.width != snapshot.width ||
+            previous.height != snapshot.height ||
+            previous.orientation != snapshot.orientation ||
+            previous.layoutType != snapshot.layoutType ||
+            previous.isTablet != snapshot.isTablet;
+
+    if (!hasChanged) {
+      return;
+    }
+
+    _snapshot = snapshot;
+
+    notifyListeners();
+  }
+}

@@ -1,23 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
-
 import '../../../../../app/router/controllers/app_controller.dart';
-
 import '../../../../shared/responsive/device_gesture_observer.dart';
 import '../../repositories/config_repository.dart';
 import '../../services/pos_labels_service.dart';
 import '../../shared/utils.dart';
 import '../../state/pos_product_browser_state.dart';
+
 import '../dialogs/moda_managerl.dart';
 import '../dialogs/modal_pos_pay.dart';
 import '../models/pos_product_item.dart';
+
 import '../../state/pos_shift_state.dart';
 import '../../state/pos_ticket_state.dart';
 import '../../state/pos_payment_state.dart';
 import '../../state/pos_checkout_state.dart';
 import '../../state/pos_ui_state.dart';
 
-class PosMainController extends ChangeNotifier {//CONECTION
+class PosMainController extends ChangeNotifier {
   final AppController app;
   final PosShiftState shift;
   final PosProductBrowserState browser;
@@ -27,10 +27,15 @@ class PosMainController extends ChangeNotifier {//CONECTION
   final PosUiState ui;
   final ConfigRepository configRepository;
   final PosLabelsService labels;
+  final DeviceState device;
+
+  // ============================================================
+  // CONSTRUCTOR
+  // ============================================================
 
   PosMainController({
     required AppController app,
-    required this.configRepository, // 👈 NUEVO
+    required this.configRepository,
     PosShiftState? shift,
     PosProductBrowserState? browser,
     PosTicketState? ticket,
@@ -38,23 +43,26 @@ class PosMainController extends ChangeNotifier {//CONECTION
     PosCheckoutState? checkout,
     PosUiState? ui,
     PosLabelsService? labels,
+    DeviceState? device,
   }) : app = app,
-
        shift = shift ?? PosShiftState(app: app),
        browser = browser ?? PosProductBrowserState(),
        ticket = ticket ?? PosTicketState(),
        payment = payment ?? PosPaymentState(),
        checkout = checkout ?? PosCheckoutState(),
        labels = labels ?? const PosLabelsService(),
-       ui = ui ?? PosUiState() {
-    typeService = typeServicesData.first; // 🔥 AQUÍ
+       ui = ui ?? PosUiState(),
+       device = device ?? DeviceState() {
+    typeService = typeServicesData.first;
     initDataConfig();
     _bindStates();
   }
   Future<void> initDataConfig() async {
     final customer = await configRepository.getFinalConsumer();
 
-    if (_isDisposed) return;
+    if (_isDisposed) {
+      return;
+    }
 
     dataCustomerFinal = customer;
 
@@ -62,6 +70,11 @@ class PosMainController extends ChangeNotifier {//CONECTION
       setCustomerTicket(dataCustomerFinal);
     }
   }
+
+  // ============================================================
+  // BIND STATES
+  // ============================================================
+
   void _bindStates() {
     shift.addListener(notifyListeners);
     browser.addListener(notifyListeners);
@@ -69,7 +82,12 @@ class PosMainController extends ChangeNotifier {//CONECTION
     payment.addListener(notifyListeners);
     checkout.addListener(notifyListeners);
     ui.addListener(notifyListeners);
+    device.addListener(notifyListeners);
   }
+
+  // ============================================================
+  // INIT
+  // ============================================================
 
   Future<void> init({
     required List<PosProductItem> initialProducts,
@@ -78,20 +96,21 @@ class PosMainController extends ChangeNotifier {//CONECTION
     String? initialSelectedProductCategoryId,
     String? initialSelectedMenuCategoryId,
   }) async {
-    //await shift.initLocalStorage();//INIT DATA CASH
+    // await shift.initLocalStorage(); // INIT DATA CASH
 
-    if (_isDisposed) return;
+    if (_isDisposed) {
+      return;
+    }
 
     browser.init(
       initialProducts: initialProducts,
       initialProductCategories: initialProductCategories,
       initialMenuCategories: initialMenuCategories,
-      initialSelectedProductCategoryId:
-      initialSelectedProductCategoryId,
-      initialSelectedMenuCategoryId:
-      initialSelectedMenuCategoryId,
+      initialSelectedProductCategoryId: initialSelectedProductCategoryId,
+      initialSelectedMenuCategoryId: initialSelectedMenuCategoryId,
     );
   }
+
   /**
    * ============================================================
    * SHIFT
@@ -107,9 +126,18 @@ class PosMainController extends ChangeNotifier {//CONECTION
   int? get shiftOpenedByUserId => shift.openedByUserId;
 
   PosShiftSession? get shiftSession => shift.currentSession;
+
+  // ============================================================
+  // PRODUCT
+  // ============================================================
+
   void onProductTap(PosProductItem product) {
     ticket.addProduct(product);
   }
+
+  // ============================================================
+  // SAVE
+  // ============================================================
 
   void onSave() {
     if (!shift.isShiftOpen) {
@@ -118,16 +146,24 @@ class PosMainController extends ChangeNotifier {//CONECTION
     }
 
     debugPrint('onSave -> guardar ticket');
+
     ticket.saveTicket();
   }
 
+  // ============================================================
+  // PAYMENT
+  // ============================================================
+
   void onPay(BuildContext context) {
-    //PROCESS-INIT
+    // PROCESS-INIT
+
     if (!shift.isShiftOpen) {
       shift.onRequestOpenShift?.call();
       return;
     }
+
     final controller = PosPaymentLayoutController(main: this);
+
     Navigator.push(
       context,
       PageRouteBuilder(
@@ -144,11 +180,8 @@ class PosMainController extends ChangeNotifier {//CONECTION
         },
         transitionsBuilder: (_, animation, __, child) {
           return SlideTransition(
-            position:
-                Tween<Offset>(
-                  begin: const Offset(1, 0), // 👉 entra desde derecha
-                  end: Offset.zero,
-                ).animate(
+            position: Tween<Offset>(begin: const Offset(1, 0), end: Offset.zero)
+                .animate(
                   CurvedAnimation(parent: animation, curve: Curves.easeInOut),
                 ),
             child: child,
@@ -158,6 +191,10 @@ class PosMainController extends ChangeNotifier {//CONECTION
     );
   }
 
+  // ============================================================
+  // CHECKOUT
+  // ============================================================
+
   void onPrimaryCheckoutTap(BuildContext context) {
     if (checkout.checkoutAction == PosCheckoutAction.pay) {
       onPay(context);
@@ -165,34 +202,28 @@ class PosMainController extends ChangeNotifier {//CONECTION
       onSave();
     }
   }
+
+  // ============================================================
+  // DISPOSE STATE
+  // ============================================================
+
   bool _isDisposed = false;
+
+  // ============================================================
+  // INIT POINT OF SALES
+  // ============================================================
+
   Future<void> initDataPointOfSales() async {
     if (_isDisposed) return;
 
     browser.setLoadingData(true);
 
     try {
-
-      /**
-       * ============================================================
-       * INIT CASH / SHIFT
-       * ============================================================
-       *
-       * Inicializar estado de caja una sola vez al ingresar al POS.
-       *
-       * Aquí PosShiftState se encargará de:
-       * - consultar cache
-       * - consultar servicio
-       * - determinar si existe caja
-       * - determinar si existe sesión abierta
-       * - asignar sus valores internos
-       */
       await shift.loadData();
 
       if (_isDisposed) return;
 
-      final products =
-      await PosTabletLandscapeFixtures.getProductsData();
+      final products = await PosTabletLandscapeFixtures.getProductsData();
 
       if (_isDisposed) return;
 
@@ -200,10 +231,12 @@ class PosMainController extends ChangeNotifier {//CONECTION
 
       await init(
         initialProducts: products,
-        initialProductCategories:
-        PosTabletLandscapeFixtures.getCategoriesData(products),
-        initialMenuCategories:
-        PosTabletLandscapeFixtures.getMenuCategoriesData(products),
+        initialProductCategories: PosTabletLandscapeFixtures.getCategoriesData(
+          products,
+        ),
+        initialMenuCategories: PosTabletLandscapeFixtures.getMenuCategoriesData(
+          products,
+        ),
         initialSelectedProductCategoryId: 'all',
         initialSelectedMenuCategoryId: 'all',
       );
@@ -223,28 +256,58 @@ class PosMainController extends ChangeNotifier {//CONECTION
     }
   }
 
+  // ============================================================
+  // DISPOSE
+  // ============================================================
+
   @override
   void dispose() {
     _isDisposed = true;
 
     shift.removeListener(notifyListeners);
+
     browser.removeListener(notifyListeners);
+
     ticket.removeListener(notifyListeners);
+
     payment.removeListener(notifyListeners);
+
     checkout.removeListener(notifyListeners);
+
     ui.removeListener(notifyListeners);
+
+    /// NUEVO
+    device.removeListener(notifyListeners);
 
     ui.isSummaryExpanded.dispose();
 
+    /// PosMainController creó DeviceState
+    /// cuando no fue inyectado externamente.
+    ///
+    /// En tu implementación actual DeviceState
+    /// pertenece al ciclo de vida de este controller.
+    device.dispose();
+
     super.dispose();
   }
+
+  // ============================================================
+  // CUSTOMER
+  // ============================================================
+
   CustomerModelPosCurrent? selectedCustomer;
+
   CustomerModelPosCurrent? dataCustomerFinal;
 
   void setCustomerTicket(CustomerModelPosCurrent? selectedCustomerCurrent) {
     selectedCustomer = selectedCustomerCurrent;
+
     notifyListeners();
   }
+
+  // ============================================================
+  // TYPE SERVICES
+  // ============================================================
 
   List<TypeService> typeServicesData = [
     TypeService(
@@ -268,40 +331,54 @@ class PosMainController extends ChangeNotifier {//CONECTION
   ];
 
   bool get hasCustomerSelected => selectedCustomer != null;
+
   late TypeService typeService;
 
   void setTypeService(TypeService typeSelected) {
     typeService = typeSelected;
+
     debugPrint('setTypeService: ${typeService.value}');
 
     notifyListeners();
   }
 
-  // 🔥 CATEGORY
+  // ============================================================
+  // CATEGORY
+  // ============================================================
+
   String? selectedProductCategoryId;
 
   void setProductCategory(String id) {
     selectedProductCategoryId = id;
+
     notifyListeners();
   }
 
-  // 🔥 SEARCH
+  // ============================================================
+  // SEARCH
+  // ============================================================
+
   String query = '';
 
   void setQuery(String value) {
     query = value;
+
     notifyListeners();
   }
 
   List<PosCategoryItem> get productCategories => browser.productCategories;
-
   bool allowManagementPost() {
     late bool result =
         selectedCustomer != null &&
         shift.isShiftOpen &&
         ticket.items.isNotEmpty;
+
     if (checkout.isPaySelected) {
-    } else {}
+      // Mantener lógica actual.
+    } else {
+      // Mantener lógica actual.
+    }
+
     return result;
   }
 
@@ -315,19 +392,28 @@ class PosMainController extends ChangeNotifier {//CONECTION
     return ticket.items.isNotEmpty && shift.isShiftOpen;
   }
 
-  void initManagerDataByDevice(DeviceSnapshot device) {
-    setCurrentManagerDevice(device);
-    setColsNumberRowPosSales(getColsNumberRowPosSales(device));
+  void initManagerDataByDevice(DeviceSnapshot snapshot) {
+
+    device.update(snapshot);
+
+    setCurrentManagerDevice(snapshot);
+
+    setColsNumberRowPosSales(getColsNumberRowPosSales(snapshot));
   }
 
-  void onDeviceEvent(DeviceSnapshot device, GestureEvent event) {
+  // ============================================================
+  // DEVICE EVENTS
+  // ============================================================
+
+  void onDeviceEvent(DeviceSnapshot snapshot, GestureEvent event) {
     switch (event.type) {
+
       case GestureEventType.orientationChanged:
-        initManagerDataByDevice(device);
-
+        initManagerDataByDevice(snapshot);
         break;
-
       case GestureEventType.metricsChanged:
+        initManagerDataByDevice(snapshot);
+
         break;
 
       case GestureEventType.tap:
@@ -352,17 +438,18 @@ class PosMainController extends ChangeNotifier {//CONECTION
         break;
     }
   }
-
+  int colsNumberRowPosSales = 5;
   void setColsNumberRowPosSales(int value) {
     colsNumberRowPosSales = value;
+
     notifyListeners();
   }
 
-  int colsNumberRowPosSales = 5;
   DeviceSnapshot? currentManagerDevice;
 
   void setCurrentManagerDevice(DeviceSnapshot value) {
     currentManagerDevice = value;
+
     notifyListeners();
   }
 

@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/models/sections_data.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../../../app/router/controllers/app_controller.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
-
+import '../../../../../../shared/utils/screen_utils.dart';
 import '../../../state/pos_items_controller.dart';
 import '../../drawers/pos_app_drawer.dart';
 import '../../organisms/items/pos_items_content.dart';
 import '../../organisms/pos_settings_app_bar.dart';
+import '../pos_main_controller.dart';
 
 class PosItemsLayout extends StatelessWidget {
   final VoidCallback? onMenuTap;
@@ -39,12 +38,47 @@ class _PosItemsView extends StatefulWidget {
 class _PosItemsViewState extends State<_PosItemsView> {
   final GlobalKey<ScaffoldState> _scaffoldKey =
   GlobalKey<ScaffoldState>();
-
   @override
   Widget build(BuildContext context) {
     final colors = AppThemeTokens.of(context);
-    final sectionTitle = '';
 
+    final main =
+    context.watch<PosMainController>();
+
+    // =========================================================
+    // DEVICE STATE
+    // =========================================================
+
+    final device = main.device;
+
+    final width = device.width;
+    final height = device.height;
+
+    final isLandscape =
+        device.isLandscape;
+
+    final isPortrait =
+        device.isPortrait;
+
+    final isTablet =
+        device.isTablet;
+
+    final layoutType =
+        device.layoutType;
+
+    var sectionTitle =
+        'Dispositivo: ${isTablet ? 'Tablet' : 'Móvil'}'
+        ' | Orientación: ${isLandscape ? 'Horizontal' : 'Vertical'}'
+        ' | Ancho: ${width.toStringAsFixed(0)}'
+        ' | Alto: ${height.toStringAsFixed(0)}'
+        ' | Layout: ${layoutType.name}';
+    sectionTitle="";
+    final appBarConfig = ScreenUtils.appBarConfigTitle(
+      width: device.width,
+      height: device.height,
+      isLandscape: device.isLandscape,
+      isTablet: device.isTablet,
+    );
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: colors.background,
@@ -55,6 +89,8 @@ class _PosItemsViewState extends State<_PosItemsView> {
         ),
         titleSecondary: sectionTitle,
         showDivider: false,
+        secondaryFlex: appBarConfig.secondaryFlex,
+        primaryFlex: appBarConfig.primaryFlex,
 
         onMenuTap: () {
           _scaffoldKey.currentState?.openDrawer();

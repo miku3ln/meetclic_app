@@ -238,7 +238,6 @@ class _PointSalePageState
 
       body: DeviceGestureObserver(
         onEvent: controller.onDeviceEvent,
-
         child: _buildByLayout(
           device.layoutType,
         ),
