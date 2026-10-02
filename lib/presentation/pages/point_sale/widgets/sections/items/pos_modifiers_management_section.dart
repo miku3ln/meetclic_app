@@ -14,7 +14,7 @@ class PosModifiersManagementSection extends StatelessWidget {
           icon: Sections.getIconItems(PosItemsSection.modifiers),
 
           title: 'Todavía no existe modificadores',
-          descriptionText: 'Aquí puedes gestionar los modificadores',
+          descriptionText: 'Aquí puedes gestionar los modificadoresad ad',
           linkText: 'Más información',
           onLinkTap: () {
             debugPrint('Abrir más información de este proceso');
@@ -25,7 +25,7 @@ class PosModifiersManagementSection extends StatelessWidget {
           bottom: 80,
           child: FloatingActionButton(
             onPressed: () {
-              debugPrint('Agregar proceso');
+              debugPrint('Agregar procesos MODIFICADORES');
             },
             child: const Icon(Icons.add),
           ),

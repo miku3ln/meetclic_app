@@ -24,7 +24,7 @@ class PosDiscountsManagementSection extends StatelessWidget {
           bottom: 80,
           child: FloatingActionButton(
             onPressed: () {
-              debugPrint('Agregar proceso');
+              debugPrint('Agregar proceso POS DIS');
             },
             child: const Icon(Icons.add),
           ),

@@ -8,14 +8,12 @@ import '../layouts/pos_main_controller.dart';
 import '../molecules/pos_ticket_header.dart';
 import '../organisms/pos_ticket_checkout.dart';
 import '../organisms/pos_ticket_list.dart';
-class PosRightPanel extends StatelessWidget {
+class PosRightPanel extends StatelessWidget {//INIT PROCESS-MANAGER-UI-END
   final PosMainController controller;
-
   const PosRightPanel({super.key, required this.controller});
-
   @override
   Widget build(BuildContext context) {
-    final app = context.watch<AppController>(); // ✅ lee modo global
+    final app = context.watch<AppController>();
     final bool isLoginMode = app.isLoginRequired;
     final double heightPostTicket=isLoginMode?170:200;
     final styles = const PosTicketStyles().copyWith(
@@ -38,7 +36,6 @@ class PosRightPanel extends StatelessWidget {
               // ✅ Lista ocupa todo menos checkout
               Expanded(
                 child: PosTicketBody(
-
                   items: controller.ticket.items,
                   styles: styles,
                   onMinus: (it) => controller.ticket. decreaseItem(it),

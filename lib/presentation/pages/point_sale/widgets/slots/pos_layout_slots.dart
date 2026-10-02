@@ -12,3 +12,11 @@ class PosLayoutSlots {
     this.right
   });
 }
+class LayoutLandSlots {
+  final PreferredSizeWidget? header;
+  final Widget? body;
+  const LayoutLandSlots({
+    this.header,
+    this.body,
+  });
+}

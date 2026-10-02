@@ -13,7 +13,7 @@ abstract class Config {
 }
 
 class ServerConfig {
-  static Environment currentEnv = Environment.production;
+  static Environment currentEnv = Environment.local;
 
   static String get getSocketServer {
     //return 'ws://${Config.socket}:${Config.port}/audio';
