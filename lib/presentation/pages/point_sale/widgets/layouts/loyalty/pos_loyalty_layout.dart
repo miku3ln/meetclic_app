@@ -54,12 +54,6 @@ class _PosLoyaltyView extends StatefulWidget {
 }
 
 class _PosLoyaltyViewState extends State<_PosLoyaltyView> {
-  // ==========================================================================
-  // SCAFFOLD KEY
-  //
-  // Se crea una sola vez y se mantiene durante toda la vida de la pantalla.
-  // ==========================================================================
-
   final GlobalKey<ScaffoldState> _scaffoldKey =
   GlobalKey<ScaffoldState>();
 
@@ -68,15 +62,9 @@ class _PosLoyaltyViewState extends State<_PosLoyaltyView> {
     final colors = AppThemeTokens.of(context);
 
     const sectionTitle = '';
-
-    // SE MANTIENE
     context.read<AppController>();
-
-    // SE MANTIENE
     final main = context.watch<PosMainController>();
     final device = main.device;
-
-    // SE MANTIENE
     final appBarConfig = ScreenUtils.appBarConfigTitle(
       width: device.width,
       height: device.height,
@@ -102,16 +90,13 @@ class _PosLoyaltyViewState extends State<_PosLoyaltyView> {
         titlePrimary: 'Fidelización',
         titleSecondary: sectionTitle,
         showDivider: false,
-
         secondaryFlex: appBarConfig.primaryFlex,
         primaryFlex: appBarConfig.secondaryFlex,
-
         onMenuTap: () {
           if (widget.onMenuTap != null) {
             widget.onMenuTap!();
             return;
           }
-
           _scaffoldKey.currentState?.openDrawer();
         },
 

@@ -326,7 +326,7 @@ class RiveGenImage {
     List<RiveAnimationController> controllers = const [],
     OnInitCallback? onInit,
     RiveHitTestBehavior behavior = RiveHitTestBehavior.opaque,
-   // ObjectGenerator? objectGenerator,
+    required ObjectGenerator  objectGenerator,
     double speedMultiplier = 1,
     Key? key,
   }) {
@@ -344,8 +344,6 @@ class RiveGenImage {
       controllers: controllers,
       onInit: onInit,
       behavior: behavior,
-      //objectGenerator: objectGenerator,
-      //speedMultiplier: speedMultiplier,
       key: key,
     );
   }
@@ -353,4 +351,7 @@ class RiveGenImage {
   String get path => _assetName;
 
   String get keyName => _assetName;
+}
+
+class ObjectGenerator {
 }

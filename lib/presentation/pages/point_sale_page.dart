@@ -148,6 +148,7 @@ class _PointSalePageState extends State<PointSalePage> {
       case LayoutType.mobileLandscape:
         return LandscapeLayout(device: device);
       case LayoutType.tabletPortrait:
+        return LandscapeLayout(device: device);
       case LayoutType.tabletLandscape:
         return PosTabletLandscapeLayout(device: device);
     }

@@ -74,6 +74,7 @@ dependencies:
   flutter_blue_plus: ^1.35.5
   esc_pos_utils_plus: ^2.0.4
   image: ^4.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
