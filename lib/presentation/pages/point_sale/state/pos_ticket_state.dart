@@ -95,7 +95,7 @@ class PosTicketState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void saveTicket() {
+  void onCompleteSave() {//GENERATE TICKET
     _items.clear();
     currentTicketId = ticketIdNow();
     _recalculate();

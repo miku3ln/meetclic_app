@@ -40,21 +40,8 @@ abstract class Config {
 
   static const String productionSocketUrl =
       'wss://post-venta-manager.meetclic.com';
-
-  // ===========================================================================
-  // DEVELOPER - API
-  // ===========================================================================
-
-  // PC donde está Docker.
-  //
-  // PC:      192.168.0.101
-  // Celular: 192.168.0.100
-  //
-  // Docker:
-  // 0.0.0.0:8080 -> 80/tcp
-
   static const String developerApi =
-      'http://192.168.0.101:8080/meetclic-manager/api';
+      'http://10.0.2.2:8080/meetclic-manager/api';
 
   // ===========================================================================
   // DEVELOPER - POS SOCKET
@@ -64,21 +51,21 @@ abstract class Config {
   // 0.0.0.0:3000 -> 3000/tcp
 
   static const String developerSocketUrl =
-      'ws://192.168.0.101:3000';
+      'ws://post-venta-manager.meetclic.com';
 
   // ===========================================================================
   // TEST - API
   // ===========================================================================
 
   static const String testApi =
-      'http://192.168.0.101:8080/meetclic-manager/api';
+      'http://10.0.2.2:8080/meetclic-manager/api';
 
   // ===========================================================================
   // TEST - POS SOCKET
   // ===========================================================================
 
   static const String testSocketUrl =
-      'ws://192.168.0.101:3000';
+      'ws://post-venta-manager.meetclic.com';
 
   // ===========================================================================
   // LOCAL - API
@@ -94,7 +81,7 @@ abstract class Config {
   // ===========================================================================
 
   static const String localSocketUrl =
-      'ws://10.0.2.2:3000';
+      'ws://post-venta-manager.meetclic.com';
 }
 
 class ServerConfig {
