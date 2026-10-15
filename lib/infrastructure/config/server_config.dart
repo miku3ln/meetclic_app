@@ -41,7 +41,7 @@ abstract class Config {
   static const String productionSocketUrl =
       'wss://post-venta-manager.meetclic.com';
   static const String developerApi =
-      'http://10.0.2.2:8080/meetclic-manager/api';
+      'http://10.0.2.2/meetclic-manager/api';
 
   // ===========================================================================
   // DEVELOPER - POS SOCKET
@@ -58,7 +58,7 @@ abstract class Config {
   // ===========================================================================
 
   static const String testApi =
-      'http://10.0.2.2:8080/meetclic-manager/api';
+      'http://10.0.2.2/meetclic-manager/api';
 
   // ===========================================================================
   // TEST - POS SOCKET
@@ -74,7 +74,7 @@ abstract class Config {
   // Android Emulator -> PC host.
 
   static const String localApi =
-      'http://10.0.2.2:8080/meetclic-manager/api';
+      'http://10.0.2.2/meetclic-manager/api';
 
   // ===========================================================================
   // LOCAL - POS SOCKET
@@ -133,13 +133,13 @@ class ServerConfig {
         return Config.productionSocketUrl;
 
       case Environment.developer:
-        return Config.developerSocketUrl;
+        return Config.productionSocketUrl;
 
       case Environment.test:
-        return Config.testSocketUrl;
+        return Config.productionSocketUrl;
 
       case Environment.local:
-        return Config.localSocketUrl;
+        return Config.productionSocketUrl;
     }
   }
 

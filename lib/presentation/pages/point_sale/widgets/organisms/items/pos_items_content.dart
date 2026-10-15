@@ -179,6 +179,9 @@ class PosTicketManagementApi {
     required int rowCount,
     String? searchCode,
     DateTime? date,
+    String? status,
+    DateTime? startDate,
+    DateTime? endDate,
   }) {
     return SafeExecutor.run(
       () async {
@@ -195,6 +198,11 @@ class PosTicketManagementApi {
                 'searchPhrase': searchCode ?? '',
                 'business_id': businessId,
                 if (date != null) 'date': date.toIso8601String(),
+                if (status != null) 'status': status,
+                if (startDate != null)
+                  'startDate': DateFormat('yyyy-MM-dd').format(startDate),
+                if (endDate != null)
+                  'endDate': DateFormat('yyyy-MM-dd').format(endDate),
               },
             );
 

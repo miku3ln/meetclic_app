@@ -728,8 +728,8 @@ Widget posPaymentManagement(
         if (mainController.payment.allowInputCashPointSale)
           SizedBox(
             height: 70,
-            child: PageView.builder(
-              controller: PageController(viewportFraction: 0.35),
+            child: PageView.builder(//MONEY CATCH
+              controller: PageController(viewportFraction: 0.25),
               itemCount: controller.suggestedAmounts.length,
               itemBuilder: (context, index) {
                 final amount = controller.suggestedAmounts[index];

@@ -1,35 +1,33 @@
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:meetclic_app/presentation/pages/point_sale/widgets/dialogs/draft-manager/pos_ticket-payment_modal.dart';
+
+import '../../organisms/items/pos_items_content.dart';
 
 typedef TicketMap = Map<String, dynamic>;
 
 class PosDraftTicketsModal extends StatefulWidget {
-  final Future<Map<String, dynamic>> Function() loadTickets;
-  final Future<void> Function(TicketMap ticket) onCollect;
 
   final double widthFactor;
   final double heightFactor;
 
   const PosDraftTicketsModal({
     super.key,
-    required this.loadTickets,
-    required this.onCollect,
     this.widthFactor = 0.92,
     this.heightFactor = 0.88,
   });
 
   static Future<void> show(
       BuildContext context, {
-        required Future<Map<String, dynamic>> Function() loadTickets,
-        required Future<void> Function(TicketMap ticket) onCollect,
         double widthFactor = 0.92,
         double heightFactor = 0.88,
       }) {
     return showDialog<void>(
       context: context,
       builder: (_) => PosDraftTicketsModal(
-        loadTickets: loadTickets,
-        onCollect: onCollect,
         widthFactor: widthFactor,
         heightFactor: heightFactor,
       ),
@@ -42,8 +40,16 @@ class PosDraftTicketsModal extends StatefulWidget {
 }
 
 class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
-  final TextEditingController _searchController =
-  TextEditingController();
+  final TextEditingController _searchController = TextEditingController();
+  late final PosTicketManagementApi _api;
+  static const int _rowCount = 20;
+  int _totalRecords = 0;
+  int _currentPage = 1;
+  bool _hasMore = true;
+  bool _loadingMore = false;
+  int _requestVersion = 0;
+  Timer? _searchDebounce;
+  final ScrollController _scrollController = ScrollController();
 
   List<TicketMap> _tickets = [];
 
@@ -54,17 +60,26 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
   String _search = '';
 
   bool _loading = false;
-  bool _collecting = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
+    _api = PosTicketManagementApi(total: 0);
+    _scrollController.addListener(_onScroll);
     _load();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients || _loading || _loadingMore || !_hasMore) return;
+    if (_scrollController.position.extentAfter < 350) _loadNextPage();
   }
 
   @override
   void dispose() {
+    _requestVersion++;
+    _searchDebounce?.cancel();
+    _scrollController.dispose();
     _searchController.dispose();
     super.dispose();
   }
@@ -99,7 +114,7 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
         '${two(date.hour)}:${two(date.minute)}';
   }
 
-  double _total(TicketMap ticket) {
+  double _ticketTotal(TicketMap ticket) {
     final header = _map(ticket['header']);
     final invoiceValue = _number(header['invoice_value']);
 
@@ -131,91 +146,72 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
   }
 
   Future<void> _load() async {
-    if (_loading) return;
-
+    final version = ++_requestVersion;
     setState(() {
+      _tickets = [];
+      _totalRecords = 0;
+      _currentPage = 1;
+      _hasMore = true;
       _loading = true;
+      _loadingMore = false;
       _error = null;
     });
+    if (_scrollController.hasClients) _scrollController.jumpTo(0);
+    await _fetchPage(version, 1);
+  }
 
+  Future<void> _loadNextPage() async {
+    if (_loading || _loadingMore || !_hasMore) return;
+    await _fetchPage(_requestVersion, _currentPage + 1);
+  }
+
+  Future<void> _fetchPage(int version, int page) async {
+    if (page > 1) setState(() => _loadingMore = true);
     try {
-      final response = await widget.loadTickets();
-
-      // Soporta directamente:
-      // { "total": 18, "rows": [...] }
-      final rows = response['rows'];
-
-      if (rows is! List) {
-        throw Exception('La respuesta no contiene rows.');
-      }
-
-      if (!mounted) return;
-
+      final response = await _api.fetchPage(
+        current: page,
+        rowCount: _rowCount,
+        searchCode: _search.trim(),
+        status: _status == 'ALL' ? null : _status,
+        startDate: _startDate,
+        endDate: _endDate,
+      );
+      if (!mounted || version != _requestVersion) return;
+      final batch = response.rows.map((item) {
+        final original = item.data?['all'];
+        if (original is! Map) {
+          throw const FormatException('El ticket no contiene data.all.');
+        }
+        return Map<String, dynamic>.from(original);
+      }).toList();
       setState(() {
-        _tickets = rows
-            .whereType<Map>()
-            .map((e) => Map<String, dynamic>.from(e))
-            .toList();
+        final ids = _tickets.map((t) => _map(t['header'])['id']).toSet();
+        for (final ticket in batch) {
+          if (ids.add(_map(ticket['header'])['id'])) _tickets.add(ticket);
+        }
+        _currentPage = page;
+        _totalRecords = response.total;
+        _hasMore = batch.isNotEmpty &&
+            batch.length >= _rowCount &&
+            _tickets.length < _totalRecords;
+        _error = null;
       });
     } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        _error = e.toString();
-      });
+      if (mounted && version == _requestVersion) {
+        setState(() => _error = e.toString());
+      }
     } finally {
-      if (mounted) {
-        setState(() => _loading = false);
+      if (mounted && version == _requestVersion) {
+        setState(() {
+          _loading = false;
+          _loadingMore = false;
+        });
       }
     }
   }
 
-  List<TicketMap> get _filteredTickets {
-    final query = _search.trim().toLowerCase();
-
-    return _tickets.where((ticket) {
-      final header = _map(ticket['header']);
-      final status = header['status']?.toString() ?? '';
-
-      if (_status != 'ALL' && status != _status) {
-        return false;
-      }
-
-      final date = _parseDate(header['invoice_date']);
-
-      if (_startDate != null) {
-        if (date == null ||
-            date.isBefore(DateUtils.dateOnly(_startDate!))) {
-          return false;
-        }
-      }
-
-      if (_endDate != null) {
-        if (date == null ||
-            !date.isBefore(
-              DateUtils.dateOnly(_endDate!)
-                  .add(const Duration(days: 1)),
-            )) {
-          return false;
-        }
-      }
-
-      if (query.isNotEmpty) {
-        final searchable = [
-          header['id'],
-          header['invoice_code'],
-          _ticketCode(ticket),
-          _customerName(ticket),
-          header['employee_user_name'],
-          header['customer_identification_document'],
-        ].join(' ').toLowerCase();
-
-        if (!searchable.contains(query)) return false;
-      }
-
-      return true;
-    }).toList();
-  }
+  // Los filtros se aplican en el servidor, no sobre la página actual.
+  List<TicketMap> get _filteredTickets => _tickets;
 
   Future<void> _pickDate(bool start) async {
     final picked = await showDatePicker(
@@ -239,30 +235,11 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
         _endDate = picked;
       }
     });
+    _load();
   }
 
-  Future<void> _collect(TicketMap ticket) async {
-    final header = _map(ticket['header']);
-
-    if (_collecting || header['status'] != 'DRAFT') return;
-
-    setState(() => _collecting = true);
-
-    try {
-      await widget.onCollect(ticket);
-      if (mounted) await _load();
-    } catch (e) {
-      if (!mounted) return;
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo cobrar: $e')),
-      );
-    } finally {
-      if (mounted) {
-        setState(() => _collecting = false);
-      }
-    }
-  }
+  // La acción de cobro se conectará posteriormente con el flujo del POS.
+  // No se realiza ningún cobro simulado.
 
   Widget _dateButton(String label, DateTime? date, bool start) {
     return OutlinedButton.icon(
@@ -287,10 +264,10 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
         if (_startDate != null || _endDate != null)
           IconButton(
             tooltip: 'Limpiar fechas',
-            onPressed: () => setState(() {
-              _startDate = null;
-              _endDate = null;
-            }),
+            onPressed: () {
+              setState(() { _startDate = null; _endDate = null; });
+              _load();
+            },
             icon: const Icon(Icons.event_busy_outlined),
           ),
         SizedBox(
@@ -319,6 +296,7 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
             onChanged: (value) {
               if (value != null) {
                 setState(() => _status = value);
+                _load();
               }
             },
           ),
@@ -329,6 +307,8 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
             controller: _searchController,
             onChanged: (value) {
               setState(() => _search = value);
+              _searchDebounce?.cancel();
+              _searchDebounce = Timer(const Duration(milliseconds: 400), _load);
             },
             decoration: const InputDecoration(
               hintText: 'Buscar ticket o cliente',
@@ -349,9 +329,32 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
 
   Widget _ticketCard(TicketMap ticket) {
     final header = _map(ticket['header']);
-    final status = header['status']?.toString() ?? '-';
-    final canCollect = status == 'DRAFT';
+    final status = (header['status']?.toString()=="DRAFT"?'Guardado':"Pagado") ?? '-';
+    final canCollect = status == 'Guardado';
+    final List<Widget> actions = [
+      Expanded(
+        child: OutlinedButton.icon(
+          onPressed: () => _viewTicket(ticket),
+          icon: const Icon(Icons.visibility_outlined),
+          label: const Text('Ver'),
+        ),
+      ),
 
+    ];
+
+    if(canCollect){
+      actions.add(SizedBox(width: 8));
+      actions.add(    Expanded(
+        child: FilledButton.icon(
+          onPressed: () => _collectTicket(ticket),
+          icon: const Icon(Icons.payments_outlined),
+          label: const Text('Cobrar'),
+        ),
+      ));
+
+
+    }
+final allowPayment=canCollect;
     return Card(
       clipBehavior: Clip.antiAlias,
       child: Padding(
@@ -393,37 +396,70 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
             ),
             const Spacer(),
             Text(
-              _money(_total(ticket)),
+              _money(_ticketTotal(ticket)),
               style: Theme.of(context).textTheme.titleLarge,
             ),
             const SizedBox(height: 8),
             Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton.icon(
-                    onPressed: () => _viewTicket(ticket),
-                    icon: const Icon(Icons.visibility_outlined),
-                    label: const Text('Ver'),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: FilledButton.icon(
-                    onPressed: canCollect && !_collecting
-                        ? () => _collect(ticket)
-                        : null,
-                    icon: const Icon(Icons.payments_outlined),
-                    label: const Text('Cobrar'),
-                  ),
-                ),
-              ],
+              children: actions,
             ),
           ],
         ),
       ),
     );
   }
+  Future<void> _collectTicket(TicketMap ticket) async {
+    final result = await PosTicketPaymentModal.show(
+      context,
+      ticket: ticket,
+    );
 
+    if (!mounted || result == null) return;
+
+    // Resultado del modal
+    final success = result.success;
+    final message = result.message;
+    final data = result.data;
+    final type = result.type;
+
+    switch (type) {
+      case 'saved':
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(message),
+              backgroundColor: Colors.green,
+            ),
+          );
+
+          // Actualizar tickets después del cobro.
+          await _load();
+        }
+        break;
+
+      case 'cancelled':
+        debugPrint('Cobro cancelado: $message');
+        break;
+
+      case 'closed':
+        debugPrint('Modal cerrado: $message');
+        break;
+
+      case 'error':
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(message),
+            backgroundColor: Colors.red,
+          ),
+        );
+        break;
+    }
+
+    debugPrint('Success: $success');
+    debugPrint('Message: $message');
+    debugPrint('Type: $type');
+    debugPrint('Data: $data');
+  }
   void _viewTicket(TicketMap ticket) {
     showDialog<void>(
       context: context,
@@ -477,7 +513,7 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
               const SizedBox(height: 12),
               _filters(),
               const SizedBox(height: 12),
-              Text('${tickets.length} tickets encontrados'),
+              Text('${tickets.length} tickets cargados de $_totalRecords registros'),
               const SizedBox(height: 8),
               Expanded(
                 child: _loading && _tickets.isEmpty
@@ -500,7 +536,8 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
                         : 1;
 
                     return GridView.builder(
-                      itemCount: tickets.length,
+                      controller: _scrollController,
+                      itemCount: tickets.length + (_loadingMore ? 1 : 0),
                       gridDelegate:
                       SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: columns,
@@ -508,8 +545,12 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
                         mainAxisSpacing: 10,
                         mainAxisExtent: 195,
                       ),
-                      itemBuilder: (context, index) =>
-                          _ticketCard(tickets[index]),
+                      itemBuilder: (context, index) {
+                        if (index == tickets.length) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        return _ticketCard(tickets[index]);
+                      },
                     );
                   },
                 ),
@@ -651,4 +692,31 @@ class _SavedTicketPreview extends StatelessWidget {
       ],
     );
   }
+}
+
+
+
+enum TicketPaymentMethod { cash, deposit, card, qr }
+
+class TicketPaymentRequest {
+  final int invoiceSaleId;
+  final TicketPaymentMethod method;
+  final double total;
+  final double received;
+  final double change;
+
+  const TicketPaymentRequest({
+    required this.invoiceSaleId,
+    required this.method,
+    required this.total,
+    required this.received,
+    required this.change,
+  });
+
+  String get paymentMethodCode => switch (method) {
+    TicketPaymentMethod.cash => 'CASH',
+    TicketPaymentMethod.deposit => 'DEPOSIT',
+    TicketPaymentMethod.card => 'CARD',
+    TicketPaymentMethod.qr => 'QR',
+  };
 }
