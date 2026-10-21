@@ -234,6 +234,22 @@ class PosMainController extends ChangeNotifier {
 
     notifyListeners();
   }
+  Map<String, dynamic> getTicketDraftData(total,paymentMethod,invoiceId) {//GENERATE TICKET
+    final businessId = SessionService().businessId;
+    final currentSession = SessionService().currentSession;
+    final userId = currentSession?.userId;
+    final typeSave ='SAVE';
+    return {
+      'header': {
+        'paymentMethod': paymentMethod,
+        'total': total,
+        'userId': userId,
+        'invoice_id': invoiceId,
+        'business_id': businessId,
+        'typeSave': typeSave,
+      },
+    };
+  }
   Map<String, dynamic> getTicketData() {//GENERATE TICKET
     final customerId = selectedCustomer?.id;
     final businessId = SessionService().businessId;
@@ -808,17 +824,8 @@ class _PosSaveTicketModalState
     });
 
     try {
-      // ========================================================
-      // BODY
-      // ========================================================
-
       final body =
       widget.main.getTicketData();
-
-      // ========================================================
-      // API
-      // ========================================================
-
       final result =
       await PosTicketService.generateTicket(
         body,
@@ -827,62 +834,32 @@ class _PosSaveTicketModalState
       if (!mounted) {
         return;
       }
-
-      // ========================================================
-      // API ERROR
-      // ========================================================
-
       if (result['success'] != true) {
         setState(() {
           _isSaving = false;
-
           _errorMessage =
               result['message']?.toString() ??
                   result['msj']?.toString() ??
                   'No se pudo registrar la compra.';
         });
-
         return;
       }
-
-      // ========================================================
-      // DATA
-      //
-      // {
-      //   "success": true,
-      //   "data": {
-      //      ...
-      //   }
-      // }
-      // ========================================================
-
       final data = result['data'];
-
       if (data is! Map) {
         setState(() {
           _isSaving = false;
-
           _errorMessage =
           'El servidor no devolvió '
               'la información de la compra.';
         });
-
         return;
       }
-
-      // ========================================================
-      // INVOICE
-      //
-      // data['invoice']
-      // ========================================================
-
       final invoiceData =
       data['invoice'];
 
       if (invoiceData is! Map) {
         setState(() {
           _isSaving = false;
-
           _errorMessage =
           'No se recibió la información '
               'de la factura.';
@@ -903,26 +880,17 @@ class _PosSaveTicketModalState
       if (invoice['id'] == null) {
         setState(() {
           _isSaving = false;
-
           _errorMessage =
           'La compra fue registrada, '
               'pero no se recibió el número '
               'del ticket.';
         });
-
         return;
       }
-
-      // ========================================================
-      // SUCCESS
-      // ========================================================
-
       setState(() {
         _invoice = invoice;
-
         _isSaving = false;
         _isCompleted = true;
-
         _errorMessage = null;
       });
     } catch (e) {

@@ -56,7 +56,7 @@ class PosUiState extends ChangeNotifier {
             context,
             widthFactor: 0.95,
             heightFactor: 0.90,
-
+            main: controllerMain,
           );
           break;
       }

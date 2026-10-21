@@ -165,6 +165,89 @@ class PosItemsManagementRepository {
       total: data['total'] ?? 0,
     );
   }
+  Future<PaginatedResponse<GenericListItem<Map<String, dynamic>>>>
+  fetchCustomer({
+    required int current,
+    required String searchPhrase,
+    required int rowCount,
+  }) async {
+    final token = SessionService().apiToken;
+    final businessId = SessionService().businessId;
+
+    final uri = Uri.parse(
+      '${ServerConfig.baseUrl}/pointsales/business/customer/admin',
+    );
+
+    // =====================================
+    // BODY POST
+    // =====================================
+    final body = {
+      'current': current,
+      'rowCount': rowCount,
+      'searchPhrase': searchPhrase,
+      'filters': {
+        'business_id': businessId,
+      },
+    };
+
+    // =====================================
+    // REQUEST POST
+    // =====================================
+    final response = await http.post(
+      uri,
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      },
+      body: jsonEncode(body),
+    );
+
+    if (response.statusCode != 200) {
+      throw Exception(
+        'Error al cargar clientes: ${response.statusCode} - ${response.body}',
+      );
+    }
+
+    // =====================================
+    // RESPONSE
+    // =====================================
+    final data = jsonDecode(response.body) as Map<String, dynamic>;
+
+    final rows = (data['rows'] as List<dynamic>? ?? []).map((item) {
+      final json = Map<String, dynamic>.from(item as Map);
+
+      final firstName = (json['name'] ?? '').toString().trim();
+      final lastName = (json['last_name'] ?? '').toString().trim();
+
+      final fullName = '$firstName $lastName'.trim();
+
+      final identification =
+      (json['identification_document'] ?? '').toString();
+
+      final phone =
+      (json['information_phone_value'] ?? '').toString();
+
+      return GenericListItem<Map<String, dynamic>>(
+        id: json['id'],
+        title: fullName,
+        subtitle: identification,
+        description: phone,
+        image: json['src'],
+        data: json,
+      );
+    }).toList();
+
+    // =====================================
+    // PAGINATION RESULT
+    // =====================================
+    return PaginatedResponse<GenericListItem<Map<String, dynamic>>>(
+      current: int.tryParse('${data['current']}') ?? current,
+      rowCount: int.tryParse('${data['rowCount']}') ?? rowCount,
+      rows: rows,
+      total: int.tryParse('${data['total']}') ?? 0,
+    );
+  }
 }
 
 class PosTicketManagementApi {

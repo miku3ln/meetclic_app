@@ -20,7 +20,7 @@ class MeetclicMaterialApp extends StatelessWidget {
     final app = context.watch<AppController>();
     final themeController = context.watch<AppThemeController>();
     return MaterialApp(
-      title: 'Meetclic',
+      title: 'Yapitas',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeController.themeMode,

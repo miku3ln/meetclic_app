@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/widgets/dialogs/draft-manager/pos_ticket-payment_modal.dart';
 
+import '../../layouts/pos_main_controller.dart';
 import '../../organisms/items/pos_items_content.dart';
 
 typedef TicketMap = Map<String, dynamic>;
@@ -13,23 +14,26 @@ class PosDraftTicketsModal extends StatefulWidget {
 
   final double widthFactor;
   final double heightFactor;
-
+  final PosMainController main;
   const PosDraftTicketsModal({
     super.key,
     this.widthFactor = 0.92,
     this.heightFactor = 0.88,
+    required  this.main,
   });
 
   static Future<void> show(
       BuildContext context, {
         double widthFactor = 0.92,
         double heightFactor = 0.88,
+        required PosMainController main,
       }) {
     return showDialog<void>(
       context: context,
       builder: (_) => PosDraftTicketsModal(
         widthFactor: widthFactor,
         heightFactor: heightFactor,
+          main:main
       ),
     );
   }
@@ -346,7 +350,7 @@ class _PosDraftTicketsModalState extends State<PosDraftTicketsModal> {
       actions.add(SizedBox(width: 8));
       actions.add(    Expanded(
         child: FilledButton.icon(
-          onPressed: () => _collectTicket(ticket),
+          onPressed: () => _collectTicket(ticket,widget.main),
           icon: const Icon(Icons.payments_outlined),
           label: const Text('Cobrar'),
         ),
@@ -408,10 +412,11 @@ final allowPayment=canCollect;
       ),
     );
   }
-  Future<void> _collectTicket(TicketMap ticket) async {
+  Future<void> _collectTicket(TicketMap ticket,PosMainController main) async {
     final result = await PosTicketPaymentModal.show(
       context,
       ticket: ticket,
+        main:main
     );
 
     if (!mounted || result == null) return;
@@ -719,4 +724,12 @@ class TicketPaymentRequest {
     TicketPaymentMethod.card => 'CARD',
     TicketPaymentMethod.qr => 'QR',
   };
+  static String getPaymentMethodCode(TicketPaymentMethod method) {
+    return switch (method) {
+      TicketPaymentMethod.cash => 'CASH',
+      TicketPaymentMethod.deposit => 'DEPOSIT',
+      TicketPaymentMethod.card => 'CARD',
+      TicketPaymentMethod.qr => 'QR',
+    };
+  }
 }

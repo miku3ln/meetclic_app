@@ -877,6 +877,54 @@ class PosTicketService {
       },
     );
   }
+  static Future<Map<String, dynamic>> transformDraftInvoiceRegister(
+      Map<String, dynamic> body,
+      ) async {
+    return SafeExecutor.run(
+          () async {
+        final token = SessionService().apiToken;
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/transform-draft-invoice-register',
+        );
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token!}',
+            'Content-Type': 'text/plain',
+          },
+          body: jsonEncode(body),
+        );
+
+        if (response.statusCode == 200) {
+          final decoded = jsonDecode(response.body);
+
+          final success = decoded['success'] ?? false;
+          final message = decoded['msj'] ?? 'Sin mensaje';
+
+          return {
+            'success': success,
+            'message': message,
+            'data': decoded['data'],
+            'errors': decoded['errors'] ?? [],
+          };
+        }
+
+        return {
+          'success': false,
+          'message': 'Error Servidor.!',
+          'data': [],
+          'errors': [],
+        };
+      },
+      {
+        'success': false,
+        'message': 'Error al cobrar el ticket.',
+        'data': null,
+        'errors': [],
+      },
+    );
+  }
 }
 class PosMockData {
   static Future<List<GenericListItem<Map<String, dynamic>>>>
