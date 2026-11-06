@@ -22,6 +22,7 @@ import '../molecules/pos_totals_card.dart';
 import '../organisms/pos_ticket_list.dart';
 import '../organisms/pos_ticket_row.dart';
 import '../sections/pos_layouts_utils.dart';
+import 'customer/customer_manager.dart';
 import 'moda_managerl.dart';
 
 /// =============================
@@ -1084,7 +1085,7 @@ class _Header extends StatelessWidget {
                         mainController.selectedCustomer!,
                       );
                     } else {
-                      controller.initLoadData(); // sin await → loading
+                     // controller.initLoadData(); // sin await → loading
                     }
 
                     await showCustomerModal(

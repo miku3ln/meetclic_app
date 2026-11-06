@@ -1,7 +1,6 @@
 
 import '../repositories/config_repository.dart';
-import '../services/config_api_service.dart';
-import '../widgets/dialogs/moda_managerl.dart';
+import '../widgets/dialogs/customer/customer_manager.dart';
 
 class PosConfigController {
   final ConfigRepository repository;

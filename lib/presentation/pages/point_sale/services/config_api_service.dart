@@ -1,10 +1,8 @@
-import 'package:http/http.dart' as api;
 
-import '../widgets/dialogs/moda_managerl.dart';
+import '../widgets/dialogs/customer/customer_manager.dart';
 
 class ConfigApiService {
   Future<CustomerModelPosCurrent> fetchFinalConsumer() async {
- //   final response = await api.get('/consumer-final');
     final mockData = {
       "id": "1",
       "name": "CONSUMIDOR FINAL",

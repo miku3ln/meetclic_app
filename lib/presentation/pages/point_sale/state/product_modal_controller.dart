@@ -13,6 +13,7 @@ import '../models/product_draft.dart';
 import '../models/product_subcategory.dart';
 import '../repositories/config_repository.dart';
 import '../services/product_catalog_service.dart';
+import '../widgets/dialogs/customer/customer_manager.dart';
 import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/layouts/tablet_landscape/pos_tablet_landscape_fixtures.dart';
 import '../widgets/molecules/ps_image_picker.dart';
@@ -1492,7 +1493,7 @@ enum CustomerDetailTab { profile, redeem, purchases }
 
 enum CustomerViewType { list, create, update, detail }
 
-class CustomerModalController extends ChangeNotifier {
+class CustomerModalController2 extends ChangeNotifier {
   /// =========================
   /// VIEW STATE
   /// =========================
@@ -1647,26 +1648,6 @@ class CustomerModalController extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// =========================
-  /// SAVE
-  /// =========================
-  CustomerModelPosCurrent save() {
-    final customer = CustomerModelPosCurrent(
-      id: DateTime.now().toString(),
-      name: name,
-      email: email,
-      phone: phone,
-      city: city,
-    );
-
-    customers.add(customer);
-
-    view = CustomerViewType.list;
-
-    notifyListeners();
-
-    return customer;
-  }
 
   void reset() {
     view = CustomerViewType.list;
@@ -1765,7 +1746,7 @@ class CustomerModalController extends ChangeNotifier {
 
   final CustomerServiceModal _service;
 
-  CustomerModalController(this._service);
+  CustomerModalController2(this._service);
 
   bool isLoading = false;
   String? errorMessage;
@@ -1774,9 +1755,8 @@ class CustomerModalController extends ChangeNotifier {
     try {
       isLoading = true;
       notifyListeners();
-      await Future.delayed(const Duration(seconds: 2));
-      final data = await _service.fetchCustomers();
-      customers = data;
+     // final data = await _service.fetchCustomers();
+     // customers = data;
     } catch (e) {
       errorMessage = "Error al cargar clientes";
     } finally {

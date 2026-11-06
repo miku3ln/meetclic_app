@@ -8,4 +8,5 @@
     <color name="amarilloVital">#FFCC00</color>
     <color name="launch_background_color">#FFFFFF</color>
     <color name="launch_yellow">#FFFF00</color> <!-- ejemplo -->
+	<color name="ic_launcher_background">#FFFFFF</color>
 </resources>

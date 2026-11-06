@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meetclic_app/presentation/pages/point_sale/state/product_modal_controller.dart';
 import '../repositories/config_repository.dart';
 import '../shared/utils.dart';
+import '../widgets/dialogs/customer/customer_manager.dart';
 import '../widgets/dialogs/moda_managerl.dart';
 import '../widgets/dialogs/draft-manager/pos_draft_tickets_modal.dart';
 import '../widgets/layouts/pos_main_controller.dart';
@@ -76,7 +77,7 @@ class PosUiState extends ChangeNotifier {
     if (controllerMain.hasCustomerSelected) {
       controller.initWithCustomer(controllerMain.selectedCustomer!);
     } else {
-      controller.initLoadData(); // sin await → loading
+      //controller.initLoadData(); // sin await → loading
 
     }
 

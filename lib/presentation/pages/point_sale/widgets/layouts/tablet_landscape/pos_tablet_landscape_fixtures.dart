@@ -828,6 +828,101 @@ class UtilServicesCash {
     );
   }
 }
+class CustomerManagerService {
+  static Future<Map<String, dynamic>> saveCustomer(
+      Map<String, dynamic> body,
+      ) async {
+    final fallback = <String, dynamic>{
+      'success': false,
+      'message': 'Error al guardar el cliente.',
+      'data': null,
+      'errors': [],
+      'step': null,
+      'step_code': null,
+      'step_name': null,
+      'operation': null,
+    };
+
+    return SafeExecutor.run(
+          () async {
+        // ==========================================
+        // 1. CONFIGURACIÓN
+        // ==========================================
+
+        final token = SessionService().apiToken;
+        final businessId = SessionService().businessId;
+        body['Customer']['business_id'] = businessId;
+        final uri = Uri.parse(
+          '${ServerConfig.baseUrl}/pointsales/business/customer/save',
+        );
+
+        // ==========================================
+        // 2. REALIZAR PETICIÓN
+        // ==========================================
+
+        final response = await http.post(
+          uri,
+          headers: {
+            'Authorization': 'Bearer ${token ?? ''}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: jsonEncode(body),
+        );
+
+        // ==========================================
+        // 3. PROCESAR RESPUESTA
+        // ==========================================
+
+        Map<String, dynamic> decoded;
+
+        try {
+          final result = jsonDecode(response.body);
+
+          decoded = result is Map
+              ? Map<String, dynamic>.from(result)
+              : {};
+        } catch (_) {
+          return {
+            ...fallback,
+            'message': 'El servidor devolvió una respuesta no válida.',
+            'status_code': response.statusCode,
+          };
+        }
+
+        // ==========================================
+        // 4. IDENTIFICAR RESULTADO
+        // ==========================================
+
+        final success =
+            response.statusCode >= 200 &&
+                response.statusCode < 300 &&
+                decoded['success'] == true;
+
+        final message = decoded['msj']
+            ?? decoded['message']
+            ?? 'Sin mensaje';
+
+        // ==========================================
+        // 5. RETORNAR RESULTADO
+        // ==========================================
+
+        return {
+          'success': success,
+          'message': message,
+          'data': decoded['data'],
+          'errors': decoded['errors'] ?? [],
+          'step': decoded['step'],
+          'step_code': decoded['step_code'],
+          'step_name': decoded['step_name'],
+          'operation': decoded['operation'],
+          'status_code': response.statusCode,
+        };
+      },
+      fallback,
+    );
+  }
+}
 class PosTicketService {
   static Future<Map<String, dynamic>> generateTicket(
       Map<String, dynamic> body,

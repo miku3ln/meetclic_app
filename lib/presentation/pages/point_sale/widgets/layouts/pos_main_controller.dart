@@ -8,6 +8,7 @@ import '../../services/pos_labels_service.dart';
 import '../../shared/utils.dart';
 import '../../state/pos_product_browser_state.dart';
 
+import '../dialogs/customer/customer_manager.dart';
 import '../dialogs/moda_managerl.dart';
 import '../dialogs/modal_pos_pay.dart';
 import '../models/pos_product_item.dart';

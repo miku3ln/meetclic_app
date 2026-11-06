@@ -6,12 +6,11 @@ import '../../../../../../shared/theme/configuration/app_spacing.dart';
 import '../../../../../../shared/theme/configuration/app_text_styles.dart';
 import '../../../../../../shared/theme/configuration/app_theme_tokens.dart';
 import '../../state/product_modal_controller.dart';
-
 import '../layouts/pos_main_controller.dart';
-import '../molecules/inputs/ps_field_row.dart';
 import '../molecules/inputs/ps_input.dart';
 import '../organisms/items/pos_items_content.dart';
 import '../sections/product/ps_section_card.dart';
+import 'customer/customer_manager.dart';
 
 
 class ModalManagerLayout extends StatelessWidget {
@@ -262,12 +261,9 @@ Future<void> showCustomerModal({
               // =====================================
               // GUARDAR
               // =====================================
-              onSave: controller.view == CustomerViewType.create &&
-                  controller.canSubmit
-                  ? () {
-                if (controller.validate().success) {
-                  controller.save();
-                }
+              onSave: controller.canSubmit
+                  ? () async {
+                await controller.save();
               }
                   : null,
             );
@@ -458,63 +454,6 @@ class CustomerDetailView extends StatelessWidget {
 
 }
 
-class CustomerCreateView extends StatelessWidget {
-  final CustomerModalController controller;
-
-  const CustomerCreateView(this.controller, {super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return PsSectionCard(
-      title: "Información",
-      child: Column(
-        children: [
-          PsInput(
-            label: "Nombre",
-            value: controller.name,
-            onChanged: controller.setName,
-            requiredField: true,
-            isTouched: controller.nameTouched,
-            error: controller.nameError,
-            isValid: controller.nameError == null,
-          ),
-
-          AppSpacing.spaceBetweenInputs,
-
-          PsInput(
-            label: "Correo",
-            value: controller.email,
-            onChanged: controller.setEmail,
-          ),
-
-          AppSpacing.spaceBetweenInputs,
-          PsFieldRow(
-            children: [
-              Expanded(
-                child: PsInput(
-                  label: "Teléfono",
-                  value: controller.phone,
-                  onChanged: controller.setPhone,
-
-                ),
-              ),
-
-              const SizedBox(width: AppSpacing.s),
-
-              Expanded(
-                child: PsInput(
-                  label: "Ciudad",
-                  value: controller.city,
-                  onChanged: controller.setCity,
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class CustomerListView extends StatefulWidget {
   final CustomerModalController controller;
@@ -616,7 +555,7 @@ class _CustomerListViewState extends State<CustomerListView> {
           alignment: Alignment.centerLeft,
           child: TextButton(
             onPressed: controller.goToCreate,
-            child: const Text("AÑADIR CLIENTE NUEVO"),
+            child: const Text("AÑADIR CLIENTE NUEVOs"),
           ),
         ),
 
@@ -1050,9 +989,6 @@ class _CustomerListViewState extends State<CustomerListView> {
 
   @override
   Widget build(BuildContext context) {
-
-   //   return _buildOriginalCustomerList();
-
     return Column(
       children: [
         PsInput(
@@ -1069,7 +1005,7 @@ class _CustomerListViewState extends State<CustomerListView> {
               child: TextButton.icon(
                 onPressed: widget.controller.goToCreate,
                 icon: const Icon(Icons.person_add_alt_1),
-                label: const Text('AÑADIR CLIENTE NUEVO'),
+                label: const Text('AÑADIR CLIENTE NUEVO2'),
               ),
             ),
           ],
@@ -1095,22 +1031,13 @@ class _CustomerListViewState extends State<CustomerListView> {
 
   @override
   void dispose() {
-    debugPrint('🧹 CUSTOMER LIST: iniciando limpieza');
-
-    // Marcar el widget como cerrado.
     _isClosing = true;
-
-    // Invalidar solicitudes pendientes.
     _requestVersion++;
-
-    // Cancelar búsquedas programadas.
     _searchDebounce?.cancel();
     _searchDebounce = null;
 
-    // Liberar controlador de scroll.
     _scrollController.removeListener(_onScroll);
     _scrollController.dispose();
-
     // Liberar datos temporales.
     _items.clear();
 
@@ -1144,65 +1071,6 @@ String _getTitle(CustomerModalController c) {
   }
 }
 
-class CustomerModelPosCurrent {
-  final String id;
-  final String name;
-  final String? email;
-  final String? phone;
-  final String? address;
-  final String? city;
-
-  CustomerModelPosCurrent({
-    required this.id,
-    required this.name,
-    this.email,
-    this.phone,
-    this.address,
-    this.city,
-  });
-
-  factory CustomerModelPosCurrent.fromJson(
-      Map<String, dynamic> json,
-      ) {
-    String? optionalString(dynamic value) {
-      if (value == null) return null;
-      final text = value.toString().trim();
-      return text.isEmpty ? null : text;
-    }
-
-    final firstName =
-        optionalString(json['name']) ?? '';
-
-    final lastName =
-        optionalString(json['last_name']) ?? '';
-
-    final fullName = '$firstName $lastName'.trim();
-
-    return CustomerModelPosCurrent(
-      id: json['id'].toString(),
-      name: fullName,
-      email: optionalString(json['email']),
-      phone: optionalString(
-        json['information_phone_value'] ?? json['phone'],
-      ),
-      address: optionalString(
-        json['street_one'] ?? json['address'],
-      ),
-      city: optionalString(json['city']),
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'phone': phone,
-      'address': address,
-      'city': city,
-    };
-  }
-}
 
 class _CustomerTabs extends StatelessWidget {
   final CustomerModalController controller;

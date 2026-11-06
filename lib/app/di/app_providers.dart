@@ -4,6 +4,9 @@ import '../../shared/models/app_config.dart';
 import '../../domain/services/session_service.dart';
 import 'package:provider/single_child_widget.dart';
 
+import '../../shared/printer/bluetooth/android_classic_printer_service.dart';
+import '../../shared/printer/bluetooth/printer_discovery_manager.dart';
+import '../../shared/printer/cache/printer_device_cache.dart';
 import '../../shared/printer/mock_bluetooth.dart';
 import '../../shared/printer/printer_service.dart';
 import '../../shared/theme/configuration/app_theme_controller.dart';
@@ -48,18 +51,54 @@ List<SingleChildWidget> buildAppProviders(AppMode mode) {
       create: (context) => AppDrawerController(app: context.read<AppController>()),
       update: (context, app, drawer) => drawer ?? AppDrawerController(app: app),
     ),
+// ==========================================
+    // PRINTER - LOCAL CACHE
+    // ==========================================
+
+    Provider<PrinterDeviceCache>(
+      create: (_) => PrinterDeviceCache(),
+    ),
+
+    // ==========================================
+    // PRINTER - ANDROID BLUETOOTH CLASSIC
+    // ==========================================
+
+    Provider<AndroidClassicPrinterService>(
+      create: (_) => AndroidClassicPrinterService(),
+    ),
+
+    // ==========================================
+    // PRINTER - DISCOVERY MANAGER
+    // ==========================================
+
+    ProxyProvider2<
+        AndroidClassicPrinterService,
+        PrinterDeviceCache,
+        PrinterDiscoveryManager>(
+      update: (
+          context,
+          bluetooth,
+          cache,
+          previous,
+          ) {
+        return previous ??
+            PrinterDiscoveryManager(
+              bluetooth: bluetooth,
+              cache: cache,
+            );
+      },
+    ),
+
+    // ==========================================
+    // PRINTER - PRINT SERVICE
+    // ==========================================
+
     Provider<PrinterService>(
       create: (_) {
-
         return PrinterService(
-
-          bluetooth:
-          FlutterBluetoothPrinterService(),
-          driver:
-          MockPrinterDriver(),
-
+          bluetooth: FlutterBluetoothPrinterService(),
+          driver: MockPrinterDriver(),
         );
-
       },
     ),
   ];
