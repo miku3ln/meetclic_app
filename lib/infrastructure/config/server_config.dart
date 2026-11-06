@@ -90,7 +90,7 @@ class ServerConfig {
   // ===========================================================================
 
   static Environment currentEnv =
-      Environment.local;
+      Environment.production;
 
   // ===========================================================================
   // LEGACY SOCKET

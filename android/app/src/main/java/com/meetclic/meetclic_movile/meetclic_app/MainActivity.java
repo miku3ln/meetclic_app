@@ -1,6 +1,4 @@
-
 package com.meetclic.meetclic_movile;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.bluetooth.BluetoothAdapter;
@@ -14,6 +12,9 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.location.LocationManager;
+import android.provider.Settings;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -28,7 +29,7 @@ import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
 
 public class MainActivity extends FlutterActivity {
-
+    private static final String TAG = "YapitaBluetooth";
     private static final String CHANNEL =
             "pos/printer_bluetooth_classic";
 
@@ -46,11 +47,14 @@ public class MainActivity extends FlutterActivity {
     private String pairingAddress;
 
     private boolean receiverRegistered = false;
+    private boolean scanStarted = false;
+    private Runnable pendingScanStart;
 
     private final Runnable scanTimeout = () -> {
         if (scanResult != null) {
-            finishScan();
+            Log.w(TAG, "SCAN_TIMEOUT found=" + discoveredDevices.size());
             stopDiscoverySafely();
+            finishScan();
         }
     };
 
@@ -82,7 +86,8 @@ public class MainActivity extends FlutterActivity {
                         BluetoothDevice device =
                                 getIntentDevice(intent);
 
-                        if (device != null) {
+                        if (device != null && scanResult != null && scanStarted) {
+                            Log.d(TAG, "ACTION_FOUND address=" + device.getAddress());
                             discoveredDevices.put(
                                     device.getAddress(),
                                     device
@@ -93,7 +98,11 @@ public class MainActivity extends FlutterActivity {
                             BluetoothAdapter.ACTION_DISCOVERY_FINISHED
                                     .equals(action)
                     ) {
-                        finishScan();
+                        Log.d(TAG, "ACTION_DISCOVERY_FINISHED started=" + scanStarted
+                                + " pending=" + (scanResult != null));
+                        if (scanResult != null && scanStarted) {
+                            finishScan();
+                        }
 
                     } else if (
                             BluetoothDevice.ACTION_BOND_STATE_CHANGED
@@ -122,8 +131,33 @@ public class MainActivity extends FlutterActivity {
                 CHANNEL
         ).setMethodCallHandler((call, result) -> {
 
+            Log.d(TAG, "METHOD_CALL method=" + call.method);
             try {
                 switch (call.method) {
+
+                    case "getBluetoothStatus":
+                        result.success(getBluetoothStatus());
+                        break;
+
+                    case "openBluetoothSettings":
+                        Log.d(TAG, "OPEN_BLUETOOTH_SETTINGS");
+                        startActivity(new Intent(Settings.ACTION_BLUETOOTH_SETTINGS));
+                        result.success(true);
+                        break;
+
+                    case "openLocationSettings":
+                        Log.d(TAG, "OPEN_LOCATION_SETTINGS");
+                        startActivity(new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS));
+                        result.success(true);
+                        break;
+
+                    case "openAppSettings":
+                        Intent appSettings = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                        appSettings.setData(android.net.Uri.parse("package:" + getPackageName()));
+                        Log.d(TAG, "OPEN_APP_SETTINGS");
+                        startActivity(appSettings);
+                        result.success(true);
+                        break;
 
                     case "scan":
                         startScan(result);
@@ -172,6 +206,7 @@ public class MainActivity extends FlutterActivity {
                 }
 
             } catch (SecurityException e) {
+                Log.e(TAG, "METHOD_PERMISSION_ERROR method=" + call.method, e);
                 result.error(
                         "PERMISSION_DENIED",
                         e.getMessage(),
@@ -179,6 +214,7 @@ public class MainActivity extends FlutterActivity {
                 );
 
             } catch (Exception e) {
+                Log.e(TAG, "METHOD_ERROR method=" + call.method, e);
                 result.error(
                         "BLUETOOTH_ERROR",
                         e.getMessage(),
@@ -195,6 +231,7 @@ public class MainActivity extends FlutterActivity {
     private void registerBluetoothReceiver() {
         if (receiverRegistered) return;
 
+        Log.d(TAG, "REGISTER_RECEIVER");
         IntentFilter filter = new IntentFilter();
 
         filter.addAction(BluetoothDevice.ACTION_FOUND);
@@ -291,48 +328,157 @@ public class MainActivity extends FlutterActivity {
 
         return adapter;
     }
+    private boolean isLocationEnabled() {
+        LocationManager manager =
+                (LocationManager) getSystemService(
+                        Context.LOCATION_SERVICE
+                );
+
+        if (manager == null) {
+            return false;
+        }
+
+        if (Build.VERSION.SDK_INT >= 28) {
+            return manager.isLocationEnabled();
+        }
+
+        return manager.isProviderEnabled(
+                LocationManager.GPS_PROVIDER
+        ) || manager.isProviderEnabled(
+                LocationManager.NETWORK_PROVIDER
+        );
+    }
+    // ==========================================
+    // ESTADO CENTRALIZADO (NO SOLICITA PERMISOS)
+    // ==========================================
+    private Map<String, Object> getBluetoothStatus() {
+        Map<String, Object> status = new HashMap<>();
+        BluetoothAdapter adapter = getBluetoothAdapter();
+        boolean bluetoothEnabled = false;
+        try {
+            bluetoothEnabled = adapter != null && adapter.isEnabled();
+        } catch (SecurityException e) {
+            Log.w(TAG, "STATUS_CONNECT_PERMISSION_MISSING", e);
+        }
+        status.put("sdk", Build.VERSION.SDK_INT);
+        status.put("bluetoothAvailable", adapter != null);
+        status.put("bluetoothEnabled", bluetoothEnabled);
+        status.put("locationEnabled", isLocationEnabled());
+        status.put("scanPermissionGranted", Build.VERSION.SDK_INT >= 31
+                ? hasPermission(Manifest.permission.BLUETOOTH_SCAN)
+                : hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
+        status.put("connectPermissionGranted", Build.VERSION.SDK_INT >= 31
+                ? hasPermission(Manifest.permission.BLUETOOTH_CONNECT) : true);
+        Log.d(TAG, "BLUETOOTH_STATUS " + status);
+        return status;
+    }
 
     // ==========================================
     // SCAN
     // ==========================================
 
+
     @SuppressLint("MissingPermission")
     private void startScan(MethodChannel.Result result) {
-        checkScanPermission();
+        Log.d(TAG, "SCAN_REQUEST sdk=" + Build.VERSION.SDK_INT
+                + " scanGranted=" + hasPermission(Manifest.permission.BLUETOOTH_SCAN)
+                + " connectGranted=" + hasPermission(Manifest.permission.BLUETOOTH_CONNECT)
+                + " locationGranted=" + hasPermission(Manifest.permission.ACCESS_FINE_LOCATION));
 
+        checkScanPermission();
+        Log.d(TAG, "SCAN_LOCATION_ENABLED=" + isLocationEnabled());
+        if (Build.VERSION.SDK_INT < 31 && !isLocationEnabled()) {
+            Log.e(TAG, "SCAN_BLOCKED_LOCATION_DISABLED");
+            result.error("LOCATION_DISABLED",
+                    "Activa la ubicación del teléfono para buscar dispositivos Bluetooth", null);
+            return;
+        }
         BluetoothAdapter adapter = requireAdapter();
 
         if (scanResult != null || pairResult != null) {
-            result.error(
-                    "BLUETOOTH_BUSY",
-                    "Ya existe una operación Bluetooth activa",
-                    null
-            );
+            Log.w(TAG, "SCAN_BUSY scanPending=" + (scanResult != null)
+                    + " pairPending=" + (pairResult != null));
+            result.error("BLUETOOTH_BUSY", "Ya existe una operación Bluetooth activa", null);
             return;
         }
+
+        Log.d(TAG, "SCAN_ADAPTER enabled=" + adapter.isEnabled()
+                + " state=" + adapter.getState()
+                + " discovering=" + adapter.isDiscovering());
 
         discoveredDevices.clear();
         scanResult = result;
+        scanStarted = false;
 
-        adapter.cancelDiscovery();
-
-        boolean started = adapter.startDiscovery();
-
-        if (!started) {
-            scanResult = null;
-
-            result.error(
-                    "SCAN_FAILED",
-                    "No se pudo iniciar el escaneo",
-                    null
-            );
-            return;
+        if (adapter.isDiscovering()) {
+            boolean cancelled = adapter.cancelDiscovery();
+            Log.d(TAG, "CANCEL_PREVIOUS_DISCOVERY result=" + cancelled);
+            if (!cancelled) {
+                failScan("SCAN_CANCEL_FAILED", "No se pudo cancelar la búsqueda anterior");
+                return;
+            }
         }
 
-        handler.postDelayed(
-                scanTimeout,
-                SCAN_TIMEOUT_MS
-        );
+        pendingScanStart = () -> {
+            pendingScanStart = null;
+            if (scanResult == null) return;
+
+            try {
+                BluetoothAdapter current = requireAdapter();
+                boolean alreadyDiscovering = current.isDiscovering();
+                Log.d(TAG, "SCAN_BEFORE_START enabled=" + current.isEnabled()
+                        + " state=" + current.getState()
+                        + " discovering=" + alreadyDiscovering);
+
+                if (alreadyDiscovering) {
+                    failScan("BLUETOOTH_BUSY", "Bluetooth continúa realizando una búsqueda");
+                    return;
+                }
+
+                boolean started = current.startDiscovery();
+                Log.d(TAG, "START_DISCOVERY_RESULT=" + started
+                        + " discoveringAfter=" + current.isDiscovering());
+
+                if (!started) {
+                    failScan("SCAN_FAILED", "Android rechazó startDiscovery() (resultado false)");
+                    return;
+                }
+
+                scanStarted = true;
+                handler.postDelayed(scanTimeout, SCAN_TIMEOUT_MS);
+            } catch (SecurityException e) {
+                Log.e(TAG, "SCAN_PERMISSION_EXCEPTION", e);
+                failScan("PERMISSION_DENIED", e.getMessage());
+            } catch (Exception e) {
+                Log.e(TAG, "SCAN_EXCEPTION", e);
+                failScan("SCAN_ERROR", e.getMessage() != null ? e.getMessage() : "Error desconocido");
+            }
+        };
+        Log.d(TAG, "SCAN_SCHEDULED delayMs=800");
+        handler.postDelayed(pendingScanStart, 800);
+    }
+
+    private boolean hasPermission(String permission) {
+        return Build.VERSION.SDK_INT < 23
+                || checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private void cancelPendingScanStart() {
+        if (pendingScanStart != null) {
+            handler.removeCallbacks(pendingScanStart);
+            pendingScanStart = null;
+        }
+    }
+
+    private void failScan(String code, String message) {
+        Log.e(TAG, "SCAN_FAILED code=" + code + " message=" + message);
+        cancelPendingScanStart();
+        handler.removeCallbacks(scanTimeout);
+        scanStarted = false;
+        if (scanResult == null) return;
+        MethodChannel.Result pending = scanResult;
+        scanResult = null;
+        pending.error(code, message, null);
     }
 
     @SuppressLint("MissingPermission")
@@ -343,6 +489,9 @@ public class MainActivity extends FlutterActivity {
         scanResult = null;
 
         handler.removeCallbacks(scanTimeout);
+        cancelPendingScanStart();
+        scanStarted = false;
+        Log.d(TAG, "SCAN_FINISHED found=" + discoveredDevices.size());
 
         try {
             List<Map<String, Object>> devices =
@@ -398,6 +547,7 @@ public class MainActivity extends FlutterActivity {
     @SuppressLint("MissingPermission")
     private List<Map<String, Object>> getBondedDevices() {
         BluetoothAdapter adapter = requireAdapter();
+        Log.d(TAG, "BONDED_DEVICES_REQUEST");
 
         List<Map<String, Object>> devices =
                 new ArrayList<>();
@@ -408,6 +558,7 @@ public class MainActivity extends FlutterActivity {
             devices.add(deviceToMap(device));
         }
 
+        Log.d(TAG, "BONDED_DEVICES_RESULT count=" + devices.size());
         return devices;
     }
 
@@ -420,7 +571,8 @@ public class MainActivity extends FlutterActivity {
             String address,
             MethodChannel.Result result
     ) {
-        checkScanPermission();
+        Log.d(TAG, "PAIR_REQUEST address=" + address);
+        checkConnectPermission();
 
         BluetoothAdapter adapter = requireAdapter();
 
@@ -439,6 +591,7 @@ public class MainActivity extends FlutterActivity {
         if (device.getBondState() ==
                 BluetoothDevice.BOND_BONDED) {
 
+            Log.d(TAG, "PAIR_ALREADY_BONDED address=" + address);
             result.success(deviceToMap(device));
             return;
         }
@@ -449,6 +602,7 @@ public class MainActivity extends FlutterActivity {
         pairingAddress = address;
 
         boolean started = device.createBond();
+        Log.d(TAG, "PAIR_CREATE_BOND_RESULT=" + started);
 
         if (!started) {
             finishPairError(
@@ -493,6 +647,7 @@ public class MainActivity extends FlutterActivity {
                 BluetoothDevice.BOND_NONE
         );
 
+        Log.d(TAG, "PAIR_BOND_STATE address=" + device.getAddress() + " state=" + state + " previous=" + previousState);
         if (state == BluetoothDevice.BOND_BONDED) {
 
             MethodChannel.Result pending = pairResult;
@@ -502,6 +657,7 @@ public class MainActivity extends FlutterActivity {
 
             handler.removeCallbacks(pairTimeout);
 
+            Log.d(TAG, "PAIR_SUCCESS address=" + device.getAddress());
             pending.success(deviceToMap(device));
 
         } else if (
@@ -530,6 +686,7 @@ public class MainActivity extends FlutterActivity {
 
         handler.removeCallbacks(pairTimeout);
 
+        Log.e(TAG, "PAIR_ERROR code=" + code + " message=" + message);
         pending.error(code, message, null);
     }
 
@@ -541,6 +698,7 @@ public class MainActivity extends FlutterActivity {
     private Map<String, Object> getDeviceDetails(
             String address
     ) {
+        Log.d(TAG, "DETAILS_REQUEST address=" + address);
         BluetoothAdapter adapter = requireAdapter();
 
         BluetoothDevice device =
@@ -621,6 +779,8 @@ public class MainActivity extends FlutterActivity {
 
         handler.removeCallbacks(scanTimeout);
         handler.removeCallbacks(pairTimeout);
+        cancelPendingScanStart();
+        scanStarted = false;
 
         stopDiscoverySafely();
 
@@ -656,3 +816,5 @@ public class MainActivity extends FlutterActivity {
         super.onDestroy();
     }
 }
+
+

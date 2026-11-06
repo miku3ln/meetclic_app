@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../../../shared/printer/bluetooth/bluetooth_permission_manager.dart';
 import '../../../../../../shared/printer/models/printer_device.dart';
 import '../../../../../../shared/printer/printer_service.dart';
 import '../../../../../../shared/printer/bluetooth/printer_discovery_manager.dart';
@@ -61,7 +62,34 @@ class _PosSettingsPrintersSectionState
   // INITIAL LOAD
   // ==========================================
 
+  Future<bool> _requestBluetoothPermissions() async {
+    if (!Platform.isAndroid) return false;
 
+    final androidInfo = await DeviceInfoPlugin().androidInfo;
+    final sdkInt = androidInfo.version.sdkInt;
+
+    debugPrint(
+      '[YapitaPrintersSection] BONDED_PERMISSION_CHECK sdk=$sdkInt',
+    );
+
+    // Android 10 y 11: los dispositivos ya emparejados
+    // no necesitan permiso de ubicación.
+    if (sdkInt < 31) {
+      debugPrint(
+        '[YapitaPrintersSection] BONDED_PERMISSION_LEGACY_OK',
+      );
+      return true;
+    }
+
+    // Android 12+: requiere BLUETOOTH_CONNECT.
+    final status = await Permission.bluetoothConnect.request();
+
+    debugPrint(
+      '[YapitaPrintersSection] BONDED_PERMISSION_RESULT $status',
+    );
+
+    return status.isGranted;
+  }
   Future<void> _loadInitial() async {
     if (_isLoading || _isSearching || _pairingAddress != null) {
       return;
@@ -336,27 +364,6 @@ class _PosSettingsPrintersSectionState
 // BLUETOOTH PERMISSIONS
 // ==========================================
 
-  Future<bool> _requestBluetoothPermissions() async {
-    if (!Platform.isAndroid) return false;
-
-    final androidInfo = await DeviceInfoPlugin().androidInfo;
-    final sdkInt = androidInfo.version.sdkInt;
-
-    final permissions = sdkInt >= 31
-        ? <Permission>[
-      Permission.bluetoothScan,
-      Permission.bluetoothConnect,
-    ]
-        : <Permission>[
-      Permission.locationWhenInUse,
-    ];
-
-    final statuses = await permissions.request();
-
-    return statuses.values.every(
-          (status) => status.isGranted,
-    );
-  }
   // ==========================================
   // HELPERS
   // ==========================================
