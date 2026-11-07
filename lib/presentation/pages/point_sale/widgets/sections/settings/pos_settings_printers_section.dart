@@ -1,4 +1,20 @@
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../../../shared/printer/bluetooth/bluetooth_permission_manager.dart';
+import '../../../../../../shared/printer/cpcl/cpcl_receipt_util.dart';
+import '../../../../../../shared/printer/models/printer_device.dart';
+import '../../../../../../shared/printer/printer_service.dart';
+import '../../../../../../shared/printer/bluetooth/printer_discovery_manager.dart';
+import '../../../../../widgets/empty_data.dart';
+
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
@@ -29,6 +45,7 @@ class PosSettingsPrintersSection extends StatefulWidget {
 class _PosSettingsPrintersSectionState
     extends State<PosSettingsPrintersSection> {
   late final PrinterDiscoveryManager _manager;
+  static const MethodChannel _printerChannel = MethodChannel("pos/printer_bluetooth_classic");
 
   int _selectedPrinterTab = 0;
 
@@ -181,17 +198,13 @@ class _PosSettingsPrintersSectionState
     });
 
     try {
-      final granted = await _requestBluetoothPermissions();
-
-      if (!mounted || !granted) {
-        if (mounted) {
-          _showError(
-            'Debes autorizar Bluetooth para buscar dispositivos.',
-          );
-        }
+      debugPrint('[YapitaPrintersSection] SEARCH_REQUEST');
+      final ready = await BluetoothPermissionManager.ensureReadyForScan(context);
+      if (!mounted || !ready) {
+        debugPrint('[YapitaPrintersSection] SEARCH_NOT_READY');
         return;
       }
-
+      debugPrint('[YapitaPrintersSection] SCAN_START');
       final found = await _manager.scan();
       final bonded = await _manager.getBondedDevices();
       final saved = await _manager.loadSaved();
@@ -270,75 +283,465 @@ class _PosSettingsPrintersSectionState
   // DETAILS
   // ==========================================
 
+
   Future<void> _showDetails(PrinterDevice device) async {
-    if (_isSearching || _isLoading || _pairingAddress != null) {
-      return;
-    }
+    if (_isSearching || _isLoading || _pairingAddress != null) return;
+
+    debugPrint('[YapitaPrintersSection] DETAILS_REQUEST');
 
     try {
       final details = await _manager.getDetails(device);
-
       if (!mounted) return;
 
-      showModalBottomSheet<void>(
-        context: context,
-        isScrollControlled: true,
-        showDragHandle: true,
-        builder: (context) {
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    details.name,
-                    style: Theme.of(context)
-                        .textTheme
-                        .titleLarge,
+      bool printing = false;
+      String selectedProtocol = 'CPCL';
+      final textController = TextEditingController(text: 'Hola Yapitas');
+
+      // ==========================================
+      // GENERAR COMANDOS SEGÚN EL PROTOCOLO
+      // ==========================================
+
+      Uint8List buildPrintData(String protocol, String text) {
+        // ASCII para las pruebas iniciales.
+        final safeText = text
+            .replaceAll(RegExp(r'[^\x20-\x7E]'), '?')
+            .replaceAll('"', "'")
+            .replaceAll('\r', ' ')
+            .replaceAll('\n', ' ');
+
+        switch (protocol) {
+          case 'TSPL':
+            final command = [
+              'SIZE 50 mm,30 mm',
+              'GAP 2 mm,0 mm',
+              'DENSITY 10',
+              'DIRECTION 1',
+              'CLS',
+              'BAR 20,20,300,100',
+              'PRINT 1,1',
+              '',
+            ].join('\r\n');
+
+            return Uint8List.fromList(ascii.encode(command));
+          case 'CPCL':
+            return CpclReceiptUtil.buildReceipt(
+              profile: CpclPrinterProfile.model608L80D,
+              receipt: CpclReceiptData(
+                businessName: 'TRECE',
+                businessCategory: 'COMIDA RAPIDA',
+                address: 'Otavalo - Ecuador',
+                phone: '099 999 9999',
+                ticketNumber: '0001',
+                issuedAt: DateTime.now(),
+                items: const [
+                  CpclReceiptItem(
+                    code: '001',
+                    name: 'Hamburguesa',
+                    quantity: 2,
+                    unitPriceCents: 350,
                   ),
-                  const SizedBox(height: 16),
-                  _detailRow('Dirección', details.address),
-                  _detailRow(
-                    'Tipo',
-                    _bluetoothTypeLabel(details.bluetoothType),
+                  CpclReceiptItem(
+                    code: '002',
+                    name: 'Papas fritas',
+                    quantity: 1,
+                    unitPriceCents: 200,
                   ),
-                  _detailRow(
-                    'Emparejado',
-                    details.bonded ? 'Sí' : 'No',
+                  CpclReceiptItem(
+                    code: '003',
+                    name: 'Hot dog',
+                    quantity: 1,
+                    unitPriceCents: 250,
                   ),
-                  _detailRow(
-                    'Conectado',
-                    details.connected ? 'Sí' : 'No',
+                  CpclReceiptItem(
+                    code: '004',
+                    name: 'Gaseosa',
+                    quantity: 2,
+                    unitPriceCents: 100,
                   ),
-                  _detailRow(
-                    'Clase',
-                    details.deviceClass?.toString() ??
-                        'No disponible',
-                  ),
-                  _detailRow(
-                    'RSSI',
-                    details.rssi != null
-                        ? '${details.rssi} dBm'
-                        : 'No disponible',
-                  ),
-                  _detailRow(
-                    'Última detección',
-                    details.lastSeen?.toLocal().toString() ??
-                        'Sin información',
-                  ),
-                  const SizedBox(height: 16),
                 ],
+                amountPaidCents: 2000,
               ),
-            ),
-          );
-        },
-      );
-    } catch (e) {
-      _showError(e);
+            );
+          case 'ESC/POS':
+            return Uint8List.fromList([
+              0x1B, 0x40, // Inicializar
+              0x1B, 0x61, 0x01, // Centrar
+              ...ascii.encode(safeText),
+              0x0A, 0x0A, 0x0A,
+            ]);
+
+          default:
+            throw ArgumentError('Protocolo no soportado: $protocol');
+        }
+      }
+
+      try {
+        await showModalBottomSheet<void>(
+          context: context,
+          isScrollControlled: true,
+          showDragHandle: true,
+          builder: (sheetContext) => StatefulBuilder(
+            builder: (sheetContext, updateSheet) {
+              // ==========================================
+              // IMPRIMIR PRUEBA
+              // ==========================================
+
+              Future<void> printTest() async {
+                if (printing) return;
+
+                final text = textController.text.trim();
+
+                if (text.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Ingresa un texto para imprimir.'),
+                    ),
+                  );
+                  return;
+                }
+
+                updateSheet(() => printing = true);
+
+                try {
+                  final granted = await _requestBluetoothPermissions();
+
+                  if (!granted) {
+                    throw PlatformException(
+                      code: 'PERMISSION_DENIED',
+                      message: 'Falta permiso para conectar por Bluetooth',
+                    );
+                  }
+
+                  final protocol = selectedProtocol;
+                  final data = buildPrintData(protocol, text);
+
+                  debugPrint(
+                    '[YapitaPrintersSection] PRINT_TEST_REQUEST '
+                        'protocol=$protocol bytes=${data.length}',
+                  );
+
+                  debugPrint(
+                    '[YapitaPrintersSection] PRINT_TEXT=$text',
+                  );
+
+                  debugPrint(
+                    '[YapitaPrintersSection] PRINT_HEX='
+                        '${data.map((b) => b.toRadixString(16).padLeft(2, '0')).join(' ')}',
+                  );
+
+                  final success = await _printerChannel.invokeMethod<bool>(
+                    'printTest',
+                    {
+                      'address': details.address,
+                      'protocol': protocol,
+                      'data': data,
+                    },
+                  );
+
+                  debugPrint(
+                    '[YapitaPrintersSection] PRINT_TEST_RESULT=$success',
+                  );
+
+                  if (!mounted || !sheetContext.mounted) return;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        success == true
+                            ? 'Datos $protocol enviados. Comprueba la impresión.'
+                            : 'No se pudo completar el envío.',
+                      ),
+                    ),
+                  );
+                } catch (e, stack) {
+                  debugPrint(
+                    '[YapitaPrintersSection] PRINT_TEST_ERROR: $e',
+                  );
+                  debugPrintStack(stackTrace: stack);
+
+                  if (mounted) _showError(e);
+                } finally {
+                  if (sheetContext.mounted) {
+                    updateSheet(() => printing = false);
+                  }
+                }
+              }
+
+              // ==========================================
+              // ELIMINAR EMPAREJAMIENTO
+              // ==========================================
+
+              Future<void> openForgetSettings() async {
+                final confirmed = await showDialog<bool>(
+                  context: sheetContext,
+                  builder: (dialogContext) => AlertDialog(
+                    title: const Text('Eliminar emparejamiento'),
+                    content: const Text(
+                      'Android administra los dispositivos sincronizados. '
+                          'Abre sus ajustes y pulsa Olvidar en la impresora.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () =>
+                            Navigator.pop(dialogContext, false),
+                        child: const Text('Cancelar'),
+                      ),
+                      FilledButton(
+                        onPressed: () =>
+                            Navigator.pop(dialogContext, true),
+                        child: const Text('Abrir ajustes'),
+                      ),
+                    ],
+                  ),
+                );
+
+                if (confirmed != true || !sheetContext.mounted) return;
+
+                debugPrint(
+                  '[YapitaPrintersSection] OPEN_BLUETOOTH_SETTINGS_FOR_FORGET',
+                );
+
+                try {
+                  await _printerChannel.invokeMethod(
+                    'openBluetoothSettings',
+                  );
+
+                  if (sheetContext.mounted) {
+                    Navigator.pop(sheetContext);
+                  }
+                } catch (e, stack) {
+                  debugPrint(
+                    '[YapitaPrintersSection] OPEN_SETTINGS_ERROR: $e',
+                  );
+                  debugPrintStack(stackTrace: stack);
+
+                  if (mounted) _showError(e);
+                }
+              }
+
+              final canPrint = details.bonded &&
+                  details.bluetoothType == PrinterBluetoothType.classic;
+
+              // ==========================================
+              // INTERFAZ DE DETALLES
+              // ==========================================
+
+              return SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(
+                    20,
+                    12,
+                    20,
+                    MediaQuery.of(sheetContext).viewInsets.bottom + 24,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Center(
+                          child: Icon(
+                            Icons.print,
+                            size: 64,
+                            color: Theme.of(sheetContext)
+                                .colorScheme
+                                .primary,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+
+                        Center(
+                          child: Text(
+                            details.name,
+                            textAlign: TextAlign.center,
+                            style: Theme.of(sheetContext)
+                                .textTheme
+                                .titleLarge,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+
+                        Center(
+                          child: Text(
+                            details.bonded
+                                ? 'Dispositivo sincronizado'
+                                : 'Dispositivo no emparejado',
+                          ),
+                        ),
+
+                        const Divider(height: 32),
+
+                        _detailRow('Dirección', details.address),
+                        _detailRow(
+                          'Tipo',
+                          _bluetoothTypeLabel(details.bluetoothType),
+                        ),
+                        _detailRow(
+                          'Emparejado',
+                          details.bonded ? 'Sí' : 'No',
+                        ),
+                        _detailRow(
+                          'Conectado',
+                          details.connected ? 'Sí' : 'No',
+                        ),
+                        _detailRow(
+                          'Clase',
+                          details.deviceClass?.toString() ??
+                              'No disponible',
+                        ),
+                        _detailRow(
+                          'RSSI',
+                          details.rssi == null
+                              ? 'No disponible'
+                              : '${details.rssi} dBm',
+                        ),
+                        _detailRow(
+                          'Última detección',
+                          details.lastSeen?.toLocal().toString() ??
+                              'Sin información',
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        // ==========================================
+                        // SELECCIONAR PROTOCOLO
+                        // ==========================================
+
+                        Text(
+                          'Protocolo de impresión',
+                          style: Theme.of(sheetContext)
+                              .textTheme
+                              .titleMedium,
+                        ),
+                        const SizedBox(height: 8),
+
+                        DropdownButtonFormField<String>(
+                          value: selectedProtocol,
+                          decoration: const InputDecoration(
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.settings_input_component),
+                          ),
+                          items: const [
+                            DropdownMenuItem(
+                              value: 'TSPL',
+                              child: Text('TSPL - Etiquetas'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'CPCL',
+                              child: Text('CPCL - Etiquetas portátiles'),
+                            ),
+                            DropdownMenuItem(
+                              value: 'ESC/POS',
+                              child: Text('ESC/POS - Tickets'),
+                            ),
+                          ],
+                          onChanged: printing
+                              ? null
+                              : (value) {
+                            if (value != null) {
+                              updateSheet(
+                                    () => selectedProtocol = value,
+                              );
+                            }
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        // ==========================================
+                        // TEXTO PERSONALIZADO
+                        // ==========================================
+
+                        TextField(
+                          controller: textController,
+                          enabled: !printing,
+                          maxLines: 2,
+                          maxLength: 100,
+                          decoration: const InputDecoration(
+                            labelText: 'Texto de prueba',
+                            hintText: 'Hola Yapitas',
+                            border: OutlineInputBorder(),
+                            prefixIcon: Icon(Icons.text_fields),
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        Text(
+                          selectedProtocol == 'TSPL'
+                              ? 'Prueba TSPL: etiqueta 50 × 30 mm, '
+                              'separación de 2 mm.'
+                              : selectedProtocol == 'CPCL'
+                              ? 'Prueba CPCL: etiqueta aproximada '
+                              'de 30 mm de alto a 203 DPI.'
+                              : 'Prueba ESC/POS: texto simple '
+                              'con avance de papel.',
+                          style: Theme.of(sheetContext).textTheme.bodySmall,
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: FilledButton.icon(
+                            onPressed:
+                            canPrint && !printing ? printTest : null,
+                            icon: printing
+                                ? const SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                              ),
+                            )
+                                : const Icon(Icons.receipt_long),
+                            label: Text(
+                              printing
+                                  ? 'Enviando impresión...'
+                                  : 'Imprimir prueba',
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 8),
+
+                        SizedBox(
+                          width: double.infinity,
+                          child: OutlinedButton.icon(
+                            onPressed: printing || !details.bonded
+                                ? null
+                                : openForgetSettings,
+                            icon: const Icon(Icons.delete_outline),
+                            label: const Text('Eliminar emparejamiento'),
+                          ),
+                        ),
+
+                        const SizedBox(height: 12),
+
+                        const Text(
+                          'Prueba un protocolo a la vez y comprueba '
+                              'si la impresora imprime correctamente. '
+                              'El envío Bluetooth no garantiza que '
+                              'el papel se haya impreso.',
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      } finally {
+        textController.dispose();
+      }
+    } catch (e, stack) {
+      debugPrint('[YapitaPrintersSection] DETAILS_ERROR: $e');
+      debugPrintStack(stackTrace: stack);
+      if (mounted) _showError(e);
     }
   }
+
 
   Widget _detailRow(String label, String value) {
     return Padding(

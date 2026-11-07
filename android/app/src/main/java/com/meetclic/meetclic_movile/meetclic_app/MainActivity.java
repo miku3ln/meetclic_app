@@ -27,8 +27,16 @@ import java.util.Map;
 import io.flutter.embedding.android.FlutterActivity;
 import io.flutter.embedding.engine.FlutterEngine;
 import io.flutter.plugin.common.MethodChannel;
-
+import android.bluetooth.BluetoothSocket;
+import java.io.OutputStream;
+import java.io.IOException;
+import java.util.UUID;
+import java.nio.charset.StandardCharsets;
+import android.os.SystemClock;
 public class MainActivity extends FlutterActivity {
+    private static final UUID PRINTER_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+    private boolean printInProgress = false;
+
     private static final String TAG = "YapitaBluetooth";
     private static final String CHANNEL =
             "pos/printer_bluetooth_classic";
@@ -159,6 +167,35 @@ public class MainActivity extends FlutterActivity {
                         result.success(true);
                         break;
 
+                    case "printTest": {
+
+                        String address = call.argument("address");
+                        String protocol = call.argument("protocol");
+                        byte[] data = call.argument("data");
+
+                        Log.d(TAG, "METHOD_PRINT_TEST");
+                        Log.d(TAG, "PRINT_PROTOCOL=" + protocol);
+                        Log.d(TAG, "PRINT_DATA_LENGTH=" +
+                                (data == null ? 0 : data.length));
+
+                        if (address == null || address.trim().isEmpty()) {
+                            result.error(
+                                    "INVALID_ADDRESS",
+                                    "Dirección Bluetooth requerida",
+                                    null
+                            );
+                        } else if (data == null || data.length == 0) {
+                            result.error(
+                                    "EMPTY_DATA",
+                                    "No existen datos para imprimir",
+                                    null
+                            );
+                        } else {
+                            printTest(address, data, result);
+                        }
+
+                        break;
+                    }
                     case "scan":
                         startScan(result);
                         break;
@@ -541,6 +578,245 @@ public class MainActivity extends FlutterActivity {
     }
 
     // ==========================================
+    // PRINT TEST: BLUETOOTH CLASSIC / ESC-POS
+    // ==========================================
+
+    @SuppressLint("MissingPermission")
+    private void printTest(
+            String address,
+            byte[] data,
+            MethodChannel.Result result
+    ) {
+        Log.d(TAG, "========== PRINT REQUEST ==========");
+
+        // ==========================================
+        // 1. VALIDAR DATOS
+        // ==========================================
+
+        if (data == null || data.length == 0) {
+            Log.e(TAG, "PRINT_EMPTY_DATA");
+            result.error(
+                    "EMPTY_DATA",
+                    "No existen datos para imprimir",
+                    null
+            );
+            return;
+        }
+
+        if (address == null || address.trim().isEmpty()) {
+            Log.e(TAG, "PRINT_INVALID_ADDRESS");
+            result.error(
+                    "INVALID_ADDRESS",
+                    "Dirección Bluetooth requerida",
+                    null
+            );
+            return;
+        }
+
+        try {
+            checkConnectPermission();
+
+            BluetoothAdapter adapter = requireAdapter();
+
+            // ==========================================
+            // 2. VERIFICAR OPERACIONES ACTIVAS
+            // ==========================================
+
+            if (printInProgress || scanResult != null || pairResult != null) {
+                Log.w(TAG, "PRINT_BUSY");
+
+                result.error(
+                        "BLUETOOTH_BUSY",
+                        "Hay otra operación Bluetooth activa",
+                        null
+                );
+                return;
+            }
+
+            // ==========================================
+            // 3. OBTENER DISPOSITIVO
+            // ==========================================
+
+            BluetoothDevice device = adapter.getRemoteDevice(address);
+
+            Log.d(TAG, "PRINT_ADDRESS=" + address);
+            Log.d(TAG, "PRINT_DEVICE=" + device.getName());
+            Log.d(TAG, "PRINT_BOND_STATE=" + device.getBondState());
+
+            if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
+                Log.e(TAG, "PRINT_NOT_BONDED");
+
+                result.error(
+                        "NOT_BONDED",
+                        "La impresora no está emparejada",
+                        null
+                );
+                return;
+            }
+
+            // ==========================================
+            // 4. PREPARAR IMPRESIÓN
+            // ==========================================
+
+            printInProgress = true;
+            stopDiscoverySafely();
+
+            Log.d(TAG, "PRINT_PAYLOAD_LENGTH=" + data.length);
+            Log.d(TAG, "PRINT_HEX=" + bytesToHex(data));
+
+            // ==========================================
+            // 5. EJECUTAR EN HILO SECUNDARIO
+            // ==========================================
+
+            new Thread(() -> {
+
+                BluetoothSocket socket = null;
+                boolean success = false;
+                String errorMessage = null;
+
+                long startTime = SystemClock.elapsedRealtime();
+
+                try {
+                    Log.d(TAG, "PRINT_CONNECT_START");
+
+                    // ==========================================
+                    // CONECTAR POR BLUETOOTH CLASSIC
+                    // ==========================================
+
+                    socket = device.createRfcommSocketToServiceRecord(
+                            PRINTER_SPP_UUID
+                    );
+
+                    Log.d(TAG, "PRINT_SOCKET_CREATED");
+
+                    socket.connect();
+
+                    Log.d(
+                            TAG,
+                            "PRINT_CONNECTED=" + socket.isConnected()
+                    );
+
+                    Log.d(
+                            TAG,
+                            "PRINT_CONNECT_TIME_MS=" +
+                                    (SystemClock.elapsedRealtime() - startTime)
+                    );
+
+                    // ==========================================
+                    // OBTENER CANAL DE ESCRITURA
+                    // ==========================================
+
+                    OutputStream stream = socket.getOutputStream();
+
+                    // ==========================================
+                    // ENVIAR BYTES RECIBIDOS DESDE FLUTTER
+                    // ==========================================
+
+                    Log.d(TAG, "PRINT_WRITE_START");
+                    Log.d(TAG, "PRINT_BYTES_TO_SEND=" + data.length);
+
+                    stream.write(data);
+                    stream.flush();
+
+                    Log.d(
+                            TAG,
+                            "PRINT_WRITE_OK bytes=" + data.length
+                    );
+
+                    // Espera diagnóstica antes de cerrar.
+                    Thread.sleep(1000);
+
+                    Log.d(TAG, "PRINT_WAIT_COMPLETED");
+
+                    // Confirma envío local, no impresión física.
+                    success = true;
+
+                } catch (Exception e) {
+
+                    Log.e(TAG, "PRINT_FAILED", e);
+
+                    errorMessage = e.getMessage() != null
+                            ? e.getMessage()
+                            : "No se pudieron enviar los datos";
+
+                } finally {
+
+                    // ==========================================
+                    // CERRAR CONEXIÓN
+                    // ==========================================
+
+                    if (socket != null) {
+                        try {
+                            socket.close();
+                            Log.d(TAG, "PRINT_SOCKET_CLOSED");
+
+                        } catch (IOException e) {
+                            Log.w(TAG, "PRINT_CLOSE_FAILED", e);
+                        }
+                    }
+
+                    Log.d(
+                            TAG,
+                            "PRINT_TOTAL_TIME_MS=" +
+                                    (SystemClock.elapsedRealtime() - startTime)
+                    );
+
+                    Log.d(TAG, "PRINT_SUCCESS=" + success);
+                    Log.d(TAG, "========== PRINT END ==========");
+
+                    final boolean sent = success;
+                    final String message = errorMessage;
+
+                    // ==========================================
+                    // RESPONDER A FLUTTER
+                    // ==========================================
+
+                    handler.post(() -> {
+
+                        printInProgress = false;
+
+                        if (sent) {
+                            result.success(true);
+                        } else {
+                            result.error(
+                                    "PRINT_FAILED",
+                                    message,
+                                    null
+                            );
+                        }
+                    });
+                }
+
+            }, "YapitaPrintTest").start();
+
+        } catch (Exception e) {
+
+            printInProgress = false;
+
+            Log.e(TAG, "PRINT_SETUP_FAILED", e);
+
+            result.error(
+                    "PRINT_SETUP_FAILED",
+                    e.getMessage(),
+                    null
+            );
+        }
+    }
+
+    private String bytesToHex(byte[] data) {
+        if (data == null || data.length == 0) {
+            return "";
+        }
+
+        StringBuilder hex = new StringBuilder();
+
+        for (byte value : data) {
+            hex.append(String.format("%02X ", value & 0xFF));
+        }
+
+        return hex.toString().trim();
+    }
+    // ==========================================
     // BONDED DEVICES
     // ==========================================
 
@@ -816,5 +1092,6 @@ public class MainActivity extends FlutterActivity {
         super.onDestroy();
     }
 }
+
 
 
